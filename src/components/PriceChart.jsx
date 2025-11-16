@@ -32,28 +32,22 @@ export default function PriceChart({ pairAddress }) {
       const query = gql`
         query ($pairAddress: String!) {
           pool(id: $pairAddress) {
-            token0Price
             token1Price
-            volumeUSD
           }
         }
       `;
 
       try {
         const response = await request(UNISWAP_SUBGRAPH_URL, query, { pairAddress: pairAddress.toLowerCase() });
-        // transformăm datele într-un array pentru grafic
-        const chartData = [
-          { time: new Date().toLocaleTimeString(), price: parseFloat(response.pool.token1Price) }
-        ];
-        setData(chartData);
+        const chartData = [...data, { time: new Date().toLocaleTimeString(), price: parseFloat(response.pool.token1Price) }];
+        setData(chartData.slice(-20)); // ultimele 20 puncte
       } catch (err) {
         console.error(err);
       }
     }
 
     fetchData();
-    const interval = setInterval(fetchData, 60000); // update la fiecare 60 secunde
-
+    const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
   }, [pairAddress]);
 
@@ -63,8 +57,8 @@ export default function PriceChart({ pairAddress }) {
       {
         label: 'STBYT Price (USD)',
         data: data.map(d => d.price),
-        borderColor: 'rgba(255, 255, 255, 0.8)',
-        backgroundColor: 'rgba(155, 48, 255, 0.5)',
+        borderColor: 'rgba(255,255,255,0.8)',
+        backgroundColor: 'rgba(155,48,255,0.5)',
         tension: 0.3,
       }
     ]
@@ -74,11 +68,7 @@ export default function PriceChart({ pairAddress }) {
     responsive: true,
     plugins: {
       legend: { labels: { color: 'white' } },
-      title: {
-        display: true,
-        text: 'StancuBYT Price Chart (Live)',
-        color: 'white'
-      }
+      title: { display: true, text: 'StancuBYT Live Price', color: 'white' }
     },
     scales: {
       x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.2)' } },

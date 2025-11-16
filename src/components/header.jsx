@@ -1,18 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
-export default function Header({ showLogo }) {
+export default function Header() {
   return (
-    <header>
-      {showLogo && <img src={logo} alt="StancuBYT Logo" className="logo" />}
-      <nav>
-        <Link to="/">Home</Link> | 
-        <Link to="/about">About</Link> | 
-        <Link to="/roadmap">Roadmap</Link> | 
-        <Link to="/team">Team</Link> | 
-        <Link to="/whitepaper">Whitepaper</Link>
-      </nav>
+    <header style={{
+      display: 'flex',
+      alignItems: 'center',
+      padding: '20px',
+      background: 'linear-gradient(90deg, #4b00ff, #8e2de2)',
+      color: 'white'
+    }}>
+      <img src={logo} alt="StancuBYT Logo" style={{ width: '50px', marginRight: '20px' }} />
+      <h1>StancuBYT Official</h1>
     </header>
   );
 }
