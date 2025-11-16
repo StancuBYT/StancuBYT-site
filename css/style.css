@@ -61,6 +61,32 @@ body::before{
 .buy-btn:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(212,175,55,0.22)}
 .buy-logo{width:28px;height:28px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
 
+/* Fundal cu logo pe toate paginile */
+body {
+    background-image: url("img/logo.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: 450px;
+    opacity: 1;
+}
+
+/* Stil pentru antet prima pagină */
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 30px;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 2px solid #ffd700;
+    backdrop-filter: blur(6px);
+}
+
+.header-logo {
+    height: 70px;
+    width: auto;
+}
+
 /* stats */
 .stat-grid{display:flex;gap:12px;flex-wrap:wrap}
 .stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;text-align:center;min-width:110px}
