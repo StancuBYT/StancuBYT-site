@@ -125,16 +125,41 @@ body {
 }
 .logo.animate{animation:logo-rock 8s ease-in-out infinite}
 body {
+  /* Gradient purpuriu */
+  background: linear-gradient(135deg, #6a0dad, #9b30ff);
+  color: white; /* Text alb pentru vizibilitate */
+  font-family: Arial, sans-serif;
   min-height: 100vh;
   margin: 0;
-  font-family: Arial, sans-serif;
-  color: white;
-  background: linear-gradient(135deg, #6a0dad, #9b30ff); /* gradient purpuriu */
-  background-image: url('/src/assets/logo.png'); /* logo watermark */
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 150px; /* ajustează dimensiunea logo-ului */
-  background-blend-mode: overlay; /* logo subtil pe fundal */
+  padding: 0;
+  background-attachment: fixed; /* Fundal fix */
+  background-size: cover;
 }
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/img/logo.png') no-repeat center center;
+  background-size: 200px 200px; /* Poți ajusta dimensiunea */
+  opacity: 0.05; /* Logo foarte subtil */
+  pointer-events: none; /* Nu interferează cu click-urile */
+  z-index: -1;
+}
+header.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+}
+
+.logo-header {
+  width: 80px; /* Dimensiune logo în antet */
+  height: auto;
+}
+
 
 
