@@ -1,23 +1,26 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import logo from "../assets/logo.png";
 
-export default function Header(){
+const Header = () => {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
-    <header className="header container">
-      <img src="/logo.svg" alt="logo" className="logo" />
-      <div>
-        <div className="h1">StancuBYT (STBYT)</div>
-        <div className="small">Token oficial al comunității StancuBYT</div>
-      </div>
-
-      <nav className="nav" aria-label="main navigation">
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/about">About</NavLink>
-        <NavLink to="/roadmap">Roadmap</NavLink>
-        <NavLink to="/team">Team</NavLink>
-        <NavLink to="/whitepaper">Whitepaper</NavLink>
+    <header className="flex items-center justify-between p-4">
+      {isHome && <img src={logo} alt="StancuBYT Logo" className="h-16" />}
+      <nav>
+        <ul className="flex gap-4 text-white font-semibold">
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/about">About</Link></li>
+          <li><Link to="/roadmap">Roadmap</Link></li>
+          <li><Link to="/team">Team</Link></li>
+          <li><Link to="/whitepaper">Whitepaper</Link></li>
+        </ul>
       </nav>
     </header>
-  )
-}
+  );
+};
+
+export default Header;
 
