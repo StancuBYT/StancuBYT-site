@@ -1,4 +1,4 @@
-<div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-900 text-white bg-[url('/src/assets/logo.png')] bg-center bg-no-repeat bg-opacity-10">
+<div className="min-h-screen bg-gradient-to-br from-purple-700 to-purple-400 text-white bg-[url('/src/assets/logo.png')] bg-center bg-no-repeat bg-opacity-10">
   <Header />
   <Routes>
     <Route path="/" element={<Home />} />

@@ -125,11 +125,16 @@ body {
 }
 .logo.animate{animation:logo-rock 8s ease-in-out infinite}
 body {
-    background: linear-gradient(135deg, #4b6cb7, #182848); /* albastru spre purpuriu */
-    color: white; /* text alb pentru contrast */
-    min-height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: white;
+  background: linear-gradient(135deg, #6a0dad, #9b30ff); /* gradient purpuriu */
+  background-image: url('/src/assets/logo.png'); /* logo watermark */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 150px; /* ajustează dimensiunea logo-ului */
+  background-blend-mode: overlay; /* logo subtil pe fundal */
 }
 
 
