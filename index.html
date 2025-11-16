@@ -1,21 +1,110 @@
 <!DOCTYPE html>
 <html lang="ro">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StancuBYT</title>
-    <link rel="icon" type="image/png" href="/logo.png" />
-    
-    <!-- Open Graph pentru social media -->
-    <meta property="og:title" content="StancuBYT" />
-    <meta property="og:description" content="Viitorul schimbului de valori digitale." />
-    <meta property="og:image" content="/logo.png" />
-    <meta name="theme-color" content="#0b0e13" />
-    <script type="module" crossorigin src="/StancuBYT-site/assets/index-DVLZ_8Cw.js"></script>
-    <link rel="stylesheet" crossorigin href="/StancuBYT-site/assets/index-BOny3_iv.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StancuBYT (SBYT) - Home</title>
+  <meta name="description" content="StancuBYT — tokenul comunității StancuBYT. Contract: 0x44Cf220399be798baeaE45fd7C4fF44623713833" />
+  <link rel="stylesheet" crossorigin href="/StancuBYT-site/assets/index-CALTJ7a8.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar container">
+      <a class="brand" href="index.html">
+        <img src="/StancuBYT-site/assets/logo-C10ZatD7.png" alt="SBYT logo" class="logo" id="site-logo">
+        <span class="brand-text">StancuBYT</span>
+      </a>
+
+      <ul class="nav">
+        <li><a href="index.html">Acasă</a></li>
+        <li><a href="about.html">Despre</a></li>
+        <li><a href="tokenomics.html">Tokenomics</a></li>
+        <li><a href="roadmap.html" style="display:none">Roadmap</a></li><!-- optional -->
+        <li><a href="team.html">Echipa</a></li>
+        <li><a href="whitepaper.html">Whitepaper</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero panel">
+      <div class="hero-left">
+        <h1 class="title">StancuBYT <span class="muted"> (SBYT)</span></h1>
+        <p class="lead">Tokenul oficial al comunității StancuBYT — rapid, sigur și construit pentru transparență.</p>
+
+        <div class="token-cards">
+          <div class="card">
+            <div class="card-title">Contract</div>
+            <div class="card-body code">0x44Cf220399be798baeaE45fd7C4fF44623713833</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Total supply</div>
+            <div class="card-body">4,000,000 SBYT</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Symbol</div>
+            <div class="card-body">SBYT</div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px">
+          <a class="buy-btn" id="buy-btn" href="https://app.uniswap.org/#/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank" rel="noreferrer">
+            <span id="buy-text">Cumpără Token Acum</span>
+            <img src="/StancuBYT-site/assets/logo-C10ZatD7.png" alt="logo-mini" class="buy-logo" id="buy-logo">
+          </a>
+        </div>
+
+        <div class="small muted" style="margin-top:12px">
+          <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">Vezi contractul pe Etherscan</a>
+        </div>
+      </div>
+
+      <div class="hero-right panel-dark">
+        <h3 class="section-title">Statistici token</h3>
+        <div class="stat-grid">
+          <div class="stat">
+            <div class="stat-value" id="sold-count">1,200,000</div>
+            <div class="stat-label">Vânduți</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="bought-count">800,000</div>
+            <div class="stat-label">Cumpărați</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="avail-count">2,000,000</div>
+            <div class="stat-label">Disponibili</div>
+          </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top:18px">Vizitatori</h3>
+        <div class="stat-grid">
+          <div class="stat">
+            <div class="stat-value" id="visitors">0</div>
+            <div class="stat-label">Vizitatori</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="online">0</div>
+            <div class="stat-label">Online</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="section-heading">Ce face StancuBYT?</h2>
+      <p class="small">STBYT este proiectat ca un token utilitar al comunității: tranzacții rapide, staking și integrare în DApps. Whitepaper-ul detaliază economia tokenului și planurile noastre de dezvoltare.</p>
+      <a class="secondary-btn" href="whitepaper.html">Citește Whitepaper</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div>© <span id="year"></span> StancuBYT · Contact: <a href="mailto:stancubyt@gmail.com">stancubyt@gmail.com</a></div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
 </html>
 
