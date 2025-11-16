@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-export default function Footer(){
+export default function Footer() {
   return (
-    <footer className="footer">
-      © {new Date().getFullYear()} StancuBYT · Contract: <code>0x44Cf220399be798baeaE45fd7C4fF44623713833</code> · <a href="mailto:stancubyt@gmail.com">stancubyt@gmail.com</a>
+    <footer style={{ textAlign: 'center', padding: '20px', marginTop: '50px' }}>
+      &copy; {new Date().getFullYear()} StancuBYT. All rights reserved.
     </footer>
-  )
+  );
 }
 

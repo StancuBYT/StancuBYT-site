@@ -1,26 +1,17 @@
-import React from "react";
-import TokenInfo from "../components/TokenInfo";
-import BuyButton from "../components/BuyButton";
+import React from 'react';
+import PriceChart from '../components/PriceChart';
 
-export default function Home(){
+export default function Home() {
+  const pairAddress = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4"; // adresa pair token/STBYT
+
   return (
-    <>
-      <section className="panel">
-        <h2 className="h1">Bine ai venit la StancuBYT</h2>
-        <p className="lead">StancuBYT (STBYT) — tokenul comunității. Supply limitat: 4.000.000.</p>
-        <TokenInfo />
-        <div style={{marginTop:16}}>
-          <BuyButton />
-        </div>
-      </section>
-
-      <section className="panel">
-        <h3 className="section-title">Scurtă descriere</h3>
-        <p className="small">
-          STBYT oferă tranzacții rapide, opțiuni pentru staking și integrare în aplicații descentralizate. Ne concentrăm pe transparență, securitate și creșterea comunității.
-        </p>
-      </section>
-    </>
-  )
+    <main style={{ padding: '50px', textAlign: 'center' }}>
+      <h1>StancuBYT - Token Oficial</h1>
+      <p>Tranzacții rapide și sigure pentru comunitatea noastră digitală.</p>
+      <div style={{ maxWidth: '800px', margin: '50px auto' }}>
+        <PriceChart pairAddress={pairAddress} />
+      </div>
+    </main>
+  );
 }
 

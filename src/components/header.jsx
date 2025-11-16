@@ -1,26 +1,19 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
-const Header = () => {
-  const location = useLocation();
-  const isHome = location.pathname === "/";
-
+export default function Header({ showLogo }) {
   return (
-    <header className="flex items-center justify-between p-4">
-      {isHome && <img src={logo} alt="StancuBYT Logo" className="h-16" />}
+    <header>
+      {showLogo && <img src={logo} alt="StancuBYT Logo" className="logo" />}
       <nav>
-        <ul className="flex gap-4 text-white font-semibold">
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/about">About</Link></li>
-          <li><Link to="/roadmap">Roadmap</Link></li>
-          <li><Link to="/team">Team</Link></li>
-          <li><Link to="/whitepaper">Whitepaper</Link></li>
-        </ul>
+        <Link to="/">Home</Link> | 
+        <Link to="/about">About</Link> | 
+        <Link to="/roadmap">Roadmap</Link> | 
+        <Link to="/team">Team</Link> | 
+        <Link to="/whitepaper">Whitepaper</Link>
       </nav>
     </header>
   );
-};
-
-export default Header;
+}
 

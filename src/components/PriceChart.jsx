@@ -1,134 +1,91 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
+import { Line } from 'react-chartjs-2';
+import { request, gql } from 'graphql-request';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  Title,
   Tooltip,
   Legend,
-  Title,
-  Filler,
-  TimeScale,
-} from "chart.js";
-import { Line } from "react-chartjs-2";
-import zoomPlugin from "chartjs-plugin-zoom";
+} from 'chart.js';
 
-// Înregistrăm toate modulele
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  Tooltip,
-  Legend,
   Title,
-  Filler,
-  TimeScale,
-  zoomPlugin
+  Tooltip,
+  Legend
 );
 
-const PriceChart = () => {
-  const chartRef = useRef(null);
+const UNISWAP_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3";
 
-  // Generăm date simulate pentru o lună
-  const generateData = () => {
-    const labels = [];
-    const prices = [];
-    let price = 1.0;
-    for (let i = 1; i <= 30; i++) {
-      labels.push(`2025-11-${i.toString().padStart(2, "0")}`);
-      price += (Math.random() - 0.5) * 0.1;
-      prices.push(price.toFixed(2));
+export default function PriceChart({ pairAddress }) {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const query = gql`
+        query ($pairAddress: String!) {
+          pool(id: $pairAddress) {
+            token0Price
+            token1Price
+            volumeUSD
+          }
+        }
+      `;
+
+      try {
+        const response = await request(UNISWAP_SUBGRAPH_URL, query, { pairAddress: pairAddress.toLowerCase() });
+        // transformăm datele într-un array pentru grafic
+        const chartData = [
+          { time: new Date().toLocaleTimeString(), price: parseFloat(response.pool.token1Price) }
+        ];
+        setData(chartData);
+      } catch (err) {
+        console.error(err);
+      }
     }
-    return { labels, prices };
-  };
 
-  const { labels, prices } = generateData();
+    fetchData();
+    const interval = setInterval(fetchData, 60000); // update la fiecare 60 secunde
 
-  const data = {
-    labels,
+    return () => clearInterval(interval);
+  }, [pairAddress]);
+
+  const chartData = {
+    labels: data.map(d => d.time),
     datasets: [
       {
-        label: "Preț SBYT",
-        data: prices,
-        borderColor: "#FFD700",
-        backgroundColor: "rgba(255, 215, 0, 0.15)",
-        fill: true,
-        tension: 0.35,
-        pointRadius: 3,
-        pointHoverRadius: 6,
-      },
-    ],
+        label: 'STBYT Price (USD)',
+        data: data.map(d => d.price),
+        borderColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: 'rgba(155, 48, 255, 0.5)',
+        tension: 0.3,
+      }
+    ]
   };
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        labels: { color: "#fff" },
-      },
+      legend: { labels: { color: 'white' } },
       title: {
         display: true,
-        text: "Evoluția prețului SBYT",
-        color: "#FFD700",
-        font: { size: 18 },
-      },
-      zoom: {
-        pan: { enabled: true, mode: "x" },
-        zoom: {
-          wheel: { enabled: true },
-          pinch: { enabled: true },
-          mode: "x",
-        },
-      },
+        text: 'StancuBYT Price Chart (Live)',
+        color: 'white'
+      }
     },
     scales: {
-      x: {
-        ticks: {
-          color: "#ddd",
-          maxRotation: 60,
-          minRotation: 0,
-          autoSkip: false, // afișează toate datele
-        },
-        grid: {
-          color: "rgba(255,255,255,0.1)",
-        },
-      },
-      y: {
-        ticks: {
-          color: "#ddd",
-        },
-        grid: {
-          color: "rgba(255,255,255,0.1)",
-        },
-      },
-    },
+      x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.2)' } },
+      y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.2)' } },
+    }
   };
 
-  useEffect(() => {
-    const chart = chartRef.current;
-    return () => chart && chart.destroy && chart.destroy();
-  }, []);
-
-  return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "1300px",
-        height: "400px",
-        background: "rgba(20, 25, 35, 0.85)",
-        borderRadius: "16px",
-        padding: "1.5rem",
-        boxShadow: "0 0 25px rgba(255,215,0,0.15)",
-        overflowX: "auto",
-      }}
-    >
-      <Line ref={chartRef} data={data} options={options} />
-    </div>
-  );
-};
-
-export default PriceChart;
+  return <Line data={chartData} options={options} />;
+}
 
