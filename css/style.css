@@ -124,4 +124,12 @@ body {
   100%{transform:rotateY(0deg)}
 }
 .logo.animate{animation:logo-rock 8s ease-in-out infinite}
+body {
+    background: linear-gradient(135deg, #4b6cb7, #182848); /* albastru spre purpuriu */
+    color: white; /* text alb pentru contrast */
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
 
