@@ -1,0 +1,158 @@
+/* ===== FUNDAL METALLIC ===== */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #0b0e13;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  color: #f5f5f5;
+}
+
+/* Fundal cu efect de valuri subtile */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-radial-gradient(circle at center, rgba(255,255,255,0.02) 0 2px, transparent 2px 10px);
+  animation: wave 15s linear infinite;
+  z-index: -1;
+  mix-blend-mode: overlay;
+}
+
+@keyframes wave {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(-50px) translateY(20px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+/* ===== Container ===== */
+.app-container {
+  background: rgba(20, 25, 35, 0.85); /* mai închis decât alb perlat */
+  backdrop-filter: blur(14px);
+  border-radius: 24px;
+  box-shadow: 0 0 35px rgba(255, 215, 0, 0.3);
+  padding: 2.5rem 4rem;
+  max-width: 1200px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  color: #f5f5f5; /* text deschis pentru contrast */
+}
+
+
+/* ===== Logo animat 3D ===== */
+.logo-animated {
+  width: 204px;
+  height: 204px;
+  object-fit: contain;
+  transform-style: preserve-3d;
+  animation: rotatePartial 8s ease-in-out infinite;
+}
+
+@keyframes rotatePartial {
+  0% { transform: rotateY(0deg); }
+  25% { transform: rotateY(60deg); }
+  50% { transform: rotateY(0deg); }
+  75% { transform: rotateY(-60deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+/* ===== Titlu și slogan ===== */
+h1.gold-text {
+  font-size: 3rem;
+  background: linear-gradient(90deg, #ffd700, #d4af37, #b8860b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px rgba(255,215,0,0.8);
+  transition: all 0.3s ease;
+}
+
+h1.gold-text:hover {
+  text-shadow: 0 0 20px rgba(255, 215, 0, 1);
+  transform: scale(1.05);
+}
+
+.slogan {
+  font-size: 1.3rem;
+  color: #fff8e1;
+  text-shadow: 0 0 5px rgba(0,0,0,0.6);
+}
+
+/* Buton cumparare token */
+.animated-buy-btn {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+  padding: 14px 28px;
+  border-radius: 36px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #0b0e13;
+  background: linear-gradient(90deg, #ffd700, #c5a100, #ffd700);
+  background-size: 200% 100%;
+  transition: all 0.4s ease;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  border: 2px solid rgba(255,215,0,0.6);
+}
+
+/* Glow / pulse pentru atenție */
+.animated-buy-btn:hover {
+  background-position: 100% 0;
+  transform: scale(1.08);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6);
+  border-color: #ffd700;
+}
+
+/* Logo care “bate” spre buton */
+.logo-pointer {
+  animation: pointerLogo 1.5s infinite alternate;
+}
+
+@keyframes pointerLogo {
+  0% { transform: rotateY(0deg) translateY(0px); }
+  50% { transform: rotateY(0deg) translateY(-10px) rotateZ(-5deg); }
+  100% { transform: rotateY(0deg) translateY(0px); }
+}
+
+
+/* ===== Token Stats ===== */
+.token-stats {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.token-card {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  min-width: 140px;
+  text-align: center;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+  font-weight: bold;
+}
+
+/* ===== Vizitatori / Online ===== */
+.visitor-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.visitor-card {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 1
+  }
+

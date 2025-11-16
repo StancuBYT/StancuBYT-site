@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* poți adăuga aici stiluri personalizate */
+body {
+  @apply bg-gray-900 text-white;
+}
+
