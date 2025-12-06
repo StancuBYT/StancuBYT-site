@@ -1,0 +1,10 @@
+{
+  "name": "stancubyt-vercel",
+  "version": "1.0.0",
+  "description": "StancuBYT Token Website cu API protejat",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
