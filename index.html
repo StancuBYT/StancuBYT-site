@@ -986,7 +986,7 @@
         </div>
     </section>
 
-    <!-- Contact Section - VERSIUNE PROFESIONALĂ -->
+    <!-- Contact Section - VERSIUNE PROFESIONALĂ CU EMAIL DIRECT -->
     <section id="contact" class="page-section">
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -1023,6 +1023,7 @@
                         <option value="investment">Oportunități de investiție</option>
                         <option value="listing">Listing pe exchange</option>
                         <option value="media">Interviu media</option>
+                        <option value="security">Securitate & Compliance</option>
                         <option value="other">Altceva</option>
                     </select>
                 </div>
@@ -1036,7 +1037,7 @@
                     <input type="checkbox" id="contactPrivacy" style="transform: scale(1.2);">
                     <label for="contactPrivacy" style="font-size: 0.9rem; opacity: 0.8;">
                         Sunt de acord cu prelucrarea datelor conform 
-                        <a href="#" style="color: var(--neon-cyan); text-decoration: none;">Politicii de confidențialitate</a>
+                        <a href="https://stancubyt.com/privacy" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Politicii de confidențialitate</a>
                     </label>
                 </div>
                 
@@ -1069,12 +1070,15 @@
                                 📧 contact@stancubyt.com
                             </a>
                         </p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+                            Pentru întrebări generale și suport
+                        </p>
                     </div>
                 </div>
 
                 <div style="margin-bottom: 2rem;">
                     <h4 style="color: var(--blue-tech); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5rem;">💼</span> Pentru parteneriate
+                        <span style="font-size: 1.5rem;">🤝</span> Pentru parteneriate
                     </h4>
                     <div class="contact-card partnership">
                         <p style="margin: 0.5rem 0;">
@@ -1083,7 +1087,7 @@
                             </a>
                         </p>
                         <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
-                            Răspuns în maxim 24h lucrătoare
+                            Colaborări, listing-uri, parteneriate
                         </p>
                     </div>
                 </div>
@@ -1707,7 +1711,7 @@
         }
 
         // =============================================
-        // FUNCȚII CONTACT PROFESIONALE
+        // FUNCȚII CONTACT - OPȚIUNEA 3 (EMAIL DIRECT)
         // =============================================
 
         // Funcție validare email
@@ -1736,7 +1740,35 @@
             }
         }
 
-        // Funcție îmbunătățită pentru contact
+        // Obține email-ul corect în funcție de tipul solicitării
+        function getEmailByType(type) {
+            const emailMap = {
+                'technical': 'contact@stancubyt.com',
+                'partnership': 'partnerships@stancubyt.com',
+                'investment': 'contact@stancubyt.com',
+                'listing': 'partnerships@stancubyt.com',
+                'media': 'contact@stancubyt.com',
+                'security': 'security@stancubyt.com',
+                'other': 'contact@stancubyt.com'
+            };
+            return emailMap[type] || 'contact@stancubyt.com';
+        }
+
+        // Obține eticheta pentru tipul solicitării
+        function getTypeLabel(type) {
+            const labelMap = {
+                'technical': 'Suport Tehnic',
+                'partnership': 'Parteneriat de Afaceri',
+                'investment': 'Oportunități de Investiție',
+                'listing': 'Listing pe Exchange',
+                'media': 'Interviu Media',
+                'security': 'Securitate & Compliance',
+                'other': 'Altceva'
+            };
+            return labelMap[type] || 'General';
+        }
+
+        // FUNCȚIA PRINCIPALĂ DE TRIMITERE EMAIL
         function sendContactMessage() {
             const name = document.getElementById('contactName').value.trim();
             const email = document.getElementById('contactEmail').value.trim();
@@ -1747,7 +1779,7 @@
             const submitBtn = document.getElementById('submitContactBtn');
             const statusDiv = document.getElementById('contactStatus');
 
-            // Validare
+            // VALIDARE
             if (!name || !email || !message) {
                 showContactStatus('⚠️ Vă rugăm completați toate câmpurile obligatorii!', 'error');
                 return;
@@ -1763,59 +1795,68 @@
                 return;
             }
 
-            // Set loading state
-            const originalContent = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span class="refresh-icon">⏳</span><span class="refresh-text">Se trimite...</span>';
-            submitBtn.classList.add('loading');
-            submitBtn.disabled = true;
+            // Obține detaliile pentru email
+            const toEmail = getEmailByType(type);
+            const typeLabel = getTypeLabel(type);
+            
+            // Construiește subiectul și conținutul emailului
+            const subject = `StancuBYT Contact: ${typeLabel} - ${name}`;
+            const body = `👤 Nume: ${name}
+📧 Email: ${email}
+🏷️ Tip solicitare: ${typeLabel}
 
-            // Simulare trimitere (în producție, înlocuiește cu API call real)
+📝 Mesaj:
+${message}
+
+---
+🌐 Trimis de pe: stancubyt.com/contact
+⏰ Data: ${new Date().toLocaleDateString('ro-RO')} ${new Date().toLocaleTimeString('ro-RO')}`;
+
+            // Deschide clientul de email
+            const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Setează loading state
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="refresh-icon">⏳</span><span class="refresh-text">Se deschide email...</span>';
+            
+            // Așteaptă puțin pentru efect vizual, apoi deschide email
             setTimeout(() => {
-                // Salvează în localStorage pentru demo
-                const contactData = {
-                    name: name,
-                    email: email,
-                    type: type,
-                    message: message,
-                    timestamp: new Date().toISOString()
-                };
+                window.location.href = mailtoLink;
                 
-                try {
-                    localStorage.setItem('stancubyt_contact_' + Date.now(), JSON.stringify(contactData));
-                    
-                    // Arată succes
-                    showContactStatus('✅ Solicitarea a fost trimisă cu succes! Vă vom contacta în curând.', 'success');
-                    
-                    // Reset form
+                // Arată mesajul de succes
+                showContactStatus('✅ Clientul de email a fost deschis! Completați și trimiteți mesajul.', 'success');
+                
+                // Reset buton după 2 secunde
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }, 2000);
+                
+                // Resetează formularul după 3 secunde
+                setTimeout(() => {
                     document.getElementById('contactName').value = '';
                     document.getElementById('contactEmail').value = '';
-                    document.getElementById('contactType').value = 'technical';
                     document.getElementById('contactMessage').value = '';
                     document.getElementById('contactPrivacy').checked = false;
-                    
-                    // Animare succes
-                    submitBtn.classList.remove('loading');
-                    submitBtn.classList.add('success');
-                    submitBtn.innerHTML = '<span class="refresh-icon">✅</span><span class="refresh-text">Trimis cu succes!</span>';
-                    
-                    // După 3 secunde, revine la normal
-                    setTimeout(() => {
-                        submitBtn.classList.remove('success');
-                        submitBtn.innerHTML = originalContent;
-                        submitBtn.disabled = false;
-                        statusDiv.innerHTML = '';
-                    }, 3000);
-                    
-                    // Logare pentru debugging
-                    console.log('📨 Contact form submitted:', contactData);
-                    
-                } catch (error) {
-                    showContactStatus('❌ A apărut o eroare. Încercați din nou sau trimiteți direct la contact@stancubyt.com', 'error');
-                    submitBtn.classList.remove('loading');
-                    submitBtn.innerHTML = originalContent;
-                    submitBtn.disabled = false;
+                    document.getElementById('contactType').value = 'technical';
+                }, 3000);
+                
+                // Salvează în localStorage pentru backup (opțional)
+                try {
+                    const contactData = {
+                        name: name,
+                        email: email,
+                        type: type,
+                        message: message,
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('stancubyt_last_contact', JSON.stringify(contactData));
+                } catch (e) {
+                    // Ignoră erori de localStorage
                 }
-            }, 1500);
+                
+            }, 500);
         }
 
         // =============================================
@@ -1857,6 +1898,18 @@
                     this.style.boxShadow = 'none';
                 });
             });
+            
+            // Încarcă ultimul contact din localStorage (opțional)
+            try {
+                const lastContact = localStorage.getItem('stancubyt_last_contact');
+                if (lastContact) {
+                    const data = JSON.parse(lastContact);
+                    // Poți folosi aceste date dacă vrei
+                    console.log('📧 Ultimul contact salvat:', data);
+                }
+            } catch (e) {
+                // Ignoră erori
+            }
         };
     </script>
 </body>
