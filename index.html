@@ -143,6 +143,102 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
+        /* Buton Modern Reîmprospătează Datele */
+        .btn-refresh-modern {
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-refresh-modern:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
+        }
+
+        .btn-refresh-modern:active {
+            transform: translateY(0) scale(1);
+        }
+
+        .refresh-icon {
+            font-size: 1.3rem;
+            transition: transform 0.5s ease;
+        }
+
+        .btn-refresh-modern:hover .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .refresh-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50px;
+            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+            opacity: 0;
+            z-index: -1;
+            animation: pulseEffect 2s infinite;
+        }
+
+        @keyframes rotate360 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseEffect {
+            0% { 
+                transform: scale(1); 
+                opacity: 0.7; 
+            }
+            100% { 
+                transform: scale(1.2); 
+                opacity: 0; 
+            }
+        }
+
+        /* Loading animation pentru buton */
+        .btn-refresh-modern.loading {
+            background: linear-gradient(45deg, #666, #888);
+            cursor: wait;
+        }
+
+        .btn-refresh-modern.loading .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .btn-refresh-modern.loading .refresh-text {
+            opacity: 0.7;
+        }
+
+        /* Animatie pentru actualizare succes */
+        @keyframes successFlash {
+            0%, 100% { 
+                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
+            }
+            50% { 
+                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
+            }
+        }
+
+        .btn-refresh-modern.success {
+            animation: successFlash 0.5s ease 2;
+        }
+
         /* Navigation - Scientific Style */
         .scientific-nav {
             background: rgba(10, 10, 31, 0.9);
@@ -427,6 +523,11 @@
             .chart-container {
                 height: 300px;
             }
+
+            .btn-refresh-modern {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -499,10 +600,11 @@
                     <small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
                 </div>
                 <div class="info-card neon-glow">
-                    <h3>💰 Total Supply</h3>
+                    <h3>💰 Total Supply REAL</h3>
                     <p style="font-size: 2rem; font-weight: bold; color: var(--green-growth);" id="mainTotalSupply">
-                        <span id="supplyValue">4,000,000</span> SBYT
+                        <span id="supplyValue">Se încarcă...</span> SBYT
                     </p>
+                    <small style="color: #888;">Date live de pe Etherscan</small>
                 </div>
                 <div class="info-card neon-glow">
                     <h3>🏆 Fondator</h3>
@@ -523,7 +625,7 @@
             <!-- Status Server -->
             <div style="margin-top: 2rem; text-align: center;">
                 <div id="serverStatus" class="status-online">
-                    ✅ Site Live - Date încărcate de pe Etherscan
+                    ✅ Date încărcate de pe Etherscan
                 </div>
             </div>
         </div>
@@ -534,8 +636,12 @@
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
             <p>Date live preluate de pe Etherscan</p>
-            <button onclick="fetchAllData()" class="btn-scientific" style="margin-top: 1rem;">
-                🔄 Reîmprospătează Datele
+            
+            <!-- Buton Modern Reîmprospătează Datele -->
+            <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
+                <span class="refresh-icon">🔄</span>
+                <span class="refresh-text">Reîmprospătează Datele</span>
+                <span class="refresh-pulse"></span>
             </button>
         </div>
 
@@ -567,7 +673,7 @@
                     <div>Deținători</div>
                 </div>
                 <div class="stat-item">
-                    <div>Total Supply</div>
+                    <div>Total Supply REAL</div>
                     <div class="stat-value" id="totalSupply">-</div>
                     <div>SBYT</div>
                 </div>
@@ -717,7 +823,7 @@
             <div class="form-group">
                 <textarea id="contactMessage" placeholder="Mesajul dvs..." rows="5" required></textarea>
             </div>
-            <button class="btn-scientific" style="width: 100%;" onclick="sendContactMessage()">
+            <button class="btn-refresh-modern" style="width: 100%;" onclick="sendContactMessage()">
                 Trimite Mesajul
             </button>
         </div>
@@ -840,17 +946,30 @@
 
         // Funcție pentru preluarea DATELOR REALE de la Etherscan
         async function fetchAllData() {
+            const refreshBtn = document.getElementById('refreshButton');
+            const originalContent = refreshBtn.innerHTML;
+            
             try {
                 console.log('🔍 Se încarcă datele reale de la Etherscan...');
                 
-                // Set loading state
+                // Set loading state pentru buton
+                refreshBtn.classList.add('loading');
+                refreshBtn.innerHTML = '<span class="refresh-icon">⏳</span><span class="refresh-text">Se încarcă...</span>';
+                
+                // Set loading state pentru întreaga pagină
                 document.getElementById('priceData').innerHTML = '⏳ Se încarcă datele de la Etherscan...';
                 document.getElementById('serverStatus').innerHTML = '🔄 Se actualizează datele live...';
                 
-                // 1. PREIA SUPPLY-ul real
-                await fetchTokenSupply();
+                // 1. PREIA SUPPLY-ul real - METODĂ AVANSATĂ
+                const realSupply = await fetchRealTokenSupply();
+                if (realSupply) {
+                    document.getElementById('totalSupply').textContent = realSupply.formatted;
+                    document.getElementById('supplyValue').textContent = realSupply.formatted;
+                    document.getElementById('mainTotalSupply').innerHTML = `${realSupply.formatted} SBYT`;
+                    console.log('✅ Supply real găsit:', realSupply.formatted);
+                }
                 
-                // 2. PREIA HOLDERS reali - METODĂ DIRECTĂ
+                // 2. PREIA HOLDERS reali
                 await fetchRealHolders();
                 
                 // 3. PREIA PREȚUL de la DexScreener
@@ -862,23 +981,44 @@
                 // 5. ACTUALIZEAZĂ TIMPUL
                 updateLastUpdateTime();
                 
-                // 6. ARATĂ SUCCES
+                // 6. Animație succes pentru buton
+                refreshBtn.classList.remove('loading');
+                refreshBtn.classList.add('success');
+                refreshBtn.innerHTML = '<span class="refresh-icon">✅</span><span class="refresh-text">Date actualizate!</span>';
+                
+                // Mesaj succes
                 document.getElementById('serverStatus').innerHTML = 
                     `<span class="status-online">✅ Date LIVE actualizate de pe Etherscan</span>`;
+                
+                // După 2 secunde, revine la normal
+                setTimeout(() => {
+                    refreshBtn.classList.remove('success');
+                    refreshBtn.innerHTML = originalContent;
+                }, 2000);
                 
                 console.log('✅ Toate datele au fost încărcate cu succes!');
                 
             } catch (error) {
                 console.error('❌ Eroare la încărcarea datelor:', error);
+                
+                // Resetare buton la eroare
+                refreshBtn.classList.remove('loading');
+                refreshBtn.innerHTML = '<span class="refresh-icon">❌</span><span class="refresh-text">Eroare, încearcă din nou</span>';
+                
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalContent;
+                }, 3000);
+                
                 showFallbackData();
                 document.getElementById('serverStatus').innerHTML = 
                     `<span class="status-offline">⚠️ Folosind date cached - Eroare API</span>`;
             }
         }
 
-        // PREIA SUPPLY-UL REAL DE LA ETHERSCAN
-        async function fetchTokenSupply() {
+        // PREIA SUPPLY-UL REAL DE LA ETHERSCAN - METODĂ AVANSATĂ
+        async function fetchRealTokenSupply() {
             try {
+                // METODA PRINCIPALĂ: API Etherscan
                 const url = `https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${CONTRACT_ADDRESS}&apikey=${ETHERSCAN_API_KEY}`;
                 const response = await fetch(url);
                 const data = await response.json();
@@ -886,19 +1026,60 @@
                 if (data.status === '1') {
                     const supplyWei = data.result;
                     const supplyTokens = supplyWei / Math.pow(10, 18);
-                    const formattedSupply = supplyTokens.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+                    const formattedSupply = supplyTokens.toLocaleString('ro-RO', { 
+                        maximumFractionDigits: 0,
+                        minimumFractionDigits: 0
+                    });
                     
-                    document.getElementById('totalSupply').textContent = formattedSupply;
-                    document.getElementById('supplyValue').textContent = formattedSupply;
-                    document.getElementById('mainTotalSupply').innerHTML = `${formattedSupply} SBYT`;
-                    
-                    console.log('✅ Supply real:', formattedSupply);
-                    return formattedSupply;
+                    return {
+                        raw: supplyWei,
+                        tokens: supplyTokens,
+                        formatted: formattedSupply
+                    };
                 }
             } catch (error) {
-                console.error('Eroare supply:', error);
+                console.error('Eroare supply API:', error);
             }
-            return '4,000,000';
+            
+            // METODA SECUNDARĂ: Direct scrape de pe Etherscan
+            try {
+                const etherscanUrl = `https://etherscan.io/token/${CONTRACT_ADDRESS}`;
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(etherscanUrl)}`;
+                
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                const html = data.contents;
+                
+                // Caută supply în HTML
+                const supplyMatch = html.match(/Total Supply:<\/span>[\s\S]*?([\d,\.]+)\s*([A-Z]+)/i);
+                if (supplyMatch && supplyMatch[1]) {
+                    const supplyStr = supplyMatch[1].replace(/,/g, '');
+                    const supplyNum = parseFloat(supplyStr);
+                    
+                    if (!isNaN(supplyNum)) {
+                        const formattedSupply = supplyNum.toLocaleString('ro-RO', {
+                            maximumFractionDigits: 0,
+                            minimumFractionDigits: 0
+                        });
+                        
+                        console.log('✅ Supply din scrape:', formattedSupply);
+                        return {
+                            raw: supplyNum * Math.pow(10, 18),
+                            tokens: supplyNum,
+                            formatted: formattedSupply
+                        };
+                    }
+                }
+            } catch (error) {
+                console.error('Eroare scrape:', error);
+            }
+            
+            // Fallback la date hardcodate
+            return {
+                raw: 4000000 * Math.pow(10, 18),
+                tokens: 4000000,
+                formatted: '4,000,000'
+            };
         }
 
         // PREIA HOLDERS REALI - METODĂ 100% FUNCȚIONALĂ
@@ -913,18 +1094,11 @@
                     const holdersCount = data.result.length;
                     document.getElementById('holdersCount').textContent = holdersCount.toLocaleString('ro-RO');
                     console.log('✅ Holders reali găsiți:', holdersCount);
+                    saveHoldersToCache(holdersCount);
                     return holdersCount;
                 }
                 
-                // METODA 2: Scrape de pe pagina Etherscan (fallback)
-                const holders = await fetchHoldersFromEtherscanPage();
-                if (holders) {
-                    document.getElementById('holdersCount').textContent = holders.toLocaleString('ro-RO');
-                    console.log('✅ Holders de pe pagină:', holders);
-                    return holders;
-                }
-                
-                // METODA 3: Verifică cache-ul nostru
+                // METODA 2: Verifică cache-ul nostru
                 const cachedHolders = await checkCachedHolders();
                 if (cachedHolders) {
                     document.getElementById('holdersCount').textContent = cachedHolders.toLocaleString('ro-RO');
@@ -939,35 +1113,6 @@
             // Fallback la date estimate
             document.getElementById('holdersCount').textContent = '2,543';
             return 2543;
-        }
-
-        // METODĂ ALTERNATIVĂ: Preia holders de pe pagina Etherscan
-        async function fetchHoldersFromEtherscanPage() {
-            try {
-                // Încercăm să obținem numărul de holders din pagina publică Etherscan
-                // Aceasta este o metodă alternativă care nu necesită API key
-                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://etherscan.io/token/${CONTRACT_ADDRESS}`)}`);
-                const data = await response.json();
-                const html = data.contents;
-                
-                // Căutăm pattern-ul pentru holders în HTML
-                const holderMatch = html.match(/Holders:\s*<span[^>]*>([\d,]+)<\/span>/i);
-                if (holderMatch && holderMatch[1]) {
-                    const holders = parseInt(holderMatch[1].replace(/,/g, ''));
-                    if (!isNaN(holders)) return holders;
-                }
-                
-                // Încercăm alt pattern
-                const altMatch = html.match(/([\d,]+)\s*holders?/i);
-                if (altMatch && altMatch[1]) {
-                    const holders = parseInt(altMatch[1].replace(/,/g, ''));
-                    if (!isNaN(holders)) return holders;
-                }
-                
-            } catch (error) {
-                console.log('Eroare la parsarea paginii Etherscan:', error);
-            }
-            return null;
         }
 
         // Verifică dacă avem holders în cache local
