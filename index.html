@@ -1177,6 +1177,31 @@
                 🔄 Tranzacționează pe Uniswap
             </a>
             
+            <div class="token-info-grid">
+                <div class="info-card neon-glow">
+                    <h3>🔗 Contract Address</h3>
+                    <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                       target="_blank" 
+                       style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;">
+                        0x44Cf220399be798baeaE45fd7C4fF44623713833
+                    </a>
+                    <small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
+                </div>
+                <div class="info-card neon-glow">
+                    <h3>💰 Total Supply REAL</h3>
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--green-growth);" id="mainTotalSupply">
+                        <span id="supplyValue">Se încarcă...</span> SBYT
+                    </p>
+                    <small style="color: #888;">Date live de pe Etherscan</small>
+                </div>
+                <div class="info-card neon-glow">
+                    <h3>🏆 Fondator</h3>
+                    <p style="font-size: 1.2rem; margin-top: 1rem;">
+                        Stancu Marian
+                    </p>
+                </div>
+            </div>
+
             <!-- SECTIUNE NOUTATI -->
             <div class="news-section">
                 <div class="news-header">
@@ -1184,8 +1209,8 @@
                         <span>📢</span> Noutăți & Anunțuri
                     </h2>
                     <div class="news-controls">
-                        <button class="news-btn" onclick="addNews()">➕ Adaugă știre</button>
-                        <button class="news-btn" onclick="clearNews()">🗑️ Șterge toate</button>
+                        <button class="news-btn" onclick="requestPassword('add')">➕ Adaugă știre</button>
+                        <button class="news-btn" onclick="requestPassword('clear')">🗑️ Șterge toate</button>
                     </div>
                 </div>
                 
@@ -1217,31 +1242,6 @@
                         <button class="news-btn" onclick="saveNews()">💾 Salvează</button>
                         <button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
                     </div>
-                </div>
-            </div>
-
-            <div class="token-info-grid">
-                <div class="info-card neon-glow">
-                    <h3>🔗 Contract Address</h3>
-                    <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
-                       target="_blank" 
-                       style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;">
-                        0x44Cf220399be798baeaE45fd7C4fF44623713833
-                    </a>
-                    <small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
-                </div>
-                <div class="info-card neon-glow">
-                    <h3>💰 Total Supply REAL</h3>
-                    <p style="font-size: 2rem; font-weight: bold; color: var(--green-growth);" id="mainTotalSupply">
-                        <span id="supplyValue">Se încarcă...</span> SBYT
-                    </p>
-                    <small style="color: #888;">Date live de pe Etherscan</small>
-                </div>
-                <div class="info-card neon-glow">
-                    <h3>🏆 Fondator</h3>
-                    <p style="font-size: 1.2rem; margin-top: 1rem;">
-                        Stancu Marian
-                    </p>
                 </div>
             </div>
 
@@ -2021,6 +2021,7 @@
 
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
         const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
+        const NEWS_PASSWORD = 'ParolaCripto24091980';
         
         // Variabile pentru grafic
         let priceChart = null;
@@ -2054,8 +2055,30 @@
         }
 
         // =============================================
-        // SISTEM DE NOUTĂȚI
+        // SISTEM DE NOUTĂȚI CU PAROLĂ
         // =============================================
+
+        // Funcție pentru verificarea parolei
+        function verifyPassword() {
+            const enteredPassword = prompt('🔐 Introdu parola pentru acces administrativ:');
+            if (enteredPassword === NEWS_PASSWORD) {
+                return true;
+            } else {
+                alert('❌ Parolă incorectă! Acces restricționat.');
+                return false;
+            }
+        }
+
+        // Funcție pentru cererea parolei înainte de acțiuni
+        function requestPassword(action) {
+            if (!verifyPassword()) return;
+            
+            if (action === 'add') {
+                addNews();
+            } else if (action === 'clear') {
+                clearNews();
+            }
+        }
 
         // Funcție pentru încărcarea noutăților
         function loadNews() {
@@ -2122,18 +2145,6 @@
                                 minute: '2-digit'
                             })}
                         </div>
-                        <button onclick="deleteNews(${item.id})" style="
-                            margin-top: 1rem;
-                            background: rgba(255, 68, 68, 0.1);
-                            border: 1px solid rgba(255, 68, 68, 0.3);
-                            color: #ff4444;
-                            padding: 0.3rem 0.8rem;
-                            border-radius: 5px;
-                            cursor: pointer;
-                            font-size: 0.8rem;
-                        ">
-                            Șterge
-                        </button>
                     `;
                     
                     newsContainer.appendChild(newsCard);
@@ -2149,6 +2160,7 @@
 
         // Funcție pentru adăugare știre
         function addNews() {
+            if (!verifyPassword()) return;
             document.getElementById('newsForm').style.display = 'block';
         }
 
@@ -2162,6 +2174,8 @@
 
         // Funcție pentru salvare știre
         function saveNews() {
+            if (!verifyPassword()) return;
+            
             const title = document.getElementById('newsTitle').value.trim();
             const content = document.getElementById('newsContent').value.trim();
             const type = document.getElementById('newsType').value;
@@ -2202,22 +2216,10 @@
             }
         }
 
-        // Funcție pentru ștergere știre
-        function deleteNews(id) {
-            if (confirm('Sigur vrei să ștergi această știre?')) {
-                try {
-                    const existingNews = JSON.parse(localStorage.getItem('stancubyt_news')) || [];
-                    const updatedNews = existingNews.filter(news => news.id !== id);
-                    localStorage.setItem('stancubyt_news', JSON.stringify(updatedNews));
-                    loadNews();
-                } catch (error) {
-                    console.error('Eroare ștergere știre:', error);
-                }
-            }
-        }
-
         // Funcție pentru ștergerea tuturor știrilor
         function clearNews() {
+            if (!verifyPassword()) return;
+            
             if (confirm('Sigur vrei să ștergi TOATE știrile?')) {
                 try {
                     localStorage.removeItem('stancubyt_news');
