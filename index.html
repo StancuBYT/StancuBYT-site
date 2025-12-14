@@ -2568,10 +2568,6 @@
             return { holders, transfers, supplyTokens };
         }
 
-
-            return { holders, transfers, supplyTokens };
-        }
-
         async function fetchContractCreation() {
             // Etherscan: getcontractcreation (există public)
             const url = `https://api.etherscan.io/api?module=contract&action=getcontractcreation&contractaddresses=${CONTRACT_ADDRESS}&apikey=${ETHERSCAN_API_KEY}`;
@@ -2683,170 +2679,19 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
         }
 
         // =============================================
-        // GRAFIC + PREȚ LIVE (DEX)
+        // PREȚ LIVE + GRAFIC (VARIANTA B, fără CORS headache)
         // =============================================
         let priceChart = null;
-        let livePriceSeries = []; // fallback serie locală pentru grafic
-        const LIVE_SERIES_MAX = 180; // ~30 min la 10s
+        let liveSeries = []; // [{t: Date, p: number}]
+        let lastPrice = null;
 
-        let currentPeriod = '24h';
-        let bestPairCache = null;
-        let lastOhlcvData = null;
- // { chainId, pairAddress, dexId, url, priceUsd, ... }
-
-        async function fetchBestPairFromDexScreener() {
-            // încearcă chainId-uri comune pentru ETH
-            const chainIds = ['ethereum', 'eth'];
-            for (const chainId of chainIds) {
-                try {
-                    const url = `https://api.dexscreener.com/token-pairs/v1/${chainId}/${CONTRACT_ADDRESS}`;
-                    const r = await fetch(url);
-                    if (!r.ok) continue;
-                    const data = await r.json();
-                    if (!Array.isArray(data) || data.length === 0) continue;
-
-                    // alege pool-ul cu cea mai mare lichiditate USD
-                    data.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
-                    return data[0];
-                } catch (e) {
-                    // continuă cu următorul chainId
-                }
-            }
-            return null;
-        }
-
-        function formatUsd(x, digits = 6) {
-            if (x == null || isNaN(x)) return '-';
-            const n = Number(x);
-            // pentru prețuri foarte mici, arată mai multe zecimale
-            const d = n < 0.000001 ? 10 : (n < 0.01 ? 8 : digits);
-            return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: d });
-        }
-
-        function setActivePeriodBtn(period) {
-            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-            const btn = document.querySelector(`.period-btn[onclick="changeChartPeriod('${period}')"]`);
-            if (btn) btn.classList.add('active');
-        }
-
-        function addLivePoint(priceUsd) {
-            const p = Number(priceUsd);
-            if (!Number.isFinite(p) || p <= 0) return;
-            const now = Date.now();
-            livePriceSeries.push({ t: now, p });
-            if (livePriceSeries.length > LIVE_SERIES_MAX) {
-                livePriceSeries = livePriceSeries.slice(-LIVE_SERIES_MAX);
-            }
-            // Persistă local ca să ai continuitate după refresh
-            try { localStorage.setItem('sbyt_live_series', JSON.stringify(livePriceSeries.slice(-200))); } catch(e){}
-        }
-
-        async function updateLivePriceAndStats() {
-            const pair = await fetchBestPairFromDexScreener();
-            bestPairCache = pair || bestPairCache;
-
-            if (!bestPairCache) return;
-
-            const priceUsd = Number(bestPairCache.priceUsd || bestPairCache.priceNative || 0);
-            const priceEl = $('currentPrice');
-            if (priceEl) priceEl.textContent = formatUsd(priceUsd);
-            addLivePoint(priceUsd);
-            // actualizează graficul live (fallback) dacă nu avem OHLC
-            try { if (priceChart && (!lastOhlcvData || !lastOhlcvData.length)) updateChart('live'); } catch(e){}
-
-            // schimbare 24h (dacă există)
-            const pc = bestPairCache.priceChange?.h24;
-            const pcEl = $('priceChange');
-            if (pcEl) {
-                if (pc == null) {
-                    pcEl.textContent = '';
-                } else {
-                    const v = Number(pc);
-                    pcEl.textContent = (v >= 0 ? '▲ ' : '▼ ') + Math.abs(v).toFixed(2) + '% (24h)';
-                    pcEl.style.color = v >= 0 ? 'var(--green-growth)' : 'var(--orange-alert)';
-                }
-            }
-
-            // Volum 24h + MarketCap (dacă există)
-            if ($('volume24h')) $('volume24h').textContent = bestPairCache.volume?.h24 ? ('$' + Number(bestPairCache.volume.h24).toLocaleString('en-US', { maximumFractionDigits: 0 })) : '-';
-            if ($('marketCap')) {
-                const mc = bestPairCache.marketCap ?? bestPairCache.fdv;
-                $('marketCap').textContent = mc ? ('$' + Number(mc).toLocaleString('en-US', { maximumFractionDigits: 0 })) : '-';
-            }
-
-            // Ultima actualizare
-            const lu = $('lastUpdated');
-            if (lu) lu.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        
-
-        async function fetchOhlcvFromGeckoTerminal(period) {
-            // avem nevoie de pool (pairAddress) – îl luăm din DexScreener
-            if (!bestPairCache) {
-                bestPairCache = await fetchBestPairFromDexScreener();
-            }
-            if (!bestPairCache?.pairAddress) return null;
-
-            // mapare perioade UI -> timeframe GeckoTerminal
-            let timeframe = 'hour';
-            let aggregate = 1;
-            let limit = 60;
-
-            if (period === '1h') { timeframe = 'minute'; aggregate = 1; limit = 60; }
-            if (period === '24h') { timeframe = 'hour'; aggregate = 1; limit = 24; }
-            if (period === '7d') { timeframe = 'day'; aggregate = 1; limit = 7; }
-            if (period === '1m') { timeframe = 'day'; aggregate = 1; limit = 30; }
-
-            const pool = bestPairCache.pairAddress;
-            const url = `https://api.geckoterminal.com/api/v2/networks/ethereum/pools/${pool}/ohlcv/${timeframe}?aggregate=${aggregate}&limit=${limit}`;
-
-            // Unele browsere / hosting-uri blochează CORS pentru geckoterminal -> încercăm direct, apoi via proxy allorigins
-            const tryFetchJson = async (u) => {
-                const r = await fetch(u, { headers: { 'accept': 'application/json' }});
-                if (!r.ok) return null;
-                return await r.json();
-            };
-
-            let data = null;
-            try { data = await tryFetchJson(url); } catch(e) { data = null; }
-
-            if (!data) {
-                try {
-                    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                    const r = await fetch(proxy);
-                    if (r.ok) data = await r.json();
-                } catch(e) { data = null; }
-            }
-
-            const list = data?.data?.attributes?.ohlcv_list;
-            if (!Array.isArray(list) || !list.length) return null;
-            lastOhlcvData = list;
-            return list;
-        }
-
-            if (!bestPairCache?.pairAddress) return null;
-
-            // mapare perioade UI -> timeframe GeckoTerminal
-            let timeframe = 'hour';
-            let aggregate = 1;
-            let limit = 60;
-
-            if (period === '1h') { timeframe = 'minute'; aggregate = 1; limit = 60; }          // ultimele ~60 minute
-            if (period === '24h') { timeframe = 'hour'; aggregate = 1; limit = 24; }          // ultimele 24 ore
-            if (period === '7d') { timeframe = 'day'; aggregate = 1; limit = 7; }             // 7 zile
-            if (period === '1m') { timeframe = 'day'; aggregate = 1; limit = 30; }            // 30 zile
-
-            const pool = bestPairCache.pairAddress;
-            const url = `https://api.geckoterminal.com/api/v2/networks/eth/pools/${pool}/ohlcv/${timeframe}?aggregate=${aggregate}&limit=${limit}`;
-            const r = await fetch(url, { headers: { 'accept': 'application/json' }});
-            if (!r.ok) return null;
-            const data = await r.json();
-
-            // data.data.attributes.ohlcv_list => [ [timestamp, open, high, low, close, volume], ... ]
-            const list = data?.data?.attributes?.ohlcv_list;
-            if (!Array.isArray(list) || !list.length) return null;
-            return list;
+        function _maxPointsForPeriod(period) {
+            // doar pentru cât păstrăm în memorie (grafic live)
+            if (period === '1h') return 60;
+            if (period === '24h') return 144;
+            if (period === '7d') return 200;
+            if (period === '1m') return 250;
+            return 120; // 'live' sau default
         }
 
         function initializeChart() {
@@ -2854,9 +2699,17 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             if (!canvas || !window.Chart) return;
 
             const ctx = canvas.getContext('2d');
+            if (priceChart) {
+                try { priceChart.destroy(); } catch(e) {}
+                priceChart = null;
+            }
+
             priceChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: [], datasets: [{ label: 'SBYT (USD)', data: [] }] },
+                data: {
+                    labels: [],
+                    datasets: [{ label: 'SBYT (USD)', data: [] }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -2870,64 +2723,91 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             });
         }
 
-        async 
-
-        async function updateChart(period) {
+        function _renderLiveChart(period = 'live') {
             if (!priceChart) return;
-
-            // butoane active
-            if (period && period !== 'live') setActivePeriodBtn(period);
-
-            // 1) Încearcă OHLCV (candlestick) din GeckoTerminal
-            let ohlcv = null;
-            if (period && period !== 'live') {
-                try { ohlcv = await fetchOhlcvFromGeckoTerminal(period); } catch(e) { ohlcv = null; }
-            }
-
-            if (ohlcv && Array.isArray(ohlcv) && ohlcv.length) {
-                // list: [ [timestamp, open, high, low, close, volume], ... ] - timestamp în secunde
-                const labels = ohlcv.map(r => new Date(r[0] * 1000).toLocaleString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
-                const closes = ohlcv.map(r => Number(r[4]));
-                priceChart.data.labels = labels;
-                priceChart.data.datasets[0].data = closes;
-                priceChart.options.scales.y.beginAtZero = false;
-                priceChart.update();
-                return;
-            }
-
-            // 2) Fallback: grafic LIVE din puncte colectate local (DexScreener)
-            // Încarcă serie din localStorage dacă e goală
-            if (!livePriceSeries.length) {
-                try {
-                    const saved = JSON.parse(localStorage.getItem('sbyt_live_series') || '[]');
-                    if (Array.isArray(saved)) livePriceSeries = saved.filter(x => x && typeof x.t === 'number' && typeof x.p === 'number');
-                } catch(e){}
-            }
-
-            // dacă încă nu avem puncte, încearcă să forțezi o actualizare de preț
-            if (!livePriceSeries.length) {
-                try { await updateLivePriceAndStats(); } catch(e){}
-            }
-
-            const series = livePriceSeries.slice(-60); // ultimele ~10 minute la 10s
-            const labels = series.map(x => new Date(x.t).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-            const data = series.map(x => x.p);
+            const maxPts = _maxPointsForPeriod(period);
+            const slice = liveSeries.slice(-maxPts);
+            const labels = slice.map(pt => {
+                const d = new Date(pt.t);
+                return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            });
+            const data = slice.map(pt => pt.p);
 
             priceChart.data.labels = labels;
             priceChart.data.datasets[0].data = data;
-            priceChart.options.scales.y.beginAtZero = false;
-            priceChart.update();
+            priceChart.update('none');
         }
 
+        async function fetchDexScreenerBestPair() {
+            const url = `https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`;
+            const r = await fetch(url);
+            if (!r.ok) throw new Error('DexScreener fetch failed');
+            const data = await r.json();
+            const pairs = data?.pairs || [];
+            if (!pairs.length) throw new Error('No pairs for token');
+            // alege perechea cu cea mai mare lichiditate USD
+            pairs.sort((a, b) => (Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)));
+            return pairs[0];
+        }
 
+        async function updateLivePriceAndChart(period = 'live') {
+            try {
+                const pair = await fetchDexScreenerBestPair();
+                const priceUsd = Number(pair.priceUsd);
+                if (!Number.isFinite(priceUsd)) throw new Error('priceUsd missing');
+
+                // UI: preț + schimbare
+                const priceEl = document.getElementById('currentPrice');
+                if (priceEl) priceEl.textContent = '$' + priceUsd.toLocaleString('en-US', { maximumFractionDigits: 10 });
+
+                const changeEl = document.getElementById('priceChange');
+                const ch24 = pair?.priceChange?.h24;
+                if (changeEl) {
+                    if (typeof ch24 === 'number') {
+                        const sign = ch24 >= 0 ? '+' : '';
+                        changeEl.textContent = `${sign}${ch24.toFixed(2)}% (24h)`;
+                    } else {
+                        changeEl.textContent = '';
+                    }
+                }
+
+                const lastEl = document.getElementById('lastUpdated');
+                if (lastEl) lastEl.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                // MarketCap (DexScreener fdv) - dacă există element
+                const mcEl = document.getElementById('marketCap');
+                const fdv = Number(pair.fdv);
+                if (mcEl) mcEl.textContent = Number.isFinite(fdv) ? ('$' + fdv.toLocaleString('en-US', { maximumFractionDigits: 0 })) : mcEl.textContent;
+
+                // adaugă punct în serie
+                const now = new Date();
+                liveSeries.push({ t: now, p: priceUsd });
+                // nu păstra prea mult
+                if (liveSeries.length > 300) liveSeries = liveSeries.slice(-300);
+
+                _renderLiveChart(period);
+
+                lastPrice = priceUsd;
+            } catch (e) {
+                console.error('Live price update error:', e);
+            }
+        }
+
+        // Butoane perioadă (dacă există în UI)
         async function changeChartPeriod(period) {
-            currentPeriod = period;
-            setActivePeriodBtn(period);
-            await updateChart(period);
+            // resetează seria pentru o experiență “curată”
+            liveSeries = [];
+            _renderLiveChart(period);
+            // forțează update imediat
+            await updateLivePriceAndChart(period);
         }
-// =============================================
-        // INIT
-        // =============================================
+
+        // compatibilitate: unele versiuni apelau updateChart()
+        async function updateChart(period) {
+            await updateLivePriceAndChart(period);
+        }
+
+
         window.addEventListener('load', () => {
             // IMPORTANT: evită conflictul de id duplicat pentru contact din whitepaper
             const wpContact = document.querySelector('#whitepaper #contact');
