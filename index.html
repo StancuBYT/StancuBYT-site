@@ -2071,6 +2071,48 @@
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
         const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
         const NEWS_PASSWORD = 'ParolaCripto24091980.';
+
+        // =============================================
+        // NAVIGAȚIE ÎNTRE PAGINI (FIX)
+        // =============================================
+        function showSection(sectionId) {
+            try {
+                // Ascunde toate secțiunile
+                document.querySelectorAll('.page-section').forEach(section => {
+                    section.classList.remove('active-section');
+                    section.style.display = 'none';
+                });
+
+                // Afișează secțiunea cerută
+                const target = document.getElementById(sectionId);
+                if (!target) {
+                    console.warn('Secțiune inexistentă:', sectionId);
+                    return;
+                }
+                target.classList.add('active-section');
+                target.style.display = 'block';
+
+                // Actualizează hash fără să facă jump agresiv
+                if (location.hash !== '#' + sectionId) {
+                    history.replaceState(null, '', '#' + sectionId);
+                }
+
+                // Scroll top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                console.error('Eroare showSection:', e);
+            }
+        }
+
+        // La refresh / acces direct cu hash (#statistici etc.)
+        window.addEventListener('load', () => {
+            const id = (location.hash || '#prezentare').replace('#', '');
+            showSection(id);
+        });
+        window.addEventListener('hashchange', () => {
+            const id = (location.hash || '#prezentare').replace('#', '');
+            showSection(id);
+        });
         
         // Variabile pentru grafic
         let priceChart = null;
