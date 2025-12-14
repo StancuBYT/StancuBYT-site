@@ -2525,6 +2525,41 @@
             return { wei, tokens };
         }
 
+
+        // Tranzacții (Total TX) - varianta B: numărăm tranzacțiile găsite de Etherscan API.
+        // Notă: Etherscan limitează offset la 10k; pentru un contract nou e suficient.
+        async function fetchTransactionsCountAPI() {
+            const base = `https://api.etherscan.io/api?apikey=${ETHERSCAN_API_KEY}`;
+            let best = null;
+
+            // 1) Tranzacții normale către adresa contractului (deploy + interacțiuni)
+            try {
+                const url = `${base}&module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc`;
+                const r = await fetch(url);
+                const j = await r.json();
+                if (j.status === '1' && Array.isArray(j.result)) {
+                    best = Math.max(best || 0, j.result.length);
+                }
+            } catch (e) {
+                console.warn('txlist failed', e);
+            }
+
+            // 2) Token transfers (tokentx) - poate reprezenta mai bine "Transfers"
+            try {
+                const url = `${base}&module=account&action=tokentx&contractaddress=${CONTRACT_ADDRESS}&page=1&offset=10000&sort=asc`;
+                const r = await fetch(url);
+                const j = await r.json();
+                if (j.status === '1' && Array.isArray(j.result)) {
+                    best = Math.max(best || 0, j.result.length);
+                }
+            } catch (e) {
+                console.warn('tokentx failed', e);
+            }
+
+            return best;
+        }
+
+
         // CORS-safe: r.jina.ai proxy (text)
         async function fetchEtherscanTokenPageText() {
             const url = `https://r.jina.ai/https://etherscan.io/token/${CONTRACT_ADDRESS}`;
@@ -2633,6 +2668,15 @@
                     console.warn('Etherscan scrape failed:', e);
                 }
 
+
+                // Tranzacții (API) - dacă scrape nu a dat nimic
+                try {
+                    const txc = await fetchTransactionsCountAPI();
+                    if (txc != null) setText('transactionsCount', txc.toLocaleString('ro-RO'));
+                } catch (e) {
+                    console.warn('transactionsCount API failed', e);
+                }
+
                 // Contract creator + data aproximativă (din tx)
                 try {
                     const cc = await fetchContractCreation();
@@ -2684,6 +2728,7 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
         let priceChart = null;
         let liveSeries = []; // [{t: Date, p: number}]
         let lastPrice = null;
+        let currentPeriod = 'live';
 
         function _maxPointsForPeriod(period) {
             // doar pentru cât păstrăm în memorie (grafic live)
@@ -2795,12 +2840,25 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
 
         // Butoane perioadă (dacă există în UI)
         async function changeChartPeriod(period) {
+            currentPeriod = period || 'live';
             // resetează seria pentru o experiență “curată”
             liveSeries = [];
             _renderLiveChart(period);
             // forțează update imediat
             await updateLivePriceAndChart(period);
         }
+
+
+        // Butoane tip grafic (lumânări/linie). În varianta B folosim linie (live).
+        // Dacă se apasă "Lumânări", nu crăpăm site-ul: rămânem pe linie.
+        function changeChartType(type) {
+            // compatibilitate cu UI existent
+            if (!type) return;
+            // În această implementare simplă rămânem pe line chart (Chart.js standard)
+            // pentru a evita probleme de CORS / OHLC. Doar re-render.
+            _renderLiveChart(currentPeriod || 'live');
+        }
+
 
         // compatibilitate: unele versiuni apelau updateChart()
         async function updateChart(period) {
