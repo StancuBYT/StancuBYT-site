@@ -2615,7 +2615,7 @@
                     const parsed = parseFromEtherscanText(txt);
 
                     if (parsed.holders != null) setText('holdersCount', parsed.holders.toLocaleString('ro-RO'));
-                    if (parsed.transfers != null) setText('txCount', parsed.transfers.toLocaleString('ro-RO'));
+                    if (parsed.transfers != null) setText('transactionsCount', parsed.transfers.toLocaleString('ro-RO'));
 
                     if (supplyTokens == null && parsed.supplyTokens != null) {
                         const formatted = parsed.supplyTokens.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
@@ -2644,7 +2644,12 @@
                     setText('launchDate', '-');
                 }
 
-                setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
+                
+                // Preț live + chart (DEX)
+                try { await updateLivePriceAndStats(); } catch(e){ console.warn('Dex price failed', e); }
+                try { await updateChart(currentPeriod); } catch(e){ console.warn('Chart update failed', e); }
+
+setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
 
                 if (refreshBtn) {
                     refreshBtn.classList.remove('loading');
@@ -2667,53 +2672,159 @@
         }
 
         // =============================================
-        // GRAFIC (minim – ca să nu dea erori)
+        // GRAFIC + PREȚ LIVE (DEX)
         // =============================================
         let priceChart = null;
+        let currentPeriod = '24h';
+        let bestPairCache = null; // { chainId, pairAddress, dexId, url, priceUsd, ... }
+
+        async function fetchBestPairFromDexScreener() {
+            // încearcă chainId-uri comune pentru ETH
+            const chainIds = ['ethereum', 'eth'];
+            for (const chainId of chainIds) {
+                try {
+                    const url = `https://api.dexscreener.com/token-pairs/v1/${chainId}/${CONTRACT_ADDRESS}`;
+                    const r = await fetch(url);
+                    if (!r.ok) continue;
+                    const data = await r.json();
+                    if (!Array.isArray(data) || data.length === 0) continue;
+
+                    // alege pool-ul cu cea mai mare lichiditate USD
+                    data.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
+                    return data[0];
+                } catch (e) {
+                    // continuă cu următorul chainId
+                }
+            }
+            return null;
+        }
+
+        function formatUsd(x, digits = 6) {
+            if (x == null || isNaN(x)) return '-';
+            const n = Number(x);
+            // pentru prețuri foarte mici, arată mai multe zecimale
+            const d = n < 0.000001 ? 10 : (n < 0.01 ? 8 : digits);
+            return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: d });
+        }
+
+        function setActivePeriodBtn(period) {
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.period-btn[onclick="changeChartPeriod('${period}')"]`);
+            if (btn) btn.classList.add('active');
+        }
+
+        async function updateLivePriceAndStats() {
+            const pair = await fetchBestPairFromDexScreener();
+            bestPairCache = pair || bestPairCache;
+
+            if (!bestPairCache) return;
+
+            const priceUsd = Number(bestPairCache.priceUsd || bestPairCache.priceNative || 0);
+            const priceEl = $('currentPrice');
+            if (priceEl) priceEl.textContent = formatUsd(priceUsd);
+
+            // schimbare 24h (dacă există)
+            const pc = bestPairCache.priceChange?.h24;
+            const pcEl = $('priceChange');
+            if (pcEl) {
+                if (pc == null) {
+                    pcEl.textContent = '';
+                } else {
+                    const v = Number(pc);
+                    pcEl.textContent = (v >= 0 ? '▲ ' : '▼ ') + Math.abs(v).toFixed(2) + '% (24h)';
+                    pcEl.style.color = v >= 0 ? 'var(--green-growth)' : 'var(--orange-alert)';
+                }
+            }
+
+            // Volum 24h + MarketCap (dacă există)
+            if ($('volume24h')) $('volume24h').textContent = bestPairCache.volume?.h24 ? ('$' + Number(bestPairCache.volume.h24).toLocaleString('en-US', { maximumFractionDigits: 0 })) : '-';
+            if ($('marketCap')) {
+                const mc = bestPairCache.marketCap ?? bestPairCache.fdv;
+                $('marketCap').textContent = mc ? ('$' + Number(mc).toLocaleString('en-US', { maximumFractionDigits: 0 })) : '-';
+            }
+
+            // Ultima actualizare
+            const lu = $('lastUpdated');
+            if (lu) lu.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        async function fetchOhlcvFromGeckoTerminal(period) {
+            // avem nevoie de pool (pairAddress) – îl luăm din DexScreener
+            if (!bestPairCache) {
+                bestPairCache = await fetchBestPairFromDexScreener();
+            }
+            if (!bestPairCache?.pairAddress) return null;
+
+            // mapare perioade UI -> timeframe GeckoTerminal
+            let timeframe = 'hour';
+            let aggregate = 1;
+            let limit = 60;
+
+            if (period === '1h') { timeframe = 'minute'; aggregate = 1; limit = 60; }          // ultimele ~60 minute
+            if (period === '24h') { timeframe = 'hour'; aggregate = 1; limit = 24; }          // ultimele 24 ore
+            if (period === '7d') { timeframe = 'day'; aggregate = 1; limit = 7; }             // 7 zile
+            if (period === '1m') { timeframe = 'day'; aggregate = 1; limit = 30; }            // 30 zile
+
+            const pool = bestPairCache.pairAddress;
+            const url = `https://api.geckoterminal.com/api/v2/networks/eth/pools/${pool}/ohlcv/${timeframe}?aggregate=${aggregate}&limit=${limit}`;
+            const r = await fetch(url, { headers: { 'accept': 'application/json' }});
+            if (!r.ok) return null;
+            const data = await r.json();
+
+            // data.data.attributes.ohlcv_list => [ [timestamp, open, high, low, close, volume], ... ]
+            const list = data?.data?.attributes?.ohlcv_list;
+            if (!Array.isArray(list) || !list.length) return null;
+            return list;
+        }
 
         function initializeChart() {
             const canvas = document.getElementById('priceChart');
             if (!canvas || !window.Chart) return;
 
             const ctx = canvas.getContext('2d');
-            const labels = Array.from({length: 10}, (_, i) => `T-${9 - i}`);
-            const data = Array.from({length: 10}, () => Math.random() * 10 + 1);
-
             priceChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels, datasets: [{ label: 'SBYT', data }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: [], datasets: [{ label: 'SBYT (USD)', data: [] }] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { display: true } },
+                    scales: {
+                        x: { ticks: { maxTicksLimit: 8 } },
+                        y: { ticks: { callback: (v) => '$' + v } }
+                    }
+                }
             });
         }
 
-        function changeChartPeriod() { /* păstrat pentru compatibilitate */ }
-        function changeChartType() { /* păstrat pentru compatibilitate */ }
+        async function updateChart(period) {
+            if (!priceChart) return;
+            const ohlcv = await fetchOhlcvFromGeckoTerminal(period);
+            if (!ohlcv) return;
 
-        // =============================================
-        // CONTACT (trimite mailto – static)
-        // =============================================
-        function sendContactMessage() {
-            try {
-                const name = ($('contactName')?.value || '').trim();
-                const email = ($('contactEmail')?.value || '').trim();
-                const type = ($('contactType')?.value || '').trim();
-                const message = ($('contactMessage')?.value || '').trim();
+            // GeckoTerminal poate întoarce ordine descrescătoare; sortăm crescător după timestamp
+            const sorted = ohlcv.slice().sort((a, b) => a[0] - b[0]);
 
-                if (!name || !email || !message) {
-                    alert('Completează numele, emailul și mesajul.');
-                    return;
-                }
+            const labels = sorted.map(x => {
+                const d = new Date(x[0] * 1000);
+                if (period === '1h') return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                if (period === '24h') return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                return d.toLocaleDateString('ro-RO', { month: 'short', day: '2-digit' });
+            });
 
-                const subject = encodeURIComponent(`[StancuBYT] ${type || 'Mesaj'} - ${name}`);
-                const body = encodeURIComponent(`Nume: ${name}\nEmail: ${email}\nTip: ${type}\n\nMesaj:\n${message}\n\n---\nTrimis de pe stancubyt.com`);
-                window.location.href = `mailto:contact@stancubyt.com?subject=${subject}&body=${body}`;
-            } catch (e) {
-                console.error('sendContactMessage:', e);
-                alert('Nu s-a putut deschide clientul de email.');
-            }
+            const closes = sorted.map(x => Number(x[4])); // close
+            priceChart.data.labels = labels;
+            priceChart.data.datasets[0].data = closes;
+            priceChart.update();
         }
 
-        // =============================================
+        async function changeChartPeriod(period) {
+            currentPeriod = period;
+            setActivePeriodBtn(period);
+            await updateChart(period);
+        }
+// =============================================
         // INIT
         // =============================================
         window.addEventListener('load', () => {
