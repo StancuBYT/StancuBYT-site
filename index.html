@@ -2978,6 +2978,22 @@ async function updateLivePriceAndChart(period = 'live') {
 
         // dacă utilizatorul schimbă hash manual
         window.addEventListener('hashchange', initRouting);
+        // Expune funcțiile folosite în HTML (onclick) în scope global
+        try {
+            Object.assign(window, {
+                showSection,
+                scrollToSection,
+                requestPassword,
+                saveNews,
+                cancelAddNews,
+                deleteNewsItem,
+                clearAllNews,
+                changeChartPeriod,
+                changeChartType,
+                fetchAllData
+            });
+        } catch (e) {}
+
     </script>
 </body>
 </html>
