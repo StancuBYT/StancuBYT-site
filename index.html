@@ -1145,6 +1145,7 @@
                 <a href="#statistici" onclick="showSection('statistici'); fetchAllData();">Statistici</a>
                 <a href="#whitepaper" onclick="showSection('whitepaper')">Whitepaper</a>
                 <a href="#contact" onclick="showSection('contact')">Contact</a>
+                <a href="#giveaway" onclick="showSection('giveaway')">Giveaway & Promoții</a>
             </div>
         </div>
     </nav>
@@ -1410,7 +1411,7 @@
                 <li><a href="#roadmap" onclick="scrollToSection('roadmap')">5. Plan de lansare / Roadmap</a></li>
                 <li><a href="#taxe" onclick="scrollToSection('taxe')">6. Taxe & Tranzacții</a></li>
                 <li><a href="#echipa" onclick="scrollToSection('echipa')">7. Echipa</a></li>
-                <li><a href="#contact" onclick="scrollToSection('contact')">8. Contact & Linkuri</a></li>
+                <li><a href="#contact-whitepaper" onclick="scrollToSection('contact-whitepaper')">8. Contact & Linkuri</a></li>
                 <li><a href="#recomandari" onclick="scrollToSection('recomandari')">9. Note & Recomandări</a></li>
                 <li><a href="#disclaimer" onclick="scrollToSection('disclaimer')">10. Disclaimer & Riscuri</a></li>
             </ul>
@@ -1672,7 +1673,7 @@
         </div>
 
         <!-- 8. Contact & Linkuri -->
-        <div id="contact" class="section-card neon-glow">
+        <div id="contact-whitepaper" class="section-card neon-glow">
             <h3>8. Contact & Linkuri</h3>
             
             <div style="margin: 1.5rem 0;">
@@ -2011,6 +2012,54 @@
             </div>
         </div>
     </section>
+    <!-- Giveaway & Promoții Section -->
+    <section id="giveaway" class="page-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Giveaway & Promoții
+            </h1>
+            <p style="opacity: 0.8;">Înscrie-te la giveaway-uri și promoții active. (Notă: în varianta B, datele se salvează local în browser.)</p>
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <button class="news-btn" onclick="adminOpenPromoForm()">➕ Adaugă promoție/giveaway (admin)</button>
+                <button class="news-btn" onclick="adminClearAllPromos()">🗑️ Șterge toate (admin)</button>
+            </div>
+        </div>
+
+        <!-- Listă promoții -->
+        <div class="data-visualization neon-glow">
+            <h3>🎁 Promoții active</h3>
+            <div id="promoList" class="news-grid" style="margin-top: 1.5rem;"></div>
+            <div id="promoEmpty" style="opacity:0.8; margin-top:1rem; display:none;">Nu există promoții active momentan.</div>
+        </div>
+
+        <!-- Formular admin: adăugare promo -->
+        <div class="data-visualization neon-glow" id="promoAdminFormWrap" style="display:none;">
+            <h3 style="margin-bottom: 1rem;">🛠️ Admin: Creează promoție / giveaway</h3>
+
+            <div class="form-row">
+                <input type="text" id="promoTitle" placeholder="Titlu promoție / giveaway" maxlength="120">
+                <input type="datetime-local" id="promoEndAt">
+            </div>
+
+            <div class="form-row">
+                <input type="text" id="promoDesc" placeholder="Descriere (max 500 caractere)" maxlength="500">
+            </div>
+
+            <div class="form-row" style="align-items:center;">
+                <input type="file" id="promoMedia" accept="image/*,video/*" multiple>
+            </div>
+            <small style="display:block; opacity:0.8; margin-top:-0.5rem;">
+                În varianta B (fără backend), fișierele se salvează local în browser și pot fi limitate ca mărime.
+            </small>
+
+            <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
+                <button class="news-btn" onclick="adminSavePromo()">💾 Salvează</button>
+                <button class="news-btn" onclick="adminCancelPromoForm()">❌ Anulează</button>
+            </div>
+        </div>
+    </section>
+
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -2021,7 +2070,7 @@
 
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
         const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
-        const NEWS_PASSWORD = 'ParolaCripto24091980';
+        const NEWS_PASSWORD = 'ParolaCripto24091980.';
         
         // Variabile pentru grafic
         let priceChart = null;
@@ -2130,10 +2179,12 @@
                     const cardClass = item.pinned ? 'news-card pinned' : 'news-card';
                     
                     const newsCard = document.createElement('div');
-                    newsCard.className = cardClass;
-                    newsCard.innerHTML = `
+                    newsCard.style.position = 'relative';
+              newsCard.innerHTML = `
+                        <button class="news-btn" title="Șterge" style="position:absolute; top:12px; right:12px; padding:0.35rem 0.6rem; border-radius:10px; font-size:0.8rem;"
+                                onclick="deleteNews(${item.id})">🗑️</button>
                         <div class="news-badge ${badgeClass}">${badgeText}</div>
-                        <h4 style="margin-bottom: 0.5rem; color: white;">${item.title}</h4>
+                        <h4 style="margin-bottom: 0.5rem; color: white; padding-right: 3rem;">${item.title}</h4>
                         <p style="opacity: 0.9; line-height: 1.5;">${item.content}</p>
                         <div class="news-date">
                             <span>📅</span>
@@ -2146,6 +2197,7 @@
                             })}
                         </div>
                     `;
+              `;
                     
                     newsContainer.appendChild(newsCard);
                 });
@@ -2228,6 +2280,23 @@
                 } catch (error) {
                     console.error('Eroare ștergere știri:', error);
                 }
+            }
+        }
+
+        // Ștergere individuală știre (admin)
+        function deleteNews(id) {
+            if (!verifyPassword()) return;
+
+            if (!confirm('Sigur vrei să ștergi această știre?')) return;
+
+            try {
+                const existingNews = JSON.parse(localStorage.getItem('stancubyt_news')) || [];
+                const filtered = existingNews.filter(n => n.id !== id);
+                localStorage.setItem('stancubyt_news', JSON.stringify(filtered));
+                loadNews();
+            } catch (error) {
+                console.error('Eroare ștergere știre:', error);
+                alert('Eroare la ștergerea știrii.');
             }
         }
 
@@ -2369,7 +2438,10 @@
                 // 4. PREIA TRANZACȚIILE
                 await fetchTransactionsCount();
                 
-                // 5. ACTUALIZEAZĂ TIMPUL
+                // 5. PREIA DETALII CONTRACT (creator, data) - Etherscan LIVE
+                await fetchContractDetailsReal();
+
+                // 6. ACTUALIZEAZĂ TIMPUL
                 updateLastUpdateTime();
                 
                 // 6. Animație succes pentru buton
@@ -2465,45 +2537,49 @@
                 console.error('Eroare scrape:', error);
             }
             
-            // Fallback la date hardcodate
-            return {
-                raw: 4000000 * Math.pow(10, 18),
-                tokens: 4000000,
-                formatted: '4,000,000'
-            };
+            // Fallback: nu afișăm valori fake
+            return null;
         }
 
         // PREIA HOLDERS REALI - METODĂ 100% FUNCȚIONALĂ
         async function fetchRealHolders() {
             try {
-                // METODA 1: Folosește Etherscan API cu API key
-                const url = `https://api.etherscan.io/api?module=token&action=tokenholderlist&contractaddress=${CONTRACT_ADDRESS}&page=1&offset=1000&apikey=${ETHERSCAN_API_KEY}`;
-                const response = await fetch(url);
+                // Metodă robustă (fără endpoint public stabil pentru "holder count"): scrape din pagina Etherscan
+                const etherscanUrl = `https://etherscan.io/token/${CONTRACT_ADDRESS}`;
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(etherscanUrl)}`;
+
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
-                
-                if (data.status === '1' && data.result) {
-                    const holdersCount = data.result.length;
-                    document.getElementById('holdersCount').textContent = holdersCount.toLocaleString('ro-RO');
-                    console.log('✅ Holders reali găsiți:', holdersCount);
-                    saveHoldersToCache(holdersCount);
-                    return holdersCount;
+                const html = (data && data.contents) ? data.contents : '';
+
+                // Caută "Holders" și extrage numărul
+                const patterns = [
+                    /Holders<\/a>\s*<\/div>\s*<div[^>]*>\s*([\d,]+)/i,
+                    /Holders[\s\S]{0,200}?([\d,]+)\s*<\/span>/i,
+                    /Holders[\s\S]{0,200}?([\d,]+)\s*<\/a>/i
+                ];
+
+                let holders = null;
+                for (const p of patterns) {
+                    const m = html.match(p);
+                    if (m && m[1]) {
+                        const n = parseInt(m[1].replace(/,/g, ''), 10);
+                        if (!Number.isNaN(n)) { holders = n; break; }
+                    }
                 }
-                
-                // METODA 2: Verifică cache-ul nostru
-                const cachedHolders = await checkCachedHolders();
-                if (cachedHolders) {
-                    document.getElementById('holdersCount').textContent = cachedHolders.toLocaleString('ro-RO');
-                    console.log('✅ Holders din cache:', cachedHolders);
-                    return cachedHolders;
+
+                if (holders !== null) {
+                    document.getElementById('holdersCount').textContent = holders.toLocaleString('ro-RO');
+                    console.log('✅ Holders (Etherscan):', holders);
+                    return holders;
                 }
-                
             } catch (error) {
-                console.error('Eroare holders:', error);
+                console.error('Eroare holders (scrape):', error);
             }
-            
-            // Fallback la date estimate
-            document.getElementById('holdersCount').textContent = '2,543';
-            return 2543;
+
+            // Fără estimări fake — afișăm "-"
+            document.getElementById('holdersCount').textContent = '-';
+            return null;
         }
 
         // Verifică dacă avem holders în cache local
@@ -2589,48 +2665,192 @@
         // PREIA NUMĂRUL DE TRANZACȚII
         async function fetchTransactionsCount() {
             try {
-                const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=${ETHERSCAN_API_KEY}`;
-                const response = await fetch(url);
+                // Metodă robustă (fără endpoint de "count" direct): scrape din pagina Etherscan (Transfers)
+                const etherscanUrl = `https://etherscan.io/token/${CONTRACT_ADDRESS}`;
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(etherscanUrl)}`;
+
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
-                
-                if (data.status === '1' && data.result) {
-                    document.getElementById('transactionsCount').textContent = data.result.length.toLocaleString('ro-RO');
-                    console.log('✅ Tranzacții:', data.result.length);
-                    return data.result.length;
+                const html = (data && data.contents) ? data.contents : '';
+
+                // În Etherscan, tranzacțiile token sunt afișate de obicei ca "Transfers"
+                const patterns = [
+                    /Transfers<\/a>\s*<\/div>\s*<div[^>]*>\s*([\d,]+)/i,
+                    /Transfers[\s\S]{0,200}?([\d,]+)\s*<\/span>/i,
+                    /Transfers[\s\S]{0,200}?([\d,]+)\s*<\/a>/i
+                ];
+
+                let count = null;
+                for (const p of patterns) {
+                    const m = html.match(p);
+                    if (m && m[1]) {
+                        const n = parseInt(m[1].replace(/,/g, ''), 10);
+                        if (!Number.isNaN(n)) { count = n; break; }
+                    }
+                }
+
+                if (count !== null) {
+                    document.getElementById('transactionsCount').textContent = count.toLocaleString('ro-RO');
+                    console.log('✅ Transfers (Etherscan):', count);
+                    return count;
                 }
             } catch (error) {
-                console.error('Eroare tranzacții:', error);
+                console.error('Eroare tranzacții (scrape):', error);
             }
-            
-            document.getElementById('transactionsCount').textContent = '12,459';
-            return 12459;
+
+            // Fără valori fake — afișăm "-"
+            document.getElementById('transactionsCount').textContent = '-';
+            return null;
         }
 
         // Actualizează timpul ultimei actualizări
-        function updateLastUpdateTime() {
+        
+        // PREIA DETALII CONTRACT REAL (creator + data creare + status verificare) - ETHERSCAN
+        async function fetchContractDetailsReal() {
+            // Reset values to loading while fetching
+            try {
+                const creationEl = document.getElementById('creationDate');
+                const creatorEl = document.getElementById('contractCreator');
+                const ageEl = document.getElementById('contractAge');
+
+                if (creationEl) creationEl.textContent = 'Se încarcă...';
+                if (creatorEl) creatorEl.textContent = 'Se încarcă...';
+                if (ageEl) ageEl.textContent = '-';
+
+                // 1) Contract creation (creator + block)
+                let creator = null;
+                let createdAtISO = null;
+
+                try {
+                    const url = `https://api.etherscan.io/api?module=contract&action=getcontractcreation&contractaddresses=${CONTRACT_ADDRESS}&apikey=${ETHERSCAN_API_KEY}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    if (data && data.status === '1' && Array.isArray(data.result) && data.result[0]) {
+                        creator = data.result[0].contractCreator || null;
+                        const blockDec = data.result[0].blockNumber ? parseInt(data.result[0].blockNumber, 10) : null;
+
+                        if (blockDec && !Number.isNaN(blockDec)) {
+                            const tag = '0x' + blockDec.toString(16);
+                            const bUrl = `https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=${tag}&boolean=true&apikey=${ETHERSCAN_API_KEY}`;
+                            const bRes = await fetch(bUrl);
+                            const bData = await bRes.json();
+                            const tsHex = bData && bData.result && bData.result.timestamp ? bData.result.timestamp : null;
+                            if (tsHex) {
+                                const ts = parseInt(tsHex, 16) * 1000;
+                                const d = new Date(ts);
+                                if (!Number.isNaN(d.getTime())) createdAtISO = d.toISOString();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('getcontractcreation nu a răspuns, încerc scrape...', e);
+                }
+
+                // 2) Fallback: scrape de pe Etherscan token page (creator/creation time)
+                if (!creator || !createdAtISO) {
+                    try {
+                        const etherscanUrl = `https://etherscan.io/token/${CONTRACT_ADDRESS}`;
+                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(etherscanUrl)}`;
+                        const response = await fetch(proxyUrl);
+                        const data = await response.json();
+                        const html = data.contents || '';
+
+                        // Creator (caută adresa în zona "Contract Creator")
+                        if (!creator) {
+                            const creatorMatch =
+                                html.match(/Contract\s*Creator[\s\S]{0,400}?href="\/address\/(0x[a-fA-F0-9]{40})"/i) ||
+                                html.match(/Contract\s*Creator[\s\S]{0,400}?(0x[a-fA-F0-9]{40})/i);
+                            if (creatorMatch) creator = (creatorMatch[1] || creatorMatch[0]).toString();
+                        }
+
+                        // Time (uneori apare ca "Contract Creation" / "Created" etc. - încercăm câteva patternuri)
+                        if (!createdAtISO) {
+                            const timeMatch =
+                                html.match(/Contract\s*Creation[\s\S]{0,500}?(?:data-bs-title|title)="([^"]+?)"/i) ||
+                                html.match(/Created\s*([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4})/i);
+                            if (timeMatch && timeMatch[1]) {
+                                const d = new Date(timeMatch[1]);
+                                if (!Number.isNaN(d.getTime())) createdAtISO = d.toISOString();
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Scrape pentru detalii contract a eșuat:', e);
+                    }
+                }
+
+                // Update UI
+                if (creatorEl) {
+                    if (creator && creator.startsWith('0x')) {
+                        creatorEl.innerHTML = `<a href="https://etherscan.io/address/${creator}" target="_blank" style="color: var(--neon-cyan); text-decoration: none; font-family: monospace;">${creator}</a>`;
+                    } else {
+                        creatorEl.textContent = '-';
+                    }
+                }
+
+                if (createdAtISO) {
+                    const d = new Date(createdAtISO);
+                    const ro = d.toLocaleDateString('ro-RO');
+                    if (creationEl) creationEl.textContent = ro;
+                    if (ageEl) ageEl.textContent = calculateContractAge(createdAtISO.slice(0, 10));
+                } else {
+                    if (creationEl) creationEl.textContent = '-';
+                    if (ageEl) ageEl.textContent = '-';
+                }
+
+                // 3) Verificare source code (Etherscan)
+                try {
+                    const vUrl = `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${CONTRACT_ADDRESS}&apikey=${ETHERSCAN_API_KEY}`;
+                    const vRes = await fetch(vUrl);
+                    const vData = await vRes.json();
+
+                    let verified = false;
+                    if (vData && vData.status === '1' && Array.isArray(vData.result) && vData.result[0]) {
+                        const abi = vData.result[0].ABI || '';
+                        verified = abi && abi !== 'Contract source code not verified';
+                    }
+
+                    const statusEl = document.getElementById('serverStatus');
+                    if (statusEl) {
+                        statusEl.innerHTML = verified
+                            ? `<span class="status-online">✅ Contract verificat pe Etherscan</span>`
+                            : `<span class="status-offline">⚠️ Contract NEverificat (sau API limitat)</span>`;
+                    }
+                } catch (e) {
+                    console.warn('Verificare contract a eșuat:', e);
+                }
+
+            } catch (err) {
+                console.error('Eroare detalii contract:', err);
+                // Nu mai afișăm valori fake — lăsăm "-"
+                const creationEl = document.getElementById('creationDate');
+                const creatorEl = document.getElementById('contractCreator');
+                const ageEl = document.getElementById('contractAge');
+                if (creationEl) creationEl.textContent = '-';
+                if (creatorEl) creatorEl.textContent = '-';
+                if (ageEl) ageEl.textContent = '-';
+            }
+        }
+function updateLastUpdateTime() {
             const now = new Date();
             lastUpdateTime = now;
             const timeString = now.toLocaleTimeString('ro-RO');
             const dateString = now.toLocaleDateString('ro-RO');
-            
+
             document.getElementById('lastUpdated').textContent = `Ultima actualizare: ${timeString}`;
             document.getElementById('lastUpdateTime').textContent = `${dateString} ${timeString}`;
-            
-            // Actualizează vârsta contractului (hardcoded pentru exemplu)
-            const creationDate = '2023-12-01';
-            document.getElementById('creationDate').textContent = '01/12/2023';
-            document.getElementById('contractAge').textContent = calculateContractAge(creationDate);
         }
 
         // Date fallback
         function showFallbackData() {
             const now = new Date();
             const timeString = now.toLocaleTimeString('ro-RO');
-            
-            document.getElementById('totalSupply').textContent = '4,000,000';
-            document.getElementById('supplyValue').textContent = '4,000,000';
-            document.getElementById('holdersCount').textContent = '2,543';
-            document.getElementById('transactionsCount').textContent = '12,459';
+
+            // În varianta B nu afișăm valori "inventate" pentru metricele contractului
+            document.getElementById('totalSupply').textContent = '-';
+            document.getElementById('supplyValue').textContent = '-';
+            document.getElementById('holdersCount').textContent = '-';
+            document.getElementById('transactionsCount').textContent = '-';
             document.getElementById('marketCap').textContent = '$168,000';
             document.getElementById('volume24h').textContent = '$68,420';
             document.getElementById('currentPrice').textContent = '$0.0420';
@@ -2891,7 +3111,271 @@ ${message}
             }, 500);
         }
 
+        
         // =============================================
+        // GIVEAWAY & PROMOȚII (VARIANTA B - localStorage)
+        // =============================================
+
+        const PROMOS_KEY = 'stancubyt_promos_v1';
+
+        function loadPromos() {
+            const listEl = document.getElementById('promoList');
+            const emptyEl = document.getElementById('promoEmpty');
+            if (!listEl) return;
+
+            const promos = JSON.parse(localStorage.getItem(PROMOS_KEY) || '[]');
+
+            // filtrează expirate (le păstrăm, dar nu le afișăm ca active)
+            const now = Date.now();
+            const active = promos.filter(p => !p.endAt || new Date(p.endAt).getTime() > now);
+
+            listEl.innerHTML = '';
+            if (!active.length) {
+                if (emptyEl) emptyEl.style.display = 'block';
+                return;
+            }
+            if (emptyEl) emptyEl.style.display = 'none';
+
+            active
+                .sort((a,b)=> (new Date(a.endAt||0).getTime()) - (new Date(b.endAt||0).getTime()))
+                .forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'news-card';
+                    card.style.position = 'relative';
+
+                    const endTxt = p.endAt ? new Date(p.endAt).toLocaleString('ro-RO') : 'N/A';
+
+                    card.innerHTML = `
+                        <div class="news-badge badge-event">🎁 Activ</div>
+                        <button class="news-btn" title="Șterge promoția (admin)" style="position:absolute; top:12px; right:12px; padding:0.35rem 0.6rem; border-radius:10px; font-size:0.8rem;"
+                                onclick="adminDeletePromo(${p.id})">🗑️</button>
+                        <h4 style="margin-bottom:0.5rem; color:white; padding-right:3rem;">${escapeHtml(p.title)}</h4>
+                        <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.description || '')}</p>
+                        <div class="news-date" style="margin-top:0.75rem;">
+                            <span>⏳</span> Expiră: ${endTxt}
+                        </div>
+                        ${renderPromoMedia(p)}
+                        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+                            <h4 style="margin:0 0 0.75rem 0; color: var(--green-growth);">Înscriere</h4>
+                            <div class="form-row">
+                                <input type="text" id="enrollName_${p.id}" placeholder="Nume / Username">
+                                <input type="email" id="enrollEmail_${p.id}" placeholder="Email">
+                            </div>
+                            <div class="form-row">
+                                <input type="text" id="enrollSocial_${p.id}" placeholder="Link social (X/Telegram/Instagram)">
+                                <input type="number" id="enrollPromos_${p.id}" placeholder="Promovări (ex: 0)" min="0" step="1">
+                            </div>
+                            <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                                <button class="news-btn" onclick="enrollPromo(${p.id})">✅ Înscrie-te</button>
+                                <button class="news-btn" onclick="showLeaderboard(${p.id})">🏆 Clasament</button>
+                            </div>
+                            <div id="leaderboard_${p.id}" style="margin-top:1rem; display:none;"></div>
+                        </div>
+                    `;
+
+                    listEl.appendChild(card);
+                });
+        }
+
+        function renderPromoMedia(promo) {
+            if (!promo.media || !promo.media.length) return '';
+            const items = promo.media.map(m => {
+                if (m.type === 'image') {
+                    return `<img src="${m.dataUrl}" alt="media" style="width:100%; border-radius:12px; margin-top:1rem; border:1px solid rgba(0,102,255,0.25);" />`;
+                }
+                if (m.type === 'video') {
+                    return `<video controls style="width:100%; border-radius:12px; margin-top:1rem; border:1px solid rgba(0,102,255,0.25);"><source src="${m.dataUrl}"></video>`;
+                }
+                return '';
+            }).join('');
+            return `<div>${items}</div>`;
+        }
+
+        function adminOpenPromoForm() {
+            if (!verifyPassword()) return;
+            const wrap = document.getElementById('promoAdminFormWrap');
+            if (wrap) wrap.style.display = 'block';
+            // auto default endAt: +7 zile
+            const endInput = document.getElementById('promoEndAt');
+            if (endInput && !endInput.value) {
+                const d = new Date(Date.now() + 7*24*60*60*1000);
+                endInput.value = d.toISOString().slice(0,16);
+            }
+        }
+
+        function adminCancelPromoForm() {
+            const wrap = document.getElementById('promoAdminFormWrap');
+            if (wrap) wrap.style.display = 'none';
+            const t = document.getElementById('promoTitle');
+            const d = document.getElementById('promoDesc');
+            const e = document.getElementById('promoEndAt');
+            const f = document.getElementById('promoMedia');
+            if (t) t.value = '';
+            if (d) d.value = '';
+            if (e) e.value = '';
+            if (f) f.value = '';
+        }
+
+        async function adminSavePromo() {
+            if (!verifyPassword()) return;
+
+            const title = (document.getElementById('promoTitle')?.value || '').trim();
+            const desc = (document.getElementById('promoDesc')?.value || '').trim();
+            const endAt = document.getElementById('promoEndAt')?.value || '';
+
+            if (!title) { alert('Te rog completează titlul.'); return; }
+            if (!endAt) { alert('Te rog setează data expirării.'); return; }
+
+            const mediaInput = document.getElementById('promoMedia');
+            const files = mediaInput?.files ? Array.from(mediaInput.files) : [];
+
+            // Convertim fișierele în dataURL (limitare localStorage)
+            const media = [];
+            for (const file of files.slice(0, 4)) {
+                // limită ~2MB per fișier (localStorage e limitat)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert(`Fișier prea mare: ${file.name}. În varianta B limita recomandată este 2MB/fișier.`);
+                    continue;
+                }
+                const dataUrl = await fileToDataUrl(file);
+                const kind = file.type.startsWith('video/') ? 'video' : 'image';
+                media.push({ type: kind, dataUrl });
+            }
+
+            const promos = JSON.parse(localStorage.getItem(PROMOS_KEY) || '[]');
+            const newId = promos.length ? Math.max(...promos.map(p => p.id)) + 1 : 1;
+
+            promos.push({
+                id: newId,
+                title,
+                description: desc,
+                endAt: new Date(endAt).toISOString(),
+                createdAt: new Date().toISOString(),
+                media
+            });
+
+            localStorage.setItem(PROMOS_KEY, JSON.stringify(promos));
+            adminCancelPromoForm();
+            loadPromos();
+            alert('Promoția / giveaway-ul a fost salvat(ă) local.');
+        }
+
+        function adminDeletePromo(id) {
+            if (!verifyPassword()) return;
+            if (!confirm('Sigur vrei să ștergi această promoție/giveaway?')) return;
+
+            const promos = JSON.parse(localStorage.getItem(PROMOS_KEY) || '[]');
+            const filtered = promos.filter(p => p.id !== id);
+            localStorage.setItem(PROMOS_KEY, JSON.stringify(filtered));
+
+            // șterge participanții locali
+            localStorage.removeItem(`stancubyt_participants_${id}`);
+
+            loadPromos();
+        }
+
+        function adminClearAllPromos() {
+            if (!verifyPassword()) return;
+            if (!confirm('Sigur vrei să ștergi TOATE promoțiile/giveaway-urile?')) return;
+
+            const promos = JSON.parse(localStorage.getItem(PROMOS_KEY) || '[]');
+            promos.forEach(p => localStorage.removeItem(`stancubyt_participants_${p.id}`));
+            localStorage.removeItem(PROMOS_KEY);
+            loadPromos();
+        }
+
+        function enrollPromo(promoId) {
+            const name = (document.getElementById(`enrollName_${promoId}`)?.value || '').trim();
+            const email = (document.getElementById(`enrollEmail_${promoId}`)?.value || '').trim();
+            const social = (document.getElementById(`enrollSocial_${promoId}`)?.value || '').trim();
+            const promos = parseInt(document.getElementById(`enrollPromos_${promoId}`)?.value || '0', 10) || 0;
+
+            if (!name || !email) {
+                alert('Completează numele și emailul pentru înscriere.');
+                return;
+            }
+
+            const key = `stancubyt_participants_${promoId}`;
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+
+            // update dacă există același email
+            const existing = list.findIndex(x => (x.email || '').toLowerCase() === email.toLowerCase());
+            const row = {
+                name,
+                email,
+                social,
+                promos,
+                points: promos, // simplu: puncte = promovări
+                updatedAt: new Date().toISOString()
+            };
+
+            if (existing >= 0) list[existing] = row;
+            else list.push(row);
+
+            localStorage.setItem(key, JSON.stringify(list));
+            alert('Înscriere salvată local. Mulțumim!');
+        }
+
+        function showLeaderboard(promoId) {
+            const wrap = document.getElementById(`leaderboard_${promoId}`);
+            if (!wrap) return;
+
+            const key = `stancubyt_participants_${promoId}`;
+            const list = JSON.parse(localStorage.getItem(key) || '[]')
+                .sort((a,b)=> (b.points||0) - (a.points||0))
+                .slice(0, 50);
+
+            if (!list.length) {
+                wrap.innerHTML = '<div style="opacity:0.8;">Nu există înscrieri încă.</div>';
+                wrap.style.display = 'block';
+                return;
+            }
+
+            const rows = list.map((x, i) => `
+                <tr>
+                    <td style="padding:0.6rem; border-bottom:1px solid rgba(255,255,255,0.08);">${i+1}</td>
+                    <td style="padding:0.6rem; border-bottom:1px solid rgba(255,255,255,0.08);">${escapeHtml(x.name || '-')}</td>
+                    <td style="padding:0.6rem; border-bottom:1px solid rgba(255,255,255,0.08);">${escapeHtml(x.social || '-')}</td>
+                    <td style="padding:0.6rem; border-bottom:1px solid rgba(255,255,255,0.08); text-align:right;">${(x.points||0).toLocaleString('ro-RO')}</td>
+                </tr>
+            `).join('');
+
+            wrap.innerHTML = `
+                <h4 style="margin:0.5rem 0; color: var(--neon-cyan);">🏆 Clasament (local)</h4>
+                <div class="table-container">
+                    <table class="whitepaper-table" style="font-size:0.95rem;">
+                        <tr>
+                            <th>#</th>
+                            <th>Participant</th>
+                            <th>Social</th>
+                            <th style="text-align:right;">Puncte</th>
+                        </tr>
+                        ${rows}
+                    </table>
+                </div>
+            `;
+            wrap.style.display = 'block';
+        }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // mic helper pentru siguranță în HTML
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+// =============================================
         // INITIALIZARE PAGINĂ
         // =============================================
 
@@ -2902,6 +3386,9 @@ ${message}
             
             // Încarcă noutățile
             loadNews();
+
+            // Încarcă promoțiile/giveaway-urile (local)
+            loadPromos();
             
             // Inițializează graficul și datele
             initializeChart();
