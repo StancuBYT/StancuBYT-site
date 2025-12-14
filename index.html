@@ -2525,56 +2525,7 @@
             return { wei, tokens };
         }
 
-
-        // Tranzacții (Total TX) - varianta B: numărăm tranzacțiile găsite de Etherscan API.
-        // Notă: Etherscan limitează offset la 10k; pentru un contract nou e suficient.
-        async function fetchTransactionsCountAPI() {
-            const base = `https://api.etherscan.io/api?apikey=${ETHERSCAN_API_KEY}`;
-            let best = null;
-
-            // 1) Tranzacții normale către adresa contractului (deploy + interacțiuni)
-            try {
-                const url = `${base}&module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc`;
-                const r = await fetch(url);
-                const j = await r.json();
-                if (j.status === '1' && Array.isArray(j.result)) {
-                    best = Math.max(best || 0, j.result.length);
-                }
-            } catch (e) {
-                console.warn('txlist failed', e);
-            }
-
-            // 2) Token transfers (tokentx) - poate reprezenta mai bine "Transfers"
-            try {
-                const url = `${base}&module=account&action=tokentx&contractaddress=${CONTRACT_ADDRESS}&page=1&offset=10000&sort=asc`;
-                const r = await fetch(url);
-                const j = await r.json();
-                if (j.status === '1' && Array.isArray(j.result)) {
-                    best = Math.max(best || 0, j.result.length);
-                }
-            } catch (e) {
-                console.warn('tokentx failed', e);
-            }
-
-            return best;
-        }
-
-
-        
-        // Fallback public API (fără chei): Ethplorer
-        async function fetchEthplorerTokenInfo() {
-            try {
-                const url = `https://api.ethplorer.io/getTokenInfo/${CONTRACT_ADDRESS}?apiKey=freekey`;
-                const r = await fetch(url);
-                if (!r.ok) throw new Error('ethplorer http ' + r.status);
-                const j = await r.json();
-                return j && typeof j === 'object' ? j : null;
-            } catch (e) {
-                console.warn('Ethplorer fallback failed', e);
-                return null;
-            }
-        }
-// CORS-safe: r.jina.ai proxy (text)
+        // CORS-safe: r.jina.ai proxy (text)
         async function fetchEtherscanTokenPageText() {
             const url = `https://r.jina.ai/https://etherscan.io/token/${CONTRACT_ADDRESS}`;
             const r = await fetch(url);
@@ -2582,41 +2533,37 @@
             return await r.text();
         }
 
-        
         async function parseFromEtherscanText(t) {
-            // încearcă mai multe regex-uri; Etherscan își schimbă des markup-ul
-            const clean = (t || '').replace(/\u00a0/g, ' ');
+            // încearcă mai multe regex-uri, fiindcă formatul poate varia (r.jina.ai poate schimba layout-ul)
+            const norm = String(t || '').replace(/\u00a0/g, ' ');
 
-            const pickNum = (arr) => {
-                if (!arr) return null;
-                const raw = String(arr).replace(/[^0-9.,]/g, '');
-                if (!raw) return null;
-                const n = parseFloat(raw.replace(/,/g, ''));
+            function grabNumberAfter(labelRegex) {
+                const m = norm.match(labelRegex);
+                if (!m) return null;
+                const raw = (m[1] || '').trim();
+                const digits = raw.replace(/[^\d,]/g, '').replace(/,/g, '');
+                const n = parseInt(digits, 10);
                 return Number.isFinite(n) ? n : null;
-            };
+            }
 
-            // Holders (ex: "Holders:" sau "Holders (xxx)")
-            let holders = null;
-            const holdersMatch =
-                clean.match(/Holders\s*[:\)]\s*<[^>]*>\s*([0-9.,]+)/i) ||
-                clean.match(/Holders\s*[:\)]\s*([0-9.,]+)/i) ||
-                clean.match(/Holders\s*\((\s*[0-9.,]+\s*)\)/i);
-            holders = pickNum(holdersMatch && holdersMatch[1]);
+            const holders =
+                grabNumberAfter(/Holders?\s*(?:[:\-]|\n)\s*([\d,]+)/i) ??
+                grabNumberAfter(/Holders?\s*\n+([\d,]+)/i);
 
-            // Token Transfers / Transfers count (de obicei apare ca "Token Transfers (123,456)")
-            let transfers = null;
-            const transfersMatch =
-                clean.match(/Token\s*Transfers\s*\(\s*([0-9.,]+)\s*\)/i) ||
-                clean.match(/Transfers\s*\(\s*([0-9.,]+)\s*\)/i) ||
-                clean.match(/Token\s*Transfers\s*[:\)]\s*([0-9.,]+)/i);
-            transfers = pickNum(transfersMatch && transfersMatch[1]);
+            const transfers =
+                grabNumberAfter(/(?:Token\s+)?Transfers?\s*(?:[:\-]|\n)\s*([\d,]+)/i) ??
+                grabNumberAfter(/(?:Token\s+)?Transfers?\s*\n+([\d,]+)/i) ??
+                grabNumberAfter(/Transfers?\s*\((?:ERC-20|Token)\)\s*(?:[:\-]|\n)\s*([\d,]+)/i);
 
-            // Total Supply (text)
             let supplyTokens = null;
             const supplyMatch =
-                clean.match(/Total\s*Supply\s*[:\)]\s*<[^>]*>\s*([0-9.,]+)\s*([A-Z]{2,10})/i) ||
-                clean.match(/Total\s*Supply\s*[:\)]\s*([0-9.,]+)\s*([A-Z]{2,10})/i);
-            supplyTokens = pickNum(supplyMatch && supplyMatch[1]);
+                norm.match(/Total Supply\s*(?:[:\-]|\n)\s*([\d,\.]+)/i) ||
+                norm.match(/Total Supply\s*\n+([\d,\.]+)/i);
+            if (supplyMatch && supplyMatch[1]) {
+                const s = supplyMatch[1].replace(/,/g, '').trim();
+                const n = parseFloat(s);
+                if (Number.isFinite(n)) supplyTokens = n;
+            }
 
             return { holders, transfers, supplyTokens };
         }
@@ -2648,7 +2595,7 @@
         }
 
         async function fetchAllData() {
-            const refreshBtn = $('refreshButton');
+            const refreshBtn = $('refreshBtn');
             const original = refreshBtn ? refreshBtn.innerHTML : null;
 
             try {
@@ -2674,7 +2621,7 @@
                     const txt = await fetchEtherscanTokenPageText();
                     const parsed = await parseFromEtherscanText(txt);
 
-                    if (parsed.holders != null) { setText('holdersCount', parsed.holders.toLocaleString('ro-RO')); } else { try { const info = await fetchEthplorerTokenInfo(); const hc = info && info.holdersCount; if (hc != null) setText('holdersCount', Number(hc).toLocaleString('ro-RO')); } catch(e){} }
+                    if (parsed.holders != null) setText('holdersCount', parsed.holders.toLocaleString('ro-RO'));
                     if (parsed.transfers != null) setText('transactionsCount', parsed.transfers.toLocaleString('ro-RO'));
 
                     if (supplyTokens == null && parsed.supplyTokens != null) {
@@ -2684,24 +2631,6 @@
                     }
                 } catch (e) {
                     console.warn('Etherscan scrape failed:', e);
-                }
-
-
-                // Tranzacții (API) - dacă scrape nu a dat nimic
-                try {
-                    const txc = await fetchTransactionsCountAPI();
-                    if (txc != null) setText('transactionsCount', txc.toLocaleString('ro-RO'));
-                } catch (e) {
-                    console.warn('transactionsCount API failed', e);
-                // Fallback: Ethplorer transfersCount
-                try {
-                    const info = await fetchEthplorerTokenInfo();
-                    const tc = info && (info.transfersCount ?? info.transfersCount === 0 ? info.transfersCount : null);
-                    if (tc != null) setText('transactionsCount', Number(tc).toLocaleString('ro-RO'));
-                } catch(e2) {
-                    console.warn('Ethplorer transfersCount failed', e2);
-                }
-
                 }
 
                 // Contract creator + data aproximativă (din tx)
@@ -2755,7 +2684,6 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
         let priceChart = null;
         let liveSeries = []; // [{t: Date, p: number}]
         let lastPrice = null;
-        let currentPeriod = 'live';
 
         function _maxPointsForPeriod(period) {
             // doar pentru cât păstrăm în memorie (grafic live)
@@ -2766,45 +2694,15 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             return 120; // 'live' sau default
         }
 
-        
         function initializeChart() {
             const canvas = document.getElementById('priceChart');
-            if (!canvas) return;
+            if (!canvas || !window.Chart) return;
+
             const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-
-            // dacă există deja, nu recrea
-            if (window.__stancu_priceChart) return;
-
-            const data = {
-                labels: [],
-                datasets: [{
-                    label: 'Preț (USD)',
-                    data: [],
-                    borderWidth: 2,
-                    tension: 0.25,
-                    pointRadius: 0
-                }]
-            };
-
-            window.__stancu_priceChart = new Chart(ctx, {
-                type: 'line',
-                data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { display: false } },
-                        y: {
-                            ticks: { callback: (v) => v },
-                            beginAtZero: false
-                        }
-                    }
-                }
-            });
-        }
+            if (priceChart) {
+                try { priceChart.destroy(); } catch(e) {}
+                priceChart = null;
+            }
 
             priceChart = new Chart(ctx, {
                 type: 'line',
@@ -2840,27 +2738,7 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             priceChart.update('none');
         }
 
-        
-        function updatePriceChartLive(priceUsd) {
-            try {
-                const ch = window.__stancu_priceChart;
-                if (!ch) return;
-                const ts = new Date();
-                const lbl = ts.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                ch.data.labels.push(lbl);
-                ch.data.datasets[0].data.push(Number(priceUsd));
-                // păstrează ultimele 120 puncte (~20 minute la 10s)
-                const max = 120;
-                if (ch.data.labels.length > max) {
-                    ch.data.labels.shift();
-                    ch.data.datasets[0].data.shift();
-                }
-                ch.update();
-            } catch (e) {
-                console.warn('chart update failed', e);
-            }
-        }
-async function fetchDexScreenerBestPair() {
+        async function fetchDexScreenerBestPair() {
             const url = `https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`;
             const r = await fetch(url);
             if (!r.ok) throw new Error('DexScreener fetch failed');
@@ -2872,20 +2750,10 @@ async function fetchDexScreenerBestPair() {
             return pairs[0];
         }
 
-        
-        function startPriceAutoUpdate() {
-            // rulează imediat și apoi la fiecare 10s
-            updateLivePriceAndChart('live');
-            if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
-            window.__stancu_priceInterval = setInterval(() => updateLivePriceAndChart('live'), 10000);
-        }
-
-async function updateLivePriceAndChart(period = 'live') {
+        async function updateLivePriceAndChart(period = 'live') {
             try {
                 const pair = await fetchDexScreenerBestPair();
                 const priceUsd = Number(pair.priceUsd);
-                // actualizează graficul live (fallback sigur)
-                updatePriceChartLive(priceUsd);
                 if (!Number.isFinite(priceUsd)) throw new Error('priceUsd missing');
 
                 // UI: preț + schimbare
@@ -2927,25 +2795,12 @@ async function updateLivePriceAndChart(period = 'live') {
 
         // Butoane perioadă (dacă există în UI)
         async function changeChartPeriod(period) {
-            currentPeriod = period || 'live';
             // resetează seria pentru o experiență “curată”
             liveSeries = [];
             _renderLiveChart(period);
             // forțează update imediat
             await updateLivePriceAndChart(period);
         }
-
-
-        // Butoane tip grafic (lumânări/linie). În varianta B folosim linie (live).
-        // Dacă se apasă "Lumânări", nu crăpăm site-ul: rămânem pe linie.
-        function changeChartType(type) {
-            // compatibilitate cu UI existent
-            if (!type) return;
-            // În această implementare simplă rămânem pe line chart (Chart.js standard)
-            // pentru a evita probleme de CORS / OHLC. Doar re-render.
-            _renderLiveChart(currentPeriod || 'live');
-        }
-
 
         // compatibilitate: unele versiuni apelau updateChart()
         async function updateChart(period) {
@@ -2954,9 +2809,6 @@ async function updateLivePriceAndChart(period = 'live') {
 
 
         window.addEventListener('load', () => {
-            initializeChart();
-            startPriceAutoUpdate();
-
             // IMPORTANT: evită conflictul de id duplicat pentru contact din whitepaper
             const wpContact = document.querySelector('#whitepaper #contact');
             if (wpContact) wpContact.id = 'contact-wp';
@@ -2978,22 +2830,6 @@ async function updateLivePriceAndChart(period = 'live') {
 
         // dacă utilizatorul schimbă hash manual
         window.addEventListener('hashchange', initRouting);
-        // Expune funcțiile folosite în HTML (onclick) în scope global
-        try {
-            Object.assign(window, {
-                showSection,
-                scrollToSection,
-                requestPassword,
-                saveNews,
-                cancelAddNews,
-                deleteNewsItem,
-                clearAllNews,
-                changeChartPeriod,
-                changeChartType,
-                fetchAllData
-            });
-        } catch (e) {}
-
     </script>
 </body>
 </html>
