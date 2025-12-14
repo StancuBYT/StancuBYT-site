@@ -2533,30 +2533,41 @@
             return await r.text();
         }
 
-        function parseFromEtherscanText(t) {
-            // încearcă mai multe regex-uri, fiindcă formatul poate varia
-            const norm = t.replace(/\u00a0/g, ' ');
+        async function parseFromEtherscanText(t) {
+            // încearcă mai multe regex-uri, fiindcă formatul poate varia (r.jina.ai poate schimba layout-ul)
+            const norm = String(t || '').replace(/\u00a0/g, ' ');
 
-            const holdersMatch =
-                norm.match(/Holders?\s*[:\-]?\s*([\d,]+)/i) ||
-                norm.match(/Holders?\s*\n+([\d,]+)/i);
+            function grabNumberAfter(labelRegex) {
+                const m = norm.match(labelRegex);
+                if (!m) return null;
+                const raw = (m[1] || '').trim();
+                const digits = raw.replace(/[^\d,]/g, '').replace(/,/g, '');
+                const n = parseInt(digits, 10);
+                return Number.isFinite(n) ? n : null;
+            }
 
-            const transfersMatch =
-                norm.match(/Transfers?\s*[:\-]?\s*([\d,]+)/i) ||
-                norm.match(/Token Transfers?\s*[:\-]?\s*([\d,]+)/i);
+            const holders =
+                grabNumberAfter(/Holders?\s*(?:[:\-]|\n)\s*([\d,]+)/i) ??
+                grabNumberAfter(/Holders?\s*\n+([\d,]+)/i);
 
-            const supplyMatch =
-                norm.match(/Total Supply\s*[:\-]?\s*([\d,\.]+)/i);
-
-            const holders = holdersMatch ? parseInt(holdersMatch[1].replace(/,/g, ''), 10) : null;
-            const transfers = transfersMatch ? parseInt(transfersMatch[1].replace(/,/g, ''), 10) : null;
+            const transfers =
+                grabNumberAfter(/(?:Token\s+)?Transfers?\s*(?:[:\-]|\n)\s*([\d,]+)/i) ??
+                grabNumberAfter(/(?:Token\s+)?Transfers?\s*\n+([\d,]+)/i) ??
+                grabNumberAfter(/Transfers?\s*\((?:ERC-20|Token)\)\s*(?:[:\-]|\n)\s*([\d,]+)/i);
 
             let supplyTokens = null;
-            if (supplyMatch) {
-                const s = supplyMatch[1].replace(/,/g, '');
+            const supplyMatch =
+                norm.match(/Total Supply\s*(?:[:\-]|\n)\s*([\d,\.]+)/i) ||
+                norm.match(/Total Supply\s*\n+([\d,\.]+)/i);
+            if (supplyMatch && supplyMatch[1]) {
+                const s = supplyMatch[1].replace(/,/g, '').trim();
                 const n = parseFloat(s);
-                if (!isNaN(n)) supplyTokens = n;
+                if (Number.isFinite(n)) supplyTokens = n;
             }
+
+            return { holders, transfers, supplyTokens };
+        }
+
 
             return { holders, transfers, supplyTokens };
         }
@@ -2612,7 +2623,7 @@
                 // Holders/Transfers + (opțional supply fallback) din pagină Etherscan
                 try {
                     const txt = await fetchEtherscanTokenPageText();
-                    const parsed = parseFromEtherscanText(txt);
+                    const parsed = await parseFromEtherscanText(txt);
 
                     if (parsed.holders != null) setText('holdersCount', parsed.holders.toLocaleString('ro-RO'));
                     if (parsed.transfers != null) setText('transactionsCount', parsed.transfers.toLocaleString('ro-RO'));
@@ -2675,8 +2686,13 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
         // GRAFIC + PREȚ LIVE (DEX)
         // =============================================
         let priceChart = null;
+        let livePriceSeries = []; // fallback serie locală pentru grafic
+        const LIVE_SERIES_MAX = 180; // ~30 min la 10s
+
         let currentPeriod = '24h';
-        let bestPairCache = null; // { chainId, pairAddress, dexId, url, priceUsd, ... }
+        let bestPairCache = null;
+        let lastOhlcvData = null;
+ // { chainId, pairAddress, dexId, url, priceUsd, ... }
 
         async function fetchBestPairFromDexScreener() {
             // încearcă chainId-uri comune pentru ETH
@@ -2713,6 +2729,18 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             if (btn) btn.classList.add('active');
         }
 
+        function addLivePoint(priceUsd) {
+            const p = Number(priceUsd);
+            if (!Number.isFinite(p) || p <= 0) return;
+            const now = Date.now();
+            livePriceSeries.push({ t: now, p });
+            if (livePriceSeries.length > LIVE_SERIES_MAX) {
+                livePriceSeries = livePriceSeries.slice(-LIVE_SERIES_MAX);
+            }
+            // Persistă local ca să ai continuitate după refresh
+            try { localStorage.setItem('sbyt_live_series', JSON.stringify(livePriceSeries.slice(-200))); } catch(e){}
+        }
+
         async function updateLivePriceAndStats() {
             const pair = await fetchBestPairFromDexScreener();
             bestPairCache = pair || bestPairCache;
@@ -2722,6 +2750,9 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             const priceUsd = Number(bestPairCache.priceUsd || bestPairCache.priceNative || 0);
             const priceEl = $('currentPrice');
             if (priceEl) priceEl.textContent = formatUsd(priceUsd);
+            addLivePoint(priceUsd);
+            // actualizează graficul live (fallback) dacă nu avem OHLC
+            try { if (priceChart && (!lastOhlcvData || !lastOhlcvData.length)) updateChart('live'); } catch(e){}
 
             // schimbare 24h (dacă există)
             const pc = bestPairCache.priceChange?.h24;
@@ -2748,11 +2779,52 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             if (lu) lu.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
+        
+
         async function fetchOhlcvFromGeckoTerminal(period) {
             // avem nevoie de pool (pairAddress) – îl luăm din DexScreener
             if (!bestPairCache) {
                 bestPairCache = await fetchBestPairFromDexScreener();
             }
+            if (!bestPairCache?.pairAddress) return null;
+
+            // mapare perioade UI -> timeframe GeckoTerminal
+            let timeframe = 'hour';
+            let aggregate = 1;
+            let limit = 60;
+
+            if (period === '1h') { timeframe = 'minute'; aggregate = 1; limit = 60; }
+            if (period === '24h') { timeframe = 'hour'; aggregate = 1; limit = 24; }
+            if (period === '7d') { timeframe = 'day'; aggregate = 1; limit = 7; }
+            if (period === '1m') { timeframe = 'day'; aggregate = 1; limit = 30; }
+
+            const pool = bestPairCache.pairAddress;
+            const url = `https://api.geckoterminal.com/api/v2/networks/ethereum/pools/${pool}/ohlcv/${timeframe}?aggregate=${aggregate}&limit=${limit}`;
+
+            // Unele browsere / hosting-uri blochează CORS pentru geckoterminal -> încercăm direct, apoi via proxy allorigins
+            const tryFetchJson = async (u) => {
+                const r = await fetch(u, { headers: { 'accept': 'application/json' }});
+                if (!r.ok) return null;
+                return await r.json();
+            };
+
+            let data = null;
+            try { data = await tryFetchJson(url); } catch(e) { data = null; }
+
+            if (!data) {
+                try {
+                    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const r = await fetch(proxy);
+                    if (r.ok) data = await r.json();
+                } catch(e) { data = null; }
+            }
+
+            const list = data?.data?.attributes?.ohlcv_list;
+            if (!Array.isArray(list) || !list.length) return null;
+            lastOhlcvData = list;
+            return list;
+        }
+
             if (!bestPairCache?.pairAddress) return null;
 
             // mapare perioade UI -> timeframe GeckoTerminal
@@ -2798,26 +2870,55 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             });
         }
 
+        async 
+
         async function updateChart(period) {
             if (!priceChart) return;
-            const ohlcv = await fetchOhlcvFromGeckoTerminal(period);
-            if (!ohlcv) return;
 
-            // GeckoTerminal poate întoarce ordine descrescătoare; sortăm crescător după timestamp
-            const sorted = ohlcv.slice().sort((a, b) => a[0] - b[0]);
+            // butoane active
+            if (period && period !== 'live') setActivePeriodBtn(period);
 
-            const labels = sorted.map(x => {
-                const d = new Date(x[0] * 1000);
-                if (period === '1h') return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
-                if (period === '24h') return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
-                return d.toLocaleDateString('ro-RO', { month: 'short', day: '2-digit' });
-            });
+            // 1) Încearcă OHLCV (candlestick) din GeckoTerminal
+            let ohlcv = null;
+            if (period && period !== 'live') {
+                try { ohlcv = await fetchOhlcvFromGeckoTerminal(period); } catch(e) { ohlcv = null; }
+            }
 
-            const closes = sorted.map(x => Number(x[4])); // close
+            if (ohlcv && Array.isArray(ohlcv) && ohlcv.length) {
+                // list: [ [timestamp, open, high, low, close, volume], ... ] - timestamp în secunde
+                const labels = ohlcv.map(r => new Date(r[0] * 1000).toLocaleString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+                const closes = ohlcv.map(r => Number(r[4]));
+                priceChart.data.labels = labels;
+                priceChart.data.datasets[0].data = closes;
+                priceChart.options.scales.y.beginAtZero = false;
+                priceChart.update();
+                return;
+            }
+
+            // 2) Fallback: grafic LIVE din puncte colectate local (DexScreener)
+            // Încarcă serie din localStorage dacă e goală
+            if (!livePriceSeries.length) {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('sbyt_live_series') || '[]');
+                    if (Array.isArray(saved)) livePriceSeries = saved.filter(x => x && typeof x.t === 'number' && typeof x.p === 'number');
+                } catch(e){}
+            }
+
+            // dacă încă nu avem puncte, încearcă să forțezi o actualizare de preț
+            if (!livePriceSeries.length) {
+                try { await updateLivePriceAndStats(); } catch(e){}
+            }
+
+            const series = livePriceSeries.slice(-60); // ultimele ~10 minute la 10s
+            const labels = series.map(x => new Date(x.t).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+            const data = series.map(x => x.p);
+
             priceChart.data.labels = labels;
-            priceChart.data.datasets[0].data = closes;
+            priceChart.data.datasets[0].data = data;
+            priceChart.options.scales.y.beginAtZero = false;
             priceChart.update();
         }
+
 
         async function changeChartPeriod(period) {
             currentPeriod = period;
@@ -2842,6 +2943,9 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
             initializeChart();
             fetchAllData();
             setInterval(fetchAllData, 60000);
+            // Preț live + grafic fallback la 10 secunde
+            setInterval(() => { updateLivePriceAndStats().catch(()=>{}); }, 10000);
+            setInterval(() => { updateChart('live').catch(()=>{}); }, 15000);
         });
 
         // dacă utilizatorul schimbă hash manual
