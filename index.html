@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StancuBYT | Token Digital Avansat</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
     <style>
         /* Variabile culori conform psihologiei marketingului */
@@ -2034,17 +2041,22 @@
                 <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă promoție/giveaway</h3>
                 <div class="form-row">
                     <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT)" maxlength="100">
-                    <input type="date" id="promoEndDate">
+                    <input type="datetime-local" id="promoEnds">
                 </div>
                 <div class="form-row">
                     <input type="text" id="promoDesc" placeholder="Descriere (reguli, premii, pași)" maxlength="500">
+                </div>
+                <div class="form-row">
+                    <input type="number" id="promoPoints" min="1" step="1" placeholder="Puncte per promovare (ex: 10)">
+                    <input type="file" id="promoMedia" accept="image/*,video/*">
+                
                 </div>
                 <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
                     <button class="news-btn" onclick="savePromo()">💾 Salvează</button>
                     <button class="news-btn" onclick="cancelPromo()">❌ Anulează</button>
                 </div>
                 <small style="display:block; margin-top:0.8rem; opacity:0.75;">
-                    Notă: fără backend nu putem încărca fișiere foto/video pe server. Poți pune link-uri (YouTube/Drive) în descriere.
+                    Notă: upload foto/video este disponibil prin Firebase Storage (admin).
                 </small>
             </div>
         </div>
@@ -2980,5 +2992,368 @@ async function updateLivePriceAndChart(period = 'live') {
         } catch (e) {}
 
     </script>
+
+<script>
+/* ============================================================
+   FIREBASE GIVEAWAY HOTFIX (compat cu HTML-ul actual)
+   - foloseste #promoEnds (datetime-local)
+   - inscriere + promovare + leaderboard in Firestore
+   - nu modifica designul, doar functionalitatea
+============================================================ */
+
+(function(){
+  // Daca nu exista Firebase, iesim fara sa stricăm site-ul
+  if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) return;
+
+  // Helpers
+  const $ = (id) => document.getElementById(id);
+  const esc = (s)=>String(s??'').replace(/[&<>"'`=\/]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;' }[c]));
+  const fmtDate = (ms)=> {
+    try { return new Date(ms).toLocaleString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+    catch { return '-'; }
+  };
+
+  // Asigura ca exista ensureAdminAuth din fisier; daca nu, facem fallback pe parola + email admin
+  window.ensureAdminAuth = window.ensureAdminAuth || (async function(){
+    try{
+      if (auth.currentUser) return true;
+      const pass = prompt('Parola admin:');
+      if (!pass) return false;
+      await auth.signInWithEmailAndPassword('admin@stancubyt.com', pass);
+      return true;
+    }catch(e){
+      console.error(e);
+      alert('Nu te poti autentifica. Verifica in Firebase: Authentication -> Email/Password enabled si user admin@stancubyt.com.');
+      return false;
+    }
+  });
+
+  // Fix: show promo form
+  window.showPromoForm = async function(){
+    const ok = await window.ensureAdminAuth();
+    if (!ok) return;
+    const f = $('promoForm');
+    if (f) f.style.display = 'block';
+  };
+
+  window.cancelPromo = function(){
+    const f = $('promoForm');
+    if (f) f.style.display = 'none';
+    ['promoTitle','promoDesc','promoEnds','promoPoints'].forEach(id=>{ const el=$(id); if(el) el.value='';});
+    const media = $('promoMedia'); if (media) media.value='';
+  };
+
+  async function uploadPromoMedia(promoId, file){
+    if (!file || !storage) return null;
+    const safeName = String(file.name || 'file').replace(/[^\w.\-]+/g,'_');
+    const path = `promos/${promoId}/${Date.now()}_${safeName}`;
+    const ref = storage.ref().child(path);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    return { url, path, contentType: file.type || 'application/octet-stream', name: safeName };
+  }
+
+  // SAVE PROMO (admin)
+  window.savePromo = async function(){
+    const ok = await window.ensureAdminAuth();
+    if (!ok) return;
+
+    const title = ( $('promoTitle')?.value || '' ).trim();
+    const desc  = ( $('promoDesc')?.value || '' ).trim();
+    const endsV = ( $('promoEnds')?.value || '' ).trim(); // datetime-local
+    const points = parseInt(($('promoPoints')?.value || '10'),10) || 10;
+    const file = $('promoMedia')?.files?.[0] || null;
+
+    if (!title || !endsV){
+      alert('Completează titlul și data expirării!');
+      return;
+    }
+
+    const endsAt = new Date(endsV).getTime();
+    if (!endsAt || endsAt <= Date.now()){
+      alert('Data expirării trebuie să fie în viitor!');
+      return;
+    }
+
+    try{
+      const ref = await db.collection('promos').add({
+        title, desc, endsAt,
+        pointsPerPromotion: points,
+        createdAt: Date.now(),
+        status: 'active',
+        media: null
+      });
+
+      if (file){
+        const media = await uploadPromoMedia(ref.id, file);
+        if (media) await ref.update({ media });
+      }
+
+      window.cancelPromo();
+      alert('Giveaway/Promoție adăugată!');
+    }catch(e){
+      console.error('savePromo', e);
+      alert('Eroare la salvarea promoției (verifică Firestore Rules).');
+    }
+  };
+
+  // DELETE PROMO (admin)
+  window.deletePromo = async function(promoId){
+    const ok = await window.ensureAdminAuth();
+    if (!ok) return;
+    if (!confirm('Ștergi această promoție/giveaway?')) return;
+
+    try{
+      await db.collection('promos').doc(promoId).delete();
+    }catch(e){
+      console.error(e);
+      alert('Eroare la ștergere promo.');
+    }
+  };
+
+  // CLEAR PROMOS (admin)
+  window.clearPromos = async function(){
+    const ok = await window.ensureAdminAuth();
+    if (!ok) return;
+    if (!confirm('Ștergi toate promoțiile/giveaway-urile?')) return;
+
+    try{
+      const snap = await db.collection('promos').get();
+      const batch = db.batch();
+      snap.forEach(d=>batch.delete(d.ref));
+      await batch.commit();
+      alert('Promoțiile au fost șterse.');
+    }catch(e){
+      console.error(e);
+      alert('Eroare la ștergere.');
+    }
+  };
+
+  // Participant helpers
+  const pidFrom = (s)=>String(s||'').trim().toLowerCase().replace(/[^\w.\-@]+/g,'_');
+
+  window.openPromo = function(promoId){
+    window.__activePromoId = promoId;
+    renderLeaderboardFor(promoId).catch(()=>{});
+  };
+
+  // JOIN (public)
+  window.joinPromo = async function(promoId){
+    const name = (document.getElementById('joinName_'+promoId)?.value || '').trim();
+    const email = (document.getElementById('joinEmail_'+promoId)?.value || '').trim().toLowerCase();
+
+    if (!name || !email){
+      alert('Completează nume și email.');
+      return;
+    }
+
+    try{
+      // verify promo not expired
+      const promoDoc = await db.collection('promos').doc(promoId).get();
+      if (!promoDoc.exists) return alert('Promoția nu există.');
+      const p = promoDoc.data() || {};
+      if (p.endsAt && Number(p.endsAt) <= Date.now()) return alert('Acest giveaway/promoție a expirat.');
+
+      const pid = pidFrom(email);
+      await db.collection('promos').doc(promoId).collection('participants').doc(pid).set({
+        name, email,
+        promotions: 0,
+        points: 0,
+        joinedAt: Date.now(),
+        lastPromotionAt: 0
+      }, { merge:true });
+
+      alert('Înscriere reușită!');
+      renderLeaderboardFor(promoId).catch(()=>{});
+    }catch(e){
+      console.error(e);
+      alert('Eroare înscriere (verifică Rules).');
+    }
+  };
+
+  // PROMOTE (public)
+  window.promoteMe = async function(promoId){
+    const email = (document.getElementById('joinEmail_'+promoId)?.value || '').trim().toLowerCase();
+    if (!email) return alert('Introdu emailul cu care ești înscris.');
+
+    const pid = pidFrom(email);
+    const ref = db.collection('promos').doc(promoId).collection('participants').doc(pid);
+
+    try{
+      const promoDoc = await db.collection('promos').doc(promoId).get();
+      if (!promoDoc.exists) return alert('Promoția nu există.');
+      const p = promoDoc.data() || {};
+      if (p.endsAt && Number(p.endsAt) <= Date.now()) return alert('Acest giveaway/promoție a expirat.');
+
+      const addPts = Number(p.pointsPerPromotion || 10);
+      const cooldownMs = 60 * 1000;
+
+      await db.runTransaction(async (t)=>{
+        const snap = await t.get(ref);
+        if (!snap.exists) throw new Error('Nu ești înscris.');
+        const d = snap.data() || {};
+        const now = Date.now();
+        const last = Number(d.lastPromotionAt || 0);
+        if (now - last < cooldownMs) throw new Error('Poți promova o dată pe minut.');
+
+        t.set(ref, {
+          promotions: Number(d.promotions||0) + 1,
+          points: Number(d.points||0) + addPts,
+          lastPromotionAt: now
+        }, { merge:true });
+      });
+
+      alert(`Promovare înregistrată (+${addPts} puncte)!`);
+      renderLeaderboardFor(promoId).catch(()=>{});
+    }catch(e){
+      alert(e?.message || 'Eroare promovare.');
+    }
+  };
+
+  // LEADERBOARD
+  async function renderLeaderboardFor(promoId){
+    const lb = document.getElementById('leaderboard');
+    if (!lb) return;
+
+    lb.innerHTML = '<div style="opacity:0.85;">Se încarcă clasamentul...</div>';
+
+    const snap = await db.collection('promos').doc(promoId).collection('participants')
+      .orderBy('points','desc').limit(50).get();
+
+    if (snap.empty){
+      lb.innerHTML = '<div style="opacity:0.85;">Nu există participanți încă.</div>';
+      return;
+    }
+
+    let html = '<div style="display:grid; gap:10px;">';
+    let i=0;
+    snap.forEach(doc=>{
+      i++;
+      const d = doc.data() || {};
+      html += `
+        <div class="news-card" style="padding:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div>
+              <div style="font-weight:bold; color:white;">#${i} ${esc(d.name||'—')}</div>
+              <div style="opacity:0.8; font-size:0.9rem;">${esc(d.email||'')}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:bold; color: var(--neon-cyan); font-size:1.2rem;">${Number(d.points||0)}</div>
+              <div style="opacity:0.75; font-size:0.85rem;">puncte (${Number(d.promotions||0)} promovări)</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+    lb.innerHTML = html;
+  }
+
+  // LISTEN PROMOS (live)
+  let __unsubPromos = null;
+  function listenPromos(){
+    const list = document.getElementById('promoList');
+    if (!list) return;
+
+    if (__unsubPromos) { try{ __unsubPromos(); }catch(_){} __unsubPromos=null; }
+
+    __unsubPromos = db.collection('promos').orderBy('createdAt','desc').onSnapshot((snap)=>{
+      const items = [];
+      snap.forEach(doc=>items.push({ _id: doc.id, ...(doc.data()||{}) }));
+      renderPromos(items);
+    });
+  }
+
+  function renderPromos(promos){
+    const promoList = document.getElementById('promoList');
+    if (!promoList) return;
+
+    promoList.innerHTML = '';
+    const now = Date.now();
+
+    if (!promos || !promos.length){
+      promoList.innerHTML = '<div style="opacity:0.85;">Nu există promoții active încă.</div>';
+      return;
+    }
+
+    promos.forEach(p=>{
+      const expired = p.endsAt && Number(p.endsAt) <= now;
+      const badgeClass = expired ? 'badge-announcement' : 'badge-event';
+      const badgeText  = expired ? 'Expirat' : 'Activ';
+
+      const mediaHtml = p.media?.url
+        ? (String(p.media.contentType||'').startsWith('video/')
+            ? `<video controls style="width:100%; border-radius:12px; margin-top:10px;">
+                 <source src="${p.media.url}" type="${esc(p.media.contentType||'video/mp4')}">
+               </video>`
+            : `<img src="${p.media.url}" alt="" style="width:100%; border-radius:12px; margin-top:10px;">`)
+        : '';
+
+      const adminBtns = `
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+          <button class="news-btn" onclick="openPromo('${p._id}')">🏆 Clasament</button>
+          <button class="news-btn" onclick="deletePromo('${p._id}')">🗑️ Șterge</button>
+        </div>
+      `;
+
+      const joinUi = `
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+          <h4 style="margin:0 0 0.6rem 0; color: var(--neon-cyan);">Înscriere</h4>
+          <div class="form-row">
+            <input id="joinName_${p._id}" type="text" placeholder="Nume" maxlength="60">
+            <input id="joinEmail_${p._id}" type="email" placeholder="Email" maxlength="80">
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="news-btn" onclick="joinPromo('${p._id}')">✅ Înscrie-te</button>
+            <button class="news-btn" onclick="promoteMe('${p._id}')">🚀 Promovează</button>
+          </div>
+          <small style="display:block; margin-top:0.6rem; opacity:0.75;">
+            Promovarea se poate face o dată pe minut. Puncte / promovare: <b>${Number(p.pointsPerPromotion||10)}</b>.
+          </small>
+        </div>
+      `;
+
+      const card = document.createElement('div');
+      card.className = 'news-card' + (expired ? ' pinned' : '');
+      card.innerHTML = `
+        <div class="news-badge ${badgeClass}">${badgeText}</div>
+        <h4 style="margin-bottom:0.5rem; color:white;">${esc(p.title||'')}</h4>
+        <p style="opacity:0.9; line-height:1.5;">${esc(p.desc||'')}</p>
+        <div class="news-date" style="margin-top:0.8rem;">
+          <span>⏳</span> Expiră: ${fmtDate(p.endsAt)}
+        </div>
+        ${mediaHtml}
+        ${joinUi}
+        ${adminBtns}
+      `;
+
+      promoList.appendChild(card);
+    });
+
+    // auto-select first promo for leaderboard
+    if (!window.__activePromoId && promos[0]?._id){
+      window.__activePromoId = promos[0]._id;
+      renderLeaderboardFor(window.__activePromoId).catch(()=>{});
+    }
+  }
+
+  // Hook requestPassword actions to firebase promo functions
+  const oldRequestPassword = window.requestPassword;
+  window.requestPassword = function(action, id){
+    if (action === 'promoAdd') return window.showPromoForm();
+    if (action === 'promoClear') return window.clearPromos();
+    if (action === 'deletePromo') return window.deletePromo(id);
+    // keep existing for news
+    return oldRequestPassword ? oldRequestPassword(action, id) : undefined;
+  };
+
+  // Start listeners when page loads
+  window.addEventListener('load', ()=>{
+    try { listenPromos(); } catch(e){ console.error(e); }
+  });
+
+})();
+</script>
+
 </body>
 </html>
