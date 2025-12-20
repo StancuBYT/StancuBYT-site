@@ -2097,7 +2097,7 @@
 
         const ADMIN_EMAIL = "admin@stancubyt.com";
 
-        async function ensureAdmin() {
+        async async function ensureAdmin() {
             if (auth.currentUser) return true;
             const pass = prompt('Introduceți parola ADMIN:');
             if (!pass) return false;
@@ -3063,6 +3063,9 @@ async function updateLivePriceAndChart(period = 'live') {
             });
         } catch (e) {}
 
-    </script>
+    
+// Expose pentru onclick inline
+window.showSection = showSection;
+</script>
 </body>
 </html>
