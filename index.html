@@ -1112,6 +1112,13 @@
             }
         }
     </style>
+
+    <!-- Firebase SDKs (compat - pentru site static GitHub Pages) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
 </head>
 <body>
     <!-- Particles Background -->
@@ -2039,6 +2046,10 @@
                 <div class="form-row">
                     <input type="text" id="promoDesc" placeholder="Descriere (reguli, premii, pași)" maxlength="500">
                 </div>
+                <div class="form-row">
+                    <input type="file" id="promoMediaImage" accept="image/*" style="flex:1;">
+                    <input type="file" id="promoMediaVideo" accept="video/*" style="flex:1;">
+                </div>
                 <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
                     <button class="news-btn" onclick="savePromo()">💾 Salvează</button>
                     <button class="news-btn" onclick="cancelPromo()">❌ Anulează</button>
@@ -2064,7 +2075,43 @@
         // CONFIGURARE
         // =============================================
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
-        const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
+        
+
+        // ================================
+        // FIREBASE (VARIANTA CU BACKEND)
+        // ================================
+        const FIREBASE_CONFIG = {
+          apiKey: "AIzaSyAjcRgrqwfXk-f2AqwUFtacSRWyUhsPTuY",
+          authDomain: "stancubyt-64c78.firebaseapp.com",
+          projectId: "stancubyt-64c78",
+          storageBucket: "stancubyt-64c78.firebasestorage.app",
+          messagingSenderId: "866498315210",
+          appId: "1:866498315210:web:abcf161e31aca695758533",
+          measurementId: "G-J5B0K35MR0"
+        };
+
+        firebase.initializeApp(FIREBASE_CONFIG);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        const ADMIN_EMAIL = "admin@stancubyt.com";
+
+        async function ensureAdmin() {
+            if (auth.currentUser) return true;
+            const pass = prompt('Introduceți parola ADMIN:');
+            if (!pass) return false;
+            try {
+                await auth.signInWithEmailAndPassword(ADMIN_EMAIL, pass);
+                return true;
+            } catch (e) {
+                console.error('Auth error:', e);
+                alert('Parolă incorectă sau user admin lipsă în Firebase Auth.');
+                return false;
+            }
+        }
+
+const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
         const ADMIN_PASSWORD = 'ParolaCripto24091980.';
 
         // Chei storage
@@ -2125,18 +2172,30 @@
         // =============================================
         // CONTOR VIZITE (local – varianta B)
         // =============================================
-        function updateVisitCounter() {
+        
+        async function updateVisitCounter() {
             try {
-                let visits = parseInt(localStorage.getItem(LS_VISITS) || '0', 10);
-                visits += 1;
-                localStorage.setItem(LS_VISITS, String(visits));
+                const el = document.getElementById('visitCount') || document.getElementById('visitsCount') || document.getElementById('visits');
+                const docRef = db.collection('stats').doc('visits');
 
-                // suport pentru diferite id-uri existente în layout
-                const el = $('visitCount') || $('visitsCount') || $('visitCounter') || $('visits');
-                if (el) el.textContent = visits.toLocaleString('ro-RO');
+                const sessionKey = 'stancubyt_session_counted';
+                if (!sessionStorage.getItem(sessionKey)) {
+                    await db.runTransaction(async (tx) => {
+                        const snap = await tx.get(docRef);
+                        const current = snap.exists && typeof snap.data().count === 'number' ? snap.data().count : 0;
+                        tx.set(docRef, { count: current + 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                    });
+                    sessionStorage.setItem(sessionKey, '1');
+                }
+
+                const snap = await docRef.get();
+                const count = snap.exists && typeof snap.data().count === 'number' ? snap.data().count : 0;
+                if (el) el.textContent = Number(count).toLocaleString('ro-RO');
             } catch (e) {
-                console.error('visit counter:', e);
+                console.error('updateVisitCounter:', e);
             }
+        }
+
         }
 
         // =============================================
@@ -2167,45 +2226,48 @@
             localStorage.setItem(LS_NEWS, JSON.stringify(initial));
         }
 
-        function loadNews() {
+        
+        async function loadNews() {
             try {
-                seedNewsIfMissing();
-                const news = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
-
-                // Sortare: pinned, apoi recent
-                news.sort((a, b) => {
-                    if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
-                    return new Date(b.date) - new Date(a.date);
-                });
-
                 const container = $('newsContainer');
                 if (!container) return;
                 container.innerHTML = '';
 
-                news.forEach(item => {
+                const snap = await db.collection('news')
+                    .orderBy('pinned', 'desc')
+                    .orderBy('date', 'desc')
+                    .limit(50)
+                    .get();
+
+                snap.forEach(doc => {
+                    const item = doc.data() || {};
+                    const id = doc.id;
+
                     const badgeClass = item.type === 'announcement' ? 'badge-announcement' :
                                      item.type === 'event' ? 'badge-event' : 'badge-update';
                     const badgeText = item.type === 'announcement' ? 'Anunț Important' :
                                     item.type === 'event' ? 'Eveniment' : 'Update';
                     const cardClass = item.pinned ? 'news-card pinned' : 'news-card';
 
+                    const dateVal = item.date && item.date.toDate ? item.date.toDate() : (item.date ? new Date(item.date) : null);
+
                     const card = document.createElement('div');
                     card.className = cardClass;
-
                     card.innerHTML = `
                         <div class="news-badge ${badgeClass}">${badgeText}</div>
-                        <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title)}</h4>
-                        <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content)}</p>
+                        <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title || '')}</h4>
+                        <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content || '')}</p>
                         <div class="news-date">
                             <span>📅</span>
-                            ${new Date(item.date).toLocaleDateString('ro-RO', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}
+                            ${dateVal ? dateVal.toLocaleDateString('ro-RO', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '-'}
                         </div>
                         <div style="display:flex; gap:10px; margin-top: 1rem; flex-wrap:wrap;">
-                            <button class="news-btn" onclick="deleteNews(${Number(item.id)})">🗑️ Șterge</button>
+                            <button class="news-btn" onclick="deleteNews('${id}')">🗑️ Șterge</button>
                         </div>
                     `;
                     container.appendChild(card);
                 });
+
             } catch (e) {
                 console.error('loadNews:', e);
             }
@@ -2226,18 +2288,38 @@
             if ($('newsType')) $('newsType').value = 'update';
         }
 
-        function saveNews() {
-            if (!verifyPassword()) return;
+        
+        async function saveNews() {
+            if (!(await ensureAdmin())) return;
 
             const title = ($('newsTitle')?.value || '').trim();
             const content = ($('newsContent')?.value || '').trim();
-            const type = $('newsType')?.value || 'update';
-            const pinned = !!$('pinNews')?.checked;
+            const type = ($('newsType')?.value || 'update');
+            const pinned = !!($('pinNews')?.checked);
 
             if (!title || !content) {
-                alert('Completează titlul și conținutul!');
+                alert('Te rog completează titlul și conținutul!');
                 return;
             }
+
+            try {
+                await db.collection('news').add({
+                    title,
+                    content,
+                    type,
+                    pinned,
+                    date: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await loadNews();
+                cancelAddNews();
+                alert('Știrea a fost adăugată cu succes!');
+            } catch (e) {
+                console.error('saveNews:', e);
+                alert('Eroare la salvare. Verifică Firestore rules / autentificarea.');
+            }
+        }
+
 
             try {
                 const existing = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
@@ -2262,18 +2344,20 @@
             }
         }
 
-        function deleteNews(id) {
-            if (!verifyPassword()) return;
-            if (!confirm('Sigur vrei să ștergi acest anunț?')) return;
+        
+        async function deleteNews(docId) {
+            if (!(await ensureAdmin())) return;
+            if (!confirm('Ștergi acest anunț?')) return;
 
             try {
-                const existing = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
-                const filtered = existing.filter(n => Number(n.id) !== Number(id));
-                localStorage.setItem(LS_NEWS, JSON.stringify(filtered));
-                loadNews();
+                await db.collection('news').doc(String(docId)).delete();
+                await loadNews();
             } catch (e) {
                 console.error('deleteNews:', e);
+                alert('Eroare la ștergere. Verifică Firestore rules / autentificarea.');
             }
+        }
+
         }
 
         function clearNews() {
