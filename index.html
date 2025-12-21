@@ -3175,7 +3175,7 @@ window.__SBYT_ADMIN = false;
 
 const ADMIN_EMAILS = [
   // Pune aici email-urile admin (optional) - ex:
-   "admin@stancubyt.com"
+   "stancubyt@gmail.com"
 ];
 
 function maskEmail(email) {
@@ -3283,7 +3283,7 @@ async function ensureAdminAuth() {
   if (!auth) { alert("Firebase Auth nu este incarcat."); return false; }
   if (auth.currentUser) return true;
 
-  const email = "admin@stancubyt.com";
+  const email = "stancubyt@gmail.com";
   const pass = prompt("Parola admin:");
   if (!pass) return false;
 
@@ -3837,8 +3837,8 @@ window.addEventListener('load', () => {
   const auth = hasFirebase ? firebase.auth() : null;
 
   // Refolosim ensureAdminAuth daca exista, altfel fallback la parola fixa
-  const ADMIN_USER = 'admin@stancubyt.com';
-  const ADMIN_FALLBACK_PASS = (typeof NEWS_PASSWORD !== 'undefined') ? NEWS_PASSWORD : 'ParolaCripto24091980';
+  const ADMIN_USER = 'stancubyt@gmail.com';
+  const ADMIN_FALLBACK_PASS = (typeof NEWS_PASSWORD !== 'undefined') ? NEWS_PASSWORD : 'ParolaCripto24091980.';
 
   async function _ensureAdmin(){
     // prefer firebase auth
