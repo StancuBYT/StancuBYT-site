@@ -1111,6 +1111,12 @@
                 height: 100px;
             }
         }
+    
+        .form-group select option {
+            background: var(--darker-bg);
+            color: #ffffff;
+        }
+
     </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1182,6 +1188,10 @@
                target="_blank" class="uniswap-btn">
                 🔄 Tranzacționează pe Uniswap
             </a>
+            <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="uniswap-btn" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));">
+                🦎 Vizualizează și Tranzacționează pe GeckoTerminal
+            </a>
+
             
             <div class="token-info-grid">
                 <div class="info-card neon-glow">
@@ -1254,6 +1264,7 @@
             <div class="social-links">
                 <a href="https://twitter.com/StancuBYT" class="social-btn" title="Twitter">🐦</a>
                 <a href="https://t.me/StancuBYT_Official" class="social-btn" title="Telegram">📢</a>
+            <a href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" class="social-btn" title="Reddit">👽</a>
                 <a href="https://github.com/StancuBYT" class="social-btn" title="GitHub">💻</a>
                 <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" class="social-btn" title="LinkedIn">👔</a>
                 <a href="https://stancubyt.com" class="social-btn" title="Website">🌐</a>
@@ -1296,8 +1307,7 @@
             </div>
             
             <div class="chart-container">
-                <iframe id="cmcDexIframe" src="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" style="width:100%; height:100%; border:0; border-radius:16px; background:rgba(0,0,0,0.2);" loading="lazy" referrerpolicy="no-referrer"></iframe>
-                <canvas id="priceChart" style="display:none;"></canvas>
+                <canvas id="priceChart"></canvas>
             </div>
             <div id="priceData" class="loading">Se încarcă datele live...</div>
         </div>
@@ -1373,7 +1383,22 @@
                     Analiză Apespace ›
                 </a>
             </div>
-        </div>
+        
+            <div class="info-card">
+                <h3>🦎 Vezi pe GeckoTerminal</h3>
+                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Pool & tranzacționare GeckoTerminal ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>📌 Vezi pe CoinMarketCap DEX</h3>
+                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    coinmarketcap DEX ›
+                </a>
+            </div>
+</div>
     </section>
 
     <!-- Whitepaper Section - VERSIUNE PROFESIONALĂ -->
@@ -1430,24 +1455,7 @@
         </div>
 
         <!-- 2. Informații generale -->
-        
-        <div class="token-info-grid" style="margin-top: 1rem;">
-            <div class="info-card">
-                <h3>🦎 Vezi pe GeckoTerminal</h3>
-                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults"
-                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                    Pool & Chart GeckoTerminal ›
-                </a>
-            </div>
-            <div class="info-card">
-                <h3>🟡 Vezi pe CoinMarketCap DEX</h3>
-                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/"
-                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                    DEX page CoinMarketCap ›
-                </a>
-            </div>
-        </div>
-<div id="informatii-generale" class="section-card neon-glow">
+        <div id="informatii-generale" class="section-card neon-glow">
             <h3>2. Informații generale</h3>
             <div class="table-container">
                 <table class="whitepaper-table">
@@ -1687,6 +1695,34 @@
                     <p style="opacity: 0.8; margin-top: 0.5rem;">Inițiator și coordonator proiect StancuBYT</p>
                 </div>
             </div>
+            <!-- Management echipa (salvare permanenta - Firebase) -->
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.12);">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <h4 style="margin:0; color: var(--neon-cyan);">Membri echipa (Live)</h4>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="news-btn" onclick="requestPassword('teamAdd')">➕ Adaugă membru</button>
+                        <button class="news-btn" onclick="requestPassword('teamClear')">🗑️ Șterge toți</button>
+                    </div>
+                </div>
+
+                <div id="teamList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; margin-top:1rem;"></div>
+
+                <div id="teamForm" style="display:none; margin-top:1rem; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:1rem;">
+                    <div class="form-row">
+                        <input type="text" id="teamName" placeholder="Nume membru" maxlength="80">
+                        <input type="text" id="teamRole" placeholder="Funcția / rol" maxlength="80">
+                    </div>
+                    <div class="form-row">
+                        <input type="date" id="teamJoinDate" placeholder="Data înscrierii">
+                        <input type="url" id="teamAvatar" placeholder="Link foto / avatar (opțional)" maxlength="240">
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:10px;">
+                        <button class="news-btn" onclick="saveTeamMember()">💾 Salvează</button>
+                        <button class="news-btn" onclick="cancelTeamMember()">✖ Anulează</button>
+                    </div>
+                </div>
+            </div>
+
 
             <div style="background: rgba(0, 204, 255, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
                 <p style="margin: 0; font-size: 0.9rem;">
@@ -1696,34 +1732,6 @@
         </div>
 
         <!-- 8. Contact & Linkuri -->
-            <div style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.12);">
-                <h4 style="color: var(--neon-cyan); margin-bottom: 0.8rem;">➕ Administrare echipă (global)</h4>
-                <div style="margin-bottom: 0.8rem; opacity:0.85;">
-                    Poți adăuga/șterge membri. Datele sunt salvate în Firestore și sunt vizibile pe orice device.
-                </div>
-
-                <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-                    <button class="news-btn" onclick="requestPassword('teamAdd')">➕ Adaugă membru</button>
-                </div>
-
-                <div id="teamForm" style="display:none; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-                    <div class="form-row">
-                        <input type="text" id="teamName" placeholder="Nume" maxlength="80">
-                        <input type="text" id="teamRole" placeholder="Funcție (ex: Dev, Marketing)" maxlength="80">
-                    </div>
-                    <div class="form-row">
-                        <input type="date" id="teamJoinDate" placeholder="Data înscrierii">
-                        <input type="url" id="teamAvatarUrl" placeholder="Link foto / avatar (URL)" maxlength="300">
-                    </div>
-                    <div style="margin-top:0.8rem; display:flex; gap:10px; flex-wrap:wrap;">
-                        <button class="news-btn" onclick="saveTeamMember()">💾 Salvează</button>
-                        <button class="news-btn" onclick="cancelTeamMember()">✖ Anulează</button>
-                    </div>
-                </div>
-
-                <div id="teamList" style="margin-top: 1rem;"></div>
-            </div>
-
         <div id="contact-wp" class="section-card neon-glow">
             <h3>8. Contact & Linkuri</h3>
             
@@ -2069,11 +2077,11 @@
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 Giveaway & Promoții
             </h1>
-            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente (variantă GLOBAL – salvat în Firestore)</p>
+            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente (variantă statică – salvat local pe device)</p>
 
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
                 <button class="news-btn" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
-                <button class="news-btn" onclick="requestPassword('giveawayAdd')">🎁 Adaugă giveaway</button>
+                <button class=\"news-btn\" onclick=\"requestPassword('giveawayAdd')\">🎁 Adaugă giveaway</button>
                 <button class="news-btn" onclick="requestPassword('promoClear')">🗑️ Șterge toate</button>
             </div>
         </div>
@@ -2084,12 +2092,6 @@
 
             <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
     <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
-    <div class="form-row">
-        <select id="promoType" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.25); color:#fff;">
-            <option value="promotion">Promotie</option>
-            <option value="giveaway">Giveaway</option>
-        </select>
-    </div>
 
     <div class="form-row">
         <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT)" maxlength="120">
@@ -2123,20 +2125,6 @@
         <div class="data-visualization neon-glow">
             <h3>🏆 Clasament participanți</h3>
             <p style="opacity:0.85; margin-top:0.5rem;">Clasament local (pe device): pe baza „promovărilor” introduse la înscriere.</p>
-            
-            <div style="margin-top:1rem; padding: 1rem; border:1px solid rgba(255,255,255,0.12); border-radius:14px; background: rgba(255,255,255,0.04);">
-                <h4 style="margin:0 0 0.7rem 0; color: var(--neon-cyan);">📝 Înscriere (după ce alegi o promoție/giveaway)</h4>
-                <div class="form-row">
-                    <input type="text" id="joinName" placeholder="Nume complet" maxlength="80">
-                    <input type="email" id="joinEmail" placeholder="Email" maxlength="120">
-                </div>
-                <div class="form-row">
-                    <input type="text" id="joinWallet" placeholder="Wallet (0x...)" maxlength="80">
-                    <button class="news-btn" onclick="joinPromo()">✅ Înscrie-mă</button>
-                </div>
-                <small style="opacity:0.75;">După înscriere primești un ID unic pentru identificare.</small>
-            </div>
-
             <div id="leaderboard" style="margin-top:1rem;"></div>
         </div>
     </section>
@@ -2375,8 +2363,7 @@
             if (action === 'clear') return clearNews();
 
             // Giveaway / promo
-            if (action === 'promoAdd') { const t=document.getElementById('promoType'); if(t) t.value='promotion'; return showPromoForm(); }
-  if (action === 'giveawayAdd') { const t=document.getElementById('promoType'); if(t) t.value='giveaway'; return showPromoForm(); }
+            if (action === 'promoAdd') return showPromoForm();
             if (action === 'promoClear') return clearPromos();
 
             // fallback
@@ -3024,51 +3011,7 @@ async function updateLivePriceAndChart(period = 'live') {
         }
 
 
-        
-        // =========================
-        
-        // =========================
-        // CONTACT: trimite pe email (mailto)
-        // =========================
-        function sendContactMessage() {
-            const name = (document.getElementById('contactName')?.value || '').trim();
-            const email = (document.getElementById('contactEmail')?.value || '').trim();
-            const type = (document.getElementById('contactType')?.value || '').trim();
-            const msg = (document.getElementById('contactMessage')?.value || '').trim();
-
-            if (!name || !email || !type || !msg) {
-                const st = document.getElementById('contactStatus');
-                if (st) st.textContent = 'Completează toate câmpurile obligatorii.';
-                return;
-            }
-
-            const to = 'stancubyt@zahomail.eu';
-            const subject = encodeURIComponent(`[StancuBYT] ${type} - ${name}`);
-            const body = encodeURIComponent(`Nume: ${name}\nEmail: ${email}\nTip: ${type}\n\nMesaj:\n${msg}`);
-            window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
-
-            const st = document.getElementById('contactStatus');
-            if (st) st.textContent = 'Se deschide clientul de email pentru trimitere...';
-        }
-
-        // Dropdown: arata toate optiunile la focus
-        function initContactTypeDropdown() {
-            const sel = document.getElementById('contactType');
-            if (!sel) return;
-            sel.addEventListener('focus', () => { sel.size = sel.options.length; });
-            sel.addEventListener('blur', () => { sel.size = 0; });
-            sel.addEventListener('change', () => { sel.size = 0; sel.blur(); });
-        }
-
-// WHITEPAPER DOWNLOAD (GitHub Pages)
-        // =========================
-        function downloadWhitepaper(lang) {
-            const l = (lang || 'ro').toLowerCase();
-            const file = l === 'en' ? 'Whitepaper/StancuBYT_EN.pdf' : 'Whitepaper/StancuBYT_RO.pdf';
-            window.open(file, '_blank');
-        }
-
-window.addEventListener('load', () => {
+        window.addEventListener('load', () => {
             initializeChart();
             startPriceAutoUpdate();
 
@@ -3135,26 +3078,20 @@ const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
 const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
 
 async function ensureAdminAuth() {
-  // Daca e deja logat in sesiunea curenta, gata
-  if (auth && auth.currentUser) return true;
+  // admin login required for write actions
+  if (!auth) { alert("Firebase Auth nu este incarcat."); return false; }
+  if (auth.currentUser) return true;
 
-  if (!auth) {
-    alert('Firebase Auth nu este disponibil. Verifica script-urile Firebase.');
-    return false;
-  }
-
-  const email = (prompt('Utilizator admin (email):', sessionStorage.getItem('stbytv_admin_email') || 'admin@stancubyt.com') || '').trim();
-  if (!email) return false;
-  const pass = prompt('Parola admin:');
+  const email = "admin@stancubyt.com";
+  const pass = prompt("Parola admin:");
   if (!pass) return false;
 
   try {
-    sessionStorage.setItem('stbytv_admin_email', email);
     await auth.signInWithEmailAndPassword(email, pass);
     return true;
   } catch (e) {
-    console.error('Auth error:', e);
-    alert('Autentificare eșuată. Verifica email/parola si ca Email/Password este activat in Firebase Authentication.');
+    console.error("Auth error:", e);
+    alert("Nu te poti autentifica. Verifica in Firebase: Authentication -> Email/Password enabled si userul admin exista.");
     return false;
   }
 }
@@ -3217,18 +3154,11 @@ function loadNews() {
     if (__newsUnsub) { try { __newsUnsub(); } catch(_) {} __newsUnsub = null; }
 
     __newsUnsub = db.collection('news')
+      .orderBy('pinned','desc')
       .orderBy('date','desc')
       .onSnapshot((snap) => {
         const items = [];
         snap.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
-
-        // pinned first, then newest
-        items.sort((a,b)=>{
-          const ap = a.pinned ? 1 : 0;
-          const bp = b.pinned ? 1 : 0;
-          if (ap !== bp) return bp - ap;
-          return (b.date||0) - (a.date||0);
-        });
 
         newsContainer.innerHTML = '';
 
@@ -3359,7 +3289,6 @@ async function savePromo() {
   if (!ok) return;
 
   const title = (document.getElementById('promoTitle')?.value || '').trim();
-  const ptype = (document.getElementById('promoType')?.value || 'promotion').trim();
   const prize = (document.getElementById('promoPrize')?.value || '').trim();
   const desc = (document.getElementById('promoDesc')?.value || '').trim();
   const ends = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
@@ -3379,7 +3308,6 @@ async function savePromo() {
 
   try {
     const ref = await db.collection('promos').add({
-      type: ptype,
       title,
       prize: prize || null,
       desc,
@@ -3509,7 +3437,6 @@ async function joinPromo(promoId) {
       participantId,
       name,
       email,
-      wallet,
       points: existing.exists ? (existing.data().points||0) : 0,
       promotions: existing.exists ? (existing.data().promotions||0) : 0,
       joinedAt: existing.exists ? (existing.data().joinedAt||Date.now()) : Date.now(),
@@ -3517,12 +3444,6 @@ async function joinPromo(promoId) {
     }, { merge: true });
 
     alert('Inscriere reusita! ID: ' + participantId);
-    // trimite codul prin email (deschide clientul de email al utilizatorului)
-    try {
-      const subj = encodeURIComponent('StancuBYT - Confirmare inscriere');
-      const body = encodeURIComponent(`Ai fost inscris cu codul: ${participantId}\n\nPromo/Giveaway: ${id}\n\nEchipa StancuBYT - security@stancubyt.com`);
-      window.location.href = `mailto:${email}?subject=${subj}&body=${body}`;
-    } catch(_) {}
     // refresh leaderboard
     listenLeaderboard(id);
   } catch (e) {
@@ -3592,106 +3513,6 @@ function listenLeaderboard(promoId) {
     });
 }
 
-
-// =========================
-// TEAM (GLOBAL, CROSS-DEVICE)
-// =========================
-let __teamUnsub = null;
-
-function showTeamForm() {
-  ensureAdminAuth().then(ok => {
-    if (!ok) return;
-    const f = document.getElementById('teamForm');
-    if (f) f.style.display = 'block';
-  });
-}
-
-function cancelTeamMember() {
-  const f = document.getElementById('teamForm');
-  if (f) f.style.display = 'none';
-  ['teamName','teamRole','teamJoinDate','teamAvatarUrl'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-}
-
-async function saveTeamMember() {
-  const ok = await ensureAdminAuth();
-  if (!ok) return;
-
-  const name = (document.getElementById('teamName')?.value || '').trim();
-  const role = (document.getElementById('teamRole')?.value || '').trim();
-  const joinDate = (document.getElementById('teamJoinDate')?.value || '').trim();
-  const avatarUrl = (document.getElementById('teamAvatarUrl')?.value || '').trim();
-
-  if (!name || !role || !joinDate) {
-    alert('Completeaza numele, functia si data inscrierii!');
-    return;
-  }
-
-  try {
-    await db.collection('team').add({
-      name, role, joinDate,
-      avatarUrl: avatarUrl || null,
-      createdAt: Date.now()
-    });
-    cancelTeamMember();
-  } catch (e) {
-    console.error('saveTeamMember error:', e);
-    alert('Eroare la salvarea membrului (verifica Firestore Rules).');
-  }
-}
-
-async function deleteTeamMember(docId) {
-  const ok = await ensureAdminAuth();
-  if (!ok) return;
-  if (!confirm('Stergi acest membru?')) return;
-  try {
-    await db.collection('team').doc(docId).delete();
-  } catch (e) {
-    console.error('deleteTeamMember error:', e);
-    alert('Eroare la stergere (Rules).');
-  }
-}
-
-function listenTeam() {
-  const list = document.getElementById('teamList');
-  if (!list || !db) return;
-
-  if (__teamUnsub) { try { __teamUnsub(); } catch(_) {} __teamUnsub = null; }
-
-  __teamUnsub = db.collection('team').orderBy('createdAt','desc').onSnapshot(snap => {
-    const items = [];
-    snap.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
-
-    if (!items.length) {
-      list.innerHTML = '<div style="opacity:0.85;">Nu exista membri adaugati inca.</div>';
-      return;
-    }
-
-    list.innerHTML = '';
-    items.forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'news-card';
-      const avatar = m.avatarUrl ? `<img src="${m.avatarUrl}" alt="" style="width:64px;height:64px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,0.15);">`
-                                : `<div style="width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);font-size:28px;">👤</div>`;
-      card.innerHTML = `
-        <div style="display:flex; gap:14px; align-items:center;">
-          ${avatar}
-          <div style="flex:1;">
-            <div style="font-weight:700; color:white; font-size:1.05rem;">${_escapeHtml(m.name||'')}</div>
-            <div style="opacity:0.85;">${_escapeHtml(m.role||'')}</div>
-            <div style="opacity:0.75; margin-top:4px;">📅 ${_escapeHtml(m.joinDate||'')}</div>
-          </div>
-        </div>
-        <div style="margin-top:0.9rem; display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="news-btn" onclick="deleteTeamMember('${m._id}')">🗑️ Sterge</button>
-        </div>
-      `;
-      list.appendChild(card);
-    });
-  });
-}
 // requestPassword mapping (keep existing buttons)
 function requestPassword(action, id) {
   if (action === 'add') {
@@ -3700,9 +3521,7 @@ function requestPassword(action, id) {
     return;
   }
   if (action === 'clear') return clearNews();
-  if (action === 'promoAdd') { const t=document.getElementById('promoType'); if(t) t.value='promotion'; return showPromoForm(); }
-  if (action === 'giveawayAdd') { const t=document.getElementById('promoType'); if(t) t.value='giveaway'; return showPromoForm(); }
-  if (action === 'teamAdd') return showTeamForm();
+  if (action === 'promoAdd') return showPromoForm();
   if (action === 'promoClear') {
     // clear promos needs admin
     ensureAdminAuth().then(async ok => {
@@ -3745,6 +3564,604 @@ window.addEventListener('load', () => {
   try { loadNews(); } catch(e){}
   try { listenPromos(); } catch(e){}
 });
+
+
+/* ============================================================
+   PATCH V4.1 (Firebase + UI fixes fara schimbare design)
+   - News & anunturi: Firestore (cross-device) + stergere individuala
+   - Vizite: Firestore (cross-device)
+   - Echipa: Firestore CRUD
+   - Contact: trimite la stancubyt@zahomail.eu + dropdown vizibil
+   - Chart: embed CoinMarketCap DEX page in container (fara CORS)
+   - Whitepaper: download din /Whitepaper/*.pdf
+   - Giveaway: buton separat giveaway + inscriere cu email + cod
+   ============================================================ */
+
+(function(){
+  // ---------- Helpers ----------
+  const $ = (id)=>document.getElementById(id);
+  const _escape = (s)=>String(s||'').replace(/[&<>"'`=\/]/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;','\\':'&#92;'
+  }[ch]||ch));
+
+  // ---------- Whitepaper downloads (GitHub Pages) ----------
+  window.downloadWhitepaper = function(language){
+    const file = (language === 'ro') ? 'StancuBYT_RO.pdf' : 'StancuBYT_EN.pdf';
+    const url = `Whitepaper/${file}`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  // ---------- Contact send (mailto) ----------
+  window.sendContactMessage = function(){
+    const name = ($('contactName')?.value||'').trim();
+    const email = ($('contactEmail')?.value||'').trim();
+    const type = ($('contactType')?.value||'').trim();
+    const msg = ($('contactMessage')?.value||'').trim();
+    const agree = $('privacyAgree')?.checked;
+
+    const status = $('contactStatus');
+    const show = (m, ok)=>{
+      if (!status) { alert(m); return; }
+      status.textContent = m;
+      status.style.color = ok ? '#00ff88' : '#ff4444';
+      status.style.background = ok ? 'rgba(0,255,136,0.1)' : 'rgba(255,68,68,0.1)';
+      status.style.border = ok ? '1px solid rgba(0,255,136,0.25)' : '1px solid rgba(255,68,68,0.25)';
+      status.style.padding = '0.6rem';
+      status.style.borderRadius = '10px';
+    };
+
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!name || !email || !msg) return show('Completează numele, emailul și mesajul.', false);
+    if (!re.test(email)) return show('Email invalid.', false);
+    if (!agree) return show('Bifează acordul de confidențialitate.', false);
+
+    const to = 'stancubyt@zahomail.eu';
+    const subj = encodeURIComponent(`StancuBYT | ${type || 'Solicitare'} | ${name}`);
+    const body = encodeURIComponent(
+      `Nume: ${name}\nEmail: ${email}\nTip: ${type}\n\nMesaj:\n${msg}\n\n— trimis de pe stancubyt.com`
+    );
+
+    window.location.href = `mailto:${to}?subject=${subj}&body=${body}`;
+    show('Se deschide clientul tău de email pentru trimitere.', true);
+  };
+
+  // ---------- Firebase guards ----------
+  const hasFirebase = (typeof firebase !== 'undefined');
+  const db = hasFirebase ? firebase.firestore() : null;
+  const auth = hasFirebase ? firebase.auth() : null;
+
+  // Refolosim ensureAdminAuth daca exista, altfel fallback la parola fixa
+  const ADMIN_USER = 'admin@stancubyt.com';
+  const ADMIN_FALLBACK_PASS = (typeof NEWS_PASSWORD !== 'undefined') ? NEWS_PASSWORD : 'ParolaCripto24091980';
+
+  async function _ensureAdmin(){
+    // prefer firebase auth
+    if (typeof ensureAdminAuth === 'function') {
+      try { return await ensureAdminAuth(); } catch(e) {}
+    }
+    // fallback (doar pentru site static, nu e securitate reala)
+    const u = prompt('Utilizator admin (email):', ADMIN_USER) || '';
+    const p = prompt('Parola admin:') || '';
+    if (!u || !p) return false;
+    if (u.trim().toLowerCase() !== ADMIN_USER.toLowerCase() || p !== ADMIN_FALLBACK_PASS) {
+      alert('Autentificare invalidă.');
+      return false;
+    }
+    return true;
+  }
+
+  // Map requestPassword actions (compatibil cu HTML existent)
+  const _origRequestPassword = window.requestPassword;
+  window.requestPassword = function(action, id){
+    if (action === 'giveawayAdd') return showPromoForm('giveaway');
+    if (action === 'promoAdd') return showPromoForm('promo');
+    if (action === 'teamAdd') return showTeamForm();
+    if (action === 'teamClear') return clearTeam();
+    return _origRequestPassword ? _origRequestPassword(action, id) : undefined;
+  };
+
+  // ---------- Vizite (cross-device) ----------
+  async function updateVisitCounterFirestore(){
+    try{
+      if (!db) return;
+      const ref = db.collection('stats').doc('visits');
+      await db.runTransaction(async (tx)=>{
+        const snap = await tx.get(ref);
+        const cur = snap.exists && snap.data().count ? Number(snap.data().count) : 0;
+        tx.set(ref, { count: cur + 1, updatedAt: Date.now() }, { merge:true });
+      });
+      const snap = await ref.get();
+      const count = snap.exists && snap.data().count ? Number(snap.data().count) : 0;
+      const el = $('visitCount') || $('visitsCount') || $('visitCounter') || $('visits');
+      if (el) el.textContent = count.toLocaleString('ro-RO');
+    } catch(e){
+      console.error('visits firestore:', e);
+    }
+  }
+
+  // Inlocuieste functia existenta, dar pastreaza fallback la localStorage daca nu e Firebase
+  const _origUpdateVisits = window.updateVisitCounter;
+  window.updateVisitCounter = function(){
+    if (db) { updateVisitCounterFirestore(); return; }
+    if (_origUpdateVisits) _origUpdateVisits();
+  };
+
+  // ---------- News (cross-device) ----------
+  let __newsUnsub = null;
+
+  function _renderNews(items){
+    const container = $('newsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!items.length){
+      container.innerHTML = '<div style="opacity:0.8;">Nu există anunțuri încă.</div>';
+      return;
+    }
+
+    items.forEach(item=>{
+      const badge = (typeof _badgeForType === 'function') ? _badgeForType(item.type) : (item.type==='announcement'?{cls:'badge-announcement',txt:'Anunț Important'}:{cls:'badge-update',txt:'Update'});
+      const card = document.createElement('div');
+      card.className = item.pinned ? 'news-card pinned' : 'news-card';
+
+      const date = item.date || item.createdAt;
+      const d = date ? new Date(date) : new Date();
+      card.innerHTML = `
+        <div class="news-badge ${badge.cls}">${badge.txt}</div>
+        <h4 style="margin-bottom:0.5rem; color:white;">${_escape(item.title||'')}</h4>
+        <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
+        <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
+          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  async function _listenNews(){
+    if (!db) return;
+    if (__newsUnsub) { try{__newsUnsub();}catch(e){} __newsUnsub=null; }
+
+    __newsUnsub = db.collection('news').orderBy('createdAt','desc').limit(50).onSnapshot((snap)=>{
+      const items=[];
+      snap.forEach(doc=>{
+        items.push({ _id: doc.id, ...doc.data() });
+      });
+      // pinned first (client side) + recent
+      items.sort((a,b)=>{
+        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+        return Number(b.createdAt||0)-Number(a.createdAt||0);
+      });
+      _renderNews(items);
+    }, (err)=>{
+      console.error('news listen:', err);
+    });
+  }
+
+  // override loadNews to use Firestore
+  const _origLoadNews = window.loadNews;
+  window.loadNews = function(){
+    if (db) { _listenNews(); return; }
+    if (_origLoadNews) _origLoadNews();
+  };
+
+  // save news to firestore
+  const _origSaveNews = window.saveNews;
+  window.saveNews = async function(){
+    if (!db) return _origSaveNews ? _origSaveNews() : undefined;
+
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+
+    const title = ($('newsTitle')?.value||'').trim();
+    const content = ($('newsContent')?.value||'').trim();
+    const type = $('newsType')?.value || 'update';
+    const pinned = !!$('pinNews')?.checked;
+
+    if (!title || !content) { alert('Completează titlul și conținutul!'); return; }
+
+    try{
+      await db.collection('news').add({
+        title, content, type, pinned,
+        createdAt: Date.now(),
+        date: new Date().toISOString()
+      });
+      if (typeof cancelAddNews === 'function') cancelAddNews();
+    }catch(e){
+      console.error('saveNews firestore:', e);
+      alert('Eroare la salvarea știrii (verifică Firestore Rules).');
+    }
+  };
+
+  // delete a single news doc
+  window.deleteNewsDoc = async function(docId){
+    if (!db) return;
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!docId) return;
+    if (!confirm('Ștergi acest anunț?')) return;
+    try{
+      await db.collection('news').doc(docId).delete();
+    }catch(e){
+      console.error('delete news:', e);
+      alert('Eroare la ștergere (Rules).');
+    }
+  };
+
+  // clear all news
+  const _origClear = window.clearNews || window.clearAllNews;
+  window.clearNews = async function(){
+    if (!db) return _origClear ? _origClear() : undefined;
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!confirm('Ștergi TOATE anunțurile?')) return;
+    const snap = await db.collection('news').get();
+    const batch = db.batch();
+    snap.forEach(doc=>batch.delete(doc.ref));
+    await batch.commit();
+  };
+
+  // ---------- Echipa (Firestore) ----------
+  let __teamUnsub = null;
+
+  function showTeamForm(){
+    const f = $('teamForm');
+    if (f) f.style.display='block';
+  }
+  window.cancelTeamMember = function(){
+    const f = $('teamForm');
+    if (f) f.style.display='none';
+    if ($('teamName')) $('teamName').value='';
+    if ($('teamRole')) $('teamRole').value='';
+    if ($('teamJoinDate')) $('teamJoinDate').value='';
+    if ($('teamAvatar')) $('teamAvatar').value='';
+  };
+
+  window.saveTeamMember = async function(){
+    if (!db) { alert('Firebase nu este încărcat.'); return; }
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+
+    const name = ($('teamName')?.value||'').trim();
+    const role = ($('teamRole')?.value||'').trim();
+    const joinDate = ($('teamJoinDate')?.value||'').trim();
+    const avatar = ($('teamAvatar')?.value||'').trim();
+
+    if (!name || !role || !joinDate) { alert('Completează nume, funcție și data înscrierii.'); return; }
+
+    try{
+      await db.collection('team').add({
+        name, role, joinDate,
+        avatar: avatar || null,
+        createdAt: Date.now()
+      });
+      cancelTeamMember();
+    }catch(e){
+      console.error('team save:', e);
+      alert('Eroare la salvare membru (Rules).');
+    }
+  };
+
+  async function deleteTeamMember(docId){
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!confirm('Ștergi acest membru?')) return;
+    try{ await db.collection('team').doc(docId).delete(); }
+    catch(e){ console.error('team delete:', e); alert('Eroare la ștergere (Rules).'); }
+  }
+  window.deleteTeamMember = deleteTeamMember;
+
+  async function clearTeam(){
+    if (!db) return;
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!confirm('Ștergi toți membrii adăugați?')) return;
+    const snap = await db.collection('team').get();
+    const batch = db.batch();
+    snap.forEach(doc=>batch.delete(doc.ref));
+    await batch.commit();
+  }
+
+  function renderTeam(items){
+    const list = $('teamList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!items.length){
+      list.innerHTML = '<div style="opacity:0.8;">Nu există membri suplimentari încă.</div>';
+      return;
+    }
+    items.forEach(m=>{
+      const avatar = m.avatar ? `<img src="${_escape(m.avatar)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">`
+                              : `<div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);font-size:1.6rem;">👤</div>`;
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      card.style.margin = '0';
+      card.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:center;">
+          ${avatar}
+          <div style="flex:1;">
+            <div style="font-weight:700; color:#fff;">${_escape(m.name||'')}</div>
+            <div style="opacity:0.9;">${_escape(m.role||'')}</div>
+            <div style="opacity:0.75; font-size:0.9rem;">📅 ${_escape(m.joinDate||'')}</div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+          <button class="news-btn" onclick="deleteTeamMember('${_escape(m._id||'')}')">🗑️ Șterge</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  function listenTeam(){
+    if (!db) return;
+    if (__teamUnsub) { try{__teamUnsub();}catch(e){} __teamUnsub=null; }
+    __teamUnsub = db.collection('team').orderBy('createdAt','desc').limit(50).onSnapshot(snap=>{
+      const items=[]; snap.forEach(doc=>items.push({ _id: doc.id, ...doc.data() }));
+      renderTeam(items);
+    }, err=>console.error('team listen:', err));
+  }
+
+  // ---------- Giveaway/Promo (Firestore) ----------
+  // (1) show form with type
+  window.showPromoForm = async function(kind){
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    const f = $('promoForm');
+    if (f) f.style.display='block';
+    if ($('promoFormKind')) $('promoFormKind').textContent = (kind==='giveaway'?'giveaway':'promoție');
+    f && (f.dataset.kind = kind || 'promo');
+  };
+
+  // (2) ensure required fields exist by mapping old ids
+  window.savePromo = async function(){
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!db) { alert('Firebase nu este încărcat.'); return; }
+
+    const title = ($('promoTitle')?.value||'').trim();
+    const ends = ($('promoEnds')?.value||'').trim();
+    const desc = ($('promoDesc')?.value||'').trim();
+    const prize = ($('promoPrize')?.value||'').trim();
+    const points = Math.max(1, parseInt(($('promoPoints')?.value||'10'),10) || 10);
+    const kind = ($('promoForm')?.dataset.kind || 'promo');
+
+    if (!title || !ends || !desc) {
+      alert('Completează titlul, data de final și descrierea.');
+      return;
+    }
+
+    const endsAt = new Date(ends).getTime();
+    if (!endsAt || endsAt <= Date.now()) {
+      alert('Data expirării trebuie să fie în viitor!');
+      return;
+    }
+
+    try{
+      await db.collection('promos').add({
+        kind,
+        title,
+        prize: prize || null,
+        desc,
+        endsAt,
+        pointsPerPromotion: points,
+        createdAt: Date.now(),
+        status: 'active'
+      });
+      if (typeof cancelPromo === 'function') cancelPromo();
+      alert('Promoția / Giveaway-ul a fost adăugat!');
+    }catch(e){
+      console.error('savePromo:', e);
+      alert('Eroare la salvarea giveaway-ului (verifică Firestore Rules).');
+    }
+  };
+
+  // (3) render promos with registration + email + code
+  let __promosUnsub = null;
+
+  function _randCode(){
+    const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let s='';
+    for(let i=0;i<10;i++) s += a[Math.floor(Math.random()*a.length)];
+    return s;
+  }
+
+  async function joinPromoFirestore(promoId){
+    if (!db) return;
+    const name = ($('joinName_'+promoId)?.value||'').trim();
+    const email = ($('joinEmail_'+promoId)?.value||'').trim();
+    const wallet = ($('joinWallet_'+promoId)?.value||'').trim();
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name || !email || !wallet) { alert('Completează nume, email și wallet.'); return; }
+    if (!re.test(email)) { alert('Email invalid.'); return; }
+
+    // generate id/code
+    const code = _randCode();
+    try{
+      await db.collection('promos').doc(promoId).collection('participants').add({
+        name, email, wallet,
+        code,
+        points: 0,
+        promotions: 0,
+        createdAt: Date.now()
+      });
+
+      // IMPORTANT: fara backend nu putem trimite email automat "from security@stancubyt.com".
+      // Deschidem clientul local de email cu mesajul complet.
+      const subj = encodeURIComponent('StancuBYT | Confirmare înscriere');
+      const body = encodeURIComponent(`Salut ${name},\n\nAi fost inscris cu codul "${code}".\n\nPromo/Giveaway ID: ${promoId}\nWallet: ${wallet}\n\n— StancuBYT Security`);
+      window.location.href = `mailto:${encodeURIComponent(email)}?subject=${subj}&body=${body}`;
+      alert('Înscriere reușită! Se deschide emailul de confirmare.');
+    }catch(e){
+      console.error('joinPromo:', e);
+      alert('Eroare la înscriere (Rules).');
+    }
+  }
+  window.joinPromo = joinPromoFirestore;
+
+  async function _loadParticipants(promoId){
+    const snap = await db.collection('promos').doc(promoId).collection('participants').orderBy('createdAt','desc').get();
+    const arr=[]; snap.forEach(d=>arr.push({ _id:d.id, ...d.data() }));
+    return arr;
+  }
+
+  async function renderPromos(promos){
+    const list = $('promoList');
+    if (!list) return;
+    list.innerHTML = '';
+    const now = Date.now();
+
+    if (!promos.length){
+      list.innerHTML = '<div style="opacity:0.85;">Nu există promoții/giveaway-uri active încă.</div>';
+      return;
+    }
+
+    for (const p of promos){
+      const expired = p.endsAt && p.endsAt <= now;
+      const badge = expired ? 'Expirat' : (p.kind==='giveaway' ? 'Giveaway' : 'Promoție');
+
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      card.style.margin = '0';
+
+      const endsStr = p.endsAt ? new Date(p.endsAt).toLocaleString('ro-RO') : '-';
+      const participants = await _loadParticipants(p._id);
+
+      const participantsHtml = participants.length
+        ? `<div style="margin-top:10px; opacity:0.95;">
+             <div style="font-weight:700; margin-bottom:6px;">Participanți (${participants.length})</div>
+             <div style="display:grid; gap:6px;">
+               ${participants.map(x=>`<div style="display:flex;justify-content:space-between;gap:10px; background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:10px;">
+                   <div style="min-width:0;">
+                     <div style="font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${_escape(x.name||'')}</div>
+                     <div style="opacity:0.8; font-size:0.85rem;">${_escape(x.email||'')} • ${_escape(x.wallet||'')}</div>
+                   </div>
+                   <div style="opacity:0.85; font-size:0.85rem;">ID: <strong>${_escape(x.code||'')}</strong></div>
+                 </div>`).join('')}
+             </div>
+           </div>`
+        : `<div style="margin-top:10px; opacity:0.8;">Niciun participant încă.</div>`;
+
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="font-weight:800; color:#fff;">${_escape(p.title||'')}</div>
+          <div style="padding:6px 10px; border-radius:999px; background:rgba(0,255,136,0.12); border:1px solid rgba(0,255,136,0.25); font-size:0.85rem;">${badge}</div>
+        </div>
+        <div style="opacity:0.85; margin-top:6px;">⏳ Expiră: <strong>${_escape(endsStr)}</strong></div>
+        ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${_escape(p.prize)}</strong></div>`:''}
+        <div style="opacity:0.92; margin-top:10px; line-height:1.5;">${_escape(p.desc||'')}</div>
+
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
+          <div style="font-weight:700; margin-bottom:8px;">Înscriere</div>
+          <div class="form-row">
+            <input type="text" id="joinName_${_escape(p._id)}" placeholder="Nume" maxlength="80">
+            <input type="email" id="joinEmail_${_escape(p._id)}" placeholder="Email" maxlength="120">
+          </div>
+          <div class="form-row">
+            <input type="text" id="joinWallet_${_escape(p._id)}" placeholder="Wallet (0x...)" maxlength="64">
+            <button class="news-btn" onclick="joinPromo('${_escape(p._id)}')" ${expired?'disabled':''} style="min-width:160px;">✅ Înscrie-te</button>
+          </div>
+          <div style="opacity:0.75; font-size:0.85rem; margin-top:6px;">
+            După înscriere primești un cod (ID) și se deschide emailul de confirmare.
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
+            <button class="news-btn" onclick="deletePromo('${_escape(p._id)}')">🗑️ Șterge</button>
+          </div>
+          ${participantsHtml}
+        </div>
+      `;
+      list.appendChild(card);
+    }
+  }
+  window.renderPromos = renderPromos;
+
+  window.deletePromo = async function(promoId){
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!db) return;
+    if (!confirm('Ștergi această promoție/giveaway?')) return;
+    try{
+      // delete participants subcollection
+      const partSnap = await db.collection('promos').doc(promoId).collection('participants').get();
+      const batch = db.batch();
+      partSnap.forEach(d=>batch.delete(d.ref));
+      batch.delete(db.collection('promos').doc(promoId));
+      await batch.commit();
+    }catch(e){
+      console.error('deletePromo:', e);
+      alert('Eroare la ștergere (Rules).');
+    }
+  };
+
+  function listenPromos(){
+    if (!db) return;
+    if (__promosUnsub) { try{__promosUnsub();}catch(e){} __promosUnsub=null; }
+    __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(async snap=>{
+      const promos=[]; snap.forEach(doc=>promos.push({ _id: doc.id, ...doc.data() }));
+      await renderPromos(promos);
+    }, err=>console.error('promos listen:', err));
+  }
+  window.listenPromos = listenPromos;
+
+  // ---------- Chart: embed CoinMarketCap DEX page ----------
+  function initCmcEmbed(){
+    const container = document.querySelector('.chart-container');
+    const canvas = $('priceChart');
+    if (!container) return;
+
+    // evită dublare
+    if (container.querySelector('iframe[data-cmc="1"]')) return;
+
+    // păstrează canvas în DOM, dar îl ascundem (nu ștergem structura)
+    if (canvas) canvas.style.display = 'none';
+
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('data-cmc','1');
+    iframe.src = 'https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/';
+    iframe.style.width = '100%';
+    iframe.style.height = '420px';
+    iframe.style.border = '0';
+    iframe.style.borderRadius = '14px';
+    iframe.loading = 'lazy';
+    container.appendChild(iframe);
+
+    const live = $('lastUpdated');
+    if (live) live.textContent = 'coinmarketcap LIVE';
+  }
+
+  // ---------- Init ----------
+  window.addEventListener('load', ()=>{
+    try{ window.loadNews && window.loadNews(); }catch(e){}
+    try{ window.updateVisitCounter && window.updateVisitCounter(); }catch(e){}
+    try{ listenTeam(); }catch(e){}
+    try{ listenPromos(); }catch(e){}
+    try{ initCmcEmbed(); }catch(e){}
+  });
+
+  // also when switching to statistics page
+  const _origShowSection = window.showSection;
+  if (typeof _origShowSection === 'function'){
+    window.showSection = function(sectionId){
+      _origShowSection(sectionId);
+      if (sectionId === 'stats' || sectionId === 'statistici') {
+        setTimeout(()=>{ try{ initCmcEmbed(); }catch(e){} }, 200);
+      }
+      if (sectionId === 'whitepaper') {
+        setTimeout(()=>{ try{ listenTeam(); }catch(e){} }, 200);
+      }
+      if (sectionId === 'giveaway' || sectionId === 'promotii') {
+        setTimeout(()=>{ try{ listenPromos(); }catch(e){} }, 200);
+      }
+    };
+  }
+})();
 
 </script>
 </body>
