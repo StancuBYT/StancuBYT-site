@@ -1334,19 +1334,26 @@
 <!-- ADMIN LOGIN (Prezentare - josul paginii) -->
 <section id="admin-login" class="admin-login">
   <h2>🔐 Administrator Login</h2>
-  <p class="admin-desc">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-
-  <div style="margin-bottom:12px;">
-    <span id="adminStatusPill" class="admin-pill off">● Neautentificat</span>
-  </div>
+  <p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
 
   <div class="admin-login-box">
-    <input type="password" id="adminPasswordInput" placeholder="Parola administrator" />
-    <button type="button" onclick="adminLogin()">Autentificare</button>
-    <button type="button" onclick="adminLogout()" style="background:#2b2b45;border:1px solid rgba(255,255,255,.12);">Logout</button>
+    <input type="email" id="adminEmail" placeholder="Email administrator" autocomplete="username" />
+    <input type="password" id="adminPass" placeholder="Parola administrator" autocomplete="current-password" />
+    <button type="button" onclick="adminSignIn()">Autentificare</button>
+    <button type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Delogare</button>
+  </div>
+
+  <div class="admin-status-row">
+    <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
+    <span id="adminUserLabel" class="admin-user-label"></span>
   </div>
 
   <p id="adminLoginMsg" class="admin-msg"></p>
+
+  <p class="admin-hint">
+    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
+    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
+  </p>
 </section>
 
 </section>
@@ -2228,15 +2235,28 @@
         }
 
         function verifyPassword() {
-            const p = prompt('Introduceți parola pentru această acțiune:');
-            if (p !== ADMIN_PASSWORD) {
-                alert('Parolă incorectă!');
-                return false;
-            }
-            return true;
-        }
+  try {
+    // Firebase admin gate (nu mai cerem parola prin prompt)
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      alert('Firebase Auth nu este incarcat. Verifica includerea firebase-auth-compat.js.');
+      return false;
+    }
+    if (!window.__SBYT_ADMIN || window.__SBYT_ADMIN !== true) {
+      alert('Actiune restrictionata. Autentifica-te ca administrator (jos, pe pagina Prezentare).');
+      try {
+        showSection('prezentare');
+        setTimeout(() => document.getElementById('admin-login')?.scrollIntoView({behavior:'smooth', block:'start'}), 150);
+      } catch(e){}
+      return false;
+    }
+    return true;
+  } catch (e) {
+    alert('Eroare verificare admin: ' + (e?.message || e));
+    return false;
+  }
+}
 
-        // Router simplu (evită bug-uri)
+// Router simplu (evită bug-uri)
         function showSection(sectionId) {
             try {
                 const sections = document.querySelectorAll('.page-section');
@@ -3143,6 +3163,116 @@ try {
     });
   }
 } catch (e) {}
+
+
+/* ============================================================
+   FIREBASE AUTH ADMIN (Email/Password)
+   - Autentificare cu user + parola din Firebase Authentication
+   - Acces admin: custom claim (claims.admin === true) SAU whitelist email
+   ============================================================ */
+
+window.__SBYT_ADMIN = false;
+
+const ADMIN_EMAILS = [
+  // Pune aici email-urile admin (optional) - ex:
+  // "admin@stancubyt.com"
+];
+
+function maskEmail(email) {
+  if (!email || typeof email !== 'string') return '';
+  const [u, d] = email.split('@');
+  if (!d) return email;
+  const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
+  return `${u2}@${d}`;
+}
+
+function setAdminUI(isAdmin, user) {
+  const badge = document.getElementById('adminStatusBadge');
+  const label = document.getElementById('adminUserLabel');
+  const msg = document.getElementById('adminLoginMsg');
+  const logoutBtn = document.getElementById('adminLogoutBtn');
+
+  if (badge) {
+    badge.classList.remove('admin-badge-on','admin-badge-off');
+    badge.classList.add(isAdmin ? 'admin-badge-on' : 'admin-badge-off');
+    badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
+  }
+  if (label) {
+    label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
+  }
+  if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
+
+  if (msg) {
+    msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
+    msg.textContent = user
+      ? (isAdmin ? 'Mod administrator activ.' : 'Autentificat, dar fara drepturi admin.')
+      : 'Autentifica-te cu email + parola (Firebase).';
+  }
+
+  // arata/ascunde elemente admin-only daca exista
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? 'block' : 'none';
+  });
+}
+
+async function computeIsAdmin(user) {
+  if (!user) return false;
+  try {
+    // 1) custom claim admin
+    const token = await user.getIdTokenResult(true);
+    if (token && token.claims && token.claims.admin === true) return true;
+  } catch (e) {}
+  // 2) whitelist email
+  const email = (user.email || '').toLowerCase();
+  return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
+}
+
+async function adminSignIn() {
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      alert('Firebase Auth nu este incarcat.');
+      return;
+    }
+    const email = (document.getElementById('adminEmail')?.value || '').trim();
+    const pass = (document.getElementById('adminPass')?.value || '');
+
+    if (!email || !pass) {
+      const msg = document.getElementById('adminLoginMsg');
+      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
+      return;
+    }
+
+    await firebase.auth().signInWithEmailAndPassword(email, pass);
+    // onAuthStateChanged va actualiza UI
+  } catch (e) {
+    const msg = document.getElementById('adminLoginMsg');
+    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
+  }
+}
+
+async function adminSignOut() {
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    await firebase.auth().signOut();
+  } catch (e) {}
+}
+
+// Listener global
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+      firebase.auth().onAuthStateChanged(async (user) => {
+        const isAdmin = await computeIsAdmin(user);
+        window.__SBYT_ADMIN = isAdmin;
+        setAdminUI(isAdmin, user);
+
+        // daca user e autentificat dar nu e admin -> optional delogare automata
+        // if (user && !isAdmin) await firebase.auth().signOut();
+      });
+    }
+  } catch (e) {}
+});
+
 
 const auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
 const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
