@@ -1296,13 +1296,14 @@
             </div>
             
             <div class="chart-container">
-                <canvas id="priceChart"></canvas>
+                <iframe id="cmcDexIframe" src="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" style="width:100%; height:100%; border:0; border-radius:16px; background:rgba(0,0,0,0.2);" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                <canvas id="priceChart" style="display:none;"></canvas>
             </div>
             <div id="priceData" class="loading">Se încarcă datele live...</div>
         </div>
 
         <div class="data-visualization neon-glow">
-            <h3>📊 Metrici Contract - Etherscan LIVE</h3>
+            <h3>📊 Metrici Contract - coinmarketcap LIVE</h3>
             <div class="stats-grid" id="etherscanStats">
                 <div class="stat-item">
                     <div>Holders</div>
@@ -1429,7 +1430,24 @@
         </div>
 
         <!-- 2. Informații generale -->
-        <div id="informatii-generale" class="section-card neon-glow">
+        
+        <div class="token-info-grid" style="margin-top: 1rem;">
+            <div class="info-card">
+                <h3>🦎 Vezi pe GeckoTerminal</h3>
+                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults"
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Pool & Chart GeckoTerminal ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>🟡 Vezi pe CoinMarketCap DEX</h3>
+                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/"
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    DEX page CoinMarketCap ›
+                </a>
+            </div>
+        </div>
+<div id="informatii-generale" class="section-card neon-glow">
             <h3>2. Informații generale</h3>
             <div class="table-container">
                 <table class="whitepaper-table">
@@ -1678,6 +1696,34 @@
         </div>
 
         <!-- 8. Contact & Linkuri -->
+            <div style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.12);">
+                <h4 style="color: var(--neon-cyan); margin-bottom: 0.8rem;">➕ Administrare echipă (global)</h4>
+                <div style="margin-bottom: 0.8rem; opacity:0.85;">
+                    Poți adăuga/șterge membri. Datele sunt salvate în Firestore și sunt vizibile pe orice device.
+                </div>
+
+                <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <button class="news-btn" onclick="requestPassword('teamAdd')">➕ Adaugă membru</button>
+                </div>
+
+                <div id="teamForm" style="display:none; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                    <div class="form-row">
+                        <input type="text" id="teamName" placeholder="Nume" maxlength="80">
+                        <input type="text" id="teamRole" placeholder="Funcție (ex: Dev, Marketing)" maxlength="80">
+                    </div>
+                    <div class="form-row">
+                        <input type="date" id="teamJoinDate" placeholder="Data înscrierii">
+                        <input type="url" id="teamAvatarUrl" placeholder="Link foto / avatar (URL)" maxlength="300">
+                    </div>
+                    <div style="margin-top:0.8rem; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="news-btn" onclick="saveTeamMember()">💾 Salvează</button>
+                        <button class="news-btn" onclick="cancelTeamMember()">✖ Anulează</button>
+                    </div>
+                </div>
+
+                <div id="teamList" style="margin-top: 1rem;"></div>
+            </div>
+
         <div id="contact-wp" class="section-card neon-glow">
             <h3>8. Contact & Linkuri</h3>
             
@@ -2023,10 +2069,11 @@
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 Giveaway & Promoții
             </h1>
-            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente (variantă statică – salvat local pe device)</p>
+            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente (variantă GLOBAL – salvat în Firestore)</p>
 
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
                 <button class="news-btn" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
+                <button class="news-btn" onclick="requestPassword('giveawayAdd')">🎁 Adaugă giveaway</button>
                 <button class="news-btn" onclick="requestPassword('promoClear')">🗑️ Șterge toate</button>
             </div>
         </div>
@@ -2037,6 +2084,12 @@
 
             <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
     <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
+    <div class="form-row">
+        <select id="promoType" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.25); color:#fff;">
+            <option value="promotion">Promotie</option>
+            <option value="giveaway">Giveaway</option>
+        </select>
+    </div>
 
     <div class="form-row">
         <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT)" maxlength="120">
@@ -2070,6 +2123,20 @@
         <div class="data-visualization neon-glow">
             <h3>🏆 Clasament participanți</h3>
             <p style="opacity:0.85; margin-top:0.5rem;">Clasament local (pe device): pe baza „promovărilor” introduse la înscriere.</p>
+            
+            <div style="margin-top:1rem; padding: 1rem; border:1px solid rgba(255,255,255,0.12); border-radius:14px; background: rgba(255,255,255,0.04);">
+                <h4 style="margin:0 0 0.7rem 0; color: var(--neon-cyan);">📝 Înscriere (după ce alegi o promoție/giveaway)</h4>
+                <div class="form-row">
+                    <input type="text" id="joinName" placeholder="Nume complet" maxlength="80">
+                    <input type="email" id="joinEmail" placeholder="Email" maxlength="120">
+                </div>
+                <div class="form-row">
+                    <input type="text" id="joinWallet" placeholder="Wallet (0x...)" maxlength="80">
+                    <button class="news-btn" onclick="joinPromo()">✅ Înscrie-mă</button>
+                </div>
+                <small style="opacity:0.75;">După înscriere primești un ID unic pentru identificare.</small>
+            </div>
+
             <div id="leaderboard" style="margin-top:1rem;"></div>
         </div>
     </section>
@@ -2308,7 +2375,8 @@
             if (action === 'clear') return clearNews();
 
             // Giveaway / promo
-            if (action === 'promoAdd') return showPromoForm();
+            if (action === 'promoAdd') { const t=document.getElementById('promoType'); if(t) t.value='promotion'; return showPromoForm(); }
+  if (action === 'giveawayAdd') { const t=document.getElementById('promoType'); if(t) t.value='giveaway'; return showPromoForm(); }
             if (action === 'promoClear') return clearPromos();
 
             // fallback
@@ -2956,7 +3024,51 @@ async function updateLivePriceAndChart(period = 'live') {
         }
 
 
-        window.addEventListener('load', () => {
+        
+        // =========================
+        
+        // =========================
+        // CONTACT: trimite pe email (mailto)
+        // =========================
+        function sendContactMessage() {
+            const name = (document.getElementById('contactName')?.value || '').trim();
+            const email = (document.getElementById('contactEmail')?.value || '').trim();
+            const type = (document.getElementById('contactType')?.value || '').trim();
+            const msg = (document.getElementById('contactMessage')?.value || '').trim();
+
+            if (!name || !email || !type || !msg) {
+                const st = document.getElementById('contactStatus');
+                if (st) st.textContent = 'Completează toate câmpurile obligatorii.';
+                return;
+            }
+
+            const to = 'stancubyt@zahomail.eu';
+            const subject = encodeURIComponent(`[StancuBYT] ${type} - ${name}`);
+            const body = encodeURIComponent(`Nume: ${name}\nEmail: ${email}\nTip: ${type}\n\nMesaj:\n${msg}`);
+            window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+
+            const st = document.getElementById('contactStatus');
+            if (st) st.textContent = 'Se deschide clientul de email pentru trimitere...';
+        }
+
+        // Dropdown: arata toate optiunile la focus
+        function initContactTypeDropdown() {
+            const sel = document.getElementById('contactType');
+            if (!sel) return;
+            sel.addEventListener('focus', () => { sel.size = sel.options.length; });
+            sel.addEventListener('blur', () => { sel.size = 0; });
+            sel.addEventListener('change', () => { sel.size = 0; sel.blur(); });
+        }
+
+// WHITEPAPER DOWNLOAD (GitHub Pages)
+        // =========================
+        function downloadWhitepaper(lang) {
+            const l = (lang || 'ro').toLowerCase();
+            const file = l === 'en' ? 'Whitepaper/StancuBYT_EN.pdf' : 'Whitepaper/StancuBYT_RO.pdf';
+            window.open(file, '_blank');
+        }
+
+window.addEventListener('load', () => {
             initializeChart();
             startPriceAutoUpdate();
 
@@ -3023,20 +3135,26 @@ const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
 const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
 
 async function ensureAdminAuth() {
-  // admin login required for write actions
-  if (!auth) { alert("Firebase Auth nu este incarcat."); return false; }
-  if (auth.currentUser) return true;
+  // Daca e deja logat in sesiunea curenta, gata
+  if (auth && auth.currentUser) return true;
 
-  const email = "admin@stancubyt.com";
-  const pass = prompt("Parola admin:");
+  if (!auth) {
+    alert('Firebase Auth nu este disponibil. Verifica script-urile Firebase.');
+    return false;
+  }
+
+  const email = (prompt('Utilizator admin (email):', sessionStorage.getItem('stbytv_admin_email') || 'admin@stancubyt.com') || '').trim();
+  if (!email) return false;
+  const pass = prompt('Parola admin:');
   if (!pass) return false;
 
   try {
+    sessionStorage.setItem('stbytv_admin_email', email);
     await auth.signInWithEmailAndPassword(email, pass);
     return true;
   } catch (e) {
-    console.error("Auth error:", e);
-    alert("Nu te poti autentifica. Verifica in Firebase: Authentication -> Email/Password enabled si userul admin exista.");
+    console.error('Auth error:', e);
+    alert('Autentificare eșuată. Verifica email/parola si ca Email/Password este activat in Firebase Authentication.');
     return false;
   }
 }
@@ -3099,11 +3217,18 @@ function loadNews() {
     if (__newsUnsub) { try { __newsUnsub(); } catch(_) {} __newsUnsub = null; }
 
     __newsUnsub = db.collection('news')
-      .orderBy('pinned','desc')
       .orderBy('date','desc')
       .onSnapshot((snap) => {
         const items = [];
         snap.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
+
+        // pinned first, then newest
+        items.sort((a,b)=>{
+          const ap = a.pinned ? 1 : 0;
+          const bp = b.pinned ? 1 : 0;
+          if (ap !== bp) return bp - ap;
+          return (b.date||0) - (a.date||0);
+        });
 
         newsContainer.innerHTML = '';
 
@@ -3234,6 +3359,7 @@ async function savePromo() {
   if (!ok) return;
 
   const title = (document.getElementById('promoTitle')?.value || '').trim();
+  const ptype = (document.getElementById('promoType')?.value || 'promotion').trim();
   const prize = (document.getElementById('promoPrize')?.value || '').trim();
   const desc = (document.getElementById('promoDesc')?.value || '').trim();
   const ends = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
@@ -3253,6 +3379,7 @@ async function savePromo() {
 
   try {
     const ref = await db.collection('promos').add({
+      type: ptype,
       title,
       prize: prize || null,
       desc,
@@ -3382,6 +3509,7 @@ async function joinPromo(promoId) {
       participantId,
       name,
       email,
+      wallet,
       points: existing.exists ? (existing.data().points||0) : 0,
       promotions: existing.exists ? (existing.data().promotions||0) : 0,
       joinedAt: existing.exists ? (existing.data().joinedAt||Date.now()) : Date.now(),
@@ -3389,6 +3517,12 @@ async function joinPromo(promoId) {
     }, { merge: true });
 
     alert('Inscriere reusita! ID: ' + participantId);
+    // trimite codul prin email (deschide clientul de email al utilizatorului)
+    try {
+      const subj = encodeURIComponent('StancuBYT - Confirmare inscriere');
+      const body = encodeURIComponent(`Ai fost inscris cu codul: ${participantId}\n\nPromo/Giveaway: ${id}\n\nEchipa StancuBYT - security@stancubyt.com`);
+      window.location.href = `mailto:${email}?subject=${subj}&body=${body}`;
+    } catch(_) {}
     // refresh leaderboard
     listenLeaderboard(id);
   } catch (e) {
@@ -3458,6 +3592,106 @@ function listenLeaderboard(promoId) {
     });
 }
 
+
+// =========================
+// TEAM (GLOBAL, CROSS-DEVICE)
+// =========================
+let __teamUnsub = null;
+
+function showTeamForm() {
+  ensureAdminAuth().then(ok => {
+    if (!ok) return;
+    const f = document.getElementById('teamForm');
+    if (f) f.style.display = 'block';
+  });
+}
+
+function cancelTeamMember() {
+  const f = document.getElementById('teamForm');
+  if (f) f.style.display = 'none';
+  ['teamName','teamRole','teamJoinDate','teamAvatarUrl'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+async function saveTeamMember() {
+  const ok = await ensureAdminAuth();
+  if (!ok) return;
+
+  const name = (document.getElementById('teamName')?.value || '').trim();
+  const role = (document.getElementById('teamRole')?.value || '').trim();
+  const joinDate = (document.getElementById('teamJoinDate')?.value || '').trim();
+  const avatarUrl = (document.getElementById('teamAvatarUrl')?.value || '').trim();
+
+  if (!name || !role || !joinDate) {
+    alert('Completeaza numele, functia si data inscrierii!');
+    return;
+  }
+
+  try {
+    await db.collection('team').add({
+      name, role, joinDate,
+      avatarUrl: avatarUrl || null,
+      createdAt: Date.now()
+    });
+    cancelTeamMember();
+  } catch (e) {
+    console.error('saveTeamMember error:', e);
+    alert('Eroare la salvarea membrului (verifica Firestore Rules).');
+  }
+}
+
+async function deleteTeamMember(docId) {
+  const ok = await ensureAdminAuth();
+  if (!ok) return;
+  if (!confirm('Stergi acest membru?')) return;
+  try {
+    await db.collection('team').doc(docId).delete();
+  } catch (e) {
+    console.error('deleteTeamMember error:', e);
+    alert('Eroare la stergere (Rules).');
+  }
+}
+
+function listenTeam() {
+  const list = document.getElementById('teamList');
+  if (!list || !db) return;
+
+  if (__teamUnsub) { try { __teamUnsub(); } catch(_) {} __teamUnsub = null; }
+
+  __teamUnsub = db.collection('team').orderBy('createdAt','desc').onSnapshot(snap => {
+    const items = [];
+    snap.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
+
+    if (!items.length) {
+      list.innerHTML = '<div style="opacity:0.85;">Nu exista membri adaugati inca.</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    items.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      const avatar = m.avatarUrl ? `<img src="${m.avatarUrl}" alt="" style="width:64px;height:64px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,0.15);">`
+                                : `<div style="width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);font-size:28px;">👤</div>`;
+      card.innerHTML = `
+        <div style="display:flex; gap:14px; align-items:center;">
+          ${avatar}
+          <div style="flex:1;">
+            <div style="font-weight:700; color:white; font-size:1.05rem;">${_escapeHtml(m.name||'')}</div>
+            <div style="opacity:0.85;">${_escapeHtml(m.role||'')}</div>
+            <div style="opacity:0.75; margin-top:4px;">📅 ${_escapeHtml(m.joinDate||'')}</div>
+          </div>
+        </div>
+        <div style="margin-top:0.9rem; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="news-btn" onclick="deleteTeamMember('${m._id}')">🗑️ Sterge</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  });
+}
 // requestPassword mapping (keep existing buttons)
 function requestPassword(action, id) {
   if (action === 'add') {
@@ -3466,7 +3700,9 @@ function requestPassword(action, id) {
     return;
   }
   if (action === 'clear') return clearNews();
-  if (action === 'promoAdd') return showPromoForm();
+  if (action === 'promoAdd') { const t=document.getElementById('promoType'); if(t) t.value='promotion'; return showPromoForm(); }
+  if (action === 'giveawayAdd') { const t=document.getElementById('promoType'); if(t) t.value='giveaway'; return showPromoForm(); }
+  if (action === 'teamAdd') return showTeamForm();
   if (action === 'promoClear') {
     // clear promos needs admin
     ensureAdminAuth().then(async ok => {
