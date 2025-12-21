@@ -1117,7 +1117,60 @@
             color: #ffffff;
         }
 
-    </style>
+    
+/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
+.admin-login{
+  margin-top: 80px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  border-top: 2px solid rgba(122,92,255,.8);
+  text-align: center;
+  border-radius: 16px;
+}
+.admin-login h2{ color:#fff; margin:0 0 10px; }
+.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
+.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+.admin-login-box input{
+  padding:12px 14px; width:280px; max-width:92vw;
+  border-radius:10px; border:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25); color:#fff; outline:none;
+}
+.admin-login-box button{
+  padding:12px 16px; border-radius:10px; border:none;
+  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
+}
+.admin-login-box button:hover{ filter: brightness(1.08); }
+.admin-msg{ margin-top:12px; font-weight:700; }
+.admin-pill{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px; font-size:.9rem;
+  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
+}
+.admin-pill.off{
+  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
+}
+.admin-only{ display:none !important; }
+
+/* ====== TROPHY BUTTON (Giveaway add) ====== */
+.trophy-btn{
+  padding: 10px 14px !important;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  min-width: 54px;
+}
+.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
+.trophy-btn .trophy-logo{
+  width: 22px; height: 22px; border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0,255,136,.25);
+}
+.table-responsive{ overflow-x:auto; width:100%; }
+.lb-table{ width:100%; border-collapse: collapse; }
+.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
+.lb-top1{ background: rgba(255,215,0,.12); }
+.lb-top2{ background: rgba(192,192,192,.12); }
+.lb-top3{ background: rgba(205,127,50,.12); }
+.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
+
+</style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1277,7 +1330,26 @@
                 </div>
             </div>
         </div>
-    </section>
+    
+<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
+<section id="admin-login" class="admin-login">
+  <h2>🔐 Administrator Login</h2>
+  <p class="admin-desc">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
+
+  <div style="margin-bottom:12px;">
+    <span id="adminStatusPill" class="admin-pill off">● Neautentificat</span>
+  </div>
+
+  <div class="admin-login-box">
+    <input type="password" id="adminPasswordInput" placeholder="Parola administrator" />
+    <button type="button" onclick="adminLogin()">Autentificare</button>
+    <button type="button" onclick="adminLogout()" style="background:#2b2b45;border:1px solid rgba(255,255,255,.12);">Logout</button>
+  </div>
+
+  <p id="adminLoginMsg" class="admin-msg"></p>
+</section>
+
+</section>
 
     <!-- Statistici Section -->
     <section id="statistici" class="page-section">
@@ -2077,13 +2149,12 @@
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 Giveaway & Promoții
             </h1>
-            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente (variantă statică – salvat local pe device)</p>
+            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
 
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
                 <button class="news-btn" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
-                <button class=\"news-btn\" onclick=\"requestPassword('giveawayAdd')\">🎁 Adaugă giveaway</button>
-                <button class="news-btn" onclick="requestPassword('promoClear')">🗑️ Șterge toate</button>
-            </div>
+                <button class="news-btn trophy-btn" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                </div>
         </div>
 
         <div class="data-visualization neon-glow">
@@ -2124,7 +2195,7 @@
 
         <div class="data-visualization neon-glow">
             <h3>🏆 Clasament participanți</h3>
-            <p style="opacity:0.85; margin-top:0.5rem;">Clasament local (pe device): pe baza „promovărilor” introduse la înscriere.</p>
+            
             <div id="leaderboard" style="margin-top:1rem;"></div>
         </div>
     </section>
@@ -4164,5 +4235,551 @@ window.addEventListener('load', () => {
 })();
 
 </script>
+
+<script>
+/* ==========================================================
+   SBYT PATCH (Admin auth + Giveaway/Promo + Team + Contact)
+   Pentru GitHub Pages: securitate reala necesita backend/rules.
+========================================================== */
+
+(function(){
+  // --- Admin auth (persistenta) ---
+  const LS_ADMIN = 'sbyt_admin';
+  // IMPORTANT: schimba parola asta!
+  const ADMIN_PASSWORD = (window.ADMIN_PASSWORD || 'SBYT_ADMIN_2025');
+
+  function _setPill(){
+    const pill = document.getElementById('adminStatusPill');
+    if (!pill) return;
+    if (isAdmin()){
+      pill.classList.remove('off');
+      pill.textContent = '● Autentificat (Admin)';
+    } else {
+      pill.classList.add('off');
+      pill.textContent = '● Neautentificat';
+    }
+  }
+
+  window.isAdmin = function(){
+    return localStorage.getItem(LS_ADMIN) === 'true';
+  }
+
+  window.adminLogin = function(){
+    const inp = document.getElementById('adminPasswordInput');
+    const msg = document.getElementById('adminLoginMsg');
+    const val = (inp?.value || '').trim();
+    if (!val){
+      if (msg){ msg.style.color='#ff4d4d'; msg.textContent='Introdu parola.'; }
+      return;
+    }
+    if (val !== ADMIN_PASSWORD){
+      if (msg){ msg.style.color='#ff4d4d'; msg.textContent='Parola incorecta!'; }
+      return;
+    }
+    localStorage.setItem(LS_ADMIN,'true');
+    if (msg){ msg.style.color='#00ff88'; msg.textContent='Autentificare reusita. Modul administrator este activ.'; }
+    _setPill();
+    showAdminOnly();
+  }
+
+  window.adminLogout = function(){
+    localStorage.removeItem(LS_ADMIN);
+    const msg = document.getElementById('adminLoginMsg');
+    if (msg){ msg.style.color='#cfcfe8'; msg.textContent='Ai iesit din modul administrator.'; }
+    _setPill();
+    hideAdminOnly();
+  }
+
+  function showAdminOnly(){
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display='block');
+  }
+  function hideAdminOnly(){
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display='none');
+  }
+
+  // Override verifyPassword: nu mai cerem prompt daca e logat
+  window.verifyPassword = function(){
+    if (isAdmin()) return true;
+    const p = prompt('Introduce parola de administrator:');
+    if (p !== ADMIN_PASSWORD){
+      alert('Parola incorecta!');
+      return false;
+    }
+    localStorage.setItem(LS_ADMIN,'true');
+    _setPill();
+    showAdminOnly();
+    return true;
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    _setPill();
+    if (isAdmin()) showAdminOnly(); else hideAdminOnly();
+  });
+
+  // --- Helpers ---
+  function $(id){ return document.getElementById(id); }
+  function escapeHtml(str){
+    return String(str||'').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+  function maskEmail(email){
+    const e = String(email||'');
+    const at = e.indexOf('@');
+    if (at <= 1) return '***' + (at>-1? e.slice(at):'');
+    const name = e.slice(0, at);
+    const dom = e.slice(at);
+    return name.slice(0,2) + '***' + dom;
+  }
+  function randCode(){
+    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let out='';
+    for(let i=0;i<10;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return out;
+  }
+  function isoToday(){
+    const d=new Date(); d.setHours(0,0,0,0);
+    return d.toISOString().slice(0,10);
+  }
+
+  // --- LocalStorage stores (fallback robust) ---
+  const LS_PROMOS = (window.LS_PROMOS || 'SBYT_PROMOS_V3');
+  const LS_PROMO_PART = 'SBYT_PROMO_PART_V3'; // map promoId -> participants[]
+  const LS_TEAM = 'SBYT_TEAM_V1';
+
+  function getPromos(){
+    try{ return JSON.parse(localStorage.getItem(LS_PROMOS) || '[]'); } catch{ return []; }
+  }
+  function setPromos(v){ localStorage.setItem(LS_PROMOS, JSON.stringify(v||[])); }
+
+  function getParticipants(promoId){
+    try{
+      const map = JSON.parse(localStorage.getItem(LS_PROMO_PART) || '{}');
+      return Array.isArray(map[promoId]) ? map[promoId] : [];
+    }catch{ return []; }
+  }
+  function setParticipants(promoId, arr){
+    let map={};
+    try{ map = JSON.parse(localStorage.getItem(LS_PROMO_PART) || '{}') || {}; }catch{ map={}; }
+    map[promoId] = arr || [];
+    localStorage.setItem(LS_PROMO_PART, JSON.stringify(map));
+  }
+
+  // --- Giveaway/Promo UI (override stable) ---
+  // showPromoForm poate primi tip: 'promo' / 'giveaway'
+  window.showPromoForm = function(type){
+    if (!verifyPassword()) return;
+    const f = $('promoForm');
+    if (f) f.style.display='block';
+    if ($('promoType')) $('promoType').value = type || 'promo';
+  };
+
+  window.savePromo = function(){
+    if (!verifyPassword()) return;
+
+    const title = ($('promoTitle')?.value || '').trim();
+    const endDate = ($('promoEndDate')?.value || '').trim();
+    const desc = ($('promoDesc')?.value || '').trim();
+    const type = ($('promoType')?.value || 'promo').trim();
+
+    const prize1 = ($('promoPrize1')?.value || '').trim();
+    const prize2 = ($('promoPrize2')?.value || '').trim();
+    const prize3 = ($('promoPrize3')?.value || '').trim();
+    const prize4 = ($('promoPrize4')?.value || '').trim();
+
+    if (!title || !endDate){
+      alert('Completeaza titlul si data de expirare.');
+      return;
+    }
+
+    const promos = getPromos();
+    const id = Date.now();
+    promos.push({ id, type, title, desc, endDate, prizes:{p1:prize1,p2:prize2,p3:prize3,p4:prize4} });
+    setPromos(promos);
+
+    // reset form
+    if ($('promoForm')) $('promoForm').style.display='none';
+    ['promoTitle','promoEndDate','promoDesc','promoPrize1','promoPrize2','promoPrize3','promoPrize4'].forEach(x=>{ if($(x)) $(x).value=''; });
+
+    renderPromos();
+    renderLeaderboard();
+    alert('Salvat.');
+  };
+
+  window.deletePromo = function(promoId){
+    if (!verifyPassword()) return;
+    if (!confirm('Stergi aceasta promotie/giveaway?')) return;
+    const promos = getPromos().filter(p => Number(p.id) !== Number(promoId));
+    setPromos(promos);
+    // sterge si participantii
+    setParticipants(String(promoId), []);
+    renderPromos();
+    renderLeaderboard();
+  };
+
+  window.joinPromo = function(promoId){
+    const name = ($('joinName_' + promoId)?.value || '').trim();
+    const email = ($('joinEmail_' + promoId)?.value || '').trim();
+    const wallet = ($('joinWallet_' + promoId)?.value || '').trim();
+    const referral = ($('joinReferral_' + promoId)?.value || '').trim().toUpperCase();
+
+    if (!name || !email || !wallet){
+      alert('Completeaza nume, email si wallet.');
+      return;
+    }
+
+    const promos = getPromos();
+    const p = promos.find(x => Number(x.id) === Number(promoId));
+    if (!p) return;
+
+    // expirare: dupa data setata nu mai acceptam inscrieri
+    const end = new Date(p.endDate + 'T23:59:59');
+    if (Date.now() > end.getTime()){
+      alert('Aceasta promotie/giveaway este expirata. Nu mai accepta inscrieri.');
+      return;
+    }
+
+    const participants = getParticipants(String(promoId));
+
+    // validate referral: accepta DOAR coduri existente (generate anterior)
+    if (referral){
+      const exists = participants.some(u => String(u.code||'').toUpperCase() === referral);
+      if (!exists){
+        alert('Codul Referal nu este valid. Trebuie sa fie un cod generat anterior.');
+        return;
+      }
+    }
+
+    const code = randCode();
+    participants.push({
+      id: Date.now() + '_' + Math.random().toString(16).slice(2),
+      name, email, wallet,
+      code,
+      referral: referral || '',
+      createdAt: Date.now()
+    });
+    setParticipants(String(promoId), participants);
+
+    // clear inputs
+    ['joinName_','joinEmail_','joinWallet_','joinReferral_'].forEach(pref=>{
+      const el=$(pref+promoId); if(el) el.value='';
+    });
+
+    renderPromos();
+    renderLeaderboard();
+    alert('Inscriere reusita! Codul tau: ' + code);
+  };
+
+  window.renderPromos = function(){
+    const list = $('promoList');
+    if (!list) return;
+    const promos = getPromos();
+
+    if (!promos.length){
+      list.innerHTML = '<div style="opacity:0.85;">Nu exista promotii/giveaway-uri inca.</div>';
+      return;
+    }
+
+    promos.sort((a,b)=> new Date(a.endDate) - new Date(b.endDate));
+    list.innerHTML = '';
+
+    promos.forEach(p=>{
+      const end = new Date(p.endDate + 'T23:59:59');
+      const expired = Date.now() > end.getTime();
+      const part = getParticipants(String(p.id));
+
+      const prizes = p.prizes || {};
+      const prizesHtml = (prizes.p1||prizes.p2||prizes.p3||prizes.p4) ? `
+        <div style="margin-top:10px; padding:10px; border:1px solid rgba(255,255,255,.10); border-radius:12px; background:rgba(255,255,255,.03);">
+          <div style="font-weight:800; margin-bottom:6px;">🏅 Premii</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:8px;">
+            <div><b>Loc 1:</b> ${escapeHtml(prizes.p1||'-')}</div>
+            <div><b>Loc 2:</b> ${escapeHtml(prizes.p2||'-')}</div>
+            <div><b>Loc 3:</b> ${escapeHtml(prizes.p3||'-')}</div>
+            <div><b>Loc 4:</b> ${escapeHtml(prizes.p4||'-')}</div>
+          </div>
+        </div>` : '';
+
+      const partHtml = part.length ? `
+        <div style="margin-top:12px; font-size:.95rem;">
+          <div style="font-weight:800; margin-bottom:6px;">👥 Participanti (${part.length})</div>
+          <div class="table-responsive">
+            <table class="lb-table">
+              <thead><tr>
+                <th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Referal</th>
+              </tr></thead>
+              <tbody>
+                ${part.slice().sort((a,b)=>a.createdAt-b.createdAt).map((u,i)=>`
+                  <tr>
+                    <td>${i+1}</td>
+                    <td>${escapeHtml(u.name)}</td>
+                    <td class="mono">${escapeHtml(maskEmail(u.email))}</td>
+                    <td class="mono">${escapeHtml(u.code)}</td>
+                    <td class="mono">${escapeHtml(u.referral||'-')}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>` : `<div style="margin-top:10px; opacity:.85;">Nu exista participanti inca.</div>`;
+
+      const adminBtns = `
+        <div class="admin-only" style="margin-top:12px; text-align:right;">
+          <button class="news-btn" onclick="deletePromo(${Number(p.id)})">🗑️ Sterge</button>
+        </div>`;
+
+      const card = document.createElement('div');
+      card.className = 'news-card neon-glow';
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+          <div>
+            <div style="font-size:1.15rem; font-weight:900;">
+              ${p.type === 'giveaway' ? '🎁' : '📣'} ${escapeHtml(p.title)}
+              ${expired ? '<span style="margin-left:8px; font-size:.85rem; color:#ff4d4d;">(Expirat)</span>' : ''}
+            </div>
+            <div style="opacity:.85; margin-top:6px;">${escapeHtml(p.desc||'')}</div>
+            <div style="opacity:.85; margin-top:10px;"><b>Expira:</b> ${escapeHtml(p.endDate)}</div>
+          </div>
+        </div>
+
+        ${prizesHtml}
+
+        <div style="margin-top:14px; padding:12px; border:1px solid rgba(255,255,255,.10); border-radius:12px; background:rgba(0,0,0,.18);">
+          <div style="font-weight:900; margin-bottom:10px;">📝 Inscriere</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px;">
+            <input id="joinName_${p.id}" placeholder="Nume" />
+            <input id="joinEmail_${p.id}" placeholder="Email" />
+            <input id="joinWallet_${p.id}" placeholder="Wallet" />
+            <input id="joinReferral_${p.id}" placeholder="Referal (optional)" />
+          </div>
+          <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+            <button class="news-btn" onclick="joinPromo(${Number(p.id)})" ${expired?'disabled style="opacity:.5; cursor:not-allowed;"':''}>✅ Inscrie-te</button>
+          </div>
+          <div style="opacity:.75; font-size:.9rem; margin-top:8px;">
+            Referal: accepta doar coduri generate anterior (de la participanti deja inscrisi).
+          </div>
+        </div>
+
+        ${partHtml}
+        ${adminBtns}
+      `;
+      list.appendChild(card);
+    });
+
+    // refresh admin visibility
+    if (isAdmin()) showAdminOnly(); else hideAdminOnly();
+  };
+
+  // --- Leaderboard by referrals (top 1-3 highlighted) ---
+  window.renderLeaderboard = function(){
+    const root = $('leaderboard');
+    if (!root) return;
+    const promos = getPromos();
+    if (!promos.length){
+      root.innerHTML = '<div style="opacity:0.85;">Nu exista clasamente inca.</div>';
+      return;
+    }
+
+    let html = '';
+    promos.sort((a,b)=> new Date(a.endDate) - new Date(b.endDate));
+
+    promos.forEach(p=>{
+      const part = getParticipants(String(p.id));
+      // compute referral counts by code
+      const counts = {};
+      part.forEach(u => { counts[String(u.code).toUpperCase()] = 0; });
+      part.forEach(u=>{
+        const ref = String(u.referral||'').toUpperCase();
+        if (ref && typeof counts[ref] === 'number') counts[ref] += 1;
+      });
+
+      const rows = part.map(u => ({
+        name: u.name,
+        email: u.email,
+        code: u.code,
+        referrals: counts[String(u.code).toUpperCase()] || 0
+      })).sort((a,b)=> b.referrals - a.referrals);
+
+      const prizes = p.prizes || {};
+      const prizeNote = (prizes.p1||prizes.p2||prizes.p3) ? `
+        <div style="opacity:.85; margin-top:6px; font-size:.95rem;">
+          <b>Premii:</b> #1 ${escapeHtml(prizes.p1||'-')} · #2 ${escapeHtml(prizes.p2||'-')} · #3 ${escapeHtml(prizes.p3||'-')} · #4 ${escapeHtml(prizes.p4||'-')}
+        </div>` : '';
+
+      html += `
+        <div class="neon-glow" style="padding:16px; border-radius:16px; margin-bottom:14px; background:rgba(255,255,255,.02);">
+          <div style="font-weight:1000; font-size:1.1rem;">
+            ${p.type === 'giveaway' ? '🎁' : '📣'} ${escapeHtml(p.title)}
+          </div>
+          ${prizeNote}
+          <div class="table-responsive" style="margin-top:12px;">
+            <table class="lb-table">
+              <thead>
+                <tr>
+                  <th>Loc</th><th>Nume</th><th>Email</th><th>Cod</th><th>Inscrieri cu codul</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${
+                  (rows.length ? rows : [{name:'-',email:'',code:'',referrals:0}]).map((r, idx)=>{
+                    const cls = idx===0?'lb-top1':idx===1?'lb-top2':idx===2?'lb-top3':'';
+                    return `<tr class="${cls}">
+                      <td><b>${rows.length? (idx+1): '-'}</b></td>
+                      <td>${escapeHtml(r.name)}</td>
+                      <td class="mono">${rows.length? escapeHtml(maskEmail(r.email)) : '-'}</td>
+                      <td class="mono">${rows.length? escapeHtml(r.code) : '-'}</td>
+                      <td><b>${rows.length? r.referrals : '-'}</b></td>
+                    </tr>`;
+                  }).join('')
+                }
+              </tbody>
+            </table>
+          </div>
+          <div style="opacity:.75; font-size:.9rem; margin-top:8px;">
+            Clasamentul se calculeaza dupa numarul de inscrieri care folosesc codul tau in campul Referal.
+          </div>
+        </div>
+      `;
+    });
+
+    root.innerHTML = html;
+  };
+
+  // --- Team members: fallback localStorage to avoid (Rules) ---
+  function getTeam(){
+    try{ return JSON.parse(localStorage.getItem(LS_TEAM) || '[]'); } catch { return []; }
+  }
+  function setTeam(arr){ localStorage.setItem(LS_TEAM, JSON.stringify(arr||[])); }
+
+  // daca exista UI de "save member", prindem butonul prin id-uri comune
+  window.saveTeamMemberLocal = function(){
+    if (!verifyPassword()) return;
+
+    const name = ($('memberName')?.value || $('teamName')?.value || '').trim();
+    const role = ($('memberRole')?.value || $('teamRole')?.value || '').trim();
+    const bio  = ($('memberBio')?.value  || $('teamBio')?.value  || '').trim();
+    const joinDate = ($('memberJoinDate')?.value || $('teamJoinDate')?.value || isoToday()).trim();
+    const img = ($('memberImage')?.value || $('teamImage')?.value || '').trim();
+
+    if (!name || !role){
+      alert('Completeaza minim Nume si Rol.');
+      return;
+    }
+
+    const team = getTeam();
+    team.push({ id: Date.now(), name, role, bio, joinDate, img });
+    setTeam(team);
+
+    ['memberName','memberRole','memberBio','memberJoinDate','memberImage','teamName','teamRole','teamBio','teamJoinDate','teamImage'].forEach(id=>{
+      const el=$(id); if(el) el.value='';
+    });
+
+    if (typeof window.renderTeamLocal === 'function') window.renderTeamLocal();
+    alert('Membru salvat (local).');
+  };
+
+  // Fortam butonul existent (saveTeamMember) sa foloseasca varianta local (evita Rules)
+  window.saveTeamMember = window.saveTeamMemberLocal;
+  window.deleteTeamMember = window.deleteTeamMemberLocal;
+
+
+  window.deleteTeamMemberLocal = function(memberId){
+    if (!verifyPassword()) return;
+    if (!confirm('Stergi acest membru?')) return;
+    const team = getTeam().filter(m => Number(m.id)!==Number(memberId));
+    setTeam(team);
+    if (typeof window.renderTeamLocal === 'function') window.renderTeamLocal();
+  };
+
+  window.renderTeamLocal = function(){
+    const list = document.getElementById('teamList') || document.getElementById('teamMembers') || document.getElementById('teamContainer');
+    if (!list) return;
+    const team = getTeam();
+    if (!team.length){
+      list.innerHTML = '<div style="opacity:0.85;">Nu exista membri adaugati inca.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    team.forEach(m=>{
+      const card = document.createElement('div');
+      card.className = 'news-card neon-glow';
+      card.innerHTML = `
+        <div style="display:flex; gap:14px; align-items:flex-start;">
+          <div style="width:64px; height:64px; border-radius:14px; overflow:hidden; background:rgba(255,255,255,.05); flex:0 0 auto;">
+            ${m.img ? `<img src="${escapeHtml(m.img)}" style="width:100%;height:100%;object-fit:cover;" alt=""/>` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;opacity:.7;">👤</div>`}
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:1000; font-size:1.05rem;">${escapeHtml(m.name)}</div>
+            <div style="opacity:.85; margin-top:4px;">${escapeHtml(m.role)}</div>
+            ${m.bio ? `<div style="opacity:.8; margin-top:8px;">${escapeHtml(m.bio)}</div>`:''}
+            <div style="opacity:.7; margin-top:8px; font-size:.9rem;">📅 ${escapeHtml(m.joinDate||'')}</div>
+          </div>
+        </div>
+        <div class="admin-only" style="display:flex; justify-content:flex-end; margin-top:12px;">
+          <button class="news-btn" onclick="deleteTeamMemberLocal(${Number(m.id)})">🗑️ Sterge</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+
+    if (isAdmin()) showAdminOnly(); else hideAdminOnly();
+  };
+
+  // Incarca giveaway/promo + leaderboard la intrare in sectiune
+  const origShowSection = window.showSection;
+  window.showSection = function(sectionId){
+    if (typeof origShowSection === 'function') origShowSection(sectionId);
+    if (sectionId === 'giveaway'){
+      try{ renderPromos(); renderLeaderboard(); }catch(e){ console.warn(e); }
+    }
+    if (sectionId === 'whitepaper'){
+      try{ renderTeamLocal(); }catch(e){}
+    }
+  };
+
+  // --- Contact privacy checkbox fix ---
+  function patchContact(){
+    // cauta formularul de contact si checkbox-ul
+    const form = document.getElementById('quickContactForm') || document.querySelector('form#contactForm') || document.querySelector('form[data-contact]');
+    const checkbox = document.getElementById('privacyAgree') || document.getElementById('confAgree') || document.querySelector('input[type="checkbox"][name*="conf"]') || document.querySelector('input[type="checkbox"][id*="agree"]');
+    const msg = document.getElementById('contactMsg') || document.getElementById('contactStatus') || document.querySelector('#contact .form-msg');
+
+    if (!form) return;
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const agreed = checkbox ? checkbox.checked : false;
+      if (!agreed){
+        alert('Bifeaza acordul de confidentialitate.');
+        if (msg) { msg.textContent='Bifeaza acordul de confidentialitate.'; msg.style.color='#ff4d4d'; }
+        return;
+      }
+      // Daca proiectul tau trimitea prin fetch, aici pastram comportamentul existent (daca exista handler).
+      // Fallback: mailto
+      const name = (document.getElementById('contactName')?.value || '').trim();
+      const email = (document.getElementById('contactEmail')?.value || '').trim();
+      const message = (document.getElementById('contactMessage')?.value || '').trim();
+
+      const subj = encodeURIComponent('StancuBYT | Contact');
+      const body = encodeURIComponent(`Nume: ${name}\nEmail: ${email}\n\nMesaj:\n${message}`);
+      window.location.href = `mailto:contact@stancubyt.com?subject=${subj}&body=${body}`;
+      if (msg){ msg.textContent='Se deschide clientul de email pentru trimitere.'; msg.style.color='#00ff88'; }
+    }, {capture:true});
+  }
+  document.addEventListener('DOMContentLoaded', patchContact);
+
+  // --- Stats + total supply: robust refresh if API key missing ---
+  const origFetchAllData = window.fetchAllData;
+  window.fetchAllData = async function(){
+    if (typeof origFetchAllData === 'function'){
+      try{ await origFetchAllData(); }catch(e){ console.warn(e); }
+    }
+    // daca supplyValue a ramas "Se incarca..." si nu avem cheie, explicam
+    const supply = document.getElementById('supplyValue');
+    if (supply && /incar/i.test(supply.textContent||'') && (!window.ETHERSCAN_API_KEY || window.ETHERSCAN_API_KEY==='YOUR_ETHERSCAN_API_KEY')){
+      supply.textContent = 'Seteaza ETHERSCAN_API_KEY';
+    }
+  };
+
+})();
+</script>
+
 </body>
 </html>
