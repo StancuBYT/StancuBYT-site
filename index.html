@@ -5964,5 +5964,644 @@ service cloud.firestore {
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   STANCUBYT HOTFIX PACK (2025-12-22)
+   - Fix invalid spread syntax in Firestore helpers
+   - Store NEWS + TEAM in Firestore collection: stats (docs: global, team)
+   - Individual delete buttons for News / Team / Promos
+   - Ensure Promos save+render via Firestore (collection: promos)
+   - Visits counter live via stats/visits
+   - Price chart: Etherscan (ETH price) via Cloud Function proxy
+   ============================================================ */
+
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const hasFirebase = (typeof firebase !== 'undefined');
+  const db = hasFirebase && firebase.firestore ? firebase.firestore() : null;
+  const auth = hasFirebase && firebase.auth ? firebase.auth() : null;
+
+  // --- Admin gate (reuse existing ensureAdminAuth/_ensureAdmin if present) ---
+  async function ensureAdmin(){
+    if (typeof window.ensureAdminAuth === 'function') {
+      try { return await window.ensureAdminAuth(); } catch(e) {}
+    }
+    if (typeof window._ensureAdmin === 'function') {
+      try { return await window._ensureAdmin(); } catch(e) {}
+    }
+    // fallback: require logged in user
+    const u = auth && auth.currentUser;
+    if (!u) { alert('Autentifica-te ca admin.'); return false; }
+    return true;
+  }
+
+  // --- Small utils ---
+  function escapeHtml(s){
+    return String(s||'').replace(/[&<>"']/g, (m)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+  }
+  function maskEmail(email){
+    if (!email || typeof email !== 'string') return '';
+    const parts = email.split('@');
+    if (parts.length !== 2) return email;
+    const u = parts[0], d = parts[1];
+    const head = u.slice(0,2);
+    const stars = '*'.repeat(Math.min(8, Math.max(1, u.length-2)));
+    return `${head}${stars}@${d}`;
+  }
+
+  // --- Etherscan proxy endpoint (Cloud Function) ---
+  const ETHERSCAN_PROXY = "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy";
+  async function etherscan(params){
+    const url = ETHERSCAN_PROXY + "?" + new URLSearchParams(params).toString();
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error("Proxy error " + r.status);
+    return await r.json();
+  }
+
+  // =========================
+  // VISITS (stats/visits)
+  // =========================
+  async function bumpVisits(){
+    if (!db) return;
+    const ref = db.collection('stats').doc('visits');
+    try{
+      await db.runTransaction(async (tx)=>{
+        const snap = await tx.get(ref);
+        const cur = snap.exists && typeof snap.data().count === 'number' ? snap.data().count : 0;
+        tx.set(ref, { count: cur + 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+      });
+    }catch(e){ console.error('bumpVisits:', e); }
+  }
+  function listenVisits(){
+    if (!db) return;
+    const ref = db.collection('stats').doc('visits');
+    ref.onSnapshot((snap)=>{
+      const count = snap.exists && typeof snap.data().count === 'number' ? snap.data().count : 0;
+      const el = $('visitCount');
+      if (el) el.textContent = Number(count).toLocaleString('ro-RO');
+    }, (e)=>console.error('visits listen:', e));
+  }
+
+  // =========================
+  // NEWS (stats/global.news[])
+  // =========================
+  async function ensureStatsDoc(){
+    if (!db) return;
+    const ref = db.collection('stats').doc('global');
+    const snap = await ref.get();
+    if (!snap.exists){
+      await ref.set({ news: [], updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+    }
+    return ref;
+  }
+
+  function renderNewsList(items){
+    const container = $('newsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!items || !items.length){
+      container.innerHTML = '<div style="opacity:0.85;">Nu exista anunturi inca.</div>';
+      return;
+    }
+
+    // pinned first then date desc
+    items = [...items].sort((a,b)=>{
+      if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+      return Number(b.ts||0) - Number(a.ts||0);
+    });
+
+    items.forEach(item=>{
+      const div = document.createElement('div');
+      div.className = item.pinned ? 'news-card pinned' : 'news-card';
+      const type = item.type || 'update';
+      const badge = type === 'announcement' ? {cls:'badge-announcement',txt:'Anunt'} :
+                    type === 'event' ? {cls:'badge-event',txt:'Eveniment'} :
+                    {cls:'badge-update',txt:'Update'};
+      const d = item.ts ? new Date(item.ts) : null;
+      const dateStr = d ? d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      div.innerHTML = `
+        <div class="news-badge ${badge.cls}">${badge.txt}</div>
+        <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(item.title||'')}</h4>
+        <p style="opacity:0.9; line-height:1.5;">${escapeHtml(item.content||'')}</p>
+        <div class="news-date"><span>📅</span> ${escapeHtml(dateStr)}</div>
+        <div style="margin-top:0.9rem; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="news-btn admin-only" onclick="deleteNewsItem('${escapeHtml(item.id)}')">🗑️ Sterge</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+
+    // show admin-only if admin
+    if (typeof window.isAdmin === 'function' ? window.isAdmin() : !!(auth && auth.currentUser)) {
+      document.querySelectorAll('.admin-only').forEach(el=>el.style.display='inline-flex');
+    } else {
+      document.querySelectorAll('.admin-only').forEach(el=>el.style.display='none');
+    }
+  }
+
+  let __newsUnsub = null;
+  async function listenNews(){
+    if (!db) return;
+    const ref = await ensureStatsDoc();
+    if (__newsUnsub) { try{__newsUnsub();}catch(_){} __newsUnsub=null; }
+    __newsUnsub = ref.onSnapshot((snap)=>{
+      const d = snap.data() || {};
+      renderNewsList(Array.isArray(d.news) ? d.news : []);
+    }, (e)=>console.error('news listen:', e));
+  }
+
+  window.saveNews = async function(){
+    const ok = await ensureAdmin(); if (!ok) return;
+    if (!db) return alert('Firestore indisponibil.');
+
+    const title = ($('newsTitle')?.value || '').trim();
+    const content = ($('newsContent')?.value || '').trim();
+    const type = $('newsType')?.value || 'update';
+    const pinned = !!$('pinNews')?.checked;
+
+    if (!title || !content){
+      alert('Completeaza titlul si continutul!');
+      return;
+    }
+
+    const ref = await ensureStatsDoc();
+    const id = String(Date.now());
+    const item = { id, title, content, type, pinned, ts: Date.now() };
+
+    try{
+      await ref.set({
+        news: firebase.firestore.FieldValue.arrayUnion(item),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge:true });
+
+      if (typeof window.cancelAddNews === 'function') window.cancelAddNews();
+    }catch(e){
+      console.error('saveNews(stats/global):', e);
+      alert('Eroare la salvarea stirei (Rules).');
+    }
+  };
+
+  window.deleteNewsItem = async function(id){
+    const ok = await ensureAdmin(); if (!ok) return;
+    if (!db) return;
+    if (!confirm('Stergi acest anunt?')) return;
+    try{
+      const ref = db.collection('stats').doc('global');
+      const snap = await ref.get();
+      const d = snap.data() || {};
+      const arr = Array.isArray(d.news) ? d.news : [];
+      const next = arr.filter(x => String(x.id) !== String(id));
+      await ref.set({ news: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+    }catch(e){
+      console.error('deleteNewsItem:', e);
+      alert('Eroare la stergere (Rules).');
+    }
+  };
+
+  window.clearAllNews = async function(){
+    const ok = await ensureAdmin(); if (!ok) return;
+    if (!db) return;
+    if (!confirm('Stergi TOATE anunturile?')) return;
+    try{
+      await db.collection('stats').doc('global').set({
+        news: [],
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge:true });
+    }catch(e){
+      console.error('clearAllNews:', e);
+      alert('Eroare la stergere (Rules).');
+    }
+  };
+
+  // keep compatibility with existing requestPassword('add'/'clear')
+  window.requestPassword = function(action){
+    if (action === 'add') {
+      const f = $('newsForm'); if (f) f.style.display='block';
+      return;
+    }
+    if (action === 'clear') return window.clearAllNews();
+    if (typeof window._origRequestPassword === 'function') return window._origRequestPassword(action);
+  };
+
+  // =========================
+  // TEAM (stats/team.members[])
+  // =========================
+  async function ensureTeamDoc(){
+    if (!db) return;
+    const ref = db.collection('stats').doc('team');
+    const snap = await ref.get();
+    if (!snap.exists){
+      await ref.set({ members: [], updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+    }
+    return ref;
+  }
+
+  function renderTeam(members){
+    const root = $('teamList');
+    if (!root) return;
+    root.innerHTML = '';
+    members = Array.isArray(members) ? members : [];
+    if (!members.length){
+      root.innerHTML = '<div style="opacity:0.85;">Nu exista membri inca.</div>';
+      return;
+    }
+    members.sort((a,b)=>Number(b.ts||0)-Number(a.ts||0));
+
+    const isAdminNow = (typeof window.isAdmin === 'function') ? window.isAdmin() : !!(auth && auth.currentUser);
+
+    members.forEach(m=>{
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      card.innerHTML = `
+        <div style="display:flex; gap:14px; align-items:center;">
+          <div style="width:54px; height:54px; border-radius:12px; overflow:hidden; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center;">
+            ${m.avatar ? `<img src="${escapeHtml(m.avatar)}" style="width:100%; height:100%; object-fit:cover;" />` : '👤'}
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:900; font-size:1.05rem;">${escapeHtml(m.name||'')}</div>
+            <div style="opacity:.85;">${escapeHtml(m.role||'')}</div>
+            <div style="opacity:.75; font-size:.9rem;">${escapeHtml(m.joinDate||'')}</div>
+          </div>
+          ${isAdminNow ? `<button class="news-btn" onclick="deleteTeamMember('${escapeHtml(m.id)}')">🗑️ Sterge</button>` : ''}
+        </div>
+      `;
+      root.appendChild(card);
+    });
+  }
+
+  let __teamUnsub = null;
+  async function listenTeam(){
+    if (!db) return;
+    const ref = await ensureTeamDoc();
+    if (__teamUnsub) { try{__teamUnsub();}catch(_){} __teamUnsub=null; }
+    __teamUnsub = ref.onSnapshot((snap)=>{
+      const d = snap.data() || {};
+      renderTeam(Array.isArray(d.members) ? d.members : []);
+    }, (e)=>console.error('team listen:', e));
+  }
+
+  window.saveTeamMember = async function(){
+    const ok = await ensureAdmin(); if (!ok) return;
+    if (!db) return alert('Firestore indisponibil.');
+
+    const name = ($('teamName')?.value || '').trim();
+    const role = ($('teamRole')?.value || '').trim();
+    const joinDate = ($('teamJoinDate')?.value || '').trim();
+    const avatar = ($('teamAvatar')?.value || '').trim();
+
+    if (!name || !role || !joinDate){
+      alert('Completeaza nume, rol si data.');
+      return;
+    }
+
+    const ref = await ensureTeamDoc();
+    const member = { id: String(Date.now()), name, role, joinDate, avatar: avatar||'', ts: Date.now() };
+
+    try{
+      await ref.set({
+        members: firebase.firestore.FieldValue.arrayUnion(member),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge:true });
+
+      if (typeof window.cancelTeamMember === 'function') window.cancelTeamMember();
+    }catch(e){
+      console.error('saveTeamMember:', e);
+      alert('Eroare la salvare membru (Rules).');
+    }
+  };
+
+  window.deleteTeamMember = async function(id){
+    const ok = await ensureAdmin(); if (!ok) return;
+    if (!db) return;
+    if (!confirm('Stergi acest membru?')) return;
+    try{
+      const ref = db.collection('stats').doc('team');
+      const snap = await ref.get();
+      const d = snap.data() || {};
+      const arr = Array.isArray(d.members) ? d.members : [];
+      const next = arr.filter(x => String(x.id) !== String(id));
+      await ref.set({ members: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+    }catch(e){
+      console.error('deleteTeamMember:', e);
+      alert('Eroare la stergere (Rules).');
+    }
+  };
+
+  // =========================
+  // PROMOS (collection: promos) + Participants subcollection
+  // =========================
+  async function loadPromosFS(){
+    if (!db) return [];
+    const snap = await db.collection('promos').orderBy('createdAt','desc').get();
+    const arr=[];
+    snap.forEach(doc=>{
+      const x = doc.data() || {};
+      arr.push({ _id: doc.id, ...x });
+    });
+    return arr;
+  }
+  async function loadParticipantsFS(promoId){
+    if (!db) return [];
+    const snap = await db.collection('promos').doc(promoId).collection('participants').orderBy('createdAt','asc').get();
+    const arr=[];
+    snap.forEach(doc=>arr.push({ _id: doc.id, ...(doc.data()||{}) }));
+    return arr;
+  }
+
+  // expose fixed helpers (overwrite broken ones)
+  window.loadPromosFS = loadPromosFS;
+  window.loadParticipantsFS = loadParticipantsFS;
+
+  // Save promo (expects existing form fields; do not break if missing)
+  window.savePromo = async function(){
+    const ok = await ensureAdmin(); if (!ok) return;
+    if (!db) return alert('Firestore indisponibil.');
+
+    const title = ($('promoTitle')?.value || '').trim();
+    const endDate = ($('promoEndDate')?.value || '').trim();
+    const desc = ($('promoDesc')?.value || '').trim();
+    const type = ($('promoType')?.value || 'promo').trim(); // if you have selector
+    const p1 = ($('promoPrize1')?.value || '').trim();
+    const p2 = ($('promoPrize2')?.value || '').trim();
+    const p3 = ($('promoPrize3')?.value || '').trim();
+    const p4 = ($('promoPrize4')?.value || '').trim();
+
+    if (!title || !endDate){
+      alert('Completeaza minim Titlu si Data expirarii.');
+      return;
+    }
+
+    try{
+      await db.collection('promos').add({
+        title,
+        desc,
+        type,
+        endDate,
+        prizes: { p1, p2, p3, p4 },
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      if (typeof window.cancelPromo === 'function') window.cancelPromo();
+    }catch(e){
+      console.error('savePromo:', e);
+      alert('Eroare la salvare promotie/giveaway (Rules).');
+    }
+  };
+
+  window.deletePromo = async function(promoId){
+    const ok = await ensureAdmin(); if (!ok) return;
+    if (!db) return;
+    if (!confirm('Stergi aceasta promotie/giveaway?')) return;
+    try{
+      // delete participants + promo doc
+      const partSnap = await db.collection('promos').doc(promoId).collection('participants').get();
+      const batch = db.batch();
+      partSnap.forEach(d=>batch.delete(d.ref));
+      batch.delete(db.collection('promos').doc(promoId));
+      await batch.commit();
+    }catch(e){
+      console.error('deletePromo:', e);
+      alert('Eroare la stergere (Rules).');
+    }
+  };
+
+  // Render promos list (uses existing markup ids: promoList)
+  async function renderPromosList(promos){
+    const list = $('promoList');
+    if (!list) return;
+    promos = Array.isArray(promos) ? promos : [];
+    if (!promos.length){
+      list.innerHTML = '<div style="opacity:0.85;">Nu exista giveaway/promotii inca.</div>';
+      return;
+    }
+
+    // sort by end date asc
+    promos.sort((a,b)=> new Date(a.endDate||0) - new Date(b.endDate||0));
+    list.innerHTML = '';
+
+    for (const p of promos){
+      const end = p.endDate ? new Date(p.endDate + 'T23:59:59') : null;
+      const expired = end ? (new Date() > end) : false;
+
+      const prizes = p.prizes || {};
+      const prizesHtml = (prizes.p1 || prizes.p2 || prizes.p3 || prizes.p4) ? `
+        <div style="opacity:.85; margin-top:8px; font-size:.95rem;">
+          <b>Premii:</b> #1 ${escapeHtml(prizes.p1||'-')} · #2 ${escapeHtml(prizes.p2||'-')} · #3 ${escapeHtml(prizes.p3||'-')} · #4 ${escapeHtml(prizes.p4||'-')}
+        </div>` : '';
+
+      // participants list (masked email + full code)
+      let partHtml = '';
+      try{
+        const participants = await loadParticipantsFS(p._id);
+        if (participants.length){
+          partHtml = `
+            <div style="margin-top:12px; opacity:.9;">
+              <div style="font-weight:800; margin-bottom:6px;">Participanti</div>
+              <div class="table-responsive">
+                <table class="lb-table">
+                  <thead><tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Referal</th></tr></thead>
+                  <tbody>
+                    ${participants.map((u,idx)=>`
+                      <tr>
+                        <td>${idx+1}</td>
+                        <td>${escapeHtml(u.name||'')}</td>
+                        <td class="mono">${escapeHtml(maskEmail(u.email||''))}</td>
+                        <td class="mono">${escapeHtml(u.code||'')}</td>
+                        <td class="mono">${escapeHtml(u.referral||'')}</td>
+                      </tr>`).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>`;
+        }
+      }catch(e){ console.error('load participants render:', e); }
+
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      card.innerHTML = `
+        <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
+        <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title||'')}</h4>
+        <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.desc||'')}</p>
+        <div class="news-date" style="margin-top:0.8rem;">
+          <span>⏳</span> Expira: ${p.endDate ? escapeHtml(new Date(p.endDate).toLocaleDateString('ro-RO')) : '-'}
+        </div>
+        ${prizesHtml}
+
+        <div style="margin-top:14px; padding:12px; border:1px solid rgba(255,255,255,.10); border-radius:12px; background:rgba(0,0,0,.18);">
+          <div style="font-weight:900; margin-bottom:10px;">📝 Inscriere</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px;">
+            <input id="joinName_${escapeHtml(p._id)}" placeholder="Nume" />
+            <input id="joinEmail_${escapeHtml(p._id)}" placeholder="Email" />
+            <input id="joinWallet_${escapeHtml(p._id)}" placeholder="Wallet" />
+            <input id="joinReferral_${escapeHtml(p._id)}" placeholder="Referal (optional)" />
+          </div>
+          <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+            <button class="news-btn" onclick="joinPromo('${escapeHtml(p._id)}')" ${expired?'disabled style="opacity:.5; cursor:not-allowed;"':''}>✅ Inscrie-te</button>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
+          <button class="news-btn admin-only" onclick="deletePromo('${escapeHtml(p._id)}')">🗑️ Sterge</button>
+        </div>
+
+        ${partHtml}
+      `;
+      list.appendChild(card);
+    }
+
+    // admin-only
+    const isAdminNow = (typeof window.isAdmin === 'function') ? window.isAdmin() : !!(auth && auth.currentUser);
+    document.querySelectorAll('#promoList .admin-only').forEach(el=>el.style.display = isAdminNow ? 'inline-flex' : 'none');
+  }
+
+  let __promosUnsub = null;
+  function listenPromos(){
+    if (!db) return;
+    if (__promosUnsub) { try{__promosUnsub();}catch(_){} __promosUnsub=null; }
+    __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(async (snap)=>{
+      const promos=[];
+      snap.forEach(doc=>promos.push({ _id: doc.id, ...doc.data() }));
+      await renderPromosList(promos);
+      if (typeof window.renderLeaderboardPerPromo === 'function') {
+        try{ window.renderLeaderboardPerPromo(); }catch(e){}
+      }
+    }, (e)=>console.error('listenPromos:', e));
+  }
+  window.listenPromos = listenPromos;
+
+  // Join promo: validate referral exists (generated codes) and save participant
+  function generateCode(){
+    return Math.random().toString(36).slice(2,8).toUpperCase() + Date.now().toString(36).slice(-2).toUpperCase();
+  }
+
+  window.joinPromo = async function(promoId){
+    if (!db) return alert('Firestore indisponibil.');
+
+    const pRef = db.collection('promos').doc(promoId);
+    const pSnap = await pRef.get();
+    if (!pSnap.exists) return alert('Promoția nu exista.');
+
+    const p = pSnap.data() || {};
+    const end = p.endDate ? new Date(p.endDate + 'T23:59:59') : null;
+    if (end && new Date() > end) return alert('Acest giveaway/promoție a expirat.');
+
+    const name = ($(`joinName_${promoId}`)?.value || '').trim();
+    const email = ($(`joinEmail_${promoId}`)?.value || '').trim();
+    const wallet = ($(`joinWallet_${promoId}`)?.value || '').trim();
+    const referral = ($(`joinReferral_${promoId}`)?.value || '').trim().toUpperCase();
+
+    if (!name || !email || !wallet){
+      alert('Completeaza Nume, Email si Wallet.');
+      return;
+    }
+
+    // validate referral code exists among participants codes
+    if (referral){
+      const snap = await pRef.collection('participants').get();
+      const codes = new Set();
+      snap.forEach(doc=>{
+        const d = doc.data() || {};
+        if (d.code) codes.add(String(d.code).toUpperCase());
+      });
+      if (!codes.has(referral)){
+        alert('Cod Referal invalid. Trebuie sa fie un cod existent (generat anterior).');
+        return;
+      }
+    }
+
+    const code = generateCode();
+    try{
+      await pRef.collection('participants').add({
+        name, email, wallet,
+        referral: referral || '',
+        code,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('Inscriere inregistrata! Codul tau: ' + code);
+    }catch(e){
+      console.error('joinPromo:', e);
+      alert('Eroare la inscriere (Rules).');
+    }
+  };
+
+  // =========================
+  // STATS + CHART (Etherscan: ETH price)
+  // =========================
+  let __chart = null;
+  function ensureChart(){
+    const canvas = $('priceChart');
+    if (!canvas || !window.Chart) return null;
+    if (__chart) return __chart;
+    __chart = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'ETH Price (USD) via Etherscan', data: [] }] },
+      options: { responsive:true, maintainAspectRatio:false }
+    });
+    return __chart;
+  }
+
+  async function updateEthPrice(){
+    // Etherscan provides ETH price (not token price). We'll show it as reference.
+    try{
+      const j = await etherscan({ module:'stats', action:'ethprice' });
+      const p = j && j.result ? j.result : null;
+      const usd = p && (p.ethusd || p.ethusd) ? Number(p.ethusd) : NaN;
+      if (!isFinite(usd)) return;
+
+      // update live price display (if exists)
+      const el = $('currentPrice');
+      if (el) el.textContent = '$' + usd.toLocaleString('en-US', { maximumFractionDigits: 2 });
+      const last = $('lastUpdated');
+      if (last) last.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO');
+
+      // push into chart
+      const ch = ensureChart();
+      if (ch){
+        const t = new Date().toLocaleTimeString('ro-RO', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        ch.data.labels.push(t);
+        ch.data.datasets[0].data.push(usd);
+        // keep last 60 points
+        if (ch.data.labels.length > 60){
+          ch.data.labels.shift(); ch.data.datasets[0].data.shift();
+        }
+        ch.update();
+      }
+
+      const pd = $('priceData');
+      if (pd) pd.textContent = `ETH (referinta): $${usd.toLocaleString('en-US',{maximumFractionDigits:2})} | SBYT pret: vezi GeckoTerminal/DEX.`;
+    }catch(e){
+      console.error('updateEthPrice:', e);
+    }
+  }
+
+  // Hook into existing fetchAllData if present
+  const _origFetchAllData = window.fetchAllData;
+  window.fetchAllData = async function(){
+    if (typeof _origFetchAllData === 'function'){
+      try{ await _origFetchAllData(); }catch(e){}
+    }
+    await updateEthPrice();
+  };
+
+  // =========================
+  // Boot
+  // =========================
+  document.addEventListener('DOMContentLoaded', ()=>{
+    try{
+      bumpVisits();
+      listenVisits();
+      listenNews();
+      listenTeam();
+      listenPromos();
+      // first price load
+      updateEthPrice();
+      setInterval(updateEthPrice, 60000);
+    }catch(e){ console.error('boot hotfix:', e); }
+  });
+
+})();
+</script>
+
 </body>
 </html>
