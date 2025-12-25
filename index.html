@@ -1227,171 +1227,6 @@
             <h1>StancuBYT Token</h1>
             <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
-                <!-- Live Token Metrics -->
-<div class="token-metrics">
-    <h2>📊 Metrici Live</h2>
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <div class="metric-label">Preț curent</div>
-            <div class="metric-value" id="livePrice">-</div>
-            <div class="metric-change" id="priceChange24h">-</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Market Cap</div>
-            <div class="metric-value" id="marketCap">-</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Total Supply</div>
-            <div class="metric-value" id="totalSupply">-</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Holders</div>
-            <div class="metric-value" id="holdersCount">-</div>
-        </div>
-    </div>
-    <small id="lastUpdate" style="opacity:0.7;">Se încarcă datele...</small>
-</div>
-
-<style>
-.token-metrics {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(0, 102, 255, 0.2);
-    border-radius: 20px;
-    padding: 2rem;
-    margin: 2rem auto;
-    max-width: 1200px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-}
-
-.metric-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    padding: 1.5rem;
-    text-align: center;
-    border: 1px solid rgba(0, 102, 255, 0.1);
-    transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.metric-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--green-growth);
-}
-
-.metric-label {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-bottom: 0.5rem;
-}
-
-.metric-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--neon-cyan);
-    margin-bottom: 0.5rem;
-}
-
-.metric-change {
-    font-size: 0.9rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 12px;
-    display: inline-block;
-}
-
-.positive {
-    color: #00ff88;
-    background: rgba(0, 255, 136, 0.1);
-}
-
-.negative {
-    color: #ff4444;
-    background: rgba(255, 68, 68, 0.1);
-}
-</style>
-
-<script>
-const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
-const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
-
-async function fetchTokenSupply() {
-    const url = `https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${CONTRACT_ADDRESS}&apikey=${ETHERSCAN_API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.status === '1') {
-        const supply = parseInt(data.result) / 10 ** 18;
-        return supply.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
-    }
-    return '-';
-}
-
-async function fetchHolders() {
-    const url = `https://api.etherscan.io/api?module=token&action=tokenholderlist&contractaddress=${CONTRACT_ADDRESS}&page=1&offset=1&apikey=${ETHERSCAN_API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.status === '1' && data.result.length > 0) {
-        return data.result[0].TokenHolderCount.toLocaleString('ro-RO');
-    }
-    return '-';
-}
-
-async function fetchMarketData() {
-    const url = `https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.pairs && data.pairs.length > 0) {
-        const pair = data.pairs[0];
-        return {
-            price: pair.priceUsd,
-            change24h: pair.priceChange?.h24 || 0,
-            marketCap: pair.fdv || 0
-        };
-    }
-    return null;
-}
-
-async function updateTokenMetrics() {
-    try {
-        // Fetch supply & holders from Etherscan
-        const supply = await fetchTokenSupply();
-        const holders = await fetchHolders();
-
-        // Fetch price & market cap from DexScreener
-        const marketData = await fetchMarketData();
-
-        // Update UI
-        document.getElementById('totalSupply').textContent = supply + ' SBYT';
-        document.getElementById('holdersCount').textContent = holders;
-
-        if (marketData) {
-            const price = parseFloat(marketData.price);
-            const change = parseFloat(marketData.change24h);
-            const marketCap = parseFloat(marketData.marketCap);
-
-            document.getElementById('livePrice').textContent = '$' + price.toFixed(8);
-            document.getElementById('marketCap').textContent = '$' + marketCap.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
-
-            const changeEl = document.getElementById('priceChange24h');
-            changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '% (24h)';
-            changeEl.className = change >= 0 ? 'metric-change positive' : 'metric-change negative';
-        }
-
-        document.getElementById('lastUpdate').textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO');
-    } catch (error) {
-        console.error('Eroare la încărcarea datelor:', error);
-        document.getElementById('lastUpdate').textContent = 'Eroare la încărcare. Reîncarcă pagina.';
-    }
-}
-
-// Update la încărcarea paginii și apoi la fiecare 30s
-window.addEventListener('load', updateTokenMetrics);
-setInterval(updateTokenMetrics, 30000);
-</script>
             </p>
             
             <!-- Live Price Display -->
@@ -1514,6 +1349,11 @@ setInterval(updateTokenMetrics, 30000);
   </div>
 
   <p id="adminLoginMsg" class="admin-msg"></p>
+
+  <p class="admin-hint">
+    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
+    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
+  </p>
 </section>
 
 </section>
@@ -2376,7 +2216,7 @@ setInterval(updateTokenMetrics, 30000);
         // =============================================
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
         const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
-        const ADMIN_PASSWORD = ''; // deprecated (Firebase Auth only)
+        const ADMIN_PASSWORD = 'ParolaCripto24091980.';
 
         // Chei storage
         const LS_NEWS = 'stancubyt_news';
@@ -3312,18 +3152,16 @@ async function updateLivePriceAndChart(period = 'live') {
 // Initialize Firebase only if SDK loaded
 try {
   if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
-    const firebaseConfig = {
-apiKey: "AIzaSyAjcRgrqwfXk-f2AqwUFtacSRWyUhsPTuY",
+    firebase.initializeApp({
+      apiKey: "AIzaSyAjcRgrqwfXk-f2AqwUFtacSRWyUhsPTuY",
       authDomain: "stancubyt-64c78.firebaseapp.com",
       projectId: "stancubyt-64c78",
       storageBucket: "stancubyt-64c78.firebasestorage.app",
       messagingSenderId: "866498315210",
       appId: "1:866498315210:web:abcf161e31aca695758533",
       measurementId: "G-J5B0K35MR0"
-};
-    window.firebaseConfig = firebaseConfig;
-    firebase.initializeApp(firebaseConfig);
-}
+    });
+  }
 } catch (e) {}
 
 
@@ -3440,36 +3278,23 @@ const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
 const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
 
 async function ensureAdminAuth() {
-  // Admin write actions require a logged-in Firebase Auth user AND admin rights
-  if (!auth || !firebase || !firebase.auth) {
-    alert("Firebase Auth nu este incarcat (verifica script-urile Firebase si firebaseConfig).");
-    return false;
-  }
+  // admin login required for write actions
+  if (!auth) { alert("Firebase Auth nu este incarcat."); return false; }
+  if (auth.currentUser) return true;
 
-  // If not logged in, guide user to the admin login section (Prezentare -> jos)
-  if (!auth.currentUser) {
-    const msg = document.getElementById('adminLoginMsg');
-    if (msg) {
-      msg.style.color = '#ff4d4d';
-      msg.textContent = 'Trebuie sa te autentifici ca administrator (Firebase Email/Password).';
-    } else {
-      alert('Trebuie sa te autentifici ca administrator.');
-    }
-    const sec = document.getElementById('admin-login') || document.getElementById('adminLogin') || document.querySelector('[data-admin-login]');
-    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    return false;
-  }
+  const email = "admin@stancubyt.com";
+  const pass = prompt("Parola admin:");
+  if (!pass) return false;
 
-  // Check admin (custom claim OR whitelist by email)
-  const ok = await computeIsAdmin(auth.currentUser);
-  window.__SBYT_ADMIN = ok;
-  if (!ok) {
-    alert('Esti autentificat, dar NU ai drepturi de administrator pentru acest site.');
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    return true;
+  } catch (e) {
+    console.error("Auth error:", e);
+    alert("Nu te poti autentifica. Verifica in Firebase: Authentication -> Email/Password enabled si userul admin exista.");
     return false;
   }
-  return true;
 }
-
 
 // --- Helpers
 function _escapeHtml(str) {
@@ -4012,13 +3837,22 @@ window.addEventListener('load', () => {
 
   // Refolosim ensureAdminAuth daca exista, altfel fallback la parola fixa
   const ADMIN_USER = 'admin@stancubyt.com';
-  const ADMIN_FALLBACK_PASS = (typeof NEWS_PASSWORD !== 'undefined') ? NEWS_PASSWORD : '';
+  const ADMIN_FALLBACK_PASS = (typeof NEWS_PASSWORD !== 'undefined') ? NEWS_PASSWORD : 'ParolaCripto24091980';
 
   async function _ensureAdmin(){
+    // prefer firebase auth
     if (typeof ensureAdminAuth === 'function') {
-      return await ensureAdminAuth();
+      try { return await ensureAdminAuth(); } catch(e) {}
     }
-    return false;
+    // fallback (doar pentru site static, nu e securitate reala)
+    const u = prompt('Utilizator admin (email):', ADMIN_USER) || '';
+    const p = prompt('Parola admin:') || '';
+    if (!u || !p) return false;
+    if (u.trim().toLowerCase() !== ADMIN_USER.toLowerCase() || p !== ADMIN_FALLBACK_PASS) {
+      alert('Autentificare invalidă.');
+      return false;
+    }
+    return true;
   }
 
   // Map requestPassword actions (compatibil cu HTML existent)
@@ -4594,13 +4428,16 @@ window.addEventListener('load', () => {
 
   // Override verifyPassword: nu mai cerem prompt daca e logat
   window.verifyPassword = function(){
-    // Firebase Admin gating (no hardcoded passwords)
-    if (window.__SBYT_ADMIN === true) return true;
-    const msg = document.getElementById('adminLoginMsg');
-    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Actiune restrictionata. Autentifica-te ca administrator (Firebase).'; }
-    const sec = document.getElementById('admin-login') || document.querySelector('[data-admin-login]');
-    if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
-    return false;
+    if (isAdmin()) return true;
+    const p = prompt('Introduce parola de administrator:');
+    if (p !== ADMIN_PASSWORD){
+      alert('Parola incorecta!');
+      return false;
+    }
+    localStorage.setItem(LS_ADMIN,'true');
+    _setPill();
+    showAdminOnly();
+    return true;
   };
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -5108,31 +4945,15 @@ window.addEventListener('load', () => {
   }
   function db(){ return firebase.firestore(); }
 
-  
-// ---------- Etherscan via Cloud Function (no key in client) ----------
-const CONTRACT_ADDR = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-
-// Default region is us-central1; change if you deploy in another region.
-// Default region is us-central1; change if you deploy in another region.
-// Hard-set to your deployed URL (no API key in client).
-const ETHERSCAN_PROXY_URL = "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy";
-
-// Optional fallback (if you ever change project/region), uncomment:
-// const ETHERSCAN_PROXY_URL = (() => {
-//   try {
-//     const pid = (window.firebaseConfig && window.firebaseConfig.projectId) || (typeof firebaseConfig !== "undefined" ? firebaseConfig.projectId : "");
-//     if (!pid) return "";
-//     return `https://us-central1-${pid}.cloudfunctions.net/etherscanProxy`;
-//   } catch(e){ return ""; }
-// })();
-
-async function fetchEtherscanViaProxy(params){
-  if (!ETHERSCAN_PROXY_URL) throw new Error("ETHERSCAN_PROXY_URL not set (firebaseConfig missing).");
-  const url = ETHERSCAN_PROXY_URL + "?" + new URLSearchParams(params);
-  const r = await fetch(url, { cache:'no-store' });
-  if (!r.ok) throw new Error('Proxy HTTP ' + r.status);
-  return await r.json();
-}
+  // ---------- Etherscan LIVE ----------
+  // IMPORTANT: set your key (optional) in localStorage 'SBYT_ETHERSCAN_KEY' or edit below.
+  const CONTRACT_ADDR = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+  const ETHERSCAN_KEY = (localStorage.getItem('SBYT_ETHERSCAN_KEY') || '').trim(); // leave blank if you want (may be rate-limited)
+  async function fetchEtherscan(url){
+    const r = await fetch(url, { cache:'no-store' });
+    if (!r.ok) throw new Error('Etherscan HTTP ' + r.status);
+    return await r.json();
+  }
   function formatTokensFromWei(weiStr, decimals=18){
     try{
       const s = String(weiStr || '0');
@@ -5151,7 +4972,9 @@ async function fetchEtherscanViaProxy(params){
     // tries stats/tokensupply
     const el = document.querySelector('[data-total-supply-real], #totalSupplyReal, #totalSupplyRealValue, #totalSupplyRealText');
     try{
-      const j = await fetchEtherscanViaProxy({ module:'stats', action:'tokensupply', contractaddress: CONTRACT_ADDR });
+      const keyPart = ETHERSCAN_KEY ? `&apikey=${encodeURIComponent(ETHERSCAN_KEY)}` : '';
+      const url = `https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${CONTRACT_ADDR}${keyPart}`;
+      const j = await fetchEtherscan(url);
       if (j && j.status === "1" && j.result){
         const val = formatTokensFromWei(j.result, 18);
         const pretty = Number(val).toLocaleString(undefined, { maximumFractionDigits: 4 });
@@ -5166,9 +4989,12 @@ async function fetchEtherscanViaProxy(params){
   async function updateStatsFromEtherscan(){
     // Minimal live update for supply + (optional) holders/transfers if elements exist in page
     await updateTotalSupplyReal();
-    // holders count (tokenholdercount) - handle gracefully
+
+    // holders count (tokenholdercount) - Etherscan endpoint may vary by plan; handle gracefully
     try{
-      const j = await fetchEtherscanViaProxy({ module:'token', action:'tokenholdercount', contractaddress: CONTRACT_ADDR });
+      const keyPart = ETHERSCAN_KEY ? `&apikey=${encodeURIComponent(ETHERSCAN_KEY)}` : '';
+      const url = `https://api.etherscan.io/api?module=token&action=tokenholdercount&contractaddress=${CONTRACT_ADDR}${keyPart}`;
+      const j = await fetchEtherscan(url);
       if (j && j.status === "1" && j.result){
         const holdersEl = document.querySelector('[data-holders], #holdersCount, #totalHolders');
         if (holdersEl) holdersEl.textContent = Number(j.result).toLocaleString();
@@ -5177,7 +5003,9 @@ async function fetchEtherscanViaProxy(params){
 
     // transfers count (tokentx) - just count recent page=1 (not total); show "recent"
     try{
-      const j = await fetchEtherscanViaProxy({ module:'account', action:'tokentx', contractaddress: CONTRACT_ADDR, page:'1', offset:'100', sort:'desc' });
+      const keyPart = ETHERSCAN_KEY ? `&apikey=${encodeURIComponent(ETHERSCAN_KEY)}` : '';
+      const url = `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${CONTRACT_ADDR}&page=1&offset=100&sort=desc${keyPart}`;
+      const j = await fetchEtherscan(url);
       if (j && j.status === "1" && Array.isArray(j.result)){
         const transfersEl = document.querySelector('[data-transfers], #transfersCount, #totalTransfers');
         if (transfersEl) transfersEl.textContent = Number(j.result.length).toLocaleString() + " (ultimele 100)";
@@ -5481,8 +5309,6 @@ async function fetchEtherscanViaProxy(params){
 
   // ---------- Admin panel (hidden) ----------
   function injectAdminPanel(){
-    return; // disabled: avoid duplicate admin section
-
     // add at bottom of presentation if not exists
     if (document.getElementById('adminPanel')) return;
     const pres = document.querySelector('#presentation, section[data-page="presentation"], section#prezentare');
@@ -5650,1306 +5476,579 @@ service cloud.firestore {
 
 
 <script>
-/** ===== SBYT PATCH v2025-12-22 =====
- * Fixes requested:
- * - Admin actions gated by Firebase Auth (admin email stancubyt@gmail.com)
- * - News (stiri/noutati) saved in Firestore stats/global.news[] with per-item delete
- * - Team members saved in Firestore stats/team.members[] with per-item delete
- * - Promos/Giveaways saved in Firestore promos collection, per-item delete, prizes 1-4
- * - Visits counter saved in Firestore stats/visits.count and updates cross-device
- * - Uses Etherscan Cloud Function proxy for tokensupply/holders/tx (price requires proxy update; see note)
- */
-
-const ADMIN_EMAIL = "stancubyt@gmail.com";
-const PROXY_URL = "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy";
-
-function $id(id){ return document.getElementById(id); }
-function isAdminUser(){
-  const u = firebase?.auth?.().currentUser;
-  return !!u && (u.email||"").toLowerCase() === ADMIN_EMAIL.toLowerCase();
-}
-function requireAdminUI(){
-  if(!isAdminUser()){
-    alert("Actiune permisa doar administratorului (logheaza-te cu " + ADMIN_EMAIL + ").");
-    const sec = $id("admin-login");
-    if(sec) sec.scrollIntoView({behavior:"smooth", block:"start"});
-    throw new Error("NOT_ADMIN");
-  }
-}
-function maskEmail(email){
-  const e = String(email||"").trim();
-  const at = e.indexOf("@");
-  if(at<=1) return e ? (e[0] + "***" + e.slice(at)) : "";
-  return e.slice(0,2) + "***" + e.slice(at);
-}
-
-const db = firebase.firestore();
-const statsGlobalRef = db.collection("stats").doc("global");
-const statsTeamRef = db.collection("stats").doc("team");
-const statsVisitsRef = db.collection("stats").doc("visits");
-const promosRef = db.collection("promos");
-
-// -------- AUTH UI (uses existing inputs: adminEmail, adminPass)
-window.adminSignIn = async function(){
-  const email = ($id("adminEmail")?.value||"").trim();
-  const pass = ($id("adminPass")?.value||"").trim();
-  if(!email || !pass){ alert("Completeaza email si parola."); return; }
-  try{
-    await firebase.auth().signInWithEmailAndPassword(email, pass);
-  }catch(e){
-    console.error(e);
-    alert("Nu te poti autentifica. Verifica email/parola in Firebase Authentication.");
-  }
-};
-window.adminSignOut = async function(){
-  await firebase.auth().signOut();
-};
-
-firebase.auth().onAuthStateChanged((user)=>{
-  const badge = $id("adminStatusBadge");
-  const label = $id("adminUserLabel");
-  const logoutBtn = $id("adminLogoutBtn");
-  if(!badge) return;
-  if(user){
-    const ok = (user.email||"").toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    badge.classList.remove("admin-badge-off");
-    badge.classList.add(ok ? "admin-badge-on" : "admin-badge-off");
-    badge.textContent = ok ? "Autentificat (Admin)" : "Autentificat (Fara drepturi)";
-    if(label) label.textContent = user.email || "";
-    if(logoutBtn) logoutBtn.style.display = "inline-block";
-  }else{
-    badge.classList.remove("admin-badge-on");
-    badge.classList.add("admin-badge-off");
-    badge.textContent = "Neautentificat";
-    if(label) label.textContent = "";
-    if(logoutBtn) logoutBtn.style.display = "none";
-  }
-
-  // Re-render admin buttons visibility
-  renderNewsFromCache();
-  renderTeamFromCache();
-  renderPromosFromCache();
-});
-
-// -------- NEWS (stats/global.news[])
-let NEWS_CACHE = [];
-async function loadNews(){
-  const snap = await statsGlobalRef.get();
-  const data = snap.exists ? snap.data() : {};
-  NEWS_CACHE = Array.isArray(data.news) ? data.news : [];
-  // sort pinned then createdAt desc
-  NEWS_CACHE.sort((a,b)=>{
-    const ap=!!a.pinned, bp=!!b.pinned;
-    if(ap!==bp) return bp-ap;
-    return (b.createdAt||0) - (a.createdAt||0);
-  });
-  renderNewsFromCache();
-}
-function renderNewsFromCache(){
-  const container = $id("newsContainer");
-  if(!container) return;
-  container.innerHTML = "";
-  if(!NEWS_CACHE.length){
-    container.innerHTML = '<div style="opacity:.7;">Nu exista stiri/noutati inca.</div>';
-    return;
-  }
-  const admin = isAdminUser();
-  NEWS_CACHE.forEach(item=>{
-    const card = document.createElement("div");
-    card.className = "news-card";
-    const dateStr = item.date || (item.createdAt ? new Date(item.createdAt).toLocaleString() : "");
-    card.innerHTML = `
-      <div class="news-header">
-        <div class="news-title">${escapeHtml(item.title||"")}</div>
-        <div class="news-meta">${escapeHtml(dateStr)}</div>
-      </div>
-      <div class="news-body">${escapeHtml(item.content||"")}</div>
-      <div class="news-footer" style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
-        <span class="news-tag">${escapeHtml(item.type||"update")}${item.pinned ? " • 📌" : ""}</span>
-        ${admin ? `<button class="news-btn" data-del-news="${item.id}" title="Sterge">🗑️</button>` : ``}
-      </div>
-    `;
-    container.appendChild(card);
-  });
-
-  if(isAdminUser()){
-    container.querySelectorAll("[data-del-news]").forEach(btn=>{
-      btn.addEventListener("click", async (e)=>{
-        const id = e.currentTarget.getAttribute("data-del-news");
-        if(!confirm("Stergi aceasta stire/noutate?")) return;
-        await deleteNewsItem(id);
-      });
-    });
-  }
-}
-window.addNews = function(){ requireAdminUI(); $id("newsForm").style.display="block"; };
-window.cancelAddNews = function(){ $id("newsForm").style.display="none"; };
-window.saveNews = async function(){
-  requireAdminUI();
-  const title = ($id("newsTitle")?.value||"").trim();
-  const content = ($id("newsContent")?.value||"").trim();
-  const type = ($id("newsType")?.value||"update").trim();
-  const pinned = !!$id("pinNews")?.checked;
-  if(!title || !content){ alert("Completeaza titlu si continut."); return; }
-  const now = Date.now();
-  const item = { id: "n_"+now, title, content, type, pinned, createdAt: now, date: new Date(now).toLocaleString() };
-  const next = [item, ...NEWS_CACHE];
-  try{
-    await statsGlobalRef.set({ news: next, updatedAt: now }, { merge:true });
-    // clear form
-    if($id("newsTitle")) $id("newsTitle").value="";
-    if($id("newsContent")) $id("newsContent").value="";
-    if($id("pinNews")) $id("pinNews").checked=false;
-    $id("newsForm").style.display="none";
-    await loadNews();
-  }catch(e){
-    console.error(e);
-    alert("Eroare la salvarea stirii (verifica Firestore Rules).");
-  }
-};
-async function deleteNewsItem(id){
-  requireAdminUI();
-  const next = NEWS_CACHE.filter(x=>x.id!==id);
-  await statsGlobalRef.set({ news: next, updatedAt: Date.now() }, { merge:true });
-  await loadNews();
-}
-
-// -------- TEAM (stats/team.members[])
-let TEAM_CACHE = [];
-async function loadTeam(){
-  const snap = await statsTeamRef.get();
-  const data = snap.exists ? snap.data() : {};
-  TEAM_CACHE = Array.isArray(data.members) ? data.members : [];
-  TEAM_CACHE.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
-  renderTeamFromCache();
-}
-function renderTeamFromCache(){
-  const list = $id("teamList");
-  if(!list) return;
-  list.innerHTML = "";
-  if(!TEAM_CACHE.length){
-    list.innerHTML = '<div style="opacity:.7;">Nu exista membri inca.</div>';
-    return;
-  }
-  const admin = isAdminUser();
-  TEAM_CACHE.forEach(m=>{
-    const card = document.createElement("div");
-    card.style.cssText = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;position:relative;";
-    const avatar = m.avatar ? `<img src="${escapeAttr(m.avatar)}" alt="" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.2);">` : `<div style="width:54px;height:54px;border-radius:50%;background:rgba(0,204,255,0.12);display:flex;align-items:center;justify-content:center;">👤</div>`;
-    card.innerHTML = `
-      <div style="display:flex;gap:12px;align-items:center;">
-        ${avatar}
-        <div style="flex:1;">
-          <div style="font-weight:800;">${escapeHtml(m.name||"")}</div>
-          <div style="opacity:.85;">${escapeHtml(m.role||"")}</div>
-          <div style="opacity:.6;font-size:.85rem;">${escapeHtml(m.joinDate||"")}</div>
-        </div>
-        ${admin ? `<button class="news-btn" data-del-member="${m.id}" title="Sterge">🗑️</button>` : ``}
-      </div>
-    `;
-    list.appendChild(card);
-  });
-  if(isAdminUser()){
-    list.querySelectorAll("[data-del-member]").forEach(btn=>{
-      btn.addEventListener("click", async (e)=>{
-        const id = e.currentTarget.getAttribute("data-del-member");
-        if(!confirm("Stergi membrul?")) return;
-        await deleteTeamMember(id);
-      });
-    });
-  }
-}
-window.addTeamMember = function(){ requireAdminUI(); $id("teamForm").style.display="block"; };
-window.cancelTeamMember = function(){ $id("teamForm").style.display="none"; };
-window.saveTeamMember = async function(){
-  requireAdminUI();
-  const name = ($id("teamName")?.value||"").trim();
-  const role = ($id("teamRole")?.value||"").trim();
-  const joinDate = ($id("teamJoinDate")?.value||"").trim();
-  const avatar = ($id("teamAvatar")?.value||"").trim();
-  if(!name || !role){ alert("Completeaza nume si rol."); return; }
-  const now = Date.now();
-  const m = { id:"m_"+now, name, role, joinDate, avatar, createdAt: now };
-  const next = [m, ...TEAM_CACHE];
-  try{
-    await statsTeamRef.set({ members: next, updatedAt: now }, { merge:true });
-    ["teamName","teamRole","teamJoinDate","teamAvatar"].forEach(id=>{ if($id(id)) $id(id).value=""; });
-    $id("teamForm").style.display="none";
-    await loadTeam();
-  }catch(e){
-    console.error(e);
-    alert("Eroare la salvare membru (verifica Firestore Rules).");
-  }
-};
-async function deleteTeamMember(id){
-  requireAdminUI();
-  const next = TEAM_CACHE.filter(x=>x.id!==id);
-  await statsTeamRef.set({ members: next, updatedAt: Date.now() }, { merge:true });
-  await loadTeam();
-}
-
-// -------- PROMOS/GIVEAWAYS (collection promos)
-let PROMO_CACHE = [];
-async function loadPromos(){
-  const snap = await promosRef.orderBy("createdAt","desc").limit(50).get();
-  PROMO_CACHE = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-  renderPromosFromCache();
-}
-function formatEnds(endsAt){
-  if(!endsAt) return "";
-  const ms = endsAt.toMillis ? endsAt.toMillis() : (typeof endsAt==="number" ? endsAt : Date.parse(endsAt));
-  if(!ms) return "";
-  return new Date(ms).toLocaleString();
-}
-function isExpired(endsAt){
-  const ms = endsAt?.toMillis ? endsAt.toMillis() : (typeof endsAt==="number" ? endsAt : Date.parse(endsAt));
-  return !!ms && ms < Date.now();
-}
-function renderPromosFromCache(){
-  const list = $id("promoList");
-  if(!list) return;
-  list.innerHTML = "";
-  if(!PROMO_CACHE.length){
-    list.innerHTML = '<div style="opacity:.7;">Nu exista promotii/giveaway inca.</div>';
-    return;
-  }
-  const admin = isAdminUser();
-  PROMO_CACHE.forEach(p=>{
-    const endsTxt = formatEnds(p.endsAt);
-    const expired = isExpired(p.endsAt);
-    const prizes = p.prizes || {};
-    const prizeHtml = `
-      <div style="margin-top:10px;opacity:.95;">
-        <div><strong>Premii:</strong></div>
-        <ul style="margin:6px 0 0 18px;opacity:.9;">
-          <li>Locul 1: ${escapeHtml(prizes.p1||"-")}</li>
-          <li>Locul 2: ${escapeHtml(prizes.p2||"-")}</li>
-          <li>Locul 3: ${escapeHtml(prizes.p3||"-")}</li>
-          <li>Locul 4: ${escapeHtml(prizes.p4||"-")}</li>
-        </ul>
-      </div>
-    `;
-    const card = document.createElement("div");
-    card.style.cssText = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:16px;";
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
-        <div>
-          <div style="font-weight:900;font-size:1.05rem;">${escapeHtml(p.title||"")}</div>
-          <div style="opacity:.75;margin-top:4px;">Expira: ${escapeHtml(endsTxt)} ${expired ? "⛔" : ""}</div>
-        </div>
-        ${admin ? `<button class="news-btn" data-del-promo="${p.id}" title="Sterge">🗑️</button>` : ``}
-      </div>
-      ${prizeHtml}
-    `;
-    list.appendChild(card);
-  });
-  if(isAdminUser()){
-    list.querySelectorAll("[data-del-promo]").forEach(btn=>{
-      btn.addEventListener("click", async (e)=>{
-        const id = e.currentTarget.getAttribute("data-del-promo");
-        if(!confirm("Stergi promotia/giveaway-ul?")) return;
-        await promosRef.doc(id).delete();
-        await loadPromos();
-      });
-    });
-  }
-}
-window.addPromo = function(){ requireAdminUI(); $id("promoForm").style.display="block"; };
-window.cancelPromo = function(){ $id("promoForm").style.display="none"; };
-window.savePromo = async function(){
-  requireAdminUI();
-  const title = ($id("promoTitle")?.value||"").trim();
-  const ends = ($id("promoEnds")?.value||"").trim();
-  if(!title || !ends){
-    alert("Completeaza minim Titlu si Data expirarii.");
-    return;
-  }
-  const endsMs = Date.parse(ends);
-  if(!endsMs){ alert("Data expirarii invalida."); return; }
-
-  const p1 = ($id("promoPrize1")?.value||"").trim();
-  const p2 = ($id("promoPrize2")?.value||"").trim();
-  const p3 = ($id("promoPrize3")?.value||"").trim();
-  const p4 = ($id("promoPrize4")?.value||"").trim();
-
-  const points = parseInt(($id("promoPoints")?.value||"10"),10) || 10;
-
-  const doc = {
-    title,
-    endsAt: firebase.firestore.Timestamp.fromMillis(endsMs),
-    prizes: { p1, p2, p3, p4 },
-    points,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    createdAtMs: Date.now()
-  };
-  try{
-    await promosRef.add(doc);
-    ["promoTitle","promoEnds","promoPoints","promoPrize1","promoPrize2","promoPrize3","promoPrize4"].forEach(id=>{ if($id(id)) $id(id).value=""; });
-    $id("promoForm").style.display="none";
-    await loadPromos();
-  }catch(e){
-    console.error(e);
-    alert("Eroare la salvarea promotiei/giveaway (verifica Firestore Rules).");
-  }
-};
-
-// -------- VISITS (stats/visits.count)
-async function bumpVisits(){
-  try{
-    const key = "sbyt_visit_day";
-    const today = new Date().toISOString().slice(0,10);
-    if(localStorage.getItem(key) === today) return;
-    localStorage.setItem(key, today);
-
-    await db.runTransaction(async (tx)=>{
-      const snap = await tx.get(statsVisitsRef);
-      const cur = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
-      tx.set(statsVisitsRef, { count: cur + 1, updatedAt: Date.now() }, { merge:true });
-    });
-  }catch(e){
-    console.warn("Visits update failed", e);
-  }
-}
-async function loadVisits(){
-  const el = $id("visitsCounter") || $id("totalVisits") || $id("visitsCount");
-  if(!el) return;
-  const snap = await statsVisitsRef.get();
-  const count = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
-  el.textContent = String(count);
-}
-
-// -------- ETHERSCAN via proxy (tokensupply/holders/tx). Price endpoint needs proxy update.
-async function fetchProxy(params){
-  const qs = new URLSearchParams(params);
-  const url = PROXY_URL + "?" + qs.toString();
-  const r = await fetch(url, { cache:"no-store" });
-  return await r.json();
-}
-async function updateSupply(){
-  // total supply real
-  const el = $id("realTotalSupply") || $id("totalSupplyReal") || $id("realSupply");
-  if(!el) return;
-  try{
-    const res = await fetchProxy({ module:"stats", action:"tokensupply", contractaddress: CONTRACT_ADDRESS });
-    if(res && res.status==="1"){
-      // result is raw integer (18 decimals)
-      const raw = String(res.result||"0");
-      const supply = (BigInt(raw) / (10n**18n)).toString();
-      el.textContent = supply + " SBYT";
-    }
-  }catch(e){ console.warn(e); }
-}
-
-// Escape helpers
-function escapeHtml(s){
-  return String(s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-}
-function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
-
-// -------- BOOT
-document.addEventListener("DOMContentLoaded", async ()=>{
-  try{
-    await bumpVisits();
-    await loadVisits();
-  }catch(e){}
-  loadNews();
-  loadTeam();
-  loadPromos();
-  updateSupply();
-});
-</script>
-
-<!-- ================= SBYT CLOUD FUNCTION + FIRESTORE OVERRIDE (NEWS/TEAM/PROMOS/STATS) ================= -->
-<script>
-/*
-  Foloseste Firebase Auth (email/parola) pentru admin (email whitelist) si Firestore pentru:
-  - Stiri/Noutati: stats/global.newsItems (array) + stergere individuala
-  - Membri echipa: stats/team.members (array) + stergere individuala
-  - Giveaway/Promotii: colectia promos (docs) + subcolectie participants + premii 1-4 + referal + expirare
-  - Vizite: stats/visits.count (transaction increment)
-  - Statistici/pret: din Etherscan prin Cloud Function proxy (fara a expune API key in site)
-*/
-
-(function(){
-  const CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+/* ============================
+   SBYT OVERRIDES (FIXED)
+   Firestore collections: promos, stats
+   Etherscan via Cloud Function proxy
+   ============================ */
+(function() {
+  const PROXY_URL = "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy";
+  const CONTRACT_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
   const ADMIN_EMAIL = "stancubyt@gmail.com";
-  // Cloud Function deja deployata de tine:
-  const ETHERSCAN_PROXY_URL = "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy";
 
-  const hasFirebase = (typeof firebase !== 'undefined');
-  const auth = hasFirebase && firebase.auth ? firebase.auth() : null;
-  const db = hasFirebase && firebase.firestore ? firebase.firestore() : null;
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s??'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function uid() { return 'id_' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+  function nowTs() { return Date.now(); }
 
-  const $ = (id)=>document.getElementById(id);
-  const esc = (s)=>String(s??'').replace(/[&<>"'`=\/\\]/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;','\\':'&#92;'
-  }[ch]||ch));
+  let auth=null, db=null;
 
-  function maskEmail(email){
-    const e = String(email||'');
-    const [u,d] = e.split('@');
-    if (!d) return e;
-    const u2 = u.length<=2 ? (u[0]||'*')+'*' : (u.slice(0,2) + '*'.repeat(Math.min(6, Math.max(1,u.length-2))));
-    const dparts = d.split('.');
-    const d0 = dparts[0] || '';
-    const d0m = d0.length<=2 ? (d0[0]||'*')+'*' : (d0.slice(0,1)+'*'.repeat(Math.min(6, Math.max(1,d0.length-1))));
-    const drest = dparts.slice(1).join('.');
-    return u2 + '@' + d0m + (drest?'.'+drest:'');
+  function ensureFirebase() {
+    if (typeof firebase === 'undefined') throw new Error('Firebase SDK missing');
+    auth = firebase.auth();
+    db = firebase.firestore();
   }
 
-  function nowRo(){
-    return new Date().toLocaleString('ro-RO');
+  function isAdmin() {
+    const u = auth?.currentUser;
+    return !!u && (u.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
   }
 
-  async function isAdminUser(user){
-    return !!user && String(user.email||'').toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  }
-
-  async function ensureAdmin(){
-    if (!auth || !db){
-      alert('Firebase nu este incarcat (verifica firebaseConfig + scripturile Firebase).');
-      return false;
-    }
-    const u = auth.currentUser;
-    if (!u){
-      const msg = $('adminLoginMsg');
-      if (msg){ msg.style.color='#ff4d4d'; msg.textContent='Trebuie sa te autentifici ca administrator.'; }
-      const sec = $('admin-login');
-      if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
-      return false;
-    }
-    if (!(await isAdminUser(u))){
-      alert('Cont fara drepturi de administrator.');
-      return false;
-    }
-    return true;
-  }
-
-  // compat: site-ul foloseste __SBYT_ADMIN pentru a arata/ascunde butoane
-  async function refreshAdminUI(user){
-    const ok = await isAdminUser(user);
-    window.__SBYT_ADMIN = ok;
-
-    const badge = $('adminStatusBadge');
-    const label = $('adminUserLabel');
-    if (badge){
-      badge.textContent = ok ? 'Autentificat (Admin)' : (user ? 'Autentificat' : 'Neautentificat');
-      badge.className = ok ? 'admin-badge admin-badge-on' : 'admin-badge admin-badge-off';
-    }
-    if (label){
-      label.textContent = user ? (user.email || '') : '';
-    }
-
-    document.querySelectorAll('.admin-only').forEach(el=>{
-      // unele elemente sunt ascunse prin CSS .admin-only{display:none !important;}
-      // deci setam inline doar unde e nevoie
-      el.style.display = ok ? '' : 'none';
+  function setAdminUI() {
+    document.querySelectorAll('.admin-hint, .admin-note').forEach(t=>t.remove());
+    document.querySelectorAll('.admin-only').forEach(el => {
+      el.style.display = isAdmin() ? '' : 'none';
     });
+    const st = document.getElementById('adminStatusLabel');
+    if (st) st.textContent = isAdmin() ? 'Autentificat (Admin)' : 'Neautentificat';
   }
 
-  // --- override: computeIsAdmin folosit de restul fisierului ---
-  window.computeIsAdmin = async function(user){
-    return isAdminUser(user);
-  };
+  // NEWS / NOUTATI in stats/news
+  async function newsDocRef() { return db.collection('stats').doc('news'); }
 
-  // =============================
-  // 1) VIZITE (stats/visits.count)
-  // =============================
-  async function bumpVisits(){
-    if (!db) return;
-    const ref = db.collection('stats').doc('visits');
-    try{
-      await db.runTransaction(async (tx)=>{
-        const snap = await tx.get(ref);
-        const cur = (snap.exists && snap.data() && snap.data().count) ? Number(snap.data().count) : 0;
-        tx.set(ref, { count: cur + 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
-      });
-    }catch(e){
-      // nu blocam UI
-      console.warn('visits tx failed:', e);
-    }
-  }
-
-  function listenVisits(){
-    if (!db) return;
-    db.collection('stats').doc('visits').onSnapshot((doc)=>{
-      const c = doc.exists ? Number(doc.data().count||0) : 0;
-      const el = $('visitCount');
-      if (el) el.textContent = c.toLocaleString('ro-RO');
-    });
-  }
-
-  // =============================
-  // 2) STIRI / NOUTATI (stats/global.newsItems[])
-  // =============================
-  function badgeForType(type){
-    const t = String(type||'update');
-    if (t === 'announcement') return { cls:'badge-announcement', txt:'Anunț Important' };
-    if (t === 'event') return { cls:'badge-event', txt:'Eveniment' };
-    return { cls:'badge-update', txt:'Update' };
-  }
-
-  function renderNews(items){
+  async function loadNews() {
     const container = $('newsContainer');
     if (!container) return;
-    const arr = Array.isArray(items) ? items.slice() : [];
-    arr.sort((a,b)=>{
-      const ap = !!a.pinned, bp = !!b.pinned;
-      if (ap!==bp) return ap? -1 : 1;
-      return (Number(b.date||0) - Number(a.date||0));
-    });
 
-    if (!arr.length){
-      container.innerHTML = '<div style="opacity:0.85;">Nu există anunțuri încă.</div>';
-      return;
+    try {
+      const snap = await (await newsDocRef()).get();
+      const data = snap.exists ? snap.data() : {};
+      const items = Array.isArray(data.items) ? data.items : [];
+      items.sort((a,b)=> (b.pinned?1:0)-(a.pinned?1:0) || (b.createdAt||0)-(a.createdAt||0));
+
+      container.innerHTML = items.length ? '' : '<div style="opacity:.75">Nu exista inca anunturi / noutati.</div>';
+
+      for (const it of items) {
+        const card = document.createElement('div');
+        card.className = 'news-item';
+        const tag = (it.type||'Noutate');
+        const pinned = it.pinned ? '📌 ' : '';
+        const delBtn = isAdmin() ? `<button class="news-btn danger" data-del-news="${esc(it.id)}">🗑️ Sterge</button>` : '';
+        card.innerHTML = `
+          <div class="news-header">
+            <span class="news-type">${esc(tag)}</span>
+            <span class="news-date">${new Date(it.createdAt||0).toLocaleString()}</span>
+          </div>
+          <h4 style="margin:8px 0 6px;">${pinned}${esc(it.title)}</h4>
+          <div style="opacity:.92; line-height:1.35">${esc(it.content)}</div>
+          <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
+            ${delBtn}
+          </div>
+        `;
+        container.appendChild(card);
+      }
+
+      container.querySelectorAll('[data-del-news]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          if (!isAdmin()) return alert('Doar admin poate sterge.');
+          const id = btn.getAttribute('data-del-news');
+          await deleteNewsItem(id);
+        });
+      });
+
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = '<div style="color:#ff6b6b">Eroare la incarcare stiri/noutati.</div>';
     }
-
-    container.innerHTML = '';
-    arr.forEach(item=>{
-      const b = badgeForType(item.type);
-      const card = document.createElement('div');
-      card.className = (item.pinned ? 'news-card pinned' : 'news-card');
-      card.innerHTML = `
-        <div class="news-badge ${b.cls}">${b.txt}</div>
-        <h4 style="margin-bottom:0.5rem; color:white;">${esc(item.title||'')}</h4>
-        <p style="opacity:0.9; line-height:1.5;">${esc(item.content||'')}</p>
-        <div class="news-date"><span>📅</span> ${item.date ? new Date(item.date).toLocaleString('ro-RO') : '--'}</div>
-        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
-          <button class="news-btn admin-only" onclick="deleteNewsItem('${esc(item.id||'')}')">🗑️ Șterge</button>
-        </div>
-      `;
-      container.appendChild(card);
-    });
-
-    // aplica vizibilitatea admin
-    document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display = window.__SBYT_ADMIN ? '' : 'none'; });
   }
 
-  function listenNews(){
-    if (!db) return;
-    db.collection('stats').doc('global').onSnapshot((doc)=>{
-      const d = doc.exists ? (doc.data()||{}) : {};
-      const items = Array.isArray(d.newsItems) ? d.newsItems : [];
-      renderNews(items);
-    }, (err)=>console.error('listenNews:', err));
-  }
-
-  window.saveNews = async function(){
-    const ok = await ensureAdmin();
-    if (!ok) return;
-
+  async function saveNewsItem() {
+    if (!isAdmin()) return alert('Trebuie sa fii autentificat ca admin.');
     const title = ($('newsTitle')?.value || '').trim();
     const content = ($('newsContent')?.value || '').trim();
-    const type = ($('newsType')?.value || 'update').trim();
-    const pinned = !!($('newsPinned')?.checked);
+    const type = ($('newsType')?.value || 'Noutate').trim();
+    const pinned = !!$('pinNews')?.checked;
 
-    if (!title || !content){
-      alert('Completează titlul și conținutul!');
-      return;
-    }
+    if (!title || !content) return alert('Completeaza Titlu si Continut.');
 
-    const item = {
-      id: 'n_' + Date.now(),
-      title, content, type, pinned,
-      date: Date.now()
-    };
+    const item = { id: uid(), title, content, type, pinned, createdAt: nowTs() };
 
-    const ref = db.collection('stats').doc('global');
-    try{
-      await db.runTransaction(async (tx)=>{
-        const snap = await tx.get(ref);
-        const cur = (snap.exists && snap.data() && Array.isArray(snap.data().newsItems)) ? snap.data().newsItems.slice() : [];
-        cur.push(item);
-        tx.set(ref, { newsItems: cur, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
-      });
+    const ref = await newsDocRef();
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(ref);
+      const data = snap.exists ? snap.data() : {};
+      const items = Array.isArray(data.items) ? data.items : [];
+      items.push(item);
+      tx.set(ref, { items }, { merge:true });
+    });
 
-      if (typeof cancelAddNews === 'function') cancelAddNews();
-      // reset
-      ['newsTitle','newsContent'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
-      if ($('newsPinned')) $('newsPinned').checked=false;
+    if ($('newsForm')) $('newsForm').style.display='none';
+    if ($('newsTitle')) $('newsTitle').value='';
+    if ($('newsContent')) $('newsContent').value='';
+    if ($('pinNews')) $('pinNews').checked=false;
 
-    }catch(e){
-      console.error('saveNews:', e);
-      alert('Eroare la salvarea știrii (verifică Firestore Rules pentru stats/global).');
-    }
-  };
+    await loadNews();
+  }
 
-  window.deleteNewsItem = async function(id){
-    const ok = await ensureAdmin();
-    if (!ok) return;
-    if (!confirm('Ștergi acest anunț/noutate?')) return;
+  async function deleteNewsItem(id) {
+    const ref = await newsDocRef();
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(ref);
+      if (!snap.exists) return;
+      const data = snap.data() || {};
+      const items = Array.isArray(data.items) ? data.items : [];
+      tx.set(ref, { items: items.filter(x=>x.id!==id) }, { merge:true });
+    });
+    await loadNews();
+  }
 
-    const ref = db.collection('stats').doc('global');
-    try{
-      await db.runTransaction(async (tx)=>{
-        const snap = await tx.get(ref);
-        const cur = (snap.exists && snap.data() && Array.isArray(snap.data().newsItems)) ? snap.data().newsItems.slice() : [];
-        const next = cur.filter(x => String(x.id||'') !== String(id||''));
-        tx.set(ref, { newsItems: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
-      });
-    }catch(e){
-      console.error('deleteNewsItem:', e);
-      alert('Eroare la ștergere (Rules).');
-    }
-  };
+  // TEAM in stats/team
+  async function teamDocRef() { return db.collection('stats').doc('team'); }
 
-  // compat: butoanele vechi pot apela deleteNews(id)
-  window.deleteNews = function(id){ return window.deleteNewsItem(id); };
-
-  // =============================
-  // 3) ECHIPA (stats/team.members[])
-  // =============================
-  function renderTeam(members){
-    const list = $('teamList') || $('teamContainer') || $('membersList');
+  async function loadTeam() {
+    const list = $('teamList');
     if (!list) return;
 
-    const arr = Array.isArray(members) ? members.slice() : [];
-    // order by joinDate desc
-    arr.sort((a,b)=> String(b.joinDate||'').localeCompare(String(a.joinDate||'')));
+    try {
+      const snap = await (await teamDocRef()).get();
+      const data = snap.exists ? snap.data() : {};
+      const members = Array.isArray(data.members) ? data.members : [];
+      members.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
 
-    if (!arr.length){
-      list.innerHTML = '<div style="opacity:0.85;">Nu există membri adăugați încă.</div>';
-      return;
-    }
+      list.innerHTML = members.length ? '' : '<div style="opacity:.75">Nu exista inca membri in echipa.</div>';
 
-    list.innerHTML = '';
-    arr.forEach(m=>{
-      const card = document.createElement('div');
-      card.className = 'news-card';
-      const avatar = m.img
-        ? `<img src="${esc(m.img)}" style="width:64px;height:64px;border-radius:14px;object-fit:cover;" />`
-        : `<div style="width:64px;height:64px;border-radius:14px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:1.6rem;">👤</div>`;
-      card.innerHTML = `
-        <div style="display:flex; gap:14px; align-items:flex-start;">
-          ${avatar}
-          <div style="flex:1;">
-            <div style="font-weight:700; color:#fff;">${esc(m.name||'')}</div>
-            <div style="opacity:0.9;">${esc(m.role||'')}</div>
-            <div style="opacity:0.75; font-size:0.9rem;">📅 ${esc(m.joinDate||'')}</div>
-            ${m.bio ? `<div style="opacity:0.85; margin-top:8px; line-height:1.45;">${esc(m.bio)}</div>` : ``}
+      for (const m of members) {
+        const row = document.createElement('div');
+        row.className = 'team-member';
+        const del = isAdmin() ? `<button class="news-btn danger" data-del-member="${esc(m.id)}">🗑️</button>` : '';
+        row.innerHTML = `
+          <div class="team-avatar">
+            <img src="${esc(m.avatar||'https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT')}" alt="avatar"
+                 onerror="this.onerror=null;this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'">
           </div>
-        </div>
-        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
-          <button class="news-btn admin-only" onclick="deleteTeamMember('${esc(m.id||'')}')">🗑️ Șterge</button>
-        </div>
-      `;
-      list.appendChild(card);
+          <div class="team-info">
+            <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+              <div>
+                <div class="team-name">${esc(m.name)}</div>
+                <div class="team-role">${esc(m.role||'')}${m.joinDate?` • ${esc(m.joinDate)}`:''}</div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">${del}</div>
+            </div>
+          </div>
+        `;
+        list.appendChild(row);
+      }
+
+      list.querySelectorAll('[data-del-member]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          if (!isAdmin()) return;
+          await deleteMember(btn.getAttribute('data-del-member'));
+        });
+      });
+
+    } catch(e) {
+      console.error(e);
+      list.innerHTML = '<div style="color:#ff6b6b">Eroare la incarcare echipa.</div>';
+    }
+  }
+
+  async function saveTeamMember() {
+    if (!isAdmin()) return alert('Trebuie sa fii autentificat ca admin.');
+    const name = ($('teamName')?.value || '').trim();
+    const role = ($('teamRole')?.value || '').trim();
+    const joinDate = ($('teamJoinDate')?.value || '').trim();
+    const avatar = ($('teamAvatar')?.value || '').trim();
+
+    if (!name) return alert('Completeaza numele membrului.');
+
+    const member = { id: uid(), name, role, joinDate, avatar, createdAt: nowTs() };
+    const ref = await teamDocRef();
+
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(ref);
+      const data = snap.exists ? snap.data() : {};
+      const members = Array.isArray(data.members) ? data.members : [];
+      members.push(member);
+      tx.set(ref, { members }, { merge:true });
     });
 
-    document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display = window.__SBYT_ADMIN ? '' : 'none'; });
+    if ($('teamForm')) $('teamForm').style.display='none';
+    ['teamName','teamRole','teamJoinDate','teamAvatar'].forEach(id=>{ if ($(id)) $(id).value=''; });
+    await loadTeam();
   }
 
-  function listenTeam(){
-    if (!db) return;
-    db.collection('stats').doc('team').onSnapshot((doc)=>{
-      const d = doc.exists ? (doc.data()||{}) : {};
-      renderTeam(Array.isArray(d.members)?d.members:[]);
-    }, (err)=>console.error('listenTeam:', err));
-  }
-
-  window.saveTeamMember = async function(){
-    const ok = await ensureAdmin();
-    if (!ok) return;
-
-    const name = ($('memberName')?.value || $('teamName')?.value || '').trim();
-    const role = ($('memberRole')?.value || $('teamRole')?.value || '').trim();
-    const bio  = ($('memberBio')?.value  || $('teamBio')?.value  || '').trim();
-    const joinDate = ($('memberJoinDate')?.value || $('teamJoinDate')?.value || new Date().toISOString().slice(0,10)).trim();
-    const img = ($('memberImage')?.value || $('teamImage')?.value || '').trim();
-
-    if (!name || !role){
-      alert('Completeaza minim Nume si Rol.');
-      return;
-    }
-
-    const member = { id: 'm_' + Date.now(), name, role, bio, joinDate, img };
-
-    const ref = db.collection('stats').doc('team');
-    try{
-      await db.runTransaction(async (tx)=>{
-        const snap = await tx.get(ref);
-        const cur = (snap.exists && snap.data() && Array.isArray(snap.data().members)) ? snap.data().members.slice() : [];
-        cur.push(member);
-        tx.set(ref, { members: cur, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
-      });
-
-      ['memberName','memberRole','memberBio','memberJoinDate','memberImage','teamName','teamRole','teamBio','teamJoinDate','teamImage'].forEach(id=>{
-        const el=$(id); if(el) el.value='';
-      });
-
-    }catch(e){
-      console.error('saveTeamMember:', e);
-      alert('Eroare la salvare membru (Rules). Verifica Firestore Rules pentru stats/team.');
-    }
-  };
-
-  window.deleteTeamMember = async function(memberId){
-    const ok = await ensureAdmin();
-    if (!ok) return;
-    if (!confirm('Ștergi acest membru?')) return;
-
-    const ref = db.collection('stats').doc('team');
-    try{
-      await db.runTransaction(async (tx)=>{
-        const snap = await tx.get(ref);
-        const cur = (snap.exists && snap.data() && Array.isArray(snap.data().members)) ? snap.data().members.slice() : [];
-        const next = cur.filter(x => String(x.id||'') !== String(memberId||''));
-        tx.set(ref, { members: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
-      });
-    }catch(e){
-      console.error('deleteTeamMember:', e);
-      alert('Eroare la ștergere membru (Rules).');
-    }
-  };
-
-  // =============================
-  // 4) PROMOS (colectia promos + subcolectie participants)
-  // =============================
-  function endOfDayMs(dateStr){
-    // date input (YYYY-MM-DD) -> end of day
-    const d = new Date(dateStr + 'T23:59:59');
-    return d.getTime();
-  }
-
-  function genCode(){
-    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let s='';
-    for (let i=0;i<8;i++) s += chars[Math.floor(Math.random()*chars.length)];
-    return s;
-  }
-
-  async function listPromos(){
-    const snap = await db.collection('promos').orderBy('createdAt','desc').get();
-    const out=[];
-    snap.forEach(doc=>out.push({ _id: doc.id, ...doc.data() }));
-    return out;
-  }
-
-  async function listParticipants(promoId){
-    const snap = await db.collection('promos').doc(promoId).collection('participants').orderBy('createdAt','asc').get();
-    const out=[];
-    snap.forEach(doc=>out.push({ _id: doc.id, ...doc.data() }));
-    return out;
-  }
-
-  function buildRanking(participants){
-    const counts = {};
-    participants.forEach(p=>{
-      const ref = String(p.referral||'').toUpperCase().trim();
-      if (!ref) return;
-      counts[ref] = (counts[ref]||0) + 1;
+  async function deleteMember(id) {
+    const ref = await teamDocRef();
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(ref);
+      if (!snap.exists) return;
+      const data = snap.data() || {};
+      const members = Array.isArray(data.members) ? data.members : [];
+      tx.set(ref, { members: members.filter(x=>x.id!==id) }, { merge:true });
     });
-    const rows = participants.map(p=>{
-      const code = String(p.code||'').toUpperCase();
-      return {
-        ...p,
-        referrals: counts[code] || 0
-      };
-    }).sort((a,b)=> (b.referrals - a.referrals) || String(a.email||'').localeCompare(String(b.email||'')));
-    return rows;
+    await loadTeam();
   }
 
-  function renderLeaderboardBlock(promo, ranked){
-    const top = ranked.slice(0, 50);
-    const rowsHtml = top.map((u, idx)=>{
-      const cls = idx===0 ? 'lb-top1' : idx===1 ? 'lb-top2' : idx===2 ? 'lb-top3' : '';
-      return `
-        <tr class="${cls}">
-          <td><b>${idx+1}</b></td>
-          <td>${esc(u.name||'')}</td>
-          <td>${esc(maskEmail(u.email||''))}</td>
-          <td class="mono">${esc(u.code||'')}</td>
-          <td><b>${Number(u.referrals||0)}</b></td>
-        </tr>
-      `;
-    }).join('');
+  // PROMOS in collection promos
+  function getEndDateValue() {
+    return ($('promoEndDate')?.value || $('promoEnds')?.value || '').trim();
+  }
 
-    const prizes = promo.prizes || {};
-    const prizeHtml = `
-      <div style="opacity:.9; margin:8px 0 10px 0;">
-        <b>Premii:</b>
-        #1 ${esc(prizes.p1||'-')} ·
-        #2 ${esc(prizes.p2||'-')} ·
-        #3 ${esc(prizes.p3||'-')} ·
-        #4 ${esc(prizes.p4||'-')}
-      </div>
+  function ensurePrizeFields() {
+    const form = $('promoForm');
+    if (!form) return;
+    if ($('prize1')) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'form-row';
+    wrap.style.marginTop = '10px';
+    wrap.innerHTML = `
+      <input type="text" id="prize1" placeholder="Premiu locul 1" maxlength="120">
+      <input type="text" id="prize2" placeholder="Premiu locul 2" maxlength="120">
+    `;
+    const wrap2 = document.createElement('div');
+    wrap2.className = 'form-row';
+    wrap2.style.marginTop = '10px';
+    wrap2.innerHTML = `
+      <input type="text" id="prize3" placeholder="Premiu locul 3" maxlength="120">
+      <input type="text" id="prize4" placeholder="Premiu locul 4" maxlength="120">
     `;
 
+    const btnRow = form.querySelector('div[style*="justify-content:flex-end"]') || form.lastElementChild;
+    form.insertBefore(wrap, btnRow);
+    form.insertBefore(wrap2, btnRow);
+  }
+
+  function maskEmail(email) {
+    if (!email || typeof email !== 'string') return '';
+    const [u,d]=email.split('@');
+    if (!d) return email;
+    const head=u.slice(0,2);
+    return head + '***@' + d;
+  }
+
+  function promoExpired(endDate) {
+    const t = Date.parse(endDate);
+    if (Number.isNaN(t)) return false;
+    return Date.now() > t;
+  }
+
+  function computeLeaderboard(participants) {
+    const byCode = new Map();
+    for (const p of participants) {
+      if (!p.code) continue;
+      if (!byCode.has(p.code)) byCode.set(p.code, { code:p.code, email:p.email, ts:p.ts||0, referrals:0 });
+    }
+    for (const p of participants) {
+      const ref = (p.referral||'').trim();
+      if (ref && byCode.has(ref)) byCode.get(ref).referrals++;
+    }
+    const arr=[...byCode.values()];
+    arr.sort((a,b)=> (b.referrals-a.referrals) || ((a.ts||0)-(b.ts||0)));
+    return arr;
+  }
+
+  function renderLeaderboard(lb, prizes) {
+    const rows = lb.map((x, idx)=>{
+      const cls = idx===0?'lb-top1':idx===1?'lb-top2':idx===2?'lb-top3':'';
+      const prize = idx===0?prizes?.p1:idx===1?prizes?.p2:idx===2?prizes?.p3:idx===3?prizes?.p4:'';
+      return `<tr class="${cls}">
+        <td>${idx+1}</td>
+        <td>${esc(maskEmail(x.email))}</td>
+        <td class="mono">${esc(x.code)}</td>
+        <td>${x.referrals}</td>
+        <td>${esc(prize||'')}</td>
+      </tr>`;
+    }).join('');
+
     return `
-      <div class="news-card" style="margin-bottom:16px;">
-        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:900; font-size:1.1rem; color:#fff;">${esc(promo.title||'')}</div>
-            <div style="opacity:.8;">Tip: ${esc(promo.type||'promo')} · Expiră: ${promo.endDate ? esc(promo.endDate) : '-'}</div>
-          </div>
-          <div style="display:flex; gap:10px; align-items:center;">
-            <button class="news-btn admin-only" onclick="deletePromo('${esc(promo._id)}')">🗑️ Șterge</button>
-          </div>
-        </div>
-        ${prizeHtml}
-        <div class="table-responsive">
+      <div style="margin-top:10px;">
+        <div style="opacity:.9; margin-bottom:6px;"><b>Clasament (referal)</b></div>
+        <div style="overflow:auto;">
           <table class="lb-table">
-            <thead>
-              <tr>
-                <th>Loc</th><th>Nume</th><th>Email</th><th>Cod</th><th>Referal</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml || `<tr><td colspan="5" style="opacity:.8;">Nu există participanți încă.</td></tr>`}
-            </tbody>
+            <thead><tr><th>#</th><th>Email</th><th>Cod</th><th>Referal</th><th>Premiu</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="5" style="opacity:.7">Nu exista participanti.</td></tr>'}</tbody>
           </table>
         </div>
       </div>
     `;
   }
 
-  async function renderLeaderboard(){
-    const root = $('leaderboard');
-    if (!root) return;
-
-    try{
-      const promos = await listPromos();
-      if (!promos.length){
-        root.innerHTML = '<div style="opacity:0.85;">Nu există clasamente încă.</div>';
-        return;
-      }
-
-      let html = '';
-      for (const p of promos){
-        const participants = await listParticipants(p._id);
-        const ranked = buildRanking(participants);
-        html += renderLeaderboardBlock(p, ranked);
-      }
-      root.innerHTML = html;
-      document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display = window.__SBYT_ADMIN ? '' : 'none'; });
-    }catch(e){
-      console.error('renderLeaderboard:', e);
-      root.innerHTML = '<div style="opacity:0.85;">Eroare la încărcarea clasamentelor.</div>';
-    }
-  }
-
-  // Promo list + join UI (pe pagina Giveaway/Promotii)
-  async function renderPromos(){
+  async function loadPromos() {
     const list = $('promoList');
     if (!list) return;
+    ensurePrizeFields();
 
-    try{
-      const promos = await listPromos();
-      if (!promos.length){
-        list.innerHTML = '<div style="opacity:0.85;">Nu există promoții/giveaway încă.</div>';
-        return;
-      }
+    try {
+      const snap = await db.collection('promos').orderBy('createdAt','desc').get();
+      const docs = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      list.innerHTML = docs.length ? '' : '<div style="opacity:.75">Nu exista inca promotii/giveaway.</div>';
 
-      list.innerHTML = '';
-      const now = Date.now();
-
-      for (const p of promos){
-        const endMs = p.endsAt ? Number(p.endsAt) : (p.endDate ? endOfDayMs(p.endDate) : 0);
-        const expired = endMs && now > endMs;
-
+      for (const p of docs) {
+        const expired = promoExpired(p.endDate);
+        const delBtn = isAdmin() ? `<button class="news-btn danger" data-del-promo="${esc(p.id)}">🗑️ Sterge</button>` : '';
         const prizes = p.prizes || {};
-        const prizesHtml = `
-          <div style="opacity:.9; margin:8px 0 10px 0;">
-            <b>Premii:</b>
-            #1 ${esc(prizes.p1||'-')} · #2 ${esc(prizes.p2||'-')} · #3 ${esc(prizes.p3||'-')} · #4 ${esc(prizes.p4||'-')}
-          </div>`;
+        const parts = Array.isArray(p.participants) ? p.participants : [];
+        const lb = computeLeaderboard(parts).slice(0,50);
 
         const card = document.createElement('div');
-        card.className = 'news-card';
+        card.className = 'promo-card';
         card.innerHTML = `
-          <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
-          <h4 style="margin-bottom:0.5rem; color:white;">${esc(p.title||'')}</h4>
-          <p style="opacity:0.9; line-height:1.5;">${esc(p.desc||'')}</p>
-          <div class="news-date"><span>⏳</span> Expiră: ${p.endDate ? esc(p.endDate) : (p.endsAt ? new Date(p.endsAt).toLocaleString('ro-RO') : '-')}</div>
-          ${prizesHtml}
-
-          <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
-            <div style="font-weight:700; margin-bottom:8px;">Înscriere</div>
-            <div class="form-row">
-              <input type="text" id="joinName_${esc(p._id)}" placeholder="Nume" maxlength="80">
-              <input type="email" id="joinEmail_${esc(p._id)}" placeholder="Email" maxlength="120">
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
+            <div>
+              <div style="font-weight:800; font-size:1.05rem;">${esc(p.title)}</div>
+              <div style="opacity:.85; margin-top:2px;">Expira: <b>${esc(p.endDate)}</b> ${expired?'<span style="color:#ff6b6b"> (expirat)</span>':''}</div>
             </div>
-            <div class="form-row">
-              <input type="text" id="joinWallet_${esc(p._id)}" placeholder="Wallet (0x...)" maxlength="64">
-              <input type="text" id="joinReferral_${esc(p._id)}" placeholder="Referal (optional)" maxlength="16">
-            </div>
-            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
-              <button class="news-btn" onclick="joinPromo('${esc(p._id)}')" ${expired?'disabled style="opacity:.55; cursor:not-allowed;"':''}>✅ Înscrie-te</button>
-              <button class="news-btn admin-only" onclick="deletePromo('${esc(p._id)}')">🗑️ Șterge</button>
-            </div>
-            <div style="opacity:0.75; font-size:0.85rem; margin-top:6px;">
-              Referal: acceptă doar coduri generate anterior (de la participanți deja înscriși).
-            </div>
+            <div style="display:flex; gap:10px; align-items:center;">${delBtn}</div>
           </div>
-
-          <div id="promo_part_${esc(p._id)}" style="margin-top:12px;"></div>
+          <div style="margin-top:10px; opacity:.92;">${esc(p.desc||'')}</div>
+          <div style="margin-top:8px; display:grid; gap:4px;">
+            <div><b>Premii:</b></div>
+            <div>1: ${esc(prizes.p1||'-')}</div>
+            <div>2: ${esc(prizes.p2||'-')}</div>
+            <div>3: ${esc(prizes.p3||'-')}</div>
+            <div>4: ${esc(prizes.p4||'-')}</div>
+          </div>
+          <div style="margin-top:10px;"><b>Participanti:</b> ${parts.length}</div>
+          <div style="margin-top:6px; opacity:.9;">
+            ${parts.slice(0,8).map(pp=>`<div>• ${esc(maskEmail(pp.email))} — cod: <span class="mono">${esc(pp.code)}</span></div>`).join('') || '<div style="opacity:.7">Nimeni inscris inca.</div>'}
+            ${parts.length>8?`<div style="opacity:.7; margin-top:4px;">... +${parts.length-8} in plus</div>`:''}
+          </div>
+          ${renderLeaderboard(lb, prizes)}
+          <div style="margin-top:12px;">
+            <div style="opacity:.9; margin-bottom:6px;"><b>Inscriere</b></div>
+            <div class="form-row">
+              <input type="email" id="joinEmail_${p.id}" placeholder="Email" maxlength="120">
+              <input type="text" id="joinReferral_${p.id}" placeholder="Referal (optional)" maxlength="40">
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+              <button class="news-btn" data-join="${esc(p.id)}" ${expired?'disabled':''}>✅ Inscrie</button>
+            </div>
+            ${expired?'<div style="color:#ff6b6b; margin-top:6px;">Inscrierile sunt inchise (expirat).</div>':''}
+          </div>
         `;
         list.appendChild(card);
-
-        // afisam participantii cu email partial + cod complet
-        try{
-          const part = await listParticipants(p._id);
-          const box = $('promo_part_' + p._id);
-          if (box){
-            const rows = part.slice(-30).reverse().map(u => `
-              <div style="display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
-                <div style="opacity:.9;">${esc(u.name||'')}</div>
-                <div style="opacity:.8;">${esc(maskEmail(u.email||''))}</div>
-                <div class="mono" style="opacity:.95;">${esc(u.code||'')}</div>
-              </div>`).join('');
-            box.innerHTML = part.length ? `
-              <div style="opacity:.85; margin-bottom:6px;"><b>Participanți</b> (email parțial + cod complet)</div>
-              ${rows}` : `<div style="opacity:.75;">Nu există participanți încă.</div>`;
-          }
-        }catch(e){}
-
       }
 
-      document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display = window.__SBYT_ADMIN ? '' : 'none'; });
-    }catch(e){
-      console.error('renderPromos:', e);
-      list.innerHTML = '<div style="opacity:0.85;">Eroare la încărcarea promoțiilor.</div>';
+      list.querySelectorAll('[data-del-promo]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          if (!isAdmin()) return;
+          await db.collection('promos').doc(btn.getAttribute('data-del-promo')).delete();
+          await loadPromos();
+        });
+      });
+
+      list.querySelectorAll('[data-join]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const promoId = btn.getAttribute('data-join');
+          const email = (document.getElementById('joinEmail_'+promoId)?.value || '').trim();
+          const referral = (document.getElementById('joinReferral_'+promoId)?.value || '').trim();
+          if (!email) return alert('Completeaza email.');
+          await joinPromo(promoId, email, referral);
+        });
+      });
+
+    } catch(e) {
+      console.error(e);
+      list.innerHTML = '<div style="color:#ff6b6b">Eroare la incarcare promotii/giveaway.</div>';
     }
   }
 
-  window.showPromoForm = async function(type){
-    const ok = await ensureAdmin();
-    if (!ok) return;
-    const f = $('promoForm');
-    if (f) f.style.display='block';
-    if ($('promoType')) $('promoType').value = type || 'promo';
-  };
-
-  window.cancelPromo = function(){
-    const f = $('promoForm');
-    if (f) f.style.display='none';
-    ['promoTitle','promoEndDate','promoDesc','promoType','promoPrize1','promoPrize2','promoPrize3','promoPrize4'].forEach(id=>{
-      const el=$(id); if(el) el.value='';
-    });
-  };
-
-  window.savePromo = async function(){
-    const ok = await ensureAdmin();
-    if (!ok) return;
+  async function savePromo() {
+    if (!isAdmin()) return alert('Trebuie sa fii autentificat ca admin.');
+    ensurePrizeFields();
 
     const title = ($('promoTitle')?.value || '').trim();
-    const endDate = ($('promoEndDate')?.value || '').trim(); // YYYY-MM-DD
+    const endDate = getEndDateValue();
     const desc = ($('promoDesc')?.value || '').trim();
-    const type = ($('promoType')?.value || 'promo').trim();
 
-    const prize1 = ($('promoPrize1')?.value || '').trim();
-    const prize2 = ($('promoPrize2')?.value || '').trim();
-    const prize3 = ($('promoPrize3')?.value || '').trim();
-    const prize4 = ($('promoPrize4')?.value || '').trim();
+    if (!title || !endDate) return alert('Completeaza minim Titlu si Data expirarii.');
 
-    if (!title || !endDate){
-      alert('Completează minim Titlu și Data expirării.');
-      return;
-    }
+    const prizes = {
+      p1: ($('prize1')?.value || '').trim(),
+      p2: ($('prize2')?.value || '').trim(),
+      p3: ($('prize3')?.value || '').trim(),
+      p4: ($('prize4')?.value || '').trim()
+    };
 
-    const endsAt = endOfDayMs(endDate);
-    if (!endsAt || endsAt <= Date.now()){
-      alert('Data expirării trebuie să fie în viitor.');
-      return;
-    }
+    const doc = {
+      type: 'promo',
+      title,
+      desc,
+      endDate,
+      prizes,
+      createdAt: nowTs(),
+      participants: []
+    };
 
-    try{
-      await db.collection('promos').add({
-        type,
-        title,
-        desc: desc || '',
-        endDate,
-        endsAt,
-        prizes: { p1: prize1||'', p2: prize2||'', p3: prize3||'', p4: prize4||'' },
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+    await db.collection('promos').add(doc);
 
-      window.cancelPromo();
-      await renderPromos();
-      await renderLeaderboard();
-      alert('Promoție/Giveaway salvat(ă).');
+    if ($('promoForm')) $('promoForm').style.display='none';
+    ['promoTitle','promoEndDate','promoEnds','promoDesc','prize1','prize2','prize3','prize4'].forEach(id=>{ if ($(id)) $(id).value=''; });
+    await loadPromos();
+  }
 
-    }catch(e){
-      console.error('savePromo:', e);
-      alert('Eroare la salvarea promoției/giveaway-ului (verifică Firestore Rules).');
-    }
-  };
+  async function joinPromo(promoId, email, referral) {
+    const ref = db.collection('promos').doc(promoId);
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(ref);
+      if (!snap.exists) throw new Error('Promo not found');
+      const p = snap.data() || {};
+      if (promoExpired(p.endDate)) throw new Error('Inscrierile sunt inchise (expirat).');
 
-  window.deletePromo = async function(promoId){
-    const ok = await ensureAdmin();
-    if (!ok) return;
-    if (!confirm('Ștergi această promoție/giveaway?')) return;
+      const parts = Array.isArray(p.participants) ? p.participants : [];
 
-    try{
-      // șterge subcolectia participants + doc promo
-      const partSnap = await db.collection('promos').doc(promoId).collection('participants').get();
-      const batch = db.batch();
-      partSnap.forEach(d=>batch.delete(d.ref));
-      batch.delete(db.collection('promos').doc(promoId));
-      await batch.commit();
-
-      await renderPromos();
-      await renderLeaderboard();
-    }catch(e){
-      console.error('deletePromo:', e);
-      alert('Eroare la ștergere (Rules).');
-    }
-  };
-
-  window.joinPromo = async function(promoId){
-    if (!db) return;
-
-    // load promo to check expiry
-    let promo=null;
-    try{
-      const snap = await db.collection('promos').doc(promoId).get();
-      promo = snap.exists ? snap.data() : null;
-    }catch(e){}
-    if (!promo){ alert('Promoția nu a fost găsită.'); return; }
-
-    const endMs = promo.endsAt ? Number(promo.endsAt) : (promo.endDate ? endOfDayMs(promo.endDate) : 0);
-    if (endMs && Date.now() > endMs){
-      alert('Această promoție/giveaway este expirată. Nu mai acceptă înscrieri.');
-      return;
-    }
-
-    const name = ($('joinName_' + promoId)?.value || '').trim();
-    const email = ($('joinEmail_' + promoId)?.value || '').trim();
-    const wallet = ($('joinWallet_' + promoId)?.value || '').trim();
-    const referral = ($('joinReferral_' + promoId)?.value || '').trim().toUpperCase();
-
-    if (!name || !email || !wallet){
-      alert('Completează nume, email și wallet.');
-      return;
-    }
-
-    // validate referral: accepta DOAR coduri existente
-    let existingCodes = [];
-    try{
-      const part = await listParticipants(promoId);
-      existingCodes = part.map(u=>String(u.code||'').toUpperCase());
-      if (referral && !existingCodes.includes(referral)){
-        alert('Codul Referal nu este valid. Trebuie să fie un cod generat anterior.');
-        return;
+      if (referral) {
+        const ok = parts.some(x => (x.code||'') === referral);
+        if (!ok) throw new Error('Cod referal invalid (nu exista).');
       }
-    }catch(e){}
 
-    const code = genCode();
-    try{
-      await db.collection('promos').doc(promoId).collection('participants').add({
-        name,
-        email,
-        wallet,
-        code,
-        referral: referral || '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      let code = 'SBYT-' + Math.random().toString(36).slice(2,8).toUpperCase();
+      const used = new Set(parts.map(x=>x.code));
+      while (used.has(code)) code = 'SBYT-' + Math.random().toString(36).slice(2,8).toUpperCase();
 
-      // clear inputs
-      ['joinName_','joinEmail_','joinWallet_','joinReferral_'].forEach(pref=>{
-        const el=$(pref+promoId); if(el) el.value='';
-      });
-
-      await renderPromos();
-      await renderLeaderboard();
-      alert('Înscriere salvată! Codul tău: ' + code);
-
-      // deschide email (optional)
-      try{
-        const subject = encodeURIComponent('Confirmare înscriere SBYT');
-        const body = encodeURIComponent('Salut!\n\nTe-ai înscris la: '+(promo.title||'')+'\nCod participant: '+code+'\nReferal: '+(referral||'-')+'\n\nStancuBYT');
-        window.open(`mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`, '_blank');
-      }catch(_){}
-    }catch(e){
-      console.error('joinPromo:', e);
-      alert('Eroare la înscriere (Rules).');
-    }
-  };
-
-  // Butoanele vechi (requestPassword) - pastram compatibilitatea
-  window.requestPassword = function(action, id){
-    if (action === 'add') return window.addNews ? window.addNews() : null;
-    if (action === 'clear') return null; // nu mai stergem tot local
-    if (action === 'promoAdd') return window.showPromoForm('promo');
-    if (action === 'promoClear') return null;
-    if (action === 'deleteNews') return window.deleteNewsItem(id);
-  };
-
-  // =============================
-  // 5) STATISTICI (Etherscan via Cloud Function)
-  // =============================
-  async function etherscanProxy(params){
-    const q = new URLSearchParams(params);
-    const url = ETHERSCAN_PROXY_URL + '?' + q.toString();
-    const r = await fetch(url, { method:'GET' });
-    if (!r.ok) throw new Error('Proxy HTTP ' + r.status);
-    return await r.json();
-  }
-
-  async function fetchTokenSupply(){
-    // module=stats&action=tokensupply&contractaddress=...
-    const d = await etherscanProxy({ module:'stats', action:'tokensupply', contractaddress: CONTRACT });
-    const raw = d && d.result ? String(d.result) : null;
-    if (!raw) throw new Error('supply missing');
-    // ERC20 decimals 18
-    const tokens = Number(raw) / 1e18;
-    return tokens;
-  }
-
-  async function fetchEthPrice(){
-    // module=stats&action=ethprice
-    const d = await etherscanProxy({ module:'stats', action:'ethprice' });
-    const usd = Number(d?.result?.ethusd || 0);
-    return usd || null;
-  }
-
-  // mentinem un istoric local pentru grafic (din polling la 1-5 minute)
-  function loadSeries(){
-    try{ return JSON.parse(localStorage.getItem('SBYT_ETHPRICE_SERIES')||'[]') || []; }catch{ return []; }
-  }
-  function saveSeries(arr){
-    try{ localStorage.setItem('SBYT_ETHPRICE_SERIES', JSON.stringify(arr.slice(-500))); }catch(_){}
-  }
-
-  async function updateStats(){
-    try{
-      // total supply real
-      const supply = await fetchTokenSupply();
-      const formatted = supply.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
-      if ($('totalSupply')) $('totalSupply').textContent = formatted;
-      if ($('supplyValue')) $('supplyValue').textContent = formatted;
-
-      // ETH price (Etherscan)
-      const ethUsd = await fetchEthPrice();
-      if (ethUsd != null){
-        if ($('currentPrice')) $('currentPrice').textContent = ethUsd.toLocaleString('ro-RO', { style:'currency', currency:'USD' }) + ' / ETH';
-        if ($('lastUpdated')) $('lastUpdated').textContent = 'Ultima actualizare: ' + nowRo();
-        if ($('priceData')) $('priceData').textContent = 'ETH/USD din Etherscan: ' + ethUsd.toLocaleString('ro-RO', { maximumFractionDigits: 2 });
-
-        const series = loadSeries();
-        series.push({ t: Date.now(), v: ethUsd });
-        // curatam la ultimele 24h
-        const cutoff = Date.now() - 24*60*60*1000;
-        const cleaned = series.filter(p=>p.t >= cutoff);
-        saveSeries(cleaned);
-        try{ drawPriceChart(cleaned); }catch(_){}
-      }
-    }catch(e){
-      console.warn('updateStats:', e);
-    }
-  }
-
-  function drawPriceChart(series){
-    const canvas = $('priceChart');
-    if (!canvas || !canvas.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width = canvas.parentElement ? canvas.parentElement.clientWidth : 800;
-    const h = canvas.height = 260;
-
-    ctx.clearRect(0,0,w,h);
-    if (!series || series.length < 2){
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = '14px system-ui';
-      ctx.fillText('Se adună date pentru grafic (ETH/USD)...', 10, 22);
-      return;
-    }
-
-    const minV = Math.min(...series.map(p=>p.v));
-    const maxV = Math.max(...series.map(p=>p.v));
-    const pad = 18;
-
-    const minT = series[0].t;
-    const maxT = series[series.length-1].t;
-
-    function x(t){ return pad + ( (t-minT) / (maxT-minT) ) * (w - pad*2); }
-    function y(v){ 
-      const r = (v-minV)/(maxV-minV || 1);
-      return (h-pad) - r*(h-pad*2);
-    }
-
-    // axis
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(pad, pad);
-    ctx.lineTo(pad, h-pad);
-    ctx.lineTo(w-pad, h-pad);
-    ctx.stroke();
-
-    // line
-    ctx.strokeStyle = 'rgba(0,255,136,0.85)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    series.forEach((p,i)=>{
-      const xx=x(p.t), yy=y(p.v);
-      if (i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+      parts.push({ email, code, referral, ts: nowTs() });
+      tx.set(ref, { participants: parts }, { merge:true });
+    }).catch(err=>{
+      alert(err.message || 'Eroare inscriere');
+      throw err;
     });
-    ctx.stroke();
 
-    // labels
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx.font = '12px system-ui';
-    ctx.fillText('min: ' + minV.toFixed(2), pad+6, pad+12);
-    ctx.fillText('max: ' + maxV.toFixed(2), pad+6, pad+26);
-    ctx.fillText('ultim: ' + series[series.length-1].v.toFixed(2), pad+6, pad+40);
+    await loadPromos();
+    alert('Inscriere reusita!');
   }
 
-  // Hook pe butonul "fetchAllData" existent
-  window.fetchAllData = async function(){
-    const btn = $('refreshButton');
-    const old = btn ? btn.innerHTML : null;
-    try{
-      if (btn){
-        btn.classList.add('loading');
-        btn.innerHTML = '<span class="refresh-icon">⏳</span><span class="refresh-text">Se actualizează...</span>';
-      }
-      await updateStats();
-      await renderPromos();
-      await renderLeaderboard();
-    }finally{
-      if (btn && old){
-        btn.classList.remove('loading');
-        btn.innerHTML = old;
-      }
-    }
-  };
+  // VISITS stats/visits
+  async function bumpVisitsOncePerDay() {
+    const key='SBYT_LAST_VISIT_DATE';
+    const today=new Date().toISOString().slice(0,10);
+    if (localStorage.getItem(key) === today) return;
 
-  // =============================
-  // INIT
-  // =============================
-  document.addEventListener('DOMContentLoaded', ()=>{
-    // ascundem textele nedorite daca exista in DOM
-    const bad = Array.from(document.querySelectorAll('*')).filter(el =>
-      el && el.textContent && el.textContent.includes('Daca ai activat rol de admin')
-    );
-    bad.forEach(el=>{ try{ el.style.display='none'; }catch(_){} });
+    localStorage.setItem(key, today);
+    const ref = db.collection('stats').doc('visits');
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(ref);
+      const c = snap.exists && typeof snap.data().count === 'number' ? snap.data().count : 0;
+      tx.set(ref, {count: c+1}, {merge:true});
+    }).catch(()=>{});
+  }
 
-    // Auth listener
-    if (auth){
-      auth.onAuthStateChanged((user)=>{
-        refreshAdminUI(user);
+  async function loadVisits() {
+    const el = $('visitCount');
+    if (!el) return;
+    try {
+      const snap = await db.collection('stats').doc('visits').get();
+      const c = snap.exists ? (snap.data().count||0) : 0;
+      el.textContent = String(c);
+    } catch(e) { console.warn('visits load failed', e); }
+  }
+
+  // Etherscan via proxy
+  let priceChart = null;
+  const priceHistory = [];
+
+  async function fetchEthPrice() {
+    const url = `${PROXY_URL}?module=stats&action=ethprice`;
+    const r = await fetch(url);
+    const j = await r.json();
+    const res = j?.result || {};
+    const usd = parseFloat(res.ethusd);
+    const ts = parseInt(res.ethusd_timestamp,10) || Math.floor(Date.now()/1000);
+    if (!Number.isFinite(usd)) throw new Error('ethprice invalid');
+    return { usd, ts };
+  }
+
+  function updateChartPoint(usd, ts) {
+    priceHistory.push({ usd, ts });
+    while (priceHistory.length > 60) priceHistory.shift();
+  }
+
+  function renderPriceChart() {
+    const canvas = $('priceChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const labels = priceHistory.map(p => new Date(p.ts*1000).toLocaleTimeString());
+    const data = priceHistory.map(p => p.usd);
+
+    if (!priceChart) {
+      priceChart = new Chart(canvas, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'ETH / USD (Etherscan)', data, tension: 0.25 }] },
+        options: { responsive: true, animation: false, scales: { x: { ticks: { maxTicksLimit: 6 } } } }
       });
+    } else {
+      priceChart.data.labels = labels;
+      priceChart.data.datasets[0].data = data;
+      priceChart.update();
     }
+  }
 
-    // listeners
-    listenVisits();
-    listenNews();
-    listenTeam();
+  async function startEthPriceLoop() {
+    const priceEl = document.querySelector('#ethPriceValue, #priceValue, #realTimePrice');
+    async function tick() {
+      try {
+        const {usd, ts} = await fetchEthPrice();
+        if (priceEl) priceEl.textContent = `$${usd.toFixed(2)}`;
+        updateChartPoint(usd, ts);
+        renderPriceChart();
+      } catch(e) {
+        console.warn('eth price error', e);
+      }
+    }
+    await tick();
+    setInterval(tick, 60000);
+  }
 
-    // init visits
-    bumpVisits();
+  async function loadTotalSupplyReal() {
+    const el = $('totalSupplyReal') || $('realTotalSupply');
+    if (!el) return;
+    try {
+      const url = `${PROXY_URL}?module=stats&action=tokensupply&contractaddress=${CONTRACT_ADDRESS}`;
+      const r = await fetch(url);
+      const j = await r.json();
+      const raw = j?.result;
+      const supply = raw ? (Number(raw) / 1e18) : null;
+      if (!supply || !Number.isFinite(supply)) return;
+      el.textContent = supply.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    } catch(e) { console.warn('supply error', e); }
+  }
 
-    // init promos + leaderboard
-    renderPromos();
-    renderLeaderboard();
+  async function init() {
+    ensureFirebase();
 
-    // initial stats + polling
-    updateStats();
-    setInterval(updateStats, 120000); // la 2 minute, grafic ETH/USD
-  });
+    // override legacy handlers
+    window.saveNews = saveNewsItem;
+    window.saveNewsItem = saveNewsItem;
+    window.loadNews = loadNews;
 
+    window.saveTeamMember = saveTeamMember;
+    window.loadTeamMembers = loadTeam;
+    window.loadTeam = loadTeam;
+
+    window.savePromo = savePromo;
+    window.loadPromos = loadPromos;
+
+    ensurePrizeFields();
+
+    auth.onAuthStateChanged(async ()=>{
+      setAdminUI();
+      await loadNews();
+      await loadTeam();
+      await loadPromos();
+    });
+
+    await bumpVisitsOncePerDay();
+    await loadVisits();
+
+    await loadNews();
+    await loadTeam();
+    await loadPromos();
+    await loadTotalSupplyReal();
+    await startEthPriceLoop();
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{ init().catch(e=>console.error(e)); });
 })();
 </script>
-
 </body>
 </html>
