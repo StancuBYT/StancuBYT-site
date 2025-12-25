@@ -1,103 +1,59 @@
 /**
  * Firebase Cloud Function: etherscanProxy
- * - Keeps Etherscan API key server-side (secret)
- * - Simple allowlist for supported endpoints to prevent abuse
+ * - ascunde API key-ul Etherscan (nu apare in index.html)
+ * - suport GET cu query: module, action, contractaddress, address, etc.
  *
- * Deploy (recommended):
- *   firebase functions:secrets:set ETHERSCAN_API_KEY
- *   firebase deploy --only functions
+ * Runtime: Node 20
  */
 const { onRequest } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 
-const ETHERSCAN_API_KEY = "ETHERSCAN_API_KEY";
-const BASE = "https://api.etherscan.io/api";
+// Optional: foloseste functions config (firebase functions:config:set etherscan.key="...").
+// Sau environment variable: ETHERSCAN_API_KEY / ETHERSCAN_KEY
+let functionsConfigKey = null;
+try {
+  const functions = require("firebase-functions");
+  functionsConfigKey = functions.config()?.etherscan?.key || null;
+} catch (e) {}
 
-function pick(obj, keys){
-  const out = {};
-  for (const k of keys){
-    if (obj[k] !== undefined && obj[k] !== null && String(obj[k]).length){
-      out[k] = String(obj[k]);
-    }
-  }
-  return out;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || process.env.ETHERSCAN_KEY || functionsConfigKey || "";
+
+function setCors(res) {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
 }
 
-function buildUrl(params, apiKey){
-  const usp = new URLSearchParams(params);
-  if (apiKey) usp.set("apikey", apiKey);
-  return BASE + "?" + usp.toString();
-}
+exports.etherscanProxy = onRequest(async (req, res) => {
+  setCors(res);
+  if (req.method === "OPTIONS") return res.status(204).send("");
 
-exports.etherscanProxy = onRequest(
-  {
-    region: "us-central1",
-    cors: true,
-    secrets: [ETHERSCAN_API_KEY],
-  },
-  async (req, res) => {
-    try{
-      // Basic validation
-      const q = req.query || {};
-      const module = String(q.module || "");
-      const action = String(q.action || "");
+  try {
+    const url = new URL("https://api.etherscan.io/api");
 
-      // Allowlist (add more if needed)
-      const ALLOW = new Set([
-        "stats:tokensupply",
-        "token:tokenholderlist",
-        "account:tokentx",
-      ]);
-
-      const key = `${module}:${action}`;
-      if (!ALLOW.has(key)){
-        return res.status(400).json({
-          status: "0",
-          message: "NOT_ALLOWED",
-          result: `Endpoint not allowed: ${key}`,
-        });
-      }
-
-      // Only pass through safe parameters per endpoint
-      let params = { module, action };
-
-      if (key === "stats:tokensupply"){
-        params = { ...params, ...pick(q, ["contractaddress"]) };
-      } else if (key === "token:tokenholderlist"){
-        params = { ...params, ...pick(q, ["contractaddress", "page", "offset"]) };
-      } else if (key === "account:tokentx"){
-        params = { ...params, ...pick(q, ["contractaddress", "address", "page", "offset", "sort", "startblock", "endblock"]) };
-      }
-
-      // Require contractaddress for all current endpoints
-      if (!params.contractaddress){
-        return res.status(400).json({
-          status: "0",
-          message: "MISSING_PARAM",
-          result: "contractaddress is required",
-        });
-      }
-
-      const apiKey = process.env[ETHERSCAN_API_KEY] || "";
-      const url = buildUrl(params, apiKey);
-
-      const upstream = await fetch(url, { method: "GET" });
-      const bodyText = await upstream.text();
-
-      res.set("Cache-Control", "no-store");
-      res.status(upstream.status);
-
-      // Try JSON; if it fails, return raw
-      try{
-        const json = JSON.parse(bodyText);
-        return res.json(json);
-      }catch(e){
-        logger.warn("Upstream non-JSON response", { url, status: upstream.status });
-        return res.send(bodyText);
-      }
-    }catch(err){
-      logger.error("etherscanProxy error", err);
-      return res.status(500).json({ status:"0", message:"SERVER_ERROR", result: String(err?.message || err) });
+    for (const [k, v] of Object.entries(req.query || {})) {
+      if (typeof v === "undefined") continue;
+      const val = Array.isArray(v) ? v[0] : v;
+      url.searchParams.set(k, String(val));
     }
+
+    if (!url.searchParams.get("apikey")) {
+      if (!ETHERSCAN_API_KEY) {
+        return res.status(500).json({
+          status: "0",
+          message: "Missing ETHERSCAN_API_KEY in Cloud Function env/config",
+          result: ""
+        });
+      }
+      url.searchParams.set("apikey", ETHERSCAN_API_KEY);
+    }
+
+    const r = await fetch(url.toString(), { method: "GET" });
+    const text = await r.text();
+
+    res.status(r.status).set("Content-Type", "application/json").send(text);
+  } catch (e) {
+    logger.error("etherscanProxy error", e);
+    res.status(500).json({ status: "0", message: "Proxy error", result: String(e?.message || e) });
   }
-);
+});

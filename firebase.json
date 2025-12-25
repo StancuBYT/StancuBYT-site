@@ -1,6 +1,7 @@
 {
-  "functions": {
-    "source": "functions"
-  }
+  "functions": [
+    {
+      "source": "functions"
+    }
+  ]
 }
-

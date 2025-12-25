@@ -1227,6 +1227,171 @@
             <h1>StancuBYT Token</h1>
             <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
+                <!-- Live Token Metrics -->
+<div class="token-metrics">
+    <h2>📊 Metrici Live</h2>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Preț curent</div>
+            <div class="metric-value" id="livePrice">-</div>
+            <div class="metric-change" id="priceChange24h">-</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Market Cap</div>
+            <div class="metric-value" id="marketCap">-</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Total Supply</div>
+            <div class="metric-value" id="totalSupply">-</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Holders</div>
+            <div class="metric-value" id="holdersCount">-</div>
+        </div>
+    </div>
+    <small id="lastUpdate" style="opacity:0.7;">Se încarcă datele...</small>
+</div>
+
+<style>
+.token-metrics {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 102, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.metric-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(0, 102, 255, 0.1);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--green-growth);
+}
+
+.metric-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--neon-cyan);
+    margin-bottom: 0.5rem;
+}
+
+.metric-change {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.positive {
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.negative {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+}
+</style>
+
+<script>
+const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
+const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
+
+async function fetchTokenSupply() {
+    const url = `https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${CONTRACT_ADDRESS}&apikey=${ETHERSCAN_API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.status === '1') {
+        const supply = parseInt(data.result) / 10 ** 18;
+        return supply.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+    }
+    return '-';
+}
+
+async function fetchHolders() {
+    const url = `https://api.etherscan.io/api?module=token&action=tokenholderlist&contractaddress=${CONTRACT_ADDRESS}&page=1&offset=1&apikey=${ETHERSCAN_API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.status === '1' && data.result.length > 0) {
+        return data.result[0].TokenHolderCount.toLocaleString('ro-RO');
+    }
+    return '-';
+}
+
+async function fetchMarketData() {
+    const url = `https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.pairs && data.pairs.length > 0) {
+        const pair = data.pairs[0];
+        return {
+            price: pair.priceUsd,
+            change24h: pair.priceChange?.h24 || 0,
+            marketCap: pair.fdv || 0
+        };
+    }
+    return null;
+}
+
+async function updateTokenMetrics() {
+    try {
+        // Fetch supply & holders from Etherscan
+        const supply = await fetchTokenSupply();
+        const holders = await fetchHolders();
+
+        // Fetch price & market cap from DexScreener
+        const marketData = await fetchMarketData();
+
+        // Update UI
+        document.getElementById('totalSupply').textContent = supply + ' SBYT';
+        document.getElementById('holdersCount').textContent = holders;
+
+        if (marketData) {
+            const price = parseFloat(marketData.price);
+            const change = parseFloat(marketData.change24h);
+            const marketCap = parseFloat(marketData.marketCap);
+
+            document.getElementById('livePrice').textContent = '$' + price.toFixed(8);
+            document.getElementById('marketCap').textContent = '$' + marketCap.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+
+            const changeEl = document.getElementById('priceChange24h');
+            changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '% (24h)';
+            changeEl.className = change >= 0 ? 'metric-change positive' : 'metric-change negative';
+        }
+
+        document.getElementById('lastUpdate').textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO');
+    } catch (error) {
+        console.error('Eroare la încărcarea datelor:', error);
+        document.getElementById('lastUpdate').textContent = 'Eroare la încărcare. Reîncarcă pagina.';
+    }
+}
+
+// Update la încărcarea paginii și apoi la fiecare 30s
+window.addEventListener('load', updateTokenMetrics);
+setInterval(updateTokenMetrics, 30000);
+</script>
             </p>
             
             <!-- Live Price Display -->
