@@ -1169,6 +1169,85 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+/* --- STANCUBYT: Prezentare page fixes --- */
+.hero-price{
+  margin-top:10px;
+  display:inline-block;
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-weight:700;
+}
+.news-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap:16px;
+}
+.news-card{
+  position:relative;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  min-height:160px;
+}
+.news-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.65));
+  z-index:0;
+}
+.news-card-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  z-index:0;
+}
+.news-card-content{
+  position:relative;
+  z-index:1;
+  padding:16px;
+}
+.news-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.25);
+  font-weight:700;
+  font-size:12px;
+}
+.news-title{
+  margin:10px 0 8px 0;
+  font-size:18px;
+  font-weight:800;
+  line-height:1.2;
+}
+.news-meta{
+  opacity:.85;
+  font-size:12px;
+  margin-bottom:10px;
+}
+.news-text{
+  opacity:.92;
+  font-size:14px;
+  line-height:1.45;
+  white-space:pre-wrap;
+}
+.news-actions{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1202,128 +1281,7 @@
 
 </div>
 </div>
-</nav><section class="page-section active-section" id="prezentare">
-<!-- Logo Background 3D -->
-<div class="hero-logo-bg">
-<div class="logo-3d-bg">
-<img alt="StancuBYT Logo Background" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-</div>
-<div class="hero">
-<h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
-                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
-            </p>
-<!-- Live Price Display -->
-<div id="livePriceDisplay" style="margin: 2rem 0;">
-<div class="price-display" id="currentPrice">Se încarcă...</div>
-<div class="price-change" id="priceChange"></div>
-<small id="lastUpdated">Ultima actualizare: --:--:--</small>
-</div>
-<!-- Buton Uniswap -->
-<a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
-                🔄 Tranzacționează pe Uniswap
-            </a>
-<a class="uniswap-btn" href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&amp;utm_medium=referral&amp;utm_campaign=searchresults" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));" target="_blank">
-                🦎 Vizualizează și Tranzacționează pe GeckoTerminal
-            </a>
-<div class="token-info-grid">
-<div class="info-card neon-glow">
-<h3>🔗 Contract Address</h3>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;" target="_blank">
-                        0x44Cf220399be798baeaE45fd7C4fF44623713833
-                    </a>
-<small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
-</div>
-<div class="info-card neon-glow">
-<h3>💰 Total Supply REAL</h3>
-<p id="mainTotalSupply" style="font-size: 2rem; font-weight: bold; color: var(--green-growth);">
-<span id="supplyValue">Se încarcă...</span> SBYT
-                    </p>
-<small style="color: #888;">Date live de pe Etherscan</small>
-</div>
-<div class="info-card neon-glow">
-<h3>🏆 Fondator</h3>
-<p style="font-size: 1.2rem; margin-top: 1rem;">
-                        Stancu Marian
-                    </p>
-</div>
-</div>
-<!-- SECTIUNE NOUTATI -->
-<div class="news-section">
-<div class="news-header">
-<h2 class="news-title">
-<span>📢</span> Noutăți &amp; Anunțuri
-                    </h2>
-<div class="news-controls">
-<button class="news-btn" onclick="requestPassword('add')">➕ Adaugă știre</button>
-<button class="news-btn" onclick="requestPassword('clear')">🗑️ Șterge toate</button>
-</div>
-</div>
-<div class="news-grid" id="newsContainer">
-<!-- Noutățile vor fi adăugate aici dinamic -->
-</div>
-<!-- Formular pentru adăugare știri -->
-<div class="news-form" id="newsForm" style="display: none;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
-<div class="form-row">
-<input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
-<select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
-</select>
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
-                            Fixează această știre
-                        </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
-                    ✅ Date încărcate de pe Etherscan
-                </div>
-</div>
-</div>
-<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">
-    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
-    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
-  </p>
-</section>
+</nav>
 </section><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
 <style>
@@ -2532,128 +2490,7 @@
 </div>
 </nav>
 <!-- Prezentare Section -->
-<section class="page-section active-section" id="prezentare">
-<!-- Logo Background 3D -->
-<div class="hero-logo-bg">
-<div class="logo-3d-bg">
-<img alt="StancuBYT Logo Background" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-</div>
-<div class="hero">
-<h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
-                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
-            </p>
-<!-- Live Price Display -->
-<div id="livePriceDisplay" style="margin: 2rem 0;">
-<div class="price-display" id="currentPrice">Se încarcă...</div>
-<div class="price-change" id="priceChange"></div>
-<small id="lastUpdated">Ultima actualizare: --:--:--</small>
-</div>
-<!-- Buton Uniswap -->
-<a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
-                🔄 Tranzacționează pe Uniswap
-            </a>
-<a class="uniswap-btn" href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&amp;utm_medium=referral&amp;utm_campaign=searchresults" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));" target="_blank">
-                🦎 Vizualizează și Tranzacționează pe GeckoTerminal
-            </a>
-<div class="token-info-grid">
-<div class="info-card neon-glow">
-<h3>🔗 Contract Address</h3>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;" target="_blank">
-                        0x44Cf220399be798baeaE45fd7C4fF44623713833
-                    </a>
-<small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
-</div>
-<div class="info-card neon-glow">
-<h3>💰 Total Supply REAL</h3>
-<p id="mainTotalSupply" style="font-size: 2rem; font-weight: bold; color: var(--green-growth);">
-<span id="supplyValue">Se încarcă...</span> SBYT
-                    </p>
-<small style="color: #888;">Date live de pe Etherscan</small>
-</div>
-<div class="info-card neon-glow">
-<h3>🏆 Fondator</h3>
-<p style="font-size: 1.2rem; margin-top: 1rem;">
-                        Stancu Marian
-                    </p>
-</div>
-</div>
-<!-- SECTIUNE NOUTATI -->
-<div class="news-section">
-<div class="news-header">
-<h2 class="news-title">
-<span>📢</span> Noutăți &amp; Anunțuri
-                    </h2>
-<div class="news-controls">
-<button class="news-btn" onclick="requestPassword('add')">➕ Adaugă știre</button>
-<button class="news-btn" onclick="requestPassword('clear')">🗑️ Șterge toate</button>
-</div>
-</div>
-<div class="news-grid" id="newsContainer">
-<!-- Noutățile vor fi adăugate aici dinamic -->
-</div>
-<!-- Formular pentru adăugare știri -->
-<div class="news-form" id="newsForm" style="display: none;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
-<div class="form-row">
-<input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
-<select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
-</select>
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
-                            Fixează această știre
-                        </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
-                    ✅ Date încărcate de pe Etherscan
-                </div>
-</div>
-</div>
-<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email">
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password">
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</input></input></div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">
-    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
-    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
-  </p>
-</section>
+
 </section>
 <!-- Statistici Section -->
 <section class="page-section" id="statistici">
@@ -2684,7 +2521,7 @@
 <div class="loading" id="priceData">Se încarcă datele live...</div>
 </div>
 <div class="data-visualization neon-glow">
-<h3>📊 Metrici Contract - coinmarketcap LIVE</h3>
+<h3>📊 Metrici Contract - </h3>
 <div class="stats-grid" id="etherscanStats">
 <div class="stat-item">
 <div>Holders</div>
@@ -4100,7 +3937,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
                 try { await updateLivePriceAndStats(); } catch(e){ console.warn('Dex price failed', e); }
                 try { await updateChart(currentPeriod); } catch(e){ console.warn('Chart update failed', e); }
 
-setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
+setStatusHtml('<span class="status-online"></span>');
 
                 if (refreshBtn) {
                     refreshBtn.classList.remove('loading');
@@ -5542,7 +5379,7 @@ window.addEventListener('load', () => {
     container.appendChild(iframe);
 
     const live = $('lastUpdated');
-    if (live) live.textContent = 'coinmarketcap LIVE';
+    if (live) live.textContent = '';
   }
 
   // ---------- Init ----------
@@ -7148,4 +6985,352 @@ service cloud.firestore {
 </script>
 <script>
 function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
-</script></body></body></html>
+</script>
+<script>
+(function(){
+  const TOKEN_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+
+  async function fetchTokenPriceUSD(){
+    try{
+      const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${TOKEN_ADDRESS}`);
+      const j = await r.json();
+      const pairs = (j && j.pairs) ? j.pairs : [];
+      const ethPairs = pairs.filter(p => (p.chainId||"").toLowerCase().includes("eth"));
+      const best = (ethPairs[0] || pairs[0]);
+      const priceUsd = best ? best.priceUsd : null;
+      if(priceUsd){
+        const v = Number(priceUsd);
+        const txt = isFinite(v) ? v.toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:8}) : priceUsd;
+        const el = document.getElementById("tokenPriceHero");
+        if(el) el.textContent = txt;
+      }
+    }catch(e){}
+  }
+
+  async function fetchTotalSupplyReal(){
+    try{
+      const keyEl = (typeof ETHERSCAN_API_KEY !== "undefined") ? ETHERSCAN_API_KEY : "";
+      const url = `https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${TOKEN_ADDRESS}${keyEl?`&apikey=${keyEl}`:""}`;
+      const r = await fetch(url);
+      const j = await r.json();
+      if(j && j.status === "1" && j.result){
+        const supply = Number(j.result) / 1e18;
+        const el = document.getElementById("totalSupplyReal");
+        if(el) el.textContent = supply.toLocaleString(undefined,{maximumFractionDigits:0});
+      }
+    }catch(e){}
+  }
+
+  const get = (k)=>window[k];
+
+  async function bumpVisitCounter(){
+    try{
+      const db = get("db"), doc = get("doc"), getDoc = get("getDoc"), setDoc = get("setDoc"),
+            updateDoc = get("updateDoc"), increment = get("increment"), serverTimestamp = get("serverTimestamp"),
+            onSnapshot = get("onSnapshot");
+      if(!db||!doc||!getDoc||!setDoc||!updateDoc||!increment) return;
+
+      const ref = doc(db, "site_meta", "visits");
+      const snap = await getDoc(ref);
+      if(!snap.exists()){
+        await setDoc(ref, { count: 1, updatedAt: serverTimestamp ? serverTimestamp() : new Date() });
+      }else{
+        await updateDoc(ref, { count: increment(1), updatedAt: serverTimestamp ? serverTimestamp() : new Date() });
+      }
+      if(onSnapshot){
+        onSnapshot(ref, (s)=>{
+          const d = s.data() || {};
+          const el = document.getElementById("visitCount");
+          if(el && typeof d.count !== "undefined") el.textContent = d.count;
+        });
+      }
+    }catch(e){}
+  }
+
+  function escapeHtml(str){
+    return String(str||"")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+
+  function renderNews(items){
+    const container = document.getElementById("newsContainer") || document.getElementById("newsList") || document.querySelector(".news-grid");
+    if(!container) return;
+    container.classList.add("news-grid");
+    container.innerHTML = "";
+    items.forEach(({id,data})=>{
+      const type = data.type || "Stire";
+      const emoji = data.emoji || "";
+      const title = data.title || "";
+      const content = data.content || "";
+      const createdAt = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate() : (data.createdAt ? new Date(data.createdAt) : null);
+      const when = createdAt ? createdAt.toLocaleString() : "";
+
+      const card = document.createElement("div");
+      card.className = "news-card";
+      if(data.imageUrl){
+        const bg = document.createElement("div");
+        bg.className = "news-card-bg";
+        bg.style.backgroundImage = `url('${data.imageUrl}')`;
+        card.appendChild(bg);
+      }
+      const inner = document.createElement("div");
+      inner.className = "news-card-content";
+      inner.innerHTML = `
+        <div class="news-badge">${escapeHtml(type)}</div>
+        <div class="news-title">${emoji ? escapeHtml(emoji)+" " : ""}${escapeHtml(title)}</div>
+        <div class="news-meta">${escapeHtml(when)}</div>
+        <div class="news-text">${escapeHtml(content)}</div>
+      `;
+      if(window.__isAdmin){
+        const actions = document.createElement("div");
+        actions.className = "news-actions";
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "btn btn-danger";
+        del.textContent = "Sterge";
+        del.addEventListener("click", async ()=>{
+          const db = get("db"), deleteDoc = get("deleteDoc"), doc = get("doc");
+          if(!db||!deleteDoc||!doc) return;
+          await deleteDoc(doc(db,"news",id));
+        });
+        actions.appendChild(del);
+        inner.appendChild(actions);
+      }
+      card.appendChild(inner);
+      container.appendChild(card);
+    });
+  }
+
+  async function wireNews(){
+    try{
+      const db = get("db"), collection = get("collection"), query = get("query"), orderBy = get("orderBy"),
+            onSnapshot = get("onSnapshot"), addDoc = get("addDoc"), serverTimestamp = get("serverTimestamp"),
+            getAuth = get("getAuth"), onAuthStateChanged = get("onAuthStateChanged"),
+            getStorage = get("getStorage"), ref = get("ref"), uploadBytes = get("uploadBytes"), getDownloadURL = get("getDownloadURL");
+      if(!db||!collection||!query||!orderBy||!onSnapshot) return;
+
+      const q = query(collection(db,"news"), orderBy("createdAt","desc"));
+      onSnapshot(q, (snap)=>{
+        const items=[];
+        snap.forEach(d=>items.push({id:d.id,data:d.data()}));
+        renderNews(items);
+      });
+
+      if(getAuth && onAuthStateChanged){
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user)=>{ window.__isAdmin = !!user; });
+      }
+
+      const form = document.getElementById("addNewsForm");
+      if(form && addDoc){
+        form.addEventListener("submit", async (e)=>{
+          e.preventDefault();
+          const fd = new FormData(form);
+          const title = (fd.get("title")||"").toString().trim();
+          const content = (fd.get("content")||"").toString().trim();
+          const type = (fd.get("type")||"Stire").toString().trim();
+          const emoji = (fd.get("emoji")||"").toString().trim();
+          let imageUrl = "";
+          const file = fd.get("newsImage");
+          if(file && file instanceof File && file.size>0 && getStorage && ref && uploadBytes && getDownloadURL){
+            const st = getStorage();
+            const path = `news_images/${Date.now()}_${file.name}`;
+            const rref = ref(st, path);
+            await uploadBytes(rref, file);
+            imageUrl = await getDownloadURL(rref);
+          }
+          if(!title || !content) return;
+          await addDoc(collection(db,"news"), {
+            title, content, type, emoji,
+            imageUrl,
+            createdAt: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+          });
+          form.reset();
+        });
+      }
+    }catch(e){}
+  }
+
+  fetchTokenPriceUSD();
+  fetchTotalSupplyReal();
+  bumpVisitCounter();
+  wireNews();
+})();
+</script>
+
+</body>
+<script>
+(function(){
+  const TOKEN_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+
+  async function fetchTokenPriceUSD(){
+    try{
+      const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${TOKEN_ADDRESS}`);
+      const j = await r.json();
+      const pairs = (j && j.pairs) ? j.pairs : [];
+      const ethPairs = pairs.filter(p => (p.chainId||"").toLowerCase().includes("eth"));
+      const best = (ethPairs[0] || pairs[0]);
+      const priceUsd = best ? best.priceUsd : null;
+      if(priceUsd){
+        const v = Number(priceUsd);
+        const txt = isFinite(v) ? v.toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:8}) : priceUsd;
+        const el = document.getElementById("tokenPriceHero");
+        if(el) el.textContent = txt;
+      }
+    }catch(e){}
+  }
+
+  async function fetchTotalSupplyReal(){
+    try{
+      const keyEl = (typeof ETHERSCAN_API_KEY !== "undefined") ? ETHERSCAN_API_KEY : "";
+      const url = `https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${TOKEN_ADDRESS}${keyEl?`&apikey=${keyEl}`:""}`;
+      const r = await fetch(url);
+      const j = await r.json();
+      if(j && j.status === "1" && j.result){
+        const supply = Number(j.result) / 1e18;
+        const el = document.getElementById("totalSupplyReal");
+        if(el) el.textContent = supply.toLocaleString(undefined,{maximumFractionDigits:0});
+      }
+    }catch(e){}
+  }
+
+  const get = (k)=>window[k];
+
+  async function bumpVisitCounter(){
+    try{
+      const db = get("db"), doc = get("doc"), getDoc = get("getDoc"), setDoc = get("setDoc"),
+            updateDoc = get("updateDoc"), increment = get("increment"), serverTimestamp = get("serverTimestamp"),
+            onSnapshot = get("onSnapshot");
+      if(!db||!doc||!getDoc||!setDoc||!updateDoc||!increment) return;
+
+      const ref = doc(db, "site_meta", "visits");
+      const snap = await getDoc(ref);
+      if(!snap.exists()){
+        await setDoc(ref, { count: 1, updatedAt: serverTimestamp ? serverTimestamp() : new Date() });
+      }else{
+        await updateDoc(ref, { count: increment(1), updatedAt: serverTimestamp ? serverTimestamp() : new Date() });
+      }
+      if(onSnapshot){
+        onSnapshot(ref, (s)=>{
+          const d = s.data() || {};
+          const el = document.getElementById("visitCount");
+          if(el && typeof d.count !== "undefined") el.textContent = d.count;
+        });
+      }
+    }catch(e){}
+  }
+
+  function escapeHtml(str){
+    return String(str||"")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+
+  function renderNews(items){
+    const container = document.getElementById("newsContainer") || document.getElementById("newsList") || document.querySelector(".news-grid");
+    if(!container) return;
+    container.classList.add("news-grid");
+    container.innerHTML = "";
+    items.forEach(({id,data})=>{
+      const type = data.type || "Stire";
+      const emoji = data.emoji || "";
+      const title = data.title || "";
+      const content = data.content || "";
+      const createdAt = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate() : (data.createdAt ? new Date(data.createdAt) : null);
+      const when = createdAt ? createdAt.toLocaleString() : "";
+
+      const card = document.createElement("div");
+      card.className = "news-card";
+      if(data.imageUrl){
+        const bg = document.createElement("div");
+        bg.className = "news-card-bg";
+        bg.style.backgroundImage = `url('${data.imageUrl}')`;
+        card.appendChild(bg);
+      }
+      const inner = document.createElement("div");
+      inner.className = "news-card-content";
+      inner.innerHTML = `
+        <div class="news-badge">${escapeHtml(type)}</div>
+        <div class="news-title">${emoji ? escapeHtml(emoji)+" " : ""}${escapeHtml(title)}</div>
+        <div class="news-meta">${escapeHtml(when)}</div>
+        <div class="news-text">${escapeHtml(content)}</div>
+      `;
+      if(window.__isAdmin){
+        const actions = document.createElement("div");
+        actions.className = "news-actions";
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "btn btn-danger";
+        del.textContent = "Sterge";
+        del.addEventListener("click", async ()=>{
+          const db = get("db"), deleteDoc = get("deleteDoc"), doc = get("doc");
+          if(!db||!deleteDoc||!doc) return;
+          await deleteDoc(doc(db,"news",id));
+        });
+        actions.appendChild(del);
+        inner.appendChild(actions);
+      }
+      card.appendChild(inner);
+      container.appendChild(card);
+    });
+  }
+
+  async function wireNews(){
+    try{
+      const db = get("db"), collection = get("collection"), query = get("query"), orderBy = get("orderBy"),
+            onSnapshot = get("onSnapshot"), addDoc = get("addDoc"), serverTimestamp = get("serverTimestamp"),
+            getAuth = get("getAuth"), onAuthStateChanged = get("onAuthStateChanged"),
+            getStorage = get("getStorage"), ref = get("ref"), uploadBytes = get("uploadBytes"), getDownloadURL = get("getDownloadURL");
+      if(!db||!collection||!query||!orderBy||!onSnapshot) return;
+
+      const q = query(collection(db,"news"), orderBy("createdAt","desc"));
+      onSnapshot(q, (snap)=>{
+        const items=[];
+        snap.forEach(d=>items.push({id:d.id,data:d.data()}));
+        renderNews(items);
+      });
+
+      if(getAuth && onAuthStateChanged){
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user)=>{ window.__isAdmin = !!user; });
+      }
+
+      const form = document.getElementById("addNewsForm");
+      if(form && addDoc){
+        form.addEventListener("submit", async (e)=>{
+          e.preventDefault();
+          const fd = new FormData(form);
+          const title = (fd.get("title")||"").toString().trim();
+          const content = (fd.get("content")||"").toString().trim();
+          const type = (fd.get("type")||"Stire").toString().trim();
+          const emoji = (fd.get("emoji")||"").toString().trim();
+          let imageUrl = "";
+          const file = fd.get("newsImage");
+          if(file && file instanceof File && file.size>0 && getStorage && ref && uploadBytes && getDownloadURL){
+            const st = getStorage();
+            const path = `news_images/${Date.now()}_${file.name}`;
+            const rref = ref(st, path);
+            await uploadBytes(rref, file);
+            imageUrl = await getDownloadURL(rref);
+          }
+          if(!title || !content) return;
+          await addDoc(collection(db,"news"), {
+            title, content, type, emoji,
+            imageUrl,
+            createdAt: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+          });
+          form.reset();
+        });
+      }
+    }catch(e){}
+  }
+
+  fetchTokenPriceUSD();
+  fetchTotalSupplyReal();
+  bumpVisitCounter();
+  wireNews();
+})();
+</script>
+
+</body></html>
