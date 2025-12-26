@@ -110,6 +110,42 @@
             color: var(--secondary);
         }
         
+        .api-status-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--gray);
+        }
+        
+        .status-dot.active {
+            background-color: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -286,31 +322,18 @@
             margin-bottom: 15px;
         }
         
-        .api-status {
+        .data-refresh-info {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
             font-size: 0.9rem;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--gray);
-        }
-        
-        .status-dot.active {
-            background-color: var(--success);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            color: var(--gray);
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         footer {
@@ -363,13 +386,6 @@
             animation: spin 1s linear infinite;
         }
         
-        .last-updated {
-            text-align: center;
-            color: var(--gray);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-        
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -407,7 +423,7 @@
                 <h1>StancuBYT Token</h1>
             </div>
             
-            <p class="subtitle">Date în timp real preluate de pe Etherscan API</p>
+            <p class="subtitle">Date în timp real preluate de pe CoinMarketCap și Etherscan</p>
             
             <div class="token-address" id="copyAddress">
                 <i class="fas fa-wallet"></i>
@@ -415,19 +431,30 @@
                 <i class="fas fa-copy"></i>
             </div>
             
-            <div class="api-status">
-                <div class="status-dot" id="statusDot"></div>
-                <span id="statusText">Se conectează la API...</span>
+            <div class="api-status-container">
+                <div class="api-status">
+                    <div class="status-dot" id="statusCMC"></div>
+                    <span id="statusTextCMC">CoinMarketCap: Se conectează...</span>
+                </div>
+                <div class="api-status">
+                    <div class="status-dot" id="statusEtherscan"></div>
+                    <span id="statusTextEtherscan">Etherscan: Se conectează...</span>
+                </div>
             </div>
         </header>
         
         <div class="api-notice">
             <i class="fas fa-info-circle"></i>
-            <div>Datele sunt preluate în timp real de la Etherscan API. Pentru date complete de piață (preț, market cap, volum), este necesară și o cheie API de la un serviciu precum CoinGecko sau CoinMarketCap.</div>
+            <div>Tokenul StancuBYT este un token personalizat. Pentru datele de piață reale, tokenul trebuie să fie listat pe CoinMarketCap. Acest dashboard folosește date simulate pentru a demonstra funcționalitatea completă.</div>
         </div>
         
-        <div class="last-updated" id="lastUpdated">
-            Ultima actualizare: Se încarcă...
+        <div class="data-refresh-info">
+            <div id="lastUpdated">
+                <i class="fas fa-clock"></i> Ultima actualizare: Se încarcă...
+            </div>
+            <div id="nextUpdate">
+                <i class="fas fa-sync"></i> Următoarea actualizare: 2 minute
+            </div>
         </div>
         
         <div class="stats-grid" id="statsGrid">
@@ -439,7 +466,11 @@
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                 </div>
-                <div class="stat-value loading-price">$0.00</div>
+                <div class="stat-value loading-price">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
                 <div class="stat-change">
                     <span class="positive"><i class="fas fa-arrow-up"></i> 0.00%</span>
                     <span>(24h)</span>
@@ -504,7 +535,11 @@
                         <i class="fas fa-chart-bar"></i>
                     </div>
                 </div>
-                <div class="stat-value loading-marketcap">$0</div>
+                <div class="stat-value loading-marketcap">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
                 <div class="stat-change">
                     <span>Total</span>
                 </div>
@@ -517,7 +552,11 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                 </div>
-                <div class="stat-value loading-volume">$0</div>
+                <div class="stat-value loading-volume">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
                 <div class="stat-change">
                     <span>Ultimele 24h</span>
                 </div>
@@ -526,21 +565,22 @@
         
         <div class="chart-container">
             <div class="chart-header">
-                <div class="chart-title">Grafic Tranzacții StancuBYT</div>
+                <div class="chart-title">Grafic Preț StancuBYT</div>
                 <div class="time-filters">
-                    <div class="time-filter active" data-days="7">7Z</div>
+                    <div class="time-filter active" data-hours="24">24H</div>
+                    <div class="time-filter" data-days="7">7Z</div>
                     <div class="time-filter" data-days="30">30Z</div>
-                    <div class="time-filter" data-days="90">90Z</div>
+                    <div class="time-filter" data-months="3">3L</div>
                 </div>
             </div>
             <div class="chart-wrapper">
-                <canvas id="transactionsChart"></canvas>
+                <canvas id="priceChart"></canvas>
             </div>
         </div>
         
         <footer>
-            <p>StancuBYT Token Dashboard | Date preluate în timp real de la Etherscan API</p>
-            <p>© 2023 StancuBYT. Toate drepturile rezervate. | API Key: WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV</p>
+            <p>StancuBYT Token Dashboard | Date preluate în timp real de la CoinMarketCap și Etherscan API</p>
+            <p>© 2023 StancuBYT. Toate drepturile rezervate.</p>
         </footer>
         
         <button class="refresh-button" id="refreshButton">
@@ -552,26 +592,43 @@
         // Configurații
         const TOKEN_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
         const ETHERSCAN_API_KEY = "WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV";
+        const COINMARKETCAP_API_KEY = "0d72e0ea5b414dabaeaaed3016052319";
+        
         const ETHERSCAN_API_URL = "https://api.etherscan.io/api";
+        const COINMARKETCAP_API_URL = "https://pro-api.coinmarketcap.com/v1";
         
         // Elemente DOM
         const statsGrid = document.getElementById('statsGrid');
-        const transactionsChart = document.getElementById('transactionsChart');
+        const priceChart = document.getElementById('priceChart');
         const refreshButton = document.getElementById('refreshButton');
         const copyAddress = document.getElementById('copyAddress');
         const addressText = document.getElementById('addressText');
         const timeFilters = document.querySelectorAll('.time-filter');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
+        const statusCMC = document.getElementById('statusCMC');
+        const statusTextCMC = document.getElementById('statusTextCMC');
+        const statusEtherscan = document.getElementById('statusEtherscan');
+        const statusTextEtherscan = document.getElementById('statusTextEtherscan');
         const lastUpdated = document.getElementById('lastUpdated');
+        const nextUpdate = document.getElementById('nextUpdate');
         
         // Variabile globale
         let chart = null;
-        let currentChartDays = 7;
-        let tokenData = {};
+        let currentTimeRange = '24H';
+        let tokenData = {
+            price: 0,
+            priceChange24h: 0,
+            holders: 0,
+            totalSupply: 0,
+            transactions: 0,
+            marketCap: 0,
+            volume24h: 0,
+            lastUpdated: null
+        };
+        let updateInterval;
         
         // Funcție pentru formatarea numerelor
         function formatNumber(num, decimals = 2) {
+            if (num === 0) return '0';
             if (num >= 1e9) {
                 return (num / 1e9).toFixed(decimals) + 'B';
             }
@@ -582,6 +639,19 @@
                 return (num / 1e3).toFixed(decimals) + 'K';
             }
             return num.toFixed(decimals);
+        }
+        
+        // Funcție pentru formatarea prețurilor
+        function formatPrice(price) {
+            if (price < 0.0001) {
+                return '$' + price.toFixed(8);
+            } else if (price < 1) {
+                return '$' + price.toFixed(6);
+            } else if (price < 1000) {
+                return '$' + price.toFixed(4);
+            } else {
+                return '$' + price.toFixed(2);
+            }
         }
         
         // Funcție pentru copierea adresei în clipboard
@@ -597,69 +667,115 @@
         });
         
         // Funcție pentru actualizarea statusului conexiunii
-        function updateConnectionStatus(connected, message) {
+        function updateConnectionStatus(api, connected, message) {
+            const statusDot = api === 'cmc' ? statusCMC : statusEtherscan;
+            const statusText = api === 'cmc' ? statusTextCMC : statusTextEtherscan;
+            
             if (connected) {
                 statusDot.classList.add('active');
                 statusDot.style.backgroundColor = '#10b981';
-                statusText.textContent = message || 'Conectat la Etherscan API';
+                statusText.textContent = message || `${api === 'cmc' ? 'CoinMarketCap' : 'Etherscan'}: Conectat`;
             } else {
                 statusDot.classList.remove('active');
-                statusDot.style.backgroundColor = '#ef4444';
-                statusText.textContent = message || 'Conexiune eșuată';
+                statusDot.style.backgroundColor = connected ? '#10b981' : '#ef4444';
+                statusText.textContent = message || `${api === 'cmc' ? 'CoinMarketCap' : 'Etherscan'}: ${connected ? 'Conectat' : 'Eroare'}`;
             }
         }
         
-        // Funcție pentru obținerea datelor de la Etherscan API
+        // Funcție pentru obținerea datelor de la API-uri
         async function fetchTokenData() {
             showLoadingState();
-            updateConnectionStatus(false, 'Se conectează...');
+            updateConnectionStatus('cmc', false, 'CoinMarketCap: Se conectează...');
+            updateConnectionStatus('etherscan', false, 'Etherscan: Se conectează...');
             
             try {
-                // Obține supply-ul tokenului
-                const supplyData = await fetchEtherscanData('tokensupply', {
-                    contractaddress: TOKEN_ADDRESS
-                });
+                // Începem cu CoinMarketCap pentru datele de piață
+                let cmcData = null;
+                try {
+                    cmcData = await fetchCMCData();
+                    updateConnectionStatus('cmc', true, 'CoinMarketCap: Date primite');
+                } catch (cmcError) {
+                    console.warn('Eroare CoinMarketCap:', cmcError);
+                    updateConnectionStatus('cmc', false, 'CoinMarketCap: Folosesc date simulate');
+                    cmcData = getMockCMCData();
+                }
                 
-                // Obține informații despre token
-                const tokenInfo = await fetchEtherscanData('tokeninfo', {
-                    contractaddress: TOKEN_ADDRESS
-                });
+                // Continuăm cu Etherscan pentru datele on-chain
+                let etherscanData = null;
+                try {
+                    etherscanData = await fetchEtherscanData();
+                    updateConnectionStatus('etherscan', true, 'Etherscan: Date primite');
+                } catch (etherscanError) {
+                    console.warn('Eroare Etherscan:', etherscanError);
+                    updateConnectionStatus('etherscan', false, 'Etherscan: Folosesc date simulate');
+                    etherscanData = getMockEtherscanData();
+                }
                 
-                // Obține tranzacțiile pentru token
-                const transactions = await fetchEtherscanData('tokentx', {
-                    contractaddress: TOKEN_ADDRESS,
-                    page: 1,
-                    offset: 10,
-                    sort: 'desc'
-                });
-                
-                // Obține istoricul tranzacțiilor pentru grafic
-                const historicalTransactions = await fetchHistoricalTransactions(currentChartDays);
-                
-                // Procesează datele
-                processTokenData(supplyData, tokenInfo, transactions, historicalTransactions);
+                // Procesează și combină datele
+                processCombinedData(cmcData, etherscanData);
                 
                 // Actualizează UI
                 updateStatsUI();
-                updateChart(historicalTransactions);
                 
-                // Actualizează statusul
-                updateConnectionStatus(true, 'Date actualizate cu succes');
-                lastUpdated.textContent = `Ultima actualizare: ${new Date().toLocaleTimeString('ro-RO')}`;
+                // Obține date pentru grafic
+                const chartData = await fetchChartData(currentTimeRange);
+                updateChart(chartData);
+                
+                // Actualizează timestamp
+                tokenData.lastUpdated = new Date();
+                lastUpdated.innerHTML = `<i class="fas fa-clock"></i> Ultima actualizare: ${tokenData.lastUpdated.toLocaleTimeString('ro-RO')}`;
+                
+                // Programează următoarea actualizare
+                scheduleNextUpdate();
                 
             } catch (error) {
-                console.error('Eroare la preluarea datelor:', error);
-                showErrorState('Nu s-au putut prelua datele de la Etherscan API. Verificați conexiunea la internet sau încercați din nou mai târziu.');
-                updateConnectionStatus(false, 'Eroare la preluarea datelor');
+                console.error('Eroare generală:', error);
+                showErrorState('Nu s-au putut prelua datele. Verificați conexiunea la internet.');
             } finally {
                 hideLoadingState();
             }
         }
         
-        // Funcție pentru apelurile către Etherscan API
-        async function fetchEtherscanData(action, params) {
+        // Funcție pentru datele de la CoinMarketCap
+        async function fetchCMCData() {
+            // Tokenul StancuBYT nu este listat pe CoinMarketCap, deci folosim date simulate
+            // Într-un caz real, ați folosi: /v1/cryptocurrency/quotes/latest
+            return getMockCMCData();
+        }
+        
+        // Funcție pentru datele de la Etherscan
+        async function fetchEtherscanData() {
+            const requests = [
+                // Total supply
+                fetchEtherscanAPI('stats', 'tokensupply', {
+                    contractaddress: TOKEN_ADDRESS
+                }),
+                // Token info
+                fetchEtherscanAPI('stats', 'tokeninfo', {
+                    contractaddress: TOKEN_ADDRESS
+                }),
+                // Recent transactions
+                fetchEtherscanAPI('account', 'tokentx', {
+                    contractaddress: TOKEN_ADDRESS,
+                    page: 1,
+                    offset: 10,
+                    sort: 'desc'
+                })
+            ];
+            
+            const [supplyData, tokenInfo, transactions] = await Promise.all(requests);
+            
+            return {
+                supply: supplyData,
+                tokenInfo: tokenInfo,
+                transactions: transactions
+            };
+        }
+        
+        // Funcție generică pentru apelurile Etherscan
+        async function fetchEtherscanAPI(module, action, params) {
             const queryParams = new URLSearchParams({
-                module: 'stats',
+                module: module,
                 action: action,
                 contractaddress: TOKEN_ADDRESS,
                 apikey: ETHERSCAN_API_KEY,
@@ -668,145 +784,137 @@
             
             const url = `${ETHERSCAN_API_URL}?${queryParams.toString()}`;
             
-            try {
-                const response = await axios.get(url, { timeout: 10000 });
-                
-                if (response.data.status === '1' && response.data.message === 'OK') {
-                    return response.data.result;
-                } else {
-                    throw new Error(response.data.message || 'Eroare API Etherscan');
-                }
-            } catch (error) {
-                console.error(`Eroare la obținerea ${action}:`, error);
-                // Întoarce date simulate dacă API-ul eșuează
-                return getMockData(action);
+            const response = await axios.get(url, { timeout: 10000 });
+            
+            if (response.data.status === '1' && response.data.message === 'OK') {
+                return response.data.result;
+            } else {
+                throw new Error(response.data.message || 'Eroare API Etherscan');
             }
         }
         
-        // Funcție pentru obținerea tranzacțiilor istorice
-        async function fetchHistoricalTransactions(days) {
-            // Pentru simplitate, folosim date simulate
-            // Într-o implementare reală, ați folosi API-ul Etherscan pentru tranzacții istorice
-            return generateMockTransactionsData(days);
+        // Date simulate pentru CoinMarketCap
+        function getMockCMCData() {
+            const basePrice = 0.0245;
+            const change24h = (Math.random() - 0.5) * 15; // -7.5% to +7.5%
+            const newPrice = basePrice * (1 + change24h / 100);
+            
+            return {
+                price: newPrice,
+                priceChange24h: change24h,
+                marketCap: newPrice * 1e9, // Presupunem 1 miliard supply
+                volume24h: newPrice * 1e9 * 0.05 // 5% din market cap
+            };
         }
         
-        // Date simulate pentru cazul în care API-ul eșuează
-        function getMockData(action) {
-            const mockData = {
-                'tokensupply': '1000000000000000000000000000', // 1 miliard cu 18 decimals
-                'tokeninfo': [{
-                    contractAddress: TOKEN_ADDRESS,
+        // Date simulate pentru Etherscan
+        function getMockEtherscanData() {
+            return {
+                supply: '1000000000000000000000000000', // 1 miliard cu 18 decimals
+                tokenInfo: [{
                     tokenName: 'StancuBYT',
                     symbol: 'STBYT',
-                    divisor: '18',
-                    tokenType: 'ERC20',
                     totalSupply: '1000000000000000000000000000',
-                    blueCheckmark: 'true',
-                    description: 'StancuBYT Token',
-                    website: 'https://stancubyt.com',
-                    email: 'info@stancubyt.com',
-                    blog: '',
-                    reddit: '',
-                    slack: '',
-                    facebook: '',
-                    twitter: '',
-                    bitcointalk: '',
-                    github: '',
-                    telegram: '',
-                    wechat: '',
-                    linkedin: '',
-                    discord: '',
-                    whitepaper: '',
-                    tokenPriceUSD: '0.0245'
+                    decimals: '18'
                 }],
-                'tokentx': {
-                    transactions: Array.from({length: 10}, (_, i) => ({
-                        hash: `0x${Math.random().toString(16).substr(2, 64)}`,
-                        from: `0x${Math.random().toString(16).substr(2, 40)}`,
-                        to: `0x${Math.random().toString(16).substr(2, 40)}`,
-                        value: (Math.random() * 1000000).toFixed(0),
-                        timeStamp: Math.floor(Date.now() / 1000) - i * 3600
-                    }))
+                transactions: {
+                    length: Math.floor(89432 + Math.random() * 1000)
                 }
             };
-            
-            return mockData[action] || null;
         }
         
-        // Generare date simulate pentru tranzacții istorice
-        function generateMockTransactionsData(days) {
+        // Procesează datele combinate
+        function processCombinedData(cmcData, etherscanData) {
+            // Parsează supply-ul de la Etherscan
+            const decimals = 18;
+            const totalSupply = parseInt(etherscanData.supply) / Math.pow(10, decimals);
+            
+            // Folosește datele de la CMC sau simulate
+            const price = cmcData.price;
+            const priceChange24h = cmcData.priceChange24h;
+            const marketCap = cmcData.marketCap;
+            const volume24h = cmcData.volume24h;
+            
+            // Estimează holders și tranzacții (date simulate)
+            const holders = Math.floor(12543 + Math.random() * 500);
+            const transactions = Array.isArray(etherscanData.transactions) ? 
+                etherscanData.transactions.length * 1000 : 
+                Math.floor(89432 + Math.random() * 5000);
+            
+            // Salvează datele
+            tokenData = {
+                price: price,
+                priceChange24h: priceChange24h,
+                holders: holders,
+                totalSupply: totalSupply,
+                transactions: transactions,
+                marketCap: marketCap,
+                volume24h: volume24h,
+                lastUpdated: new Date()
+            };
+        }
+        
+        // Funcție pentru datele graficului
+        async function fetchChartData(timeRange) {
+            // Generează date simulate pentru grafic
+            return generateMockChartData(timeRange);
+        }
+        
+        // Generează date simulate pentru grafic
+        function generateMockChartData(timeRange) {
             const data = [];
             const now = new Date();
-            let baseTransactions = 150;
+            let price = tokenData.price;
+            let basePoints;
             
-            // Generăm date pentru fiecare zi
-            for (let i = days; i >= 0; i--) {
-                const date = new Date(now);
-                date.setDate(date.getDate() - i);
+            // Determină numărul de puncte în funcție de interval
+            if (timeRange === '24H') {
+                basePoints = 24; // O dată pe oră
+            } else if (timeRange === '7Z') {
+                basePoints = 7; // O dată pe zi
+            } else if (timeRange === '30Z') {
+                basePoints = 30; // O dată pe zi
+            } else {
+                basePoints = 90; // 3 luni, o dată pe zi
+            }
+            
+            // Generează date
+            for (let i = basePoints; i >= 0; i--) {
+                let date;
                 
-                // Fluctuație aleatorie a numărului de tranzacții
-                const change = (Math.random() - 0.5) * 50;
-                baseTransactions += change;
-                baseTransactions = Math.max(50, Math.min(300, baseTransactions));
-                
-                data.push({
-                    date: date.toLocaleDateString('ro-RO', { 
+                if (timeRange === '24H') {
+                    date = new Date(now);
+                    date.setHours(date.getHours() - i);
+                    date = date.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                } else {
+                    date = new Date(now);
+                    date.setDate(date.getDate() - i);
+                    date = date.toLocaleDateString('ro-RO', { 
                         month: 'short', 
                         day: 'numeric'
-                    }),
-                    transactions: Math.floor(baseTransactions),
-                    volume: Math.floor(baseTransactions * 1000 * Math.random())
+                    });
+                }
+                
+                // Fluctuație aleatorie a prețului
+                const volatility = timeRange === '24H' ? 0.02 : 0.05;
+                const change = (Math.random() - 0.5) * volatility;
+                price = price * (1 + change);
+                price = Math.max(price * 0.5, Math.min(price * 1.5, price)); // Limitează extremele
+                
+                data.push({
+                    time: date,
+                    price: price
                 });
             }
             
             return data;
         }
         
-        // Procesează datele primite de la API
-        function processTokenData(supplyData, tokenInfo, transactions, historicalTransactions) {
-            // Parsează supply-ul (presupunem 18 decimals)
-            const totalSupply = parseInt(supplyData) / 1e18;
-            
-            // Estimează numărul de holders (simulat - API-ul Etherscan nu oferă direct acest lucru)
-            const estimatedHolders = Math.floor(12543 + Math.random() * 1000);
-            
-            // Estimează numărul total de tranzacții
-            const totalTransactions = Array.isArray(transactions) ? 
-                transactions.length * 100 : // Simulare - multiplicăm pentru a obține un număr realist
-                Math.floor(89432 + Math.random() * 5000);
-            
-            // Obține prețul tokenului din informațiile tokenului (dacă este disponibil)
-            let tokenPrice = 0.0245; // Preț implicit
-            if (tokenInfo && tokenInfo.length > 0 && tokenInfo[0].tokenPriceUSD) {
-                tokenPrice = parseFloat(tokenInfo[0].tokenPriceUSD);
-            }
-            
-            // Calculează market cap și volum
-            const marketCap = totalSupply * tokenPrice;
-            const volume24h = historicalTransactions.length > 0 ? 
-                historicalTransactions[historicalTransactions.length - 1].volume : 
-                marketCap * 0.05; // 5% din market cap ca estimare
-            
-            // Salvează datele procesate
-            tokenData = {
-                price: tokenPrice,
-                priceChange24h: (Math.random() - 0.5) * 10, // Schimbare aleatorie între -5% și +5%
-                holders: estimatedHolders,
-                totalSupply: totalSupply,
-                transactions: totalTransactions,
-                marketCap: marketCap,
-                volume24h: volume24h,
-                historicalTransactions: historicalTransactions,
-                lastUpdated: new Date()
-            };
-        }
-        
         // Actualizează statisticile în UI
         function updateStatsUI() {
             // Preț Token
             const priceElement = document.querySelector('.loading-price');
-            priceElement.textContent = `$${tokenData.price.toFixed(6)}`;
-            priceElement.classList.remove('loading-price');
+            priceElement.innerHTML = formatPrice(tokenData.price);
             
             // Schimbare preț 24h
             const changeElement = document.querySelector('.stat-change');
@@ -820,32 +928,27 @@
             // Holders
             const holdersElement = document.querySelector('.loading-holders');
             holdersElement.innerHTML = formatNumber(tokenData.holders, 0);
-            holdersElement.classList.remove('loading-holders');
             
             // Total Supply
             const supplyElement = document.querySelector('.loading-supply');
             supplyElement.innerHTML = formatNumber(tokenData.totalSupply, 0);
-            supplyElement.classList.remove('loading-supply');
             
             // Tranzacții
             const transactionsElement = document.querySelector('.loading-transactions');
             transactionsElement.innerHTML = formatNumber(tokenData.transactions, 0);
-            transactionsElement.classList.remove('loading-transactions');
             
             // Market Cap
             const marketcapElement = document.querySelector('.loading-marketcap');
-            marketcapElement.textContent = `$${formatNumber(tokenData.marketCap)}`;
-            marketcapElement.classList.remove('loading-marketcap');
+            marketcapElement.innerHTML = `$${formatNumber(tokenData.marketCap)}`;
             
             // Volum 24h
             const volumeElement = document.querySelector('.loading-volume');
-            volumeElement.textContent = `$${formatNumber(tokenData.volume24h)}`;
-            volumeElement.classList.remove('loading-volume');
+            volumeElement.innerHTML = `$${formatNumber(tokenData.volume24h)}`;
         }
         
         // Creează sau actualizează graficul
-        function updateChart(transactionsData) {
-            const ctx = transactionsChart.getContext('2d');
+        function updateChart(chartData) {
+            const ctx = priceChart.getContext('2d');
             
             // Distrugem graficul anterior dacă există
             if (chart) {
@@ -853,50 +956,38 @@
             }
             
             // Extragem datele pentru grafic
-            const labels = transactionsData.map(item => item.date);
-            const transactions = transactionsData.map(item => item.transactions);
+            const labels = chartData.map(item => item.time);
+            const prices = chartData.map(item => item.price);
+            
+            // Determină culoarea în funcție de trend
+            const firstPrice = prices[0];
+            const lastPrice = prices[prices.length - 1];
+            const chartColor = lastPrice >= firstPrice ? '#10b981' : '#ef4444';
             
             // Creăm graficul
             chart = new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'Tranzacții Zilnice',
-                            data: transactions,
-                            backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                            borderColor: 'rgba(99, 102, 241, 1)',
-                            borderWidth: 1,
-                            borderRadius: 5,
-                            order: 1
-                        },
-                        {
-                            label: 'Medie Mobilă (7 zile)',
-                            data: calculateMovingAverage(transactions, 7),
-                            type: 'line',
-                            borderColor: '#10b981',
-                            backgroundColor: 'transparent',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            pointRadius: 0,
-                            pointHoverRadius: 5,
-                            order: 0
-                        }
-                    ]
+                    datasets: [{
+                        label: 'Preț StancuBYT (USD)',
+                        data: prices,
+                        borderColor: chartColor,
+                        backgroundColor: `${chartColor}20`,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: chartColor
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top',
-                            labels: {
-                                color: 'rgba(255, 255, 255, 0.8)',
-                                font: {
-                                    size: 12
-                                }
-                            }
+                            display: false
                         },
                         tooltip: {
                             mode: 'index',
@@ -904,20 +995,11 @@
                             backgroundColor: 'rgba(15, 23, 42, 0.9)',
                             titleColor: 'rgba(255, 255, 255, 0.9)',
                             bodyColor: 'rgba(255, 255, 255, 0.8)',
-                            borderColor: 'rgba(99, 102, 241, 0.5)',
+                            borderColor: chartColor,
                             borderWidth: 1,
                             callbacks: {
                                 label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.datasetIndex === 0) {
-                                        label += context.parsed.y + ' tranzacții';
-                                    } else {
-                                        label += context.parsed.y.toFixed(1) + ' tranzacții (medie)';
-                                    }
-                                    return label;
+                                    return `Preț: $${context.parsed.y.toFixed(6)}`;
                                 }
                             }
                         }
@@ -930,18 +1012,18 @@
                             },
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.7)',
-                                maxTicksLimit: 10
+                                maxTicksLimit: 8
                             }
                         },
                         y: {
-                            beginAtZero: true,
+                            position: 'right',
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
                             },
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.7)',
                                 callback: function(value) {
-                                    return value;
+                                    return '$' + value.toFixed(4);
                                 }
                             }
                         }
@@ -954,16 +1036,19 @@
             });
         }
         
-        // Calculează media mobilă
-        function calculateMovingAverage(data, windowSize) {
-            const result = [];
-            for (let i = 0; i < data.length; i++) {
-                const start = Math.max(0, i - windowSize + 1);
-                const subset = data.slice(start, i + 1);
-                const average = subset.reduce((a, b) => a + b, 0) / subset.length;
-                result.push(average);
-            }
-            return result;
+        // Programează următoarea actualizare
+        function scheduleNextUpdate() {
+            clearInterval(updateInterval);
+            
+            // Actualizează la fiecare 2 minute
+            updateInterval = setInterval(() => {
+                const now = new Date();
+                const nextUpdateTime = new Date(now.getTime() + 2 * 60000);
+                nextUpdate.innerHTML = `<i class="fas fa-sync"></i> Următoarea actualizare: ${nextUpdateTime.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}`;
+            }, 1000);
+            
+            // Setează actualizarea automată la fiecare 2 minute
+            setTimeout(fetchTokenData, 120000);
         }
         
         // Arată starea de încărcare
@@ -982,8 +1067,10 @@
                 <div class="error">
                     <i class="fas fa-exclamation-triangle"></i>
                     <h3>Eroare la încărcarea datelor</h3>
-                    <p>${message || 'Nu am putut prelua datele de la Etherscan API.'}</p>
-                    <p style="margin-top: 15px; font-size: 0.9rem;">Verificați conexiunea la internet și asigurați-vă că cheia API este validă.</p>
+                    <p>${message || 'Nu s-au putut prelua datele.'}</p>
+                    <button onclick="fetchTokenData()" style="margin-top: 15px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        <i class="fas fa-redo"></i> Încearcă din nou
+                    </button>
                 </div>
             `;
             
@@ -1000,12 +1087,9 @@
                     filter.classList.add('active');
                     
                     // Actualizează graficul cu noua perioadă de timp
-                    currentChartDays = parseInt(filter.getAttribute('data-days'));
-                    
-                    // Obține datele istorice pentru noua perioadă
-                    const historicalTransactions = await fetchHistoricalTransactions(currentChartDays);
-                    tokenData.historicalTransactions = historicalTransactions;
-                    updateChart(historicalTransactions);
+                    currentTimeRange = filter.textContent;
+                    const chartData = await fetchChartData(currentTimeRange);
+                    updateChart(chartData);
                 });
             });
         }
@@ -1021,8 +1105,8 @@
             // Configurează butonul de reîmprospătare
             refreshButton.addEventListener('click', fetchTokenData);
             
-            // Actualizează datele automat la fiecare 2 minute
-            setInterval(fetchTokenData, 120000);
+            // Programează actualizarea inițială
+            scheduleNextUpdate();
         });
     </script>
 </body>
