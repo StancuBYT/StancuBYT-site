@@ -14,12 +14,12 @@ exports.etherscanProxy = onRequest(async (req, res) => {
 
     const module = String(req.query.module || "").trim();
     const action = String(req.query.action || "").trim();
-
     if (!module || !action) return res.status(400).json({ error: "Missing module/action" });
 
-    // Allowlist strict (doar ce folosim)
+    // ✅ allowlist complet (include tokenholderlist)
     const allow = new Set([
       "stats:tokensupply",
+      "stats:tokenholderlist",       // ✅ asta iti lipsea (si de asta aveai 403)
       "stats:ethprice",
       "account:tokentx",
       "contract:getcontractcreation"
@@ -28,19 +28,25 @@ exports.etherscanProxy = onRequest(async (req, res) => {
     const key = `${module}:${action}`;
     if (!allow.has(key)) return res.status(403).json({ error: `Action not allowed: ${key}` });
 
-    // Build params
     const params = new URLSearchParams();
     params.set("module", module);
     params.set("action", action);
 
-    if (key === "stats:tokensupply" || key === "account:tokentx") {
+    // actiuni care cer contractaddress
+    const needsContract = new Set([
+      "stats:tokensupply",
+      "stats:tokenholderlist",
+      "account:tokentx"
+    ]);
+
+    if (needsContract.has(key)) {
       const contractaddress = String(req.query.contractaddress || "").trim();
       if (!contractaddress) return res.status(400).json({ error: "Missing contractaddress" });
       params.set("contractaddress", contractaddress);
     }
 
+    // getcontractcreation cere contractaddresses (plural)
     if (key === "contract:getcontractcreation") {
-      // Etherscan expects contractaddresses (plural)
       const contractaddresses =
         String(req.query.contractaddresses || "").trim() ||
         String(req.query.contractaddress || "").trim();
@@ -48,7 +54,7 @@ exports.etherscanProxy = onRequest(async (req, res) => {
       params.set("contractaddresses", contractaddresses);
     }
 
-    // passthrough optional pagination/sort
+    // passthrough optional: page/offset/sort
     for (const k of ["page", "offset", "sort"]) {
       if (req.query[k]) params.set(k, String(req.query[k]));
     }
@@ -59,7 +65,6 @@ exports.etherscanProxy = onRequest(async (req, res) => {
     const r = await fetch(url);
     const txt = await r.text();
 
-    // return raw etherscan json
     return res.status(200).type("application/json").send(txt);
   } catch (e) {
     return res.status(500).json({ error: String(e?.message || e) });
