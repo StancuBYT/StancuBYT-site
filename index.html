@@ -1169,6 +1169,43 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+        .news-grid{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+        .news-card{
+            border: 1px solid rgba(0,255,255,0.18);
+            background: rgba(10,15,25,0.55);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 0 18px rgba(0,255,255,0.08);
+            backdrop-filter: blur(8px);
+        }
+        .news-card.pinned{
+            border-color: rgba(255,215,0,0.45);
+            box-shadow: 0 0 22px rgba(255,215,0,0.10);
+        }
+        .news-card.has-bg{
+            background-size: cover !important;
+            background-position: center !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .news-card.has-bg:before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.74));
+            pointer-events:none;
+        }
+        .news-card.has-bg > *{ position: relative; z-index: 1; }
+        .news-emoji{ font-size: 1.1rem; margin-right: 8px; }
+        .price-display{
+            font-size: 2rem;
+            font-weight: 900;
+        }
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1277,6 +1314,12 @@
 <option value="event">Eveniment</option>
 </select>
 </div>
+<div class="form-row">
+<input id="newsEmoji" maxlength="10" placeholder="Emoji (ex: 🚀 ✅ 🔥)" type="text"/>
+<input id="newsImage" accept="image/*" type="file"/>
+</div>
+<div class="form-row">
+
 <div class="form-row">
 <input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
 </div>
@@ -2523,7 +2566,9 @@
 </div>
 <div class="nav-links">
 <a href="#prezentare" onclick="showSection('prezentare')">Prezentare</a>
-<a href="#statistici" onclick="showSection('statistici'); fetchAllData();">Statistici</a>
+<a href="#statistici" onclick="showSection('statistici'); fetchAllData();
+    updateTokenPriceUI();
+    setInterval(updateTokenPriceUI, 30000);">Statistici</a>
 <a href="#whitepaper" onclick="showSection('whitepaper')">Whitepaper</a>
 <a href="#contact" onclick="showSection('contact')">Contact</a>
 <a href="#giveaway" onclick="showSection('giveaway')">Giveaway &amp; Promoții</a>
@@ -3421,7 +3466,62 @@
         // CONFIGURARE
         // =============================================
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
-        const ETHERSCAN_PROXY = 'https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy';
+
+        async function fetchTokenPriceDexScreener(){
+          try{
+            const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`, {cache:"no-store"});
+            const j = await r.json();
+            const pairs = (j && j.pairs) ? j.pairs : [];
+            if (!pairs.length) return null;
+
+            // choose the highest-liquidity pair
+            pairs.sort((a,b)=> (Number(b?.liquidity?.usd||0) - Number(a?.liquidity?.usd||0)));
+            const best = pairs[0];
+
+            const usd = Number(best?.priceUsd || 0);
+            const native = Number(best?.priceNative || 0);
+            const change24h = Number(best?.priceChange?.h24 || 0);
+
+            return { usd, native, change24h, pairUrl: best?.url || "" };
+          }catch(e){
+            console.warn("DexScreener price error", e);
+            return null;
+          }
+        }
+
+        function _fmtUsd(x){
+          if (!isFinite(x)) return "N/A";
+          if (x === 0) return "0";
+          if (x < 0.000001) return x.toFixed(10);
+          if (x < 0.01) return x.toFixed(8);
+          return x.toFixed(6);
+        }
+
+        async function updateTokenPriceUI(){
+          const priceEl = $("currentPrice");
+          const changeEl = $("priceChange");
+          const liveEl = $("lastUpdated");
+
+          const data = await fetchTokenPriceDexScreener();
+          if (!data || !data.usd){
+            if (priceEl) priceEl.textContent = "N/A";
+            if (changeEl) changeEl.textContent = "";
+            if (liveEl) liveEl.textContent = "Live (DEX)";
+            return;
+          }
+
+          if (priceEl) priceEl.textContent = `$${_fmtUsd(data.usd)}`;
+          if (changeEl){
+            const sign = data.change24h >= 0 ? "+" : "";
+            changeEl.textContent = `24h: ${sign}${data.change24h.toFixed(2)}%`;
+          }
+          if (liveEl){
+            const t = new Date();
+            liveEl.textContent = `Live (DEX) • ${t.toLocaleTimeString("ro-RO", {hour:"2-digit", minute:"2-digit", second:"2-digit"})}`;
+          }
+        }
+
+        const ETHERSCAN_PROXY = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy";
 const ETHERSCAN_API_KEY = ''; // not used client-side (Cloud Function holds the key)
 
 async function etherscanProxyRequest(module, action, params = {}) {
@@ -3615,41 +3715,60 @@ async function etherscanProxyRequest(module, action, params = {}) {
             if ($('newsType')) $('newsType').value = 'update';
         }
 
-        function saveNews() {
+        async function saveNews() {
             if (!verifyPassword()) return;
 
-            const title = ($('newsTitle')?.value || '').trim();
-            const content = ($('newsContent')?.value || '').trim();
-            const type = $('newsType')?.value || 'update';
-            const pinned = !!$('pinNews')?.checked;
+            const title = ($("newsTitle")?.value || "").trim();
+            const content = ($("newsContent")?.value || "").trim();
+            const type = $("newsType")?.value || "update";
+            const pinned = !!$("pinNews")?.checked;
+            const emoji = ($("newsEmoji")?.value || "").trim();
 
             if (!title || !content) {
-                alert('Completează titlul și conținutul!');
+                alert("Completează titlul și conținutul.");
                 return;
             }
 
             try {
-                const existing = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
-                const newId = existing.length ? Math.max(...existing.map(n => Number(n.id) || 0)) + 1 : 1;
+                let bgUrl = "";
+                const file = $("newsImage")?.files?.[0];
 
-                existing.push({
-                    id: newId,
+                if (file) {
+                    const user = firebase.auth().currentUser;
+                    if (!user || !window.__isAdmin) {
+                        alert("Doar administratorul poate încărca imagini.");
+                        return;
+                    }
+                    const safeName = (file.name || "image").replace(/[^a-zA-Z0-9._-]/g, "_");
+                    const path = `news/${Date.now()}_${safeName}`;
+                    const ref = firebase.storage().ref().child(path);
+                    await ref.put(file);
+                    bgUrl = await ref.getDownloadURL();
+                }
+
+                await db.collection("news").add({
                     title,
                     content,
                     type,
-                    date: new Date().toISOString(),
-                    pinned
+                    pinned,
+                    emoji: emoji || "",
+                    bgUrl: bgUrl || "",
+                    createdAt: new Date().toISOString(),
                 });
 
-                localStorage.setItem(LS_NEWS, JSON.stringify(existing));
-                cancelAddNews();
-                loadNews();
-                alert('Anunțul a fost adăugat!');
+                $("newsTitle").value = "";
+                $("newsContent").value = "";
+                if ($("newsEmoji")) $("newsEmoji").value = "";
+                if ($("newsImage")) $("newsImage").value = "";
+                $("pinNews").checked = false;
+
+                toggleNewsForm(false);
             } catch (e) {
-                console.error('saveNews:', e);
-                alert('Eroare la salvare.');
+                console.error(e);
+                alert("Eroare la salvare știre.");
             }
         }
+
 
         function deleteNews(id) {
             if (!verifyPassword()) return;
@@ -4358,9 +4477,9 @@ try {
   if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
     firebase.initializeApp({
       apiKey: "AIzaSyAjcRgrqwfXk-f2AqwUFtacSRWyUhsPTuY",
-      authDomain: "stancubyt-fc2b9.firebaseapp.com",
-      projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+      authDomain: "stancubyt-64c78.firebaseapp.com",
+      projectId: "stancubyt-64c78",
+      storageBucket: "stancubyt-64c78.firebasestorage.app",
       messagingSenderId: "866498315210",
       appId: "1:866498315210:web:abcf161e31aca695758533",
       measurementId: "G-J5B0K35MR0"
@@ -5102,16 +5221,17 @@ window.addEventListener('load', () => {
       const badge = (typeof _badgeForType === 'function') ? _badgeForType(item.type) : (item.type==='announcement'?{cls:'badge-announcement',txt:'Anunț Important'}:{cls:'badge-update',txt:'Update'});
       const card = document.createElement('div');
       card.className = item.pinned ? 'news-card pinned' : 'news-card';
+      if (item.bgUrl){ card.classList.add('has-bg'); card.style.backgroundImage = `url(${item.bgUrl})`; }
 
       const date = item.date || item.createdAt;
       const d = date ? new Date(date) : new Date();
       card.innerHTML = `
         <div class="news-badge ${badge.cls}">${badge.txt}</div>
-        <h4 style="margin-bottom:0.5rem; color:white;">${_escape(item.title||'')}</h4>
+        <h4 style="margin-bottom:0.5rem; color:white;">${item.emoji ? `<span class=\"news-emoji\">${_escape(item.emoji)}</span>` : ``}${_escape(item.title||'')}</h4>
         <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
         <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
         <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
-          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
+          ${(window.__isAdmin ? `<button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>` : ``)}
         </div>
       `;
       container.appendChild(card);
