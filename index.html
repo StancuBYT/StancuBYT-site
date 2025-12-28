@@ -3421,7 +3421,7 @@
         // CONFIGURARE
         // =============================================
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
-        const ETHERSCAN_PROXY = 'https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy';
+        const ETHERSCAN_PROXY = 'https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy';
 const ETHERSCAN_API_KEY = ''; // not used client-side (Cloud Function holds the key)
 
 async function etherscanProxyRequest(module, action, params = {}) {
@@ -4358,9 +4358,9 @@ try {
   if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
     firebase.initializeApp({
       apiKey: "AIzaSyAjcRgrqwfXk-f2AqwUFtacSRWyUhsPTuY",
-      authDomain: "stancubyt-64c78.firebaseapp.com",
-      projectId: "stancubyt-64c78",
-      storageBucket: "stancubyt-64c78.firebasestorage.app",
+      authDomain: "stancubyt-fc2b9.firebaseapp.com",
+      projectId: "stancubyt-fc2b9",
+      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
       messagingSenderId: "866498315210",
       appId: "1:866498315210:web:abcf161e31aca695758533",
       measurementId: "G-J5B0K35MR0"
@@ -4519,7 +4519,7 @@ function _badgeForType(type) {
 // =========================
 async function updateVisitCounter() {
   try {
-    const HIT_URL = 'https://europe-west1-stancubyt-64c78.cloudfunctions.net/hitCounter';
+    const HIT_URL = 'https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/hitCounter';
     const r = await fetch(HIT_URL, { method: 'GET' });
     const j = await r.json().catch(() => null);
     if (!j || !j.ok) return;
@@ -6659,7 +6659,7 @@ service cloud.firestore {
 (function(){
   const ADMIN_EMAIL = "stancubyt@gmail.com";
   const TOKEN_ADDR = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-  const ETHERSCAN_PROXY = "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy";
+  const ETHERSCAN_PROXY = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy";
 
   // helpers
   const $ = (id)=>document.getElementById(id);
