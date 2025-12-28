@@ -2059,13 +2059,34 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
     <script>
         // =============================================
         // CONFIGURARE
         // =============================================
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
         const ETHERSCAN_API_KEY = 'WRE7KWAN2AS9P1IJIPJKZUSQ34FSVIAQHV';
-        const ADMIN_PASSWORD = 'ParolaCripto24091980.';
+        /* ADMIN: nu mai folosi parola hardcodata in JS.
+   Folosim Firebase Auth + Firestore (global).
+   1) In Firebase Console -> Project settings -> Web app -> copiezi firebaseConfig aici.
+   2) Creezi un user (Email/Password) pentru admin.
+   3) In Firestore Rules: permite write doar admin (vezi exemplu in mesajul meu anterior).
+*/
+        const firebaseConfig = {
+            apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
+            authDomain: "stancubyt-64c78.firebaseapp.com",
+            projectId: "stancubyt-64c78",
+            storageBucket: "stancubyt-64c78.appspot.com",
+            messagingSenderId: "PASTE_SENDER_ID",
+            appId: "PASTE_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        // Optional: pune aici email-ul tau de admin (doar pentru UI). Rules sunt cele care securizeaza.
+        const ADMIN_EMAILS = ["admin@stancubyt.com"];
 
         // Chei storage
         const LS_NEWS = 'stancubyt_news';
@@ -2083,14 +2104,31 @@
             }[s]));
         }
 
-        function verifyPassword() {
-            const p = prompt('Introduceți parola pentru această acțiune:');
-            if (p !== ADMIN_PASSWORD) {
-                alert('Parolă incorectă!');
-                return false;
-            }
-            return true;
-        }
+        async function requireAdmin() {
+    // daca e deja logat
+    if (auth.currentUser) return true;
+
+    const email = prompt('Admin login - Email:');
+    if (!email) return false;
+    const pass = prompt('Admin login - Parola:');
+    if (!pass) return false;
+
+    try {
+        await auth.signInWithEmailAndPassword(email.trim(), pass);
+        return true;
+    } catch (e) {
+        console.error('Admin login error:', e);
+        alert('Autentificare esuata: ' + (e?.message || e));
+        return false;
+    }
+}
+
+function isAdminUi() {
+    const u = auth.currentUser;
+    if (!u) return false;
+    return ADMIN_EMAILS.includes((u.email || '').toLowerCase());
+}
+
 
         // Router simplu (evită bug-uri)
         function showSection(sectionId) {
@@ -2168,51 +2206,68 @@
         }
 
         function loadNews() {
-            try {
-                seedNewsIfMissing();
-                const news = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
+    const container = $('newsContainer');
+    if (!container) return;
 
-                // Sortare: pinned, apoi recent
-                news.sort((a, b) => {
-                    if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
-                    return new Date(b.date) - new Date(a.date);
-                });
+    // Live sync din Firestore (global, pe orice device)
+    db.collection('news')
+      .orderBy('pinned', 'desc')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot((snap) => {
+          container.innerHTML = '';
+          if (snap.empty) {
+              container.innerHTML = '<div style="opacity:.8; padding:1rem;">Momentan nu sunt anunțuri.</div>';
+              return;
+          }
 
-                const container = $('newsContainer');
-                if (!container) return;
-                container.innerHTML = '';
+          snap.forEach((doc) => {
+              const item = doc.data() || {};
+              const card = document.createElement('div');
+              card.className = 'news-card';
 
-                news.forEach(item => {
-                    const badgeClass = item.type === 'announcement' ? 'badge-announcement' :
-                                     item.type === 'event' ? 'badge-event' : 'badge-update';
-                    const badgeText = item.type === 'announcement' ? 'Anunț Important' :
-                                    item.type === 'event' ? 'Eveniment' : 'Update';
-                    const cardClass = item.pinned ? 'news-card pinned' : 'news-card';
+              const badge = item.type === 'alert' ? 'alert' : (item.type === 'listing' ? 'listing' : 'update');
+              const title = escapeHtml(item.title || '');
+              const content = escapeHtml(item.content || '');
+              const pinned = !!item.pinned;
 
-                    const card = document.createElement('div');
-                    card.className = cardClass;
+              let dateStr = '';
+              try {
+                  const d = item.createdAt?.toDate ? item.createdAt.toDate() : (item.date ? new Date(item.date) : null);
+                  if (d) dateStr = d.toLocaleString('ro-RO', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+              } catch {}
 
-                    card.innerHTML = `
-                        <div class="news-badge ${badgeClass}">${badgeText}</div>
-                        <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title)}</h4>
-                        <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content)}</p>
-                        <div class="news-date">
-                            <span>📅</span>
-                            ${new Date(item.date).toLocaleDateString('ro-RO', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}
-                        </div>
-                        <div style="display:flex; gap:10px; margin-top: 1rem; flex-wrap:wrap;">
-                            <button class="news-btn" onclick="deleteNews(${Number(item.id)})">🗑️ Șterge</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (e) {
-                console.error('loadNews:', e);
-            }
-        }
+              card.innerHTML = `
+                <div class="news-meta">
+                  <span class="news-badge ${badge}">${badge.toUpperCase()}</span>
+                  ${pinned ? '<span class="news-badge" style="background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2);">PINNED</span>' : ''}
+                </div>
+                <h3 class="news-card-title">${title}</h3>
+                <p class="news-card-content">${content}</p>
+                <div class="news-date"><span>📅</span> ${dateStr || ''}</div>
+                <div style="display:flex; gap:10px; margin-top: 1rem; flex-wrap:wrap;">
+                  <button class="news-btn" onclick="deleteNews('${doc.id}')">🗑️ Șterge</button>
+                </div>
+              `;
+              container.appendChild(card);
+          });
 
-        function addNews() {
-            if (!verifyPassword()) return;
+          // ascunde butoanele de admin daca nu esti logat (UI only)
+          const adminBtns = document.querySelectorAll('.news-controls .news-btn');
+          adminBtns.forEach(b => {
+              const txt = (b.textContent || '').toLowerCase();
+              if (txt.includes('adaug') || txt.includes('șterge') || txt.includes('sterge')) {
+                  b.style.display = isAdminUi() ? '' : '';
+              }
+          });
+      }, (err) => {
+          console.error('loadNews onSnapshot error:', err);
+          container.innerHTML = '<div style="opacity:.8; padding:1rem;">Eroare la încărcarea anunțurilor.</div>';
+      });
+}
+
+
+        async function addNews() {
+            if (!(await requireAdmin())) return;
             const f = $('newsForm');
             if (f) f.style.display = 'block';
         }
@@ -2226,62 +2281,65 @@
             if ($('newsType')) $('newsType').value = 'update';
         }
 
-        function saveNews() {
-            if (!verifyPassword()) return;
+        async function saveNews() {
+    if (!(await requireAdmin())) return;
 
-            const title = ($('newsTitle')?.value || '').trim();
-            const content = ($('newsContent')?.value || '').trim();
-            const type = $('newsType')?.value || 'update';
-            const pinned = !!$('pinNews')?.checked;
+    const title = ($('newsTitle')?.value || '').trim();
+    const content = ($('newsContent')?.value || '').trim();
+    const type = $('newsType')?.value || 'update';
+    const pinned = !!$('pinNews')?.checked;
 
-            if (!title || !content) {
-                alert('Completează titlul și conținutul!');
-                return;
-            }
+    if (!title || !content) {
+        alert('Completează titlul și conținutul!');
+        return;
+    }
 
-            try {
-                const existing = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
-                const newId = existing.length ? Math.max(...existing.map(n => Number(n.id) || 0)) + 1 : 1;
+    try {
+        await db.collection('news').add({
+            title,
+            content,
+            type,
+            pinned,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-                existing.push({
-                    id: newId,
-                    title,
-                    content,
-                    type,
-                    date: new Date().toISOString(),
-                    pinned
-                });
+        cancelAddNews();
+        // nu mai e nevoie de loadNews() manual, onSnapshot actualizeaza automat
+    } catch (e) {
+        console.error('saveNews:', e);
+        alert('Eroare la salvare știre: ' + (e?.message || e));
+    }
+}
 
-                localStorage.setItem(LS_NEWS, JSON.stringify(existing));
-                cancelAddNews();
-                loadNews();
-                alert('Anunțul a fost adăugat!');
-            } catch (e) {
-                console.error('saveNews:', e);
-                alert('Eroare la salvare.');
-            }
-        }
 
-        function deleteNews(id) {
-            if (!verifyPassword()) return;
-            if (!confirm('Sigur vrei să ștergi acest anunț?')) return;
+        async function deleteNews(docId) {
+    if (!(await requireAdmin())) return;
+    if (!confirm('Ștergi această știre?')) return;
 
-            try {
-                const existing = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
-                const filtered = existing.filter(n => Number(n.id) !== Number(id));
-                localStorage.setItem(LS_NEWS, JSON.stringify(filtered));
-                loadNews();
-            } catch (e) {
-                console.error('deleteNews:', e);
-            }
-        }
+    try {
+        await db.collection('news').doc(String(docId)).delete();
+    } catch (e) {
+        console.error('deleteNews:', e);
+        alert('Eroare la ștergere: ' + (e?.message || e));
+    }
+}
 
-        function clearNews() {
-            if (!verifyPassword()) return;
-            if (!confirm('Sigur vrei să ștergi TOATE anunțurile?')) return;
-            localStorage.removeItem(LS_NEWS);
-            loadNews();
-        }
+
+        async function clearNews() {
+    if (!(await requireAdmin())) return;
+    if (!confirm('Sigur vrei să ștergi TOATE anunțurile?')) return;
+
+    try {
+        const snap = await db.collection('news').get();
+        const batch = db.batch();
+        snap.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+    } catch (e) {
+        console.error('clearNews:', e);
+        alert('Eroare la ștergere totală: ' + (e?.message || e));
+    }
+}
+
 
         // Pentru butoanele existente în HTML (care apelează requestPassword)
         function requestPassword(action, id) {
@@ -2308,8 +2366,8 @@
             localStorage.setItem(LS_PROMOS, JSON.stringify(arr));
         }
 
-        function showPromoForm() {
-            if (!verifyPassword()) return;
+        async function showPromoForm() {
+            if (!(await requireAdmin())) return;
             const f = $('promoForm');
             if (f) f.style.display = 'block';
         }
@@ -2322,141 +2380,199 @@
             if ($('promoDesc')) $('promoDesc').value = '';
         }
 
-        function savePromo() {
-            if (!verifyPassword()) return;
+        async function savePromo() {
+    if (!(await requireAdmin())) return;
 
-            const title = ($('promoTitle')?.value || '').trim();
-            const endDate = ($('promoEndDate')?.value || '').trim();
-            const desc = ($('promoDesc')?.value || '').trim();
+    const title = ($('promoTitle')?.value || '').trim();
+    const endDate = ($('promoEndDate')?.value || '').trim(); // YYYY-MM-DD
+    const desc = ($('promoDesc')?.value || '').trim();
 
-            if (!title || !endDate || !desc) {
-                alert('Completează titlul, data de final și descrierea.');
-                return;
-            }
+    if (!title || !endDate || !desc) {
+        alert('Completează titlul, data de final și descrierea.');
+        return;
+    }
 
-            const promos = getPromos();
-            const newId = promos.length ? Math.max(...promos.map(p => Number(p.id) || 0)) + 1 : 1;
+    try {
+        await db.collection('promos').add({
+            title,
+            endDate,
+            desc,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        cancelAddPromo();
+    } catch (e) {
+        console.error('savePromo:', e);
+        alert('Eroare la salvare promoție: ' + (e?.message || e));
+    }
+}
 
-            promos.push({
-                id: newId,
-                title,
-                endDate,
-                desc,
-                createdAt: new Date().toISOString(),
-                participants: [] // {name,wallet,points,joinedAt}
+
+        async function clearPromos() {
+    if (!(await requireAdmin())) return;
+    if (!confirm('Sigur vrei să ștergi TOATE promoțiile?')) return;
+
+    try {
+        const promos = await db.collection('promos').get();
+        // Atenție: pentru multe documente, e mai bine cu Cloud Function recursive delete.
+        for (const doc of promos.docs) {
+            const promoRef = db.collection('promos').doc(doc.id);
+            const parts = await promoRef.collection('participants').get();
+            const batch = db.batch();
+            parts.forEach(d => batch.delete(d.ref));
+            batch.delete(promoRef);
+            await batch.commit();
+        }
+    } catch (e) {
+        console.error('clearPromos:', e);
+        alert('Eroare la ștergere: ' + (e?.message || e));
+    }
+}
+
+
+        async function deletePromo(promoId) {
+    if (!(await requireAdmin())) return;
+    if (!confirm('Ștergi această promoție? (se vor șterge și participanții)')) return;
+
+    try {
+        const promoRef = db.collection('promos').doc(String(promoId));
+        // șterge participanții (subcollection) înainte
+        const parts = await promoRef.collection('participants').get();
+        const batch = db.batch();
+        parts.forEach(d => batch.delete(d.ref));
+        batch.delete(promoRef);
+        await batch.commit();
+    } catch (e) {
+        console.error('deletePromo:', e);
+        alert('Eroare la ștergere: ' + (e?.message || e));
+    }
+}
+
+
+        async function joinPromo(promoId) {
+    // înscrierea e publică (read/write public pe participants doar dacă vrei). Recomand: write public, read public.
+    const name = ($(`joinName_${promoId}`)?.value || '').trim();
+    const wallet = ($(`joinWallet_${promoId}`)?.value || '').trim();
+    const points = Number(($(`joinPoints_${promoId}`)?.value || '0').trim());
+
+    if (!name || !wallet) {
+        alert('Completează numele și wallet-ul.');
+        return;
+    }
+    if (!/^0x[a-fA-F0-9]{40}$/.test(wallet)) {
+        alert('Wallet invalid (trebuie 0x + 40 caractere hex).');
+        return;
+    }
+
+    try {
+        await db.collection('promos').doc(String(promoId))
+            .collection('participants')
+            .add({
+                name,
+                wallet,
+                points: Number.isFinite(points) ? points : 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            setPromos(promos);
-            cancelPromo();
-            renderPromos();
-            renderLeaderboard();
-            alert('Promoția/Giveaway-ul a fost adăugat.');
-        }
+        // reset fields
+        if ($(`joinName_${promoId}`)) $(`joinName_${promoId}`).value = '';
+        if ($(`joinWallet_${promoId}`)) $(`joinWallet_${promoId}`).value = '';
+        if ($(`joinPoints_${promoId}`)) $(`joinPoints_${promoId}`).value = '';
+        alert('Înscriere reușită!');
+    } catch (e) {
+        console.error('joinPromo:', e);
+        alert('Eroare la înscriere: ' + (e?.message || e));
+    }
+}
 
-        function clearPromos() {
-            if (!verifyPassword()) return;
-            if (!confirm('Ștergi toate promoțiile/giveaway-urile?')) return;
-            localStorage.removeItem(LS_PROMOS);
-            renderPromos();
-            renderLeaderboard();
-        }
-
-        function deletePromo(promoId) {
-            if (!verifyPassword()) return;
-            if (!confirm('Ștergi această promoție/giveaway?')) return;
-            const promos = getPromos().filter(p => Number(p.id) !== Number(promoId));
-            setPromos(promos);
-            renderPromos();
-            renderLeaderboard();
-        }
-
-        function joinPromo(promoId) {
-            const name = ($('joinName_' + promoId)?.value || '').trim();
-            const wallet = ($('joinWallet_' + promoId)?.value || '').trim();
-            const pointsStr = ($('joinPoints_' + promoId)?.value || '').trim();
-            const points = Math.max(0, parseInt(pointsStr || '0', 10) || 0);
-
-            if (!name || !wallet) {
-                alert('Completează numele și wallet-ul.');
-                return;
-            }
-
-            const promos = getPromos();
-            const p = promos.find(x => Number(x.id) === Number(promoId));
-            if (!p) return;
-
-            // expirare
-            const now = new Date();
-            const end = new Date(p.endDate + 'T23:59:59');
-            if (now > end) {
-                alert('Acest giveaway/promoție a expirat.');
-                return;
-            }
-
-            p.participants = p.participants || [];
-            const existing = p.participants.find(u => (u.wallet || '').toLowerCase() === wallet.toLowerCase());
-            if (existing) {
-                existing.name = name;
-                existing.points = Math.max(existing.points || 0, points);
-            } else {
-                p.participants.push({ name, wallet, points, joinedAt: new Date().toISOString() });
-            }
-
-            setPromos(promos);
-            renderPromos();
-            renderLeaderboard();
-            alert('Înscriere salvată (local pe device).');
-        }
 
         function renderPromos() {
-            const list = $('promoList');
-            if (!list) return;
+    const list = $('promoList');
+    if (!list) return;
 
-            const promos = getPromos();
-            if (!promos.length) {
-                list.innerHTML = `<div style="opacity:0.85;">Nu există promoții active încă.</div>`;
-                return;
-            }
+    db.collection('promos')
+      .orderBy('endDate', 'asc')
+      .onSnapshot(async (snap) => {
+          list.innerHTML = '';
+          if (snap.empty) {
+              list.innerHTML = '<div style="opacity:.8; padding:1rem;">Momentan nu sunt promoții.</div>';
+              return;
+          }
 
-            // sort: cele care expiră mai repede primele
-            promos.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+          for (const doc of snap.docs) {
+              const p = doc.data() || {};
+              const promoId = doc.id;
 
-            list.innerHTML = '';
-            promos.forEach(p => {
-                const end = new Date(p.endDate + 'T23:59:59');
-                const expired = new Date() > end;
+              const end = new Date((p.endDate || '') + 'T23:59:59');
+              const expired = (p.endDate ? (new Date() > end) : false);
 
-                const card = document.createElement('div');
-                card.className = 'news-card';
-                card.innerHTML = `
-                    <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
-                    <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
-                    <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.desc)}</p>
-                    <div class="news-date" style="margin-top:0.8rem;">
-                        <span>⏳</span> Expiră: ${new Date(p.endDate).toLocaleDateString('ro-RO')}
-                    </div>
+              const card = document.createElement('div');
+              card.className = 'news-card';
+              card.innerHTML = `
+                  <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
+                  <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title || '')}</h4>
+                  <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.desc || '')}</p>
+                  <div class="news-date" style="margin-top:0.8rem;">
+                      <span>⏳</span> Expiră: ${p.endDate ? new Date(p.endDate).toLocaleDateString('ro-RO') : ''}
+                  </div>
 
-                    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
-                        <h4 style="margin:0 0 0.6rem 0; color: var(--neon-cyan);">Înscriere</h4>
-                        <div class="form-row">
-                            <input id="joinName_${p.id}" type="text" placeholder="Nume" maxlength="60">
-                            <input id="joinWallet_${p.id}" type="text" placeholder="Wallet (0x...)" maxlength="60">
-                        </div>
-                        <div class="form-row">
-                            <input id="joinPoints_${p.id}" type="number" min="0" step="1" placeholder="Promovări (puncte)" />
-                        </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="news-btn" onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
-                            <button class="news-btn" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
-                        </div>
-                        <small style="display:block; margin-top:0.6rem; opacity:0.75;">
-                            În varianta B, înscrierile/clasamentul sunt salvate doar pe device-ul tău.
-                        </small>
-                    </div>
-                `;
-                list.appendChild(card);
-            });
-        }
+                  <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+                      <h4 style="margin:0 0 0.6rem 0; color: var(--neon-cyan);">Înscriere</h4>
+                      <div class="form-row">
+                          <input id="joinName_${promoId}" type="text" placeholder="Nume" maxlength="60">
+                          <input id="joinWallet_${promoId}" type="text" placeholder="Wallet (0x...)" maxlength="60">
+                      </div>
+                      <div class="form-row">
+                          <input id="joinPoints_${promoId}" type="number" min="0" step="1" placeholder="Promovări (puncte)" />
+                      </div>
+                      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                          <button class="news-btn" onclick="joinPromo('${promoId}')">✅ Înscrie-te</button>
+                          <button class="news-btn" onclick="deletePromo('${promoId}')">🗑️ Șterge</button>
+                      </div>
+                  </div>
+
+                  <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+                      <h4 style="margin:0 0 0.6rem 0; color: var(--neon-green);">Clasament (Top 3)</h4>
+                      <div id="lb_${promoId}" style="opacity:.9;">Se încarcă...</div>
+                  </div>
+              `;
+              list.appendChild(card);
+
+              // Leaderboard top 3
+              try {
+                  const topSnap = await db.collection('promos').doc(promoId)
+                      .collection('participants')
+                      .orderBy('points', 'desc')
+                      .limit(3)
+                      .get();
+
+                  const lb = card.querySelector(`#lb_${promoId}`);
+                  if (!lb) continue;
+
+                  if (topSnap.empty) {
+                      lb.innerHTML = '<div style="opacity:.8;">Niciun participant încă.</div>';
+                  } else {
+                      let htmlRows = '<ol style="margin:0; padding-left:1.2rem;">';
+                      topSnap.forEach((d) => {
+                          const it = d.data() || {};
+                          const nm = escapeHtml(it.name || 'Anonim');
+                          const pts = Number(it.points || 0);
+                          htmlRows += `<li><b>${nm}</b> — ${pts} puncte</li>`;
+                      });
+                      htmlRows += '</ol>';
+                      lb.innerHTML = htmlRows;
+                  }
+              } catch (e) {
+                  console.error('leaderboard load error:', e);
+                  const lb = card.querySelector(`#lb_${promoId}`);
+                  if (lb) lb.textContent = 'Eroare la încărcare clasament.';
+              }
+          }
+      }, (err) => {
+          console.error('renderPromos onSnapshot error:', err);
+          list.innerHTML = '<div style="opacity:.8; padding:1rem;">Eroare la încărcarea promoțiilor.</div>';
+      });
+}
+
 
         function renderLeaderboard() {
             const lb = $('leaderboard');
