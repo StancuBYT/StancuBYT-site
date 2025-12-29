@@ -1417,44 +1417,68 @@ async function updatePrice(){
   const updEl = $("lastUpdated");
   if(!priceEl) return;
 
-  try{
-    const url = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_ADDRESS;
-    const res = await fetch(url, { cache:"no-store" });
-    if(!res.ok) throw new Error("DexScreener " + res.status);
-    const data = await res.json();
-    const pairs = (data && data.pairs) ? data.pairs : [];
-    if(!pairs.length) throw new Error("No pairs");
-
-    // pick best pair: highest liquidity USD
-    pairs.sort((a,b)=> (b?.liquidity?.usd||0) - (a?.liquidity?.usd||0));
-    const p = pairs[0];
-    const priceUsd = Number(p.priceUsd);
-    if(!isFinite(priceUsd)) throw new Error("Bad price");
-
-    priceEl.textContent = "$" + priceUsd.toLocaleString("en-US", { maximumFractionDigits: Math.max(2, Math.min(8, (priceUsd < 1 ? 8 : 6))) });
-
-    const chg24 = p?.priceChange?.h24;
-    if(chg24 !== undefined && chg24 !== null){
-      const v = Number(chg24);
-      if(isFinite(v)){
+  // helper to set UI
+  function setPrice(priceUsd, change24){
+    priceEl.textContent = "$" + Number(priceUsd).toLocaleString("en-US", {
+      maximumFractionDigits: Math.max(2, Math.min(8, (priceUsd < 1 ? 8 : 6))),
+    });
+    if(chgEl){
+      if(change24 === null || change24 === undefined || !isFinite(Number(change24))){
+        chgEl.textContent = "";
+        chgEl.className = "price-change";
+      }else{
+        const v = Number(change24);
         chgEl.textContent = (v >= 0 ? "+" : "") + v.toFixed(2) + "% (24h)";
         chgEl.className = "price-change " + (v >= 0 ? "positive" : "negative");
-      }else{
-        chgEl.textContent = "";
       }
-    }else{
-      chgEl.textContent = "";
     }
+    if(updEl) updEl.textContent = "Actualizat: " + new Date().toLocaleTimeString();
+  }
 
-    if(updEl){
-      const now = new Date();
-      updEl.textContent = "Ultima actualizare: " + now.toLocaleTimeString();
-    }
+  // 1) DexScreener (best effort)
+  try{
+    const url = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_ADDRESS;
+    const res = await fetch(url, {cache: "no-store"});
+    if(!res.ok) throw new Error("DexScreener " + res.status);
+    const data = await res.json();
+    const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
+
+    // prefer Ethereum + Uniswap pairs, and require priceUsd
+    const filtered = pairs
+      .filter((p)=> !!p && (p.chainId === "ethereum" || p.chainId === "eth"))
+      .filter((p)=> isFinite(Number(p.priceUsd)));
+
+    const best = (filtered.length ? filtered : pairs.filter((p)=> isFinite(Number(p?.priceUsd))))
+      .sort((a,b)=> (b?.liquidity?.usd||0) - (a?.liquidity?.usd||0))[0];
+
+    if(!best) throw new Error("No priced pairs");
+    setPrice(Number(best.priceUsd), best?.priceChange?.h24);
+    return;
   }catch(e){
+    // continue to fallback
+  }
+
+  // 2) CoinGecko fallback (works only if token is indexed)
+  try{
+    const cg = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
+      + "?contract_addresses=" + encodeURIComponent(TOKEN_ADDRESS)
+      + "&vs_currencies=usd";
+    const res2 = await fetch(cg, {cache: "no-store"});
+    if(!res2.ok) throw new Error("CoinGecko " + res2.status);
+    const j = await res2.json();
+    const key = TOKEN_ADDRESS.toLowerCase();
+    const priceUsd = j?.[key]?.usd;
+    if(!isFinite(Number(priceUsd))) throw new Error("No CoinGecko price");
+    setPrice(Number(priceUsd), null);
+    return;
+  }catch(e2){
     priceEl.textContent = "N/A";
     if(chgEl) chgEl.textContent = "";
+    if(updEl) updEl.textContent = "";
   }
 }
+
+
 
 /* ---- NEWS (Firestore + Storage) ----
    Collection: news
@@ -1678,6 +1702,8 @@ window.adminSignOut = async function(){
 auth.onAuthStateChanged((user)=>{
   isAdmin = !!(user && ADMIN_EMAILS.includes(String(user.email || "").toLowerCase()));
   setAdminUI();
+  // Re-render news so admin buttons appear/disappear instantly
+  startNewsListener();
 });
 
 /* ---- Init ---- */
