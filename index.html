@@ -3466,6 +3466,8 @@
         // =============================================
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
         const ETHERSCAN_PROXY = 'https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy';
+
+
 const ETHERSCAN_API_KEY = ''; // not used client-side (Cloud Function holds the key)
 
 async function etherscanProxyRequest(module, action, params = {}) {
@@ -4333,18 +4335,7 @@ async function updateLivePriceAndChart(period = 'live') {
 
         window.addEventListener('load', () => {
             initializeChart();
-            
-    // Emoji selector -> input
-    try {
-      const sel = document.getElementById("newsEmojiSelect");
-      const inp = document.getElementById("newsEmojiInput");
-      if (sel && inp && !sel.__bound) {
-        sel.__bound = true;
-        sel.addEventListener("change", () => { inp.value = sel.value || ""; });
-      }
-    } catch (_) {}
-
-    startPriceAutoUpdate();
+            startPriceAutoUpdate();
 
             // IMPORTANT: evită conflictul de id duplicat pentru contact din whitepaper
             const wpContact = document.querySelector('#whitepaper #contact');
@@ -7066,218 +7057,34 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
 
   // -------- VISITS (Cloud Function) --------
-    async function updateVisits() {
-    // Global counter (all devices) via Cloud Function hitCounter
+  async function updateVisits() {
+    // Global counter (all devices) via Cloud Function (increment 1x per page load)
     try {
-      // show cached value without incrementing again
-      if (window.__STBYT_VISIT_VALUE != null) {
-        const valCached = String(window.__STBYT_VISIT_VALUE);
-        ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id) => {
+      if (window.__SBYT_VISIT_GUARD__) return;
+      window.__SBYT_VISIT_GUARD__ = true;
+    } catch (_) {}
+
+    const url = (typeof HIT_COUNTER_URL !== "undefined" && HIT_COUNTER_URL)
+      ? HIT_COUNTER_URL
+      : "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/hitCounter";
+
+    fetch(url, { method: "GET", cache: "no-store" })
+      .then((r) => r.json().catch(() => null))
+      .then((j) => {
+        const val = (j && (j.visits ?? j.count ?? j.value)) ?? null;
+        if (val == null) return;
+        ["visitCount", "visitCounter", "visitsCount", "visitsCounter"].forEach((id) => {
           const el = document.getElementById(id);
-          if (el) el.textContent = valCached;
+          if (el) el.textContent = String(val);
         });
-        return;
-      }
-
-      // prevent multiple increments on same page load
-      if (window.__STBYT_VISIT_CALLING) return;
-      window.__STBYT_VISIT_CALLING = true;
-
-      const guardKey = "__stbyt_hit_once__";
-      try {
-        if (sessionStorage.getItem(guardKey) === "1") {
-          // already incremented this tab load; just fetch once more? keep last known or skip
-          window.__STBYT_VISIT_CALLING = false;
-          return;
-        }
-        sessionStorage.setItem(guardKey, "1");
-      } catch (_) {}
-
-      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store", mode: "cors" });
-      if (!r.ok) throw new Error("hitCounter http " + r.status);
-      const j = await r.json();
-      const n = (j && (j.count ?? j.visits ?? j.value ?? j.total ?? j.data)) ?? null;
-
-      const val = (n != null) ? String(n) : "-";
-      window.__STBYT_VISIT_VALUE = val;
-
-      ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val;
-      });
-    } catch (e) {
-      console.warn("hitCounter failed:", e);
-      try { sessionStorage.removeItem("__stbyt_hit_once__"); } catch (_) {}
-    } finally {
-      window.__STBYT_VISIT_CALLING = false;
-    }
-  }
-  window.updateVisits = updateVisits;
-
-  // Disable legacy password prompt buttons (we use Firebase Auth)
-  window.requestPassword = function(){ alert("Autentifica-te ca administrator pentru a adauga/sterge anunturi."); };
-
-  
-  
-  // -------- PRICE (Real) --------
-  // -------- PRICE helpers --------
-  async function fetchJson(url){
-    const r = await fetch(url, {cache:"no-store"});
-    if(!r.ok) throw new Error("HTTP " + r.status);
-    return await r.json();
-  }
-  function deepFindNumber(obj, keysLike){
-    try{
-      const stack=[obj];
-      while(stack.length){
-        const cur=stack.pop();
-        if(!cur) continue;
-        if(Array.isArray(cur)){
-          for(const v of cur) stack.push(v);
-          continue;
-        }
-        if(typeof cur === "object"){
-          for(const [k,v] of Object.entries(cur)){
-            const lk = String(k).toLowerCase();
-            if(typeof v === "number" && Number.isFinite(v)){
-              if(keysLike.some(s=>lk.includes(s))) return v;
-            }
-            stack.push(v);
-          }
-        }
-      }
-    }catch(_){}
-    return null;
+      })
+      .catch((e) => console.warn("updateVisits failed:", e));
   }
 
-  async function fetchPriceUsd(){
-    // 1) Uniswap interface gateway (v4 position) - best effort
-    try{
-      const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + String(UNISWAP_V4_POSITION_ID);
-      const j = await fetchJson(url);
-      const n1 = deepFindNumber(j, ["priceusd","usd","price_usd"]);
-      if(n1 != null) return n1;
-    }catch(e){}
+  // back-compat name used elsewhere
+  window.updateVisitCounter = updateVisits;
 
-    // 2) CoinGecko by contract (works if token is indexed/listed)
-    try{
-      const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=" + TOKEN_CONTRACT + "&vs_currencies=usd";
-      const j = await fetchJson(url);
-      const key = TOKEN_CONTRACT.toLowerCase();
-      const v = j && j[key] && j[key].usd ? Number(j[key].usd) : null;
-      if (v != null && Number.isFinite(v) && v > 0) return v;
-    }catch(e){}
-
-    // 3) GeckoTerminal pool
-    try{
-      const pool = String(GECKO_POOL_ADDRESS || "").toLowerCase();
-      if(pool){
-        const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + pool;
-        const j = await fetchJson(url);
-        const v = Number(j?.data?.attributes?.base_token_price_usd);
-        if(Number.isFinite(v) && v > 0) return v;
-      }
-    }catch(e){}
-
-    return null;
-  }
-
-  // Primary: CoinGecko by contract (works even when DexScreener/GeckoTerminal has no pairs)
-  const TOKEN_CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-
-  // Uniswap v4 position (provided by you). We try to read price from Uniswap interface gateway.
-  const GECKO_POOL_ADDRESS = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4";
-  const UNISWAP_V4_POSITION_ID = "95049";
-
-  async function fetchPriceFromUniswapV4Position() {
-    // Uniswap interface gateway (CORS-friendly in most cases)
-    const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + encodeURIComponent(UNISWAP_V4_POSITION_ID);
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("Uniswap position HTTP " + r.status);
-    const j = await r.json();
-
-    // We search for common fields used by the interface responses
-    // Examples: { position: { priceUSD: "0.00123" } } or nested: data.position...
-    const candidates = [
-      j && j.priceUSD,
-      j && j.position && j.position.priceUSD,
-      j && j.position && j.position.token0PriceUSD,
-      j && j.position && j.position.token1PriceUSD,
-      j && j.data && j.data.position && j.data.position.priceUSD,
-      j && j.data && j.data.position && j.data.position.token0PriceUSD,
-      j && j.data && j.data.position && j.data.position.token1PriceUSD,
-      j && j.position && j.position.currentPriceUSD,
-    ];
-    for (const v of candidates) {
-      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
-      if (Number.isFinite(num) && num > 0) return num;
-    }
-    throw new Error("Uniswap position price missing");
-  }
-
-  async function fetchPriceCoinGeckoByContract() {
-    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
-      + "?contract_addresses=" + encodeURIComponent(TOKEN_CONTRACT)
-      + "&vs_currencies=usd";
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
-    const j = await r.json();
-    const key = TOKEN_CONTRACT.toLowerCase();
-    const usd = j && j[key] && j[key].usd;
-    const num = typeof usd === "number" ? usd : Number(usd);
-    if (!Number.isFinite(num) || num <= 0) throw new Error("CoinGecko price missing");
-    return num;
-  }
-
-  // Fallback: GeckoTerminal pool (if available)
-  const GECKO_POOL = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4"; // ETH pool address already linked in page
-
-  async function fetchPriceGeckoTerminal() {
-    const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + GECKO_POOL;
-    const r = await fetch(url, {cache:"no-store"});
-    if (!r.ok) throw new Error("GeckoTerminal HTTP " + r.status);
-    const j = await r.json();
-    const a = j && j.data && j.data.attributes ? j.data.attributes : null;
-    // Try multiple possible fields (API may differ)
-    const candidates = [
-      a && a.base_token_price_usd,
-      a && a.quote_token_price_usd,
-      a && a.price_in_usd,
-      a && a.pool_price_usd,
-      a && a.token_price_usd,
-    ];
-    for (const v of candidates) {
-      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
-      if (Number.isFinite(num) && num > 0) return num;
-    }
-    throw new Error("GeckoTerminal price missing");
-  }
-
-  async function updateTokenPrice() {
-    const el = $("liveTokenPrice") || $("currentPrice") || $("tokenPrice");
-    const lastEl = $("lastUpdated");
-    try {
-      let usd = null;
-      try {
-        usd = await fetchPriceFromUniswapV4Position();
-      } catch (e0) {
-        try {
-          usd = await fetchPriceCoinGeckoByContract();
-        } catch (e1) {
-          // fallback to pool-based price if CoinGecko doesn't know the token yet
-          usd = await fetchPriceGeckoTerminal();
-        }
-      }
-      if (el) el.textContent = "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 10 });
-      if (lastEl) lastEl.textContent = "Ultima actualizare: " + new Date().toLocaleTimeString("ro-RO");
-    } catch (e) {
-      console.warn("price update failed:", e);
-      if (el) el.textContent = "-";
-      if (lastEl) lastEl.textContent = "Ultima actualizare: --:--:--";
-    }
-  }
-
-    function startPriceAutoUpdate() {
+function startPriceAutoUpdate() {
     updateTokenPrice();
     if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
     window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
@@ -7313,16 +7120,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     if(document.getElementById("stbyt-news-style")) return;
     const style = document.createElement("style");
     style.id = "stbyt-news-style";
-    style.textContent = 
-.news-header{display:block !important;margin-bottom:16px;}
-.news-title{display:flex;align-items:center;gap:10px;}
-.news-grid{margin-top:10px;}
-.news-card{border-width:2px; transform:translateZ(0);}
-.news-card.type-news{border-color: rgba(56,189,248,.75); box-shadow: 0 0 0 1px rgba(56,189,248,.15), 0 14px 40px rgba(56,189,248,.10);}
-.news-card.type-update{border-color: rgba(34,197,94,.80); box-shadow: 0 0 0 1px rgba(34,197,94,.15), 0 14px 40px rgba(34,197,94,.10);}
-.news-card.type-announcement{border-color: rgba(249,115,22,.85); box-shadow: 0 0 0 1px rgba(249,115,22,.18), 0 14px 40px rgba(249,115,22,.12);}
-.news-card .badge{font-weight:700; letter-spacing:.2px;}
-`
+    style.textContent = `
       /* Bigger cards (+~20%) + stronger differentiation */
       .news-card{ padding: 1.2rem !important; border-radius: 18px !important; min-height: 220px !important; }
       .news-card h3{ font-size: 1.15rem !important; margin-bottom: .55rem !important; }
@@ -7449,9 +7247,6 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
       div.className = `news-card ${cls} ${it.bgUrl ? "has-bg":""}`;
       if(it.bgUrl){
         div.style.backgroundImage = `url('${it.bgUrl}')`;
-        div.style.backgroundSize = 'cover';
-        div.style.backgroundPosition = 'center';
-        div.style.backgroundRepeat = 'no-repeat';
       }
       div.innerHTML = `
         <div class="meta">
@@ -7776,7 +7571,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = (( $("newsEmojiInput") && $("newsEmojiInput").value ) || ( $("newsEmojiSelect") && $("newsEmojiSelect").value ) || "").trim();
+    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
     const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
     const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
     const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
@@ -7788,7 +7583,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     try {
       let bgUrl = null;
-      if (file) bgUrl = await uploadNewsImageIfAny(file);
+      if (file) bgUrl = await uploadNewsImage(file);
 
       await db.collection("news").add({
         title,
@@ -7817,9 +7612,18 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   function setNewsAdminVisible(isAdmin) {
     const box = $("newsAdminBox");
     if (box) box.style.display = isAdmin ? "block" : "none";
+
+    // Toggle all admin-only controls (buttons/forms) across page
+    document.querySelectorAll(".admin-only").forEach((el) => {
+      el.style.display = isAdmin ? "" : "none";
+    });
+
     // hide any legacy admin section if exists
     const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
     if (legacyAdmin) legacyAdmin.style.display = "none";
+
+    // refresh news admin UI if available
+    try { window.wireNewsAdminUI && window.wireNewsAdminUI(); } catch (e) {}
   }
 
   function startNewsRealtime() {
@@ -7852,7 +7656,10 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     // show admin box if admin
     auth.onAuthStateChanged((user)=>{
       const isAdmin = isAdminUser(user);
+      window.__STBYT_IS_ADMIN__ = isAdmin;
+      window.__SBYT_ADMIN = isAdmin;
       setNewsAdminVisible(isAdmin);
+      try { window.wireNewsAdminUI && window.wireNewsAdminUI(); } catch (e) {}
 
       // also re-render delete buttons after login
       // force refresh by re-reading current DOM content
