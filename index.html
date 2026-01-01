@@ -1179,8 +1179,7 @@
 
 
 /* === STBYT News layout + type highlight === */
-.news-grid{display:grid !important; grid-template-columns:repeat(2, minmax(0, 1fr)) !important; gap:16px !important; align-items:stretch;}
-@media (max-width: 900px){ .news-grid{grid-template-columns:1fr !important;} }
+.news-grid{display:flex !important; flex-direction:column !important; gap:16px !important;}
 .news-card{min-height:140px; padding:22px; border-radius:18px; position:relative; overflow:hidden;}
 .news-card.has-bg{background-size:cover; background-position:center; background-repeat:no-repeat;}
 .news-card::before{content:""; position:absolute; inset:0; border-radius:18px; background:linear-gradient(180deg, rgba(5,5,18,0.30), rgba(5,5,18,0.78)); z-index:0;}
@@ -1191,8 +1190,6 @@
 .news-date .news-emoji{margin-right:8px; font-size:1.05rem;}
 .news-actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
 
-
-.hero-accent{color:#ffd36a; text-shadow:0 0 18px rgba(255,211,106,0.35);} 
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1239,7 +1236,7 @@
 <div class="hero">
 <h1>StancuBYT Token</h1>
 <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
-                <span class="hero-accent">Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate</span>
+                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
             </p>
 <!-- Live Price Display -->
 <div id="livePriceDisplay" style="margin: 2rem 0;">
@@ -4999,7 +4996,7 @@ Object.assign(window, {
 window.addEventListener('load', () => {
   try { updateVisitCounter(); } catch(e){}
   try { loadNews(); } catch(e){}
-  try { if(window.__STBYT_IS_ADMIN__) listenPromos(); } catch(e){}
+  try { listenPromos(); } catch(e){}
 });
 
 
@@ -5543,7 +5540,7 @@ window.addEventListener('load', () => {
     __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(async snap=>{
       const promos=[]; snap.forEach(doc=>promos.push({ _id: doc.id, ...doc.data() }));
       await renderPromos(promos);
-    }, err=>console.warn('promos listen:', err));
+    }, err=>console.error('promos listen:', err));
   }
   window.listenPromos = listenPromos;
 
@@ -5577,8 +5574,8 @@ window.addEventListener('load', () => {
   window.addEventListener('load', ()=>{
     try{ window.loadNews && window.loadNews(); }catch(e){}
     try{ window.updateVisitCounter && window.updateVisitCounter(); }catch(e){}
-    try{ if(window.__STBYT_IS_ADMIN__) listenTeam(); }catch(e){}
-    try{ if(window.__STBYT_IS_ADMIN__) listenPromos(); }catch(e){}
+    try{ listenTeam(); }catch(e){}
+    try{ listenPromos(); }catch(e){}
     try{ initCmcEmbed(); }catch(e){}
   });
 
@@ -5591,10 +5588,10 @@ window.addEventListener('load', () => {
         setTimeout(()=>{ try{ initCmcEmbed(); }catch(e){} }, 200);
       }
       if (sectionId === 'whitepaper') {
-        setTimeout(()=>{ try{ if(window.__STBYT_IS_ADMIN__) listenTeam(); }catch(e){} }, 200);
+        setTimeout(()=>{ try{ listenTeam(); }catch(e){} }, 200);
       }
       if (sectionId === 'giveaway' || sectionId === 'promotii') {
-        setTimeout(()=>{ try{ if(window.__STBYT_IS_ADMIN__) listenPromos(); }catch(e){} }, 200);
+        setTimeout(()=>{ try{ listenPromos(); }catch(e){} }, 200);
       }
     };
   }
@@ -6797,39 +6794,25 @@ try{
 
   // ===== VISITS (stats/visits: {count}) =====
   window.updateVisitCounter = async function(){
-    // Update UI from Firestore in realtime AND increment via Cloud Function (1 per page load)
-    const countEl = document.getElementById("visitCount");
-    const setCount = (v)=>{
-      if(countEl) countEl.textContent = String(v ?? 0);
-    };
-
-    // Realtime listener (shows latest on all devices)
+    const db = fs(); if(!db) return;
+    const ref = db.collection("stats").doc("visits");
     try{
-      const db = fs();
-      if(db){
-        const ref = db.collection("stats").doc("visits");
-        ref.onSnapshot((snap)=>{
-          const data = snap && snap.exists ? snap.data() : null;
-          if(data && typeof data.count === "number") setCount(data.count);
+      const key = "stbyt_visit_"+new Date().toISOString().slice(0,10);
+      if(!localStorage.getItem(key)){
+        localStorage.setItem(key,"1");
+        await db.runTransaction(async t=>{
+          const snap = await t.get(ref);
+          const c = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
+          t.set(ref, {count: c+1}, {merge:true});
         });
       }
-    }catch(e){ /* ignore */ }
-
-    // Increment (exactly once per tab load)
-    try{
-      if(sessionStorage.getItem("__STBYT_HIT_DONE__")) return;
-      sessionStorage.setItem("__STBYT_HIT_DONE__", "1");
-
-      const HIT_COUNTER_URL = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/hitCounter";
-      const r = await fetch(HIT_COUNTER_URL, { method: "GET", mode: "cors", cache: "no-store" });
-      const j = await r.json().catch(()=>null);
-
-      // Accept {count:n} or {visits:n} or plain number
-      const n = (j && (j.count ?? j.visits ?? j.total)) ?? (typeof j === "number" ? j : null);
-      if(typeof n === "number") setCount(n);
+      ref.onSnapshot(s=>{
+        const c = s.exists && typeof s.data().count==="number" ? s.data().count : 0;
+        const el = $("visitsCounter") || $("visitCounter") || $("visitsCount");
+        if(el) el.textContent = String(c);
+      });
     }catch(e){
-      // Even if increment fails, UI still updates via Firestore listener when it can.
-      console.warn("hitCounter fetch failed:", e);
+      console.error("visit counter:", e);
     }
   };
 
@@ -7018,7 +7001,7 @@ try{
     // start listeners
     window.loadNews();
     window.loadTeam();
-    if(window.__STBYT_IS_ADMIN__) listenPromos();
+    listenPromos();
     window.updateVisitCounter();
 
     // token updates
@@ -7137,10 +7120,753 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   }
 
   async function fetchPriceUsd(){
-    // Price will be fetched via Cloud Function proxy to avoid CORS.
-    // For now, keep UI stable (no console errors).
+    // 1) Uniswap interface gateway (v4 position) - best effort
+    try{
+      const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + String(UNISWAP_V4_POSITION_ID);
+      const j = await fetchJson(url);
+      const n1 = deepFindNumber(j, ["priceusd","usd","price_usd"]);
+      if(n1 != null) return n1;
+    }catch(e){}
+
+    // 2) CoinGecko by contract (works if token is indexed/listed)
+    try{
+      const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=" + TOKEN_CONTRACT + "&vs_currencies=usd";
+      const j = await fetchJson(url);
+      const key = TOKEN_CONTRACT.toLowerCase();
+      const v = j && j[key] && j[key].usd ? Number(j[key].usd) : null;
+      if (v != null && Number.isFinite(v) && v > 0) return v;
+    }catch(e){}
+
+    // 3) GeckoTerminal pool
+    try{
+      const pool = String(GECKO_POOL_ADDRESS || "").toLowerCase();
+      if(pool){
+        const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + pool;
+        const j = await fetchJson(url);
+        const v = Number(j?.data?.attributes?.base_token_price_usd);
+        if(Number.isFinite(v) && v > 0) return v;
+      }
+    }catch(e){}
+
     return null;
-  });
+  }
+
+  // Primary: CoinGecko by contract (works even when DexScreener/GeckoTerminal has no pairs)
+  const TOKEN_CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+
+  // Uniswap v4 position (provided by you). We try to read price from Uniswap interface gateway.
+  const GECKO_POOL_ADDRESS = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4";
+  const UNISWAP_V4_POSITION_ID = "95049";
+
+  async function fetchPriceFromUniswapV4Position() {
+    // Uniswap interface gateway (CORS-friendly in most cases)
+    const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + encodeURIComponent(UNISWAP_V4_POSITION_ID);
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("Uniswap position HTTP " + r.status);
+    const j = await r.json();
+
+    // We search for common fields used by the interface responses
+    // Examples: { position: { priceUSD: "0.00123" } } or nested: data.position...
+    const candidates = [
+      j && j.priceUSD,
+      j && j.position && j.position.priceUSD,
+      j && j.position && j.position.token0PriceUSD,
+      j && j.position && j.position.token1PriceUSD,
+      j && j.data && j.data.position && j.data.position.priceUSD,
+      j && j.data && j.data.position && j.data.position.token0PriceUSD,
+      j && j.data && j.data.position && j.data.position.token1PriceUSD,
+      j && j.position && j.position.currentPriceUSD,
+    ];
+    for (const v of candidates) {
+      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
+      if (Number.isFinite(num) && num > 0) return num;
+    }
+    throw new Error("Uniswap position price missing");
+  }
+
+  async function fetchPriceCoinGeckoByContract() {
+    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
+      + "?contract_addresses=" + encodeURIComponent(TOKEN_CONTRACT)
+      + "&vs_currencies=usd";
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
+    const j = await r.json();
+    const key = TOKEN_CONTRACT.toLowerCase();
+    const usd = j && j[key] && j[key].usd;
+    const num = typeof usd === "number" ? usd : Number(usd);
+    if (!Number.isFinite(num) || num <= 0) throw new Error("CoinGecko price missing");
+    return num;
+  }
+
+  // Fallback: GeckoTerminal pool (if available)
+  const GECKO_POOL = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4"; // ETH pool address already linked in page
+
+  async function fetchPriceGeckoTerminal() {
+    const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + GECKO_POOL;
+    const r = await fetch(url, {cache:"no-store"});
+    if (!r.ok) throw new Error("GeckoTerminal HTTP " + r.status);
+    const j = await r.json();
+    const a = j && j.data && j.data.attributes ? j.data.attributes : null;
+    // Try multiple possible fields (API may differ)
+    const candidates = [
+      a && a.base_token_price_usd,
+      a && a.quote_token_price_usd,
+      a && a.price_in_usd,
+      a && a.pool_price_usd,
+      a && a.token_price_usd,
+    ];
+    for (const v of candidates) {
+      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
+      if (Number.isFinite(num) && num > 0) return num;
+    }
+    throw new Error("GeckoTerminal price missing");
+  }
+
+  async function updateTokenPrice() {
+    const el = $("liveTokenPrice") || $("currentPrice") || $("tokenPrice");
+    const lastEl = $("lastUpdated");
+    try {
+      let usd = null;
+      try {
+        usd = await fetchPriceFromUniswapV4Position();
+      } catch (e0) {
+        try {
+          usd = await fetchPriceCoinGeckoByContract();
+        } catch (e1) {
+          // fallback to pool-based price if CoinGecko doesn't know the token yet
+          usd = await fetchPriceGeckoTerminal();
+        }
+      }
+      if (el) el.textContent = "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 10 });
+      if (lastEl) lastEl.textContent = "Ultima actualizare: " + new Date().toLocaleTimeString("ro-RO");
+    } catch (e) {
+      console.warn("price update failed:", e);
+      if (el) el.textContent = "-";
+      if (lastEl) lastEl.textContent = "Ultima actualizare: --:--:--";
+    }
+  }
+
+    function startPriceAutoUpdate() {
+    updateTokenPrice();
+    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
+    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
+  }
+  window.startPriceAutoUpdate = startPriceAutoUpdate;
+  window.updateTokenPrice = updateTokenPrice;
+// -------- TOTAL SUPPLY (etherscanProxy) --------
+  async function updateTotalSupplyReal() {
+    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
+    try {
+      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
+      const r = await fetch(url, {cache:"no-store"});
+      const j = await r.json();
+      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
+      if (!raw || raw === "0") return;
+      // raw is integer with 18 decimals
+      const supply = Number(raw) / 1e18;
+      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
+    } catch (e) {
+      console.warn("totalSupplyReal failed:", e);
+    }
+  }
+  window.updateTotalSupplyReal = updateTotalSupplyReal;
+
+  // -------- NEWS (Firestore collection) --------
+  // Requirements:
+  // - public read on /news
+  // - admin (email) can add/delete
+  // - emoji shown near date/time
+  // - optional background image (auto-resized to fit card)
+
+  function injectNewsStyles(){
+    if(document.getElementById("stbyt-news-style")) return;
+    const style = document.createElement("style");
+    style.id = "stbyt-news-style";
+    style.textContent = `
+      /* Bigger cards (+~20%) + stronger differentiation */
+      .news-card{ padding: 1.2rem !important; border-radius: 18px !important; min-height: 220px !important; }
+      .news-card h3{ font-size: 1.15rem !important; margin-bottom: .55rem !important; }
+      .news-card .meta{ font-size: .92rem; opacity: .9; margin-bottom: .55rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+      .news-card .badge{ display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .6rem; border-radius:999px; font-weight:700; font-size:.78rem; letter-spacing:.02em; }
+      .news-card.type-news{ border: 2px solid rgba(90,140,255,.55) !important; box-shadow: 0 10px 28px rgba(90,140,255,.14) !important; }
+      .news-card.type-announcement{ border: 2px solid rgba(255,200,80,.55) !important; box-shadow: 0 10px 28px rgba(255,200,80,.14) !important; }
+      .news-card.type-update{ border: 2px solid rgba(120,255,180,.55) !important; box-shadow: 0 10px 28px rgba(120,255,180,.14) !important; }
+
+      .news-card.type-news .badge{ background: rgba(90,140,255,.18); border:1px solid rgba(90,140,255,.35); }
+      .news-card.type-announcement .badge{ background: rgba(255,200,80,.18); border:1px solid rgba(255,200,80,.35); }
+      .news-card.type-update .badge{ background: rgba(120,255,180,.18); border:1px solid rgba(120,255,180,.35); }
+
+      .news-card.has-bg{ background-size: cover !important; background-position: center !important; position: relative; overflow: hidden; }
+      .news-card.has-bg::before{
+        content:""; position:absolute; inset:0;
+        background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.70));
+        pointer-events:none;
+      }
+      .news-card.has-bg > *{ position: relative; z-index: 1; }
+      .news-card .news-actions{ margin-top: .8rem; display:flex; gap:.5rem; flex-wrap:wrap; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureNewsFormExtras(){
+    // Find a reasonable container near the existing news inputs
+    const host =
+      document.getElementById("newsForm") ||
+      document.getElementById("newsAdminPanel") ||
+      document.getElementById("newsAdmin") ||
+      document.querySelector("[data-news-form]") ||
+      document.querySelector(".news-form") ||
+      document.querySelector("#newsSection form");
+
+    if(!host) return;
+
+    // Emoji input + picker
+    if(!document.getElementById("newsEmoji")){
+      const wrap = document.createElement("div");
+      wrap.className = "form-row";
+      wrap.style.marginTop = "10px";
+      wrap.innerHTML = `
+        <label style="display:block;margin-bottom:6px;font-weight:700;">Emoji (optional)</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <select id="newsEmojiPicker" style="min-width:180px;padding:10px;border-radius:12px;">
+            <option value="">Alege emoji…</option>
+            <option value="🚀">🚀 Rocket</option>
+            <option value="🔥">🔥 Hot</option>
+            <option value="📣">📣 Announcement</option>
+            <option value="📰">📰 News</option>
+            <option value="✅">✅ Update</option>
+            <option value="🎁">🎁 Giveaway</option>
+            <option value="💎">💎 Diamond</option>
+            <option value="⚡">⚡ Power</option>
+            <option value="📈">📈 Growth</option>
+            <option value="🔔">🔔 Alert</option>
+          </select>
+          <input id="newsEmoji" type="text" placeholder="sau scrie un emoji" style="width:140px;padding:10px;border-radius:12px;">
+        </div>
+      `;
+      host.appendChild(wrap);
+
+      const picker = document.getElementById("newsEmojiPicker");
+      const input = document.getElementById("newsEmoji");
+      if(picker && input){
+        picker.addEventListener("change", ()=>{ input.value = picker.value || ""; });
+      }
+    }
+
+    // Image upload
+    if(!document.getElementById("newsImage")){
+      const wrap2 = document.createElement("div");
+      wrap2.className = "form-row";
+      wrap2.style.marginTop = "10px";
+      wrap2.innerHTML = `
+        <label style="display:block;margin-bottom:6px;font-weight:700;">Imagine fundal (optional)</label>
+        <input id="newsImage" type="file" accept="image/*" style="padding:10px;border-radius:12px;">
+        <div style="font-size:.9rem;opacity:.8;margin-top:6px;">Imaginea este redimensionata automat ca sa se incadreze in chenar.</div>
+      `;
+      host.appendChild(wrap2);
+    }
+  }
+
+  function fmtDateTime(ts){
+    try{
+      const d = new Date(Number(ts)||Date.now());
+      const dd = d.toLocaleDateString(undefined, {year:"numeric", month:"2-digit", day:"2-digit"});
+      const tt = d.toLocaleTimeString(undefined, {hour:"2-digit", minute:"2-digit"});
+      return { dd, tt };
+    }catch(e){
+      return { dd:"", tt:"" };
+    }
+  }
+
+  function typeClass(type){
+    const t = String(type||"update").toLowerCase();
+    if(t.includes("anunt")) return "type-announcement";
+    if(t.includes("stire") || t.includes("news")) return "type-news";
+    if(t.includes("nout")) return "type-update";
+    if(t === "announcement") return "type-announcement";
+    if(t === "news") return "type-news";
+    return "type-update";
+  }
+
+  function typeLabel(type){
+    const t = String(type||"update").toLowerCase();
+    if(t.includes("anunt") || t==="announcement") return "Anunt";
+    if(t.includes("stire") || t==="news") return "Stire";
+    if(t.includes("nout")) return "Noutate";
+    return "Noutate";
+  }
+
+  function renderNewsItems(items){
+    injectNewsStyles();
+    const container = $("newsList") || $("newsContainer") || $("newsGrid");
+    if(!container) return;
+    container.innerHTML = "";
+    items.forEach(it=>{
+      const {dd, tt} = fmtDateTime(it.createdAt || it.date || Date.now());
+      const emoji = (it.emoji||"").trim();
+      const cls = typeClass(it.type);
+      const div = document.createElement("div");
+      div.className = `news-card ${cls} ${it.bgUrl ? "has-bg":""}`;
+      if(it.bgUrl){
+        div.style.backgroundImage = `url('${it.bgUrl}')`;
+      }
+      div.innerHTML = `
+        <div class="meta">
+          <span class="badge">${typeLabel(it.type)}</span>
+          <span>${emoji ? emoji + " " : ""}${dd} ${tt}</span>
+        </div>
+        <h3>${(it.title||"")}</h3>
+        <p>${(it.content||"")}</p>
+        ${window.__STBYT_IS_ADMIN__ ? `<div class="news-actions"><button class="news-btn" onclick="deleteNewsDoc('${it.id}')">🗑️ Sterge</button></div>` : ""}
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  let _newsUnsub = null;
+
+  function startNewsRealtime(){
+    if(!db) return;
+    try{
+      if(_newsUnsub) { _newsUnsub(); _newsUnsub = null; }
+      // Live list for all devices
+      _newsUnsub = db.collection("news")
+        .orderBy("createdAt","desc")
+        .limit(100)
+        .onSnapshot((snap)=>{
+          const items = [];
+          snap.forEach(doc=>{
+            items.push({ id: doc.id, ...doc.data() });
+          });
+          renderNewsItems(items);
+          // clear any permission message if present
+          const err = document.getElementById("newsError");
+          if(err) err.remove();
+        }, (err)=>{
+          console.error("news onSnapshot error:", err);
+          const container = $("newsList") || $("newsContainer") || $("newsGrid");
+          if(container && !document.getElementById("newsError")){
+            const div = document.createElement("div");
+            div.id = "newsError";
+            div.style.margin = "12px 0";
+            div.style.padding = "12px 14px";
+            div.style.borderRadius = "14px";
+            div.style.border = "1px solid rgba(255,90,90,.35)";
+            div.style.background = "rgba(255,90,90,.12)";
+            div.textContent = "Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca match /news/{id} allow read: if true;";
+            container.parentNode.insertBefore(div, container);
+          }
+        });
+    }catch(e){
+      console.error("startNewsRealtime failed:", e);
+    }
+  }
+
+  window.startNewsRealtime = startNewsRealtime;
+
+  async function resizeImageToBlob(file, maxW=1600, maxH=900, quality=0.82){
+    // Client-side resize for background images (keeps within card, reduces upload issues)
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    try{
+      await new Promise((res, rej)=>{
+        img.onload = ()=>res();
+        img.onerror = (e)=>rej(e);
+        img.src = url;
+      });
+      let {width:w, height:h} = img;
+      const ratio = Math.min(maxW / w, maxH / h, 1);
+      const nw = Math.round(w * ratio);
+      const nh = Math.round(h * ratio);
+      const canvas = document.createElement("canvas");
+      canvas.width = nw;
+      canvas.height = nh;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, nw, nh);
+      const mime = (file.type && file.type.startsWith("image/")) ? file.type : "image/jpeg";
+      const blob = await new Promise((res)=>canvas.toBlob(res, mime, quality));
+      return blob || file;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function uploadNewsImageIfAny(file){
+    if(!file) return "";
+    if(!window.firebase || !firebase.storage) return "";
+    try{
+      // hard limit to avoid hangs
+      const MAX_MB = 6;
+      if(file.size > MAX_MB*1024*1024){
+        alert("Imagine prea mare. Te rog max " + MAX_MB + "MB.");
+        return "";
+      }
+      const blob = await resizeImageToBlob(file);
+      const storage = firebase.storage();
+      const path = "news/" + Date.now() + "_" + Math.random().toString(16).slice(2) + ".jpg";
+      const ref = storage.ref().child(path);
+      const task = ref.put(blob);
+      // simple timeout guard (25s)
+      await Promise.race([
+        task,
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error("upload-timeout")), 25000))
+      ]);
+      const url = await ref.getDownloadURL();
+      return url || "";
+    }catch(e){
+      console.warn("upload image failed:", e);
+      // do not block posting
+      return "";
+    }
+  }
+
+  window.saveNews = async function(){
+    if(!db) return;
+    const ok = await _ensureAdmin();
+    if(!ok) return;
+
+    // support multiple possible ids from original page
+    const titleEl = $("newsTitle") || $("titleNews") || $("anuntTitle");
+    const contentEl = $("newsContent") || $("contentNews") || $("anuntContent");
+    const typeEl = $("newsType") || $("typeNews") || $("anuntType");
+    const pinnedEl = $("pinNews") || $("newsPinned");
+    const emojiEl = $("newsEmoji");
+    const imgEl = $("newsImage");
+
+    const title = (titleEl?.value||"").trim();
+    const content = (contentEl?.value||"").trim();
+    const type = typeEl?.value || "noutate";
+    const pinned = !!pinnedEl?.checked;
+    const emoji = (emojiEl?.value||"").trim();
+
+    if (!title || !content) { alert("Completeaza titlul si continutul!"); return; }
+
+    const btn = $("saveNewsBtn") || $("addNewsBtn") || document.querySelector("[data-save-news]");
+    if(btn) { btn.disabled = true; btn.textContent = "Se publica..."; }
+
+    try{
+      const file = imgEl?.files?.[0] || null;
+      const bgUrl = await uploadNewsImageIfAny(file);
+
+      await db.collection("news").add({
+        title,
+        content,
+        type,
+        pinned,
+        emoji,
+        bgUrl: bgUrl || "",
+        createdAt: Date.now()
+      });
+
+      // reset form so you can add more
+      if(titleEl) titleEl.value = "";
+      if(contentEl) contentEl.value = "";
+      if(emojiEl) emojiEl.value = "";
+      const picker = $("newsEmojiPicker");
+      if(picker) picker.value = "";
+      if(imgEl) imgEl.value = "";
+      if(pinnedEl) pinnedEl.checked = false;
+
+    } catch(e){
+      console.error("save news failed:", e);
+      alert("Nu s-a putut salva anuntul. Verifica Firestore Rules si conexiunea.");
+    } finally {
+      if(btn) { btn.disabled = false; btn.textContent = "Adauga"; }
+    }
+  };
+
+  window.deleteNewsDoc = async function(docId){
+    if(!db) return;
+    const ok = await _ensureAdmin();
+    if(!ok) return;
+    if(!docId) return;
+    if(!confirm("Stergi acest anunt?")) return;
+    try{
+      await db.collection("news").doc(docId).delete();
+    }catch(e){
+      console.error("delete news:", e);
+      alert("Nu s-a putut sterge. Verifica permisiunile.");
+    }
+  };
+
+  // Hook admin UI + start realtime
+  function wireNewsAdminUI(){
+    ensureNewsFormExtras();
+    // show/hide buttons based on admin
+    const adminBar = $("newsAdminControls") || $("newsControls") || document.querySelector("[data-news-controls]");
+    const addBtn = $("saveNewsBtn") || $("addNewsBtn") || document.querySelector("[data-save-news]");
+    if(addBtn){
+      addBtn.onclick = (e)=>{ e.preventDefault(); window.saveNews(); };
+    }
+    if(adminBar){
+      adminBar.style.display = window.__STBYT_IS_ADMIN__ ? "" : "none";
+    }
+    // Some pages hide the whole admin panel by default
+    const adminPanel = $("newsAdminPanel") || $("newsAdmin");
+    if(adminPanel){
+      adminPanel.style.display = window.__STBYT_IS_ADMIN__ ? "" : "none";
+    }
+  }
+
+  window.wireNewsAdminUI = wireNewsAdminUI;
+
+  // Start now if possible
+  try { ensureNewsFormExtras(); } catch(e) {}
+  // -------- PRICE
+  // -------- PRICE// -------- PRICE (CoinGecko token_price) --------
+  async function fetchPriceCoinGecko() {
+    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
+      + "?contract_addresses=" + encodeURIComponent(CONTRACT_ADDRESS)
+      + "&vs_currencies=usd";
+    const r = await fetch(url, {cache:"no-store"});
+    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
+    const j = await r.json();
+    const key = CONTRACT_ADDRESS.toLowerCase();
+    const usd = j && j[key] && typeof j[key].usd === "number" ? j[key].usd : null;
+    if (usd == null) throw new Error("CoinGecko no price for contract");
+    return usd;
+  }
+
+  
+  function startPriceAutoUpdate() {
+    updateTokenPrice();
+    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
+    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
+  }
+  window.startPriceAutoUpdate = startPriceAutoUpdate;
+  window.updateTokenPrice = updateTokenPrice;
+
+  // -------- TOTAL SUPPLY (etherscanProxy) --------
+  async function updateTotalSupplyReal() {
+    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
+    try {
+      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
+      const r = await fetch(url, {cache:"no-store"});
+      const j = await r.json();
+      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
+      if (!raw || raw === "0") return;
+      // raw is integer with 18 decimals
+      const supply = Number(raw) / 1e18;
+      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
+    } catch (e) {
+      console.warn("totalSupplyReal failed:", e);
+    }
+  }
+  window.updateTotalSupplyReal = updateTotalSupplyReal;
+
+  // -------- NEWS (Firestore + Storage) --------
+  function renderNewsList(items, isAdmin) {
+    const container = $("newsContainer");
+    if (!container) return;
+
+    // sort: pinned first, then newest
+    items.sort((a,b)=>{
+      const pa = a.pinned ? 1 : 0;
+      const pb = b.pinned ? 1 : 0;
+      if (pa !== pb) return pb - pa;
+      const ta = a.createdAtMs || 0;
+      const tb = b.createdAtMs || 0;
+      return tb - ta;
+    });
+
+    container.innerHTML = "";
+    items.forEach(item=>{
+      const card = document.createElement("div");
+      card.className = "news-card";
+
+      // background image
+      if (item.bgUrl) {
+        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
+        card.style.backgroundSize = "cover";
+        card.style.backgroundPosition = "center";
+      }
+
+      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
+      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
+
+      card.innerHTML = `
+        <div class="news-card-head">
+          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
+          <div class="news-date">${when}</div>
+        </div>
+        <div class="news-card-title"><span class="news-emoji">${item.emoji || ""}</span>${item.title || ""}</div>
+        <div class="news-card-text">${item.content || ""}</div>
+      `;
+
+      if (isAdmin) {
+        const del = document.createElement("button");
+        del.className = "news-del-btn";
+        del.textContent = "🗑️ Sterge";
+        del.onclick = async ()=>{
+          if (!confirm("Stergi acest anunt?")) return;
+          const db = getDb();
+          if (!db) return alert("Firestore indisponibil.");
+          try {
+            await db.collection("news").doc(item._id).delete();
+          } catch (e) {
+            console.error("delete news failed:", e);
+            alert("Eroare la stergere (rules/permisiuni).");
+          }
+        };
+        card.appendChild(del);
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  async function uploadNewsImage(file) {
+    if (!file) return null;
+    const storage = getStorage();
+    if (!storage) throw new Error("Storage SDK indisponibil");
+    const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
+    const path = "news/" + Date.now() + "_" + safeName;
+    const ref = storage.ref().child(path);
+    await ref.put(file);
+    return await ref.getDownloadURL();
+  }
+
+  async function adminCreateNews() {
+    const auth = getAuth();
+    const user = auth && auth.currentUser ? auth.currentUser : null;
+    if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
+
+    const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
+    const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
+    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
+    const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
+    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
+
+    if (!title || !content) return alert("Completeaza titlu si continut.");
+
+    const db = getDb();
+    if (!db) return alert("Firestore indisponibil.");
+
+    try {
+      let bgUrl = null;
+      if (file) bgUrl = await uploadNewsImage(file);
+
+      await db.collection("news").add({
+        title,
+        content,
+        emoji: emoji || "",
+        type,
+        pinned,
+        bgUrl: bgUrl || "",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAtMs: Date.now(),
+      });
+
+      // reset form
+      if ($("newsTitleInput")) $("newsTitleInput").value = "";
+      if ($("newsContentInput")) $("newsContentInput").value = "";
+      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
+      if ($("newsBgInput")) $("newsBgInput").value = "";
+      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
+    } catch (e) {
+      console.error("create news failed:", e);
+      alert("Eroare la salvare stire (rules/permisiuni).");
+    }
+  }
+  window.adminCreateNews = adminCreateNews;
+
+  function setNewsAdminVisible(isAdmin) {
+    const box = $("newsAdminBox");
+    if (box) box.style.display = isAdmin ? "block" : "none";
+    // hide any legacy admin section if exists
+    const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
+    if (legacyAdmin) legacyAdmin.style.display = "none";
+  }
+
+  function startNewsRealtime() {
+    const db = getDb();
+    const container = $("newsContainer");
+    if (!db || !container) return;
+    try {
+      db.collection("news")
+        .orderBy("createdAtMs", "desc")
+        .limit(50)
+        .onSnapshot((snap)=>{
+          const items=[];
+          snap.forEach(doc=> items.push({_id: doc.id, ...doc.data()}));
+          const auth = getAuth();
+          const isAdmin = isAdminUser(auth && auth.currentUser);
+          renderNewsList(items, isAdmin);
+        }, (err)=>{
+          console.error("news onSnapshot error:", err);
+          container.innerHTML = '<div style="color:#ffb3b3; padding:12px; border:1px solid rgba(255,255,255,.15); border-radius:12px; background:rgba(0,0,0,.35)">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca <b>match /news/{id} allow read: if true;</b></div>';
+        });
+    } catch (e) {
+      console.error("startNewsRealtime failed:", e);
+    }
+  }
+
+  function wireAuthUI() {
+    const auth = getAuth();
+    if (!auth) return;
+
+    // show admin box if admin
+    auth.onAuthStateChanged((user)=>{
+      const isAdmin = isAdminUser(user);
+      setNewsAdminVisible(isAdmin);
+
+      // also re-render delete buttons after login
+      // force refresh by re-reading current DOM content
+      // (snapshot callback will also run)
+    });
+
+    // attach login form if present
+    const loginBtn = $("adminLoginBtn");
+    const logoutBtn = $("adminLogoutBtn");
+
+    if (loginBtn) {
+      loginBtn.onclick = async ()=>{
+        const email = ($("adminEmail") && $("adminEmail").value || "").trim();
+        const pass  = ($("adminPassword") && $("adminPassword").value || "").trim();
+        try {
+          await auth.signInWithEmailAndPassword(email, pass);
+        } catch (e) {
+          console.error("login failed:", e);
+          alert("Eroare autentificare: " + (e && e.message ? e.message : e));
+        }
+      };
+    }
+    if (logoutBtn) {
+      logoutBtn.onclick = async ()=> { try { await auth.signOut(); } catch(_){} };
+    }
+  }
+
+  function init() {
+    // remove junk texts if still present
+    try {
+      document.body.innerHTML = document.body.innerHTML
+        .replace(/Particles Background Contor Vizite[^<]*Scientific Navigation/g, "")
+        .replace(/coinmarketcap LIVE/g, "");
+    } catch(_) {}
+
+    updateVisits();
+    startPriceAutoUpdate();
+    updateTotalSupplyReal();
+    wireAuthUI();
+    startNewsRealtime();
+
+    // if there is a visible price placeholder under hero text
+    const heroPrice = $("liveTokenPrice") || $("currentPrice");
+    if (heroPrice && heroPrice.textContent.trim() === "") heroPrice.textContent = "Loading...";
+  }
+
+  window.addEventListener("load", init);
+})();
+
+// Boot (runs on every page load)
+document.addEventListener("DOMContentLoaded", () => {
+  try { window.updateVisits && window.updateVisits(); } catch (e) {}
+  // price will be handled next (kept if existing function is present)
+  try { window.startPriceAutoUpdate && window.startPriceAutoUpdate(); } catch (e) {}
+  try { window.wireNewsAdminUI && window.wireNewsAdminUI(); } catch (e) {}
+  try { window.startNewsRealtime && window.startNewsRealtime(); } catch (e) {}
+});
 window.__SBYT_BOOT = true;
 </script>
 
@@ -7427,21 +8153,6 @@ window.__SBYT_BOOT = true;
     }
   }
   window.adminCreateNews = adminCreateNews;
-
-  // Emoji picker -> writes into the text field "sau scrie (ex: ...)"
-  (function bindEmojiPicker(){
-    const sel = $("newsEmojiSelect");
-    const inp = $("newsEmojiInput");
-    if(!sel || !inp) return;
-    sel.onchange = ()=>{
-      const v = (sel.value || "").trim();
-      if(v) inp.value = v;
-      // reset select back to placeholder so the same emoji can be re-picked if desired
-      sel.value = "";
-      inp.focus();
-    };
-  })();
-
 
   async function deleteNews(id){
     try{
