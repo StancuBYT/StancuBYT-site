@@ -4279,48 +4279,29 @@ async function fetchDexScreenerBestPair() {
 
 async function updateLivePriceAndChart(period = 'live') {
             try {
-                const pair = await fetchDexScreenerBestPair();
-                const priceUsd = Number(pair.priceUsd);
-                // actualizează graficul live (fallback sigur)
-                updatePriceChartLive(priceUsd);
-                if (!Number.isFinite(priceUsd)) throw new Error('priceUsd missing');
+                const priceUsd = await fetchPriceUsd();
+                if (!Number.isFinite(priceUsd)) throw new Error("price unavailable");
 
-                // UI: preț + schimbare
+                updatePriceChartLive(Number(priceUsd));
+
                 const priceEl = document.getElementById('currentPrice');
-                if (priceEl) priceEl.textContent = '$' + priceUsd.toLocaleString('en-US', { maximumFractionDigits: 10 });
+                if (priceEl) priceEl.textContent = '$' + Number(priceUsd).toLocaleString('en-US', { maximumFractionDigits: 10 });
 
                 const changeEl = document.getElementById('priceChange');
-                const ch24 = pair?.priceChange?.h24;
-                if (changeEl) {
-                    if (typeof ch24 === 'number') {
-                        const sign = ch24 >= 0 ? '+' : '';
-                        changeEl.textContent = `${sign}${ch24.toFixed(2)}% (24h)`;
-                    } else {
-                        changeEl.textContent = '';
-                    }
-                }
+                if (changeEl) changeEl.textContent = "";
 
-                const lastEl = document.getElementById('lastUpdated');
-                if (lastEl) lastEl.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const lastEl = document.getElementById('lastUpdate');
+                if (lastEl) lastEl.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO');
 
-                // MarketCap (DexScreener fdv) - dacă există element
-                const mcEl = document.getElementById('marketCap');
-                const fdv = Number(pair.fdv);
-                if (mcEl) mcEl.textContent = Number.isFinite(fdv) ? ('$' + fdv.toLocaleString('en-US', { maximumFractionDigits: 0 })) : mcEl.textContent;
-
-                // adaugă punct în serie
-                const now = new Date();
-                liveSeries.push({ t: now, p: priceUsd });
-                // nu păstra prea mult
-                if (liveSeries.length > 300) liveSeries = liveSeries.slice(-300);
-
-                _renderLiveChart(period);
-
-                lastPrice = priceUsd;
+                lastPrice = Number(priceUsd);
             } catch (e) {
                 console.error('Live price update error:', e);
+                const priceEl = document.getElementById('currentPrice');
+                if (priceEl) priceEl.textContent = '-';
             }
         }
+
+        // Butoane perioadă
 
         // Butoane perioadă (dacă există în UI)
         async function changeChartPeriod(period) {
@@ -7075,11 +7056,16 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
   // -------- VISITS (Cloud Function) --------
   async function updateVisits() {
+    // Global counter (all devices) via Cloud Function hitCounter
     try {
       const r = await fetch(FUNCTIONS_BASE + "/hitCounter", {cache:"no-store"});
       const j = await r.json();
-      const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
-      if (n != null) safeText($("visitCount"), String(n));
+      const n = (j && (j.count ?? j.visits ?? j.value ?? j.total ?? j.data)) ?? null;
+      const val = (n != null) ? String(n) : "-";
+      ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id)=>{
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      });
     } catch (e) {
       console.warn("hitCounter failed:", e);
     }
@@ -7092,10 +7078,73 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   
   
   // -------- PRICE (Real) --------
+  // -------- PRICE helpers --------
+  async function fetchJson(url){
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    return await r.json();
+  }
+  function deepFindNumber(obj, keysLike){
+    try{
+      const stack=[obj];
+      while(stack.length){
+        const cur=stack.pop();
+        if(!cur) continue;
+        if(Array.isArray(cur)){
+          for(const v of cur) stack.push(v);
+          continue;
+        }
+        if(typeof cur === "object"){
+          for(const [k,v] of Object.entries(cur)){
+            const lk = String(k).toLowerCase();
+            if(typeof v === "number" && Number.isFinite(v)){
+              if(keysLike.some(s=>lk.includes(s))) return v;
+            }
+            stack.push(v);
+          }
+        }
+      }
+    }catch(_){}
+    return null;
+  }
+
+  async function fetchPriceUsd(){
+    // 1) Uniswap interface gateway (v4 position) - best effort
+    try{
+      const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + String(UNISWAP_V4_POSITION_ID);
+      const j = await fetchJson(url);
+      const n1 = deepFindNumber(j, ["priceusd","usd","price_usd"]);
+      if(n1 != null) return n1;
+    }catch(e){}
+
+    // 2) CoinGecko by contract (works if token is indexed/listed)
+    try{
+      const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=" + TOKEN_CONTRACT + "&vs_currencies=usd";
+      const j = await fetchJson(url);
+      const key = TOKEN_CONTRACT.toLowerCase();
+      const v = j && j[key] && j[key].usd ? Number(j[key].usd) : null;
+      if (v != null && Number.isFinite(v) && v > 0) return v;
+    }catch(e){}
+
+    // 3) GeckoTerminal pool
+    try{
+      const pool = String(GECKO_POOL_ADDRESS || "").toLowerCase();
+      if(pool){
+        const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + pool;
+        const j = await fetchJson(url);
+        const v = Number(j?.data?.attributes?.base_token_price_usd);
+        if(Number.isFinite(v) && v > 0) return v;
+      }
+    }catch(e){}
+
+    return null;
+  }
+
   // Primary: CoinGecko by contract (works even when DexScreener/GeckoTerminal has no pairs)
   const TOKEN_CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
 
   // Uniswap v4 position (provided by you). We try to read price from Uniswap interface gateway.
+  const GECKO_POOL_ADDRESS = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4";
   const UNISWAP_V4_POSITION_ID = "95049";
 
   async function fetchPriceFromUniswapV4Position() {
@@ -7246,7 +7295,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
           <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
           <div class="news-date">${when}</div>
         </div>
-        <div class="news-card-title">${(item.emoji ? item.emoji + " " : "") + (item.title || "")}</div>
+        <div class="news-card-title"><span class="news-emoji">${item.emoji || ""}</span>${item.title || ""}</div>
         <div class="news-card-text">${item.content || ""}</div>
       `;
 
@@ -7274,13 +7323,31 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
   async function uploadNewsImage(file) {
     if (!file) return null;
+    const MAX_MB = 6;
+    if (file.size && file.size > MAX_MB * 1024 * 1024) {
+      throw new Error("Imagine prea mare (max " + MAX_MB + "MB).");
+    }
     const storage = getStorage();
     if (!storage) throw new Error("Storage SDK indisponibil");
     const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
     const path = "news/" + Date.now() + "_" + safeName;
     const ref = storage.ref().child(path);
-    await ref.put(file);
+
+    const timeoutMs = 15000;
+    await Promise.race([
+      ref.put(file),
+      new Promise((_, rej)=>setTimeout(()=>rej(new Error("Upload timeout. Verifica Storage Rules.")), timeoutMs)),
+    ]);
+
     return await ref.getDownloadURL();
+  }
+
+  
+  function wireEmojiSelect(){
+    const sel = document.getElementById("newsEmojiSelect");
+    const inp = document.getElementById("newsEmojiInput");
+    if (!sel || !inp) return;
+    sel.addEventListener("change", ()=>{ inp.value = sel.value || ""; });
   }
 
   async function adminCreateNews() {
@@ -7420,6 +7487,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     startPriceAutoUpdate();
     updateTotalSupplyReal();
     wireAuthUI();
+    wireEmojiSelect();
     startNewsRealtime();
 
     // if there is a visible price placeholder under hero text
@@ -7542,7 +7610,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
           <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
           <div class="news-date">${when}</div>
         </div>
-        <div class="news-card-title">${(item.emoji ? item.emoji + " " : "") + (item.title || "")}</div>
+        <div class="news-card-title"><span class="news-emoji">${item.emoji || ""}</span>${item.title || ""}</div>
         <div class="news-card-text">${item.content || ""}</div>
       `;
 
