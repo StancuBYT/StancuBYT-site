@@ -4333,7 +4333,18 @@ async function updateLivePriceAndChart(period = 'live') {
 
         window.addEventListener('load', () => {
             initializeChart();
-            startPriceAutoUpdate();
+            
+    // Emoji selector -> input
+    try {
+      const sel = document.getElementById("newsEmojiSelect");
+      const inp = document.getElementById("newsEmojiInput");
+      if (sel && inp && !sel.__bound) {
+        sel.__bound = true;
+        sel.addEventListener("change", () => { inp.value = sel.value || ""; });
+      }
+    } catch (_) {}
+
+    startPriceAutoUpdate();
 
             // IMPORTANT: evită conflictul de id duplicat pentru contact din whitepaper
             const wpContact = document.querySelector('#whitepaper #contact');
@@ -7055,32 +7066,48 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
 
   // -------- VISITS (Cloud Function) --------
-  async function updateVisits() {
+    async function updateVisits() {
     // Global counter (all devices) via Cloud Function hitCounter
     try {
-      // prevent multiple increments per page load (some scripts call it multiple times)
+      // show cached value without incrementing again
       if (window.__STBYT_VISIT_VALUE != null) {
-        const val = String(window.__STBYT_VISIT_VALUE);
-        ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id)=>{
+        const valCached = String(window.__STBYT_VISIT_VALUE);
+        ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id) => {
           const el = document.getElementById(id);
-          if (el) el.textContent = val;
+          if (el) el.textContent = valCached;
         });
         return;
       }
+
+      // prevent multiple increments on same page load
       if (window.__STBYT_VISIT_CALLING) return;
       window.__STBYT_VISIT_CALLING = true;
 
-      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store" });
+      const guardKey = "__stbyt_hit_once__";
+      try {
+        if (sessionStorage.getItem(guardKey) === "1") {
+          // already incremented this tab load; just fetch once more? keep last known or skip
+          window.__STBYT_VISIT_CALLING = false;
+          return;
+        }
+        sessionStorage.setItem(guardKey, "1");
+      } catch (_) {}
+
+      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store", mode: "cors" });
+      if (!r.ok) throw new Error("hitCounter http " + r.status);
       const j = await r.json();
       const n = (j && (j.count ?? j.visits ?? j.value ?? j.total ?? j.data)) ?? null;
+
       const val = (n != null) ? String(n) : "-";
       window.__STBYT_VISIT_VALUE = val;
-      ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id)=>{
+
+      ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.textContent = val;
       });
     } catch (e) {
       console.warn("hitCounter failed:", e);
+      try { sessionStorage.removeItem("__stbyt_hit_once__"); } catch (_) {}
     } finally {
       window.__STBYT_VISIT_CALLING = false;
     }
@@ -7286,7 +7313,16 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     if(document.getElementById("stbyt-news-style")) return;
     const style = document.createElement("style");
     style.id = "stbyt-news-style";
-    style.textContent = `
+    style.textContent = 
+.news-header{display:block !important;margin-bottom:16px;}
+.news-title{display:flex;align-items:center;gap:10px;}
+.news-grid{margin-top:10px;}
+.news-card{border-width:2px; transform:translateZ(0);}
+.news-card.type-news{border-color: rgba(56,189,248,.75); box-shadow: 0 0 0 1px rgba(56,189,248,.15), 0 14px 40px rgba(56,189,248,.10);}
+.news-card.type-update{border-color: rgba(34,197,94,.80); box-shadow: 0 0 0 1px rgba(34,197,94,.15), 0 14px 40px rgba(34,197,94,.10);}
+.news-card.type-announcement{border-color: rgba(249,115,22,.85); box-shadow: 0 0 0 1px rgba(249,115,22,.18), 0 14px 40px rgba(249,115,22,.12);}
+.news-card .badge{font-weight:700; letter-spacing:.2px;}
+`
       /* Bigger cards (+~20%) + stronger differentiation */
       .news-card{ padding: 1.2rem !important; border-radius: 18px !important; min-height: 220px !important; }
       .news-card h3{ font-size: 1.15rem !important; margin-bottom: .55rem !important; }
@@ -7413,6 +7449,9 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
       div.className = `news-card ${cls} ${it.bgUrl ? "has-bg":""}`;
       if(it.bgUrl){
         div.style.backgroundImage = `url('${it.bgUrl}')`;
+        div.style.backgroundSize = 'cover';
+        div.style.backgroundPosition = 'center';
+        div.style.backgroundRepeat = 'no-repeat';
       }
       div.innerHTML = `
         <div class="meta">
@@ -7737,7 +7776,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const emoji = (( $("newsEmojiInput") && $("newsEmojiInput").value ) || ( $("newsEmojiSelect") && $("newsEmojiSelect").value ) || "").trim();
     const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
     const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
     const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
@@ -7749,7 +7788,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     try {
       let bgUrl = null;
-      if (file) bgUrl = await uploadNewsImage(file);
+      if (file) bgUrl = await uploadNewsImageIfAny(file);
 
       await db.collection("news").add({
         title,
