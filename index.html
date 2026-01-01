@@ -1183,6 +1183,17 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<style id="stbyt-hotfix-css">
+/* HOTFIX: force 2 cards per row desktop, 1 on mobile */
+#newsContainer.news-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+@media (max-width: 780px){#newsContainer.news-grid{grid-template-columns:1fr;}}
+/* stronger type accents */
+.news-card.type-news{border:2px solid rgba(0,170,255,0.45); box-shadow:0 0 18px rgba(0,170,255,0.12);}
+.news-card.type-update{border:2px solid rgba(0,255,140,0.42); box-shadow:0 0 18px rgba(0,255,140,0.10);}
+.news-card.type-announce{border:2px solid rgba(255,170,0,0.45); box-shadow:0 0 18px rgba(255,170,0,0.10);}
+</style>
+
 </head><body>
 <div id="particles-js"></div>
 <div class="visit-counter" id="visitCounter">
@@ -7784,6 +7795,328 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   startVisits();
   startNewsListener();
 
+})();
+</script>
+
+
+<script id="stbyt-hotfix-v6">
+/* ========= STBYT HOTFIX (v6 stable) =========
+   Fixes:
+   - Add news validation + emoji select -> input + createdAt
+   - Admin-only delete button after login
+   - Background image upload (resize + Storage put) without blocking publish
+   - Visits: 1 hit per tab + live display sync
+   - Force grid 2 per row desktop, 1 mobile
+   =========================================== */
+(function(){
+  if (window.__STBYT_HOTFIX_APPLIED__) return;
+  window.__STBYT_HOTFIX_APPLIED__ = true;
+
+  const ADMIN_EMAIL = "stancubyt@gmail.com";
+  const FUNCTIONS_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net";
+
+  function $(id){ return document.getElementById(id); }
+  function isAdmin(){
+    try{
+      const u = firebase?.auth?.().currentUser;
+      return !!u && String(u.email||"").toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }catch(e){ return false; }
+  }
+  function setTextAny(ids, val){
+    ids.forEach(id=>{
+      const el = $(id);
+      if(el) el.textContent = String(val);
+    });
+  }
+  function fmtDateAny(ts){
+    try{
+      let d=null;
+      if(!ts) return "";
+      if (typeof ts === "number") d = new Date(ts);
+      else if (ts.toDate) d = ts.toDate();
+      else if (ts.seconds) d = new Date(ts.seconds*1000);
+      else d = new Date(ts);
+      if (isNaN(d.getTime())) return "";
+      const dd=String(d.getDate()).padStart(2,"0");
+      const mm=String(d.getMonth()+1).padStart(2,"0");
+      const yy=d.getFullYear();
+      const hh=String(d.getHours()).padStart(2,"0");
+      const mi=String(d.getMinutes()).padStart(2,"0");
+      return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+    }catch(_){ return ""; }
+  }
+  function typeMeta(t){
+    const type = String(t||"announcement").toLowerCase();
+    if (type === "stire" || type === "news") return {label:"Știre", cls:"type-news"};
+    if (type === "noutate" || type === "update") return {label:"Noutate", cls:"type-update"};
+    return {label:"Anunț", cls:"type-announce"};
+  }
+
+  // ---- Emoji select => input ----
+  const emojiSel = $("newsEmojiSelect");
+  const emojiInp = $("newsEmojiInput");
+  if (emojiSel && emojiInp){
+    emojiSel.addEventListener("change", ()=>{
+      emojiInp.value = emojiSel.value || "";
+      emojiInp.dispatchEvent(new Event("input", {bubbles:true}));
+    });
+  }
+
+  // ---- NEWS: single source of truth (collection news) ----
+  let unsubNews = null;
+
+  function renderNewsCard(docId, data){
+    const c = $("newsContainer");
+    if (!c) return;
+
+    const meta = typeMeta(data.type);
+    const title = (data.title||"").toString();
+    const content = (data.content||"").toString();
+    const emoji = (data.emoji||"").toString().trim();
+    const created = fmtDateAny(data.createdAt || data.created || data.timestamp);
+    const bgUrl = (data.bgUrl || data.imageUrl || "").toString();
+
+    const card = document.createElement("div");
+    card.className = "news-card " + meta.cls;
+
+    if (bgUrl){
+      const safe = bgUrl.replace(/'/g, "%27");
+      card.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.75)), url('${safe}')`;
+      card.style.backgroundSize = "cover";
+      card.style.backgroundPosition = "center";
+      card.style.backgroundRepeat = "no-repeat";
+    }
+
+    card.innerHTML = `
+      <div class="news-card-top">
+        <div class="news-badge">${meta.label}</div>
+        ${isAdmin() ? `<button class="news-del" data-id="${docId}" title="Sterge">🗑️</button>` : ``}
+      </div>
+      <div class="news-card-title">${title}</div>
+      <div class="news-card-meta">${emoji ? `<span class="news-emoji">${emoji}</span>` : ``}<span>${created}</span></div>
+      <div class="news-card-content">${content}</div>
+    `;
+    c.appendChild(card);
+  }
+
+  function renderNewsList(docs){
+    const c = $("newsContainer");
+    if (!c) return;
+    c.classList.add("news-grid");
+    c.innerHTML = "";
+    if (!docs.length){
+      c.innerHTML = '<div style="opacity:0.8;">Nu există anunțuri încă.</div>';
+      return;
+    }
+    docs.forEach(d => renderNewsCard(d.id, d.data));
+    // bind delete
+    if (isAdmin()){
+      c.querySelectorAll(".news-del").forEach(btn=>{
+        btn.onclick = async ()=>{
+          const id = btn.getAttribute("data-id");
+          if(!id) return;
+          if(!confirm("Stergi acest anunt?")) return;
+          try{
+            await firebase.firestore().collection("news").doc(id).delete();
+          }catch(e){
+            console.error(e);
+            alert("Nu am putut sterge (rules/permisiuni).");
+          }
+        };
+      });
+    }
+  }
+
+  function startNewsListener(){
+    try{
+      if (unsubNews) unsubNews();
+      const db = firebase.firestore();
+      unsubNews = db.collection("news")
+        .orderBy("createdAt", "desc")
+        .limit(50)
+        .onSnapshot(snap=>{
+          const docs=[];
+          snap.forEach(doc=> docs.push({id: doc.id, data: doc.data()}));
+          renderNewsList(docs);
+        }, err=>{
+          console.error("news listen:", err);
+          const c = $("newsContainer");
+          if (c) c.innerHTML = '<div style="opacity:0.85;">Eroare la incarcarea anunturilor (rules/permisiuni).</div>';
+        });
+    }catch(e){
+      console.error("startNewsListener:", e);
+    }
+  }
+
+  // ---- Image resize helper ----
+  function fileToResizedJpegBlob(file, maxW=1400, maxH=1400, quality=0.82){
+    return new Promise((resolve, reject)=>{
+      try{
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = ()=>{
+          try{
+            let w = img.width, h = img.height;
+            const scale = Math.min(maxW / w, maxH / h, 1);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+            const canvas = document.createElement("canvas");
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            canvas.toBlob((blob)=>{
+              URL.revokeObjectURL(url);
+              if (!blob) return reject(new Error("Resize failed"));
+              resolve(blob);
+            }, "image/jpeg", quality);
+          }catch(err){
+            URL.revokeObjectURL(url);
+            reject(err);
+          }
+        };
+        img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error("Invalid image")); };
+        img.src = url;
+      }catch(e){ reject(e); }
+    });
+  }
+
+  async function uploadBgIfAny(file){
+    if (!file) return "";
+    // always use compat storage (firebase-storage-compat)
+    const storage = firebase.storage();
+    const path = `news/${Date.now()}_${Math.random().toString(16).slice(2)}.jpg`;
+    const ref = storage.ref().child(path);
+
+    // resize before upload
+    const blob = await fileToResizedJpegBlob(file);
+    const task = ref.put(blob, {contentType:"image/jpeg"});
+    // timeout safety
+    const timeout = new Promise((_, rej)=>setTimeout(()=>rej(new Error("Upload timeout")), 20000));
+    await Promise.race([task, timeout]);
+    return await ref.getDownloadURL();
+  }
+
+  async function adminCreateNewsFixed(){
+    if (!isAdmin()) return alert("Doar admin poate adauga.");
+
+    const titleEl = $("newsTitleInput");
+    const contentEl = $("newsContentInput");
+    const emojiEl = $("newsEmojiInput");
+    const typeEl = $("newsTypeInput");
+    const fileEl = $("newsBgInput");
+
+    const title = (titleEl?.value || "").trim();
+    const content = (contentEl?.value || "").trim();
+    const emoji = (emojiEl?.value || "").trim();
+    const type = (typeEl?.value || "announcement");
+    const pinned = !!($("newsPinnedInput")?.checked);
+    const file = fileEl?.files?.[0] || null;
+
+    if (!title || !content){
+      return alert("Completeaza titlu si continut.");
+    }
+
+    const btn = $("newsAddBtn");
+    if (btn){ btn.disabled = true; btn.style.opacity="0.7"; }
+
+    try{
+      let bgUrl = "";
+      if (file){
+        try{
+          bgUrl = await uploadBgIfAny(file);
+        }catch(upErr){
+          console.warn("bg upload failed:", upErr);
+          // publish without image if upload fails
+          bgUrl = "";
+        }
+      }
+
+      await firebase.firestore().collection("news").add({
+        title,
+        content,
+        emoji,
+        type,
+        pinned,
+        bgUrl,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // reset inputs
+      if (titleEl) titleEl.value = "";
+      if (contentEl) contentEl.value = "";
+      if (emojiEl) emojiEl.value = "";
+      if (emojiSel) emojiSel.value = "";
+      if (typeEl) typeEl.value = "update";
+      if (fileEl) fileEl.value = "";
+
+    }catch(e){
+      console.error(e);
+      alert("Eroare la salvare anunt (rules/permisiuni).");
+    }finally{
+      if (btn){ btn.disabled = false; btn.style.opacity="1"; }
+    }
+  }
+
+  // bind button
+  const addBtn = $("newsAddBtn");
+  if (addBtn){
+    addBtn.onclick = adminCreateNewsFixed;
+  }
+
+  // ---- VISITS: live display + 1 hit per tab ----
+  let visitsUnsub = null;
+
+  function attachVisitsListener(){
+    try{
+      if (visitsUnsub) visitsUnsub();
+      visitsUnsub = firebase.firestore().doc("stats/visits").onSnapshot(snap=>{
+        const data = snap.exists ? snap.data() : {};
+        const n = (data && typeof data.count === "number") ? data.count : (data && data.value) ? data.value : 0;
+        setTextAny(["visitCount","visitCounter","visitsCount","visitsCounter"], n);
+      }, err=>{
+        console.warn("visits listen:", err);
+      });
+    }catch(e){ console.warn("attachVisitsListener:", e); }
+  }
+
+  async function hitCounterOncePerTab(){
+    try{
+      const key = "stbyt_hit_done";
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", {cache:"no-store"});
+      // ignore response; listener will update UI
+      await r.text().catch(()=>{});
+    }catch(e){
+      console.warn("hitCounter:", e);
+    }
+  }
+
+  // prevent legacy callers from spamming
+  window.updateVisits = function(){};
+  window.startPriceAutoUpdate = window.startPriceAutoUpdate || function(){};
+
+  // ---- INIT ----
+  function boot(){
+    attachVisitsListener();
+    hitCounterOncePerTab();
+    startNewsListener();
+  }
+
+  // Re-render admin controls after login
+  try{
+    firebase.auth().onAuthStateChanged(()=>{
+      // refresh news to show delete buttons + ensure add controls visible
+      startNewsListener();
+    });
+  }catch(_){}
+
+  // run after DOM ready
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", boot);
+  }else{
+    boot();
+  }
 })();
 </script>
 
