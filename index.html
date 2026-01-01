@@ -358,14 +358,13 @@
         }
 
         .news-header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--green-growth);
-}
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--green-growth);
+        }
 
         .news-title {
             display: flex;
@@ -399,18 +398,15 @@
         }
 
         .news-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-}
-@media (max-width: 820px) {
-    .news-grid { grid-template-columns: 1fr; }
-}
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
 
         .news-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
-            padding: 2.2rem;
+            padding: 1.5rem;
             border: 1px solid rgba(0, 102, 255, 0.2);
             transition: all 0.3s ease;
         }
@@ -421,12 +417,7 @@
             box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
         }
 
-        
-/* Card accents by type (marketing colors) */
-.news-card.type-news { border-color: rgba(0, 153, 255, 0.45); box-shadow: 0 0 0 1px rgba(0,153,255,0.10) inset; }
-.news-card.type-update { border-color: rgba(0, 255, 136, 0.35); box-shadow: 0 0 0 1px rgba(0,255,136,0.08) inset; }
-.news-card.type-announcement { border-color: rgba(255, 170, 0, 0.45); box-shadow: 0 0 0 1px rgba(255,170,0,0.10) inset; }
-.news-card.pinned {
+        .news-card.pinned {
             border: 2px solid var(--orange-alert);
             background: rgba(255, 149, 0, 0.05);
         }
@@ -466,12 +457,6 @@
             align-items: center;
             gap: 5px;
         }
-
-.news-emoji{
-    font-size: 1.05rem;
-    margin-right: 2px;
-}
-
 
         .news-form {
             margin-top: 2rem;
@@ -1237,7 +1222,9 @@
 </div>
 <div class="hero">
 <h1>StancuBYT Token</h1>
-<p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.98; font-weight:700; color:#00ff88; text-shadow: 0 0 16px rgba(0,255,136,0.25);">Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate</p>
+<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
+            </p>
 <!-- Live Price Display -->
 <div id="livePriceDisplay" style="margin: 2rem 0;">
 <div class="price-display" id="currentPrice">Se încarcă...</div>
@@ -1312,7 +1299,7 @@
   </div>
   <div class="form-row" style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
     <input id="newsBgInput" type="file" accept="image/*" />
-    <button type="button" id="newsAddBtn" style="display:none" onclick="adminCreateNews()">➕ Adauga</button>
+    <button type="button" id="newsAddBtn" type="button" onclick="adminCreateNews()">➕ Adauga</button>
   </div>
 </div>
 
@@ -1775,13 +1762,10 @@
         }
 
         .news-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-}
-@media (max-width: 820px) {
-    .news-grid { grid-template-columns: 1fr; }
-}
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
 
         .news-card {
             background: rgba(255, 255, 255, 0.05);
@@ -2600,7 +2584,9 @@
 </div>
 <div class="hero">
 <h1>StancuBYT Token</h1>
-<p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.98; font-weight:700; color:#00ff88; text-shadow: 0 0 16px rgba(0,255,136,0.25);">Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate</p>
+<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
+            </p>
 <!-- Live Price Display -->
 <div id="livePriceDisplay" style="margin: 2rem 0;">
 <div class="price-display" id="currentPrice">Se încarcă...</div>
@@ -3572,7 +3558,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
         // =============================================
         // CONTOR VIZITE (local – varianta B)
         // =============================================
-        function _legacyUpdateVisitCounter() {
+        function updateVisitCounter() {
             try {
                 let visits = parseInt(localStorage.getItem(LS_VISITS) || '0', 10);
                 visits += 1;
@@ -3614,8 +3600,1007 @@ async function etherscanProxyRequest(module, action, params = {}) {
             localStorage.setItem(LS_NEWS, JSON.stringify(initial));
         }
 
+        function loadNews() {
+            try {
+                seedNewsIfMissing();
+                const news = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
+
+                // Sortare: pinned, apoi recent
+                news.sort((a, b) => {
+                    if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+                    return new Date(b.date) - new Date(a.date);
+                });
+
+                const container = $('newsContainer');
+                if (!container) return;
+                container.innerHTML = '';
+
+                news.forEach(item => {
+                    const badgeClass = item.type === 'announcement' ? 'badge-announcement' :
+                                     item.type === 'event' ? 'badge-event' : 'badge-update';
+                    const badgeText = item.type === 'announcement' ? 'Anunț Important' :
+                                    item.type === 'event' ? 'Eveniment' : 'Update';
+                    const cardClass = item.pinned ? 'news-card pinned' : 'news-card';
+
+                    const card = document.createElement('div');
+                    card.className = cardClass;
+
+                    card.innerHTML = `
+                        <div class="news-badge ${badgeClass}">${badgeText}</div>
+                        <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title)}</h4>
+                        <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content)}</p>
+                        <div class="news-date">
+                            <span>📅</span>
+                            ${new Date(item.date).toLocaleDateString('ro-RO', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top: 1rem; flex-wrap:wrap;">
+                            <button class="news-btn" onclick="deleteNews(${Number(item.id)})">🗑️ Șterge</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                console.error('loadNews:', e);
+            }
+        }
+
+        function addNews() {
+            if (!verifyPassword()) return;
+            const f = $('newsForm');
+            if (f) f.style.display = 'block';
+        }
+
+        function cancelAddNews() {
+            const f = $('newsForm');
+            if (f) f.style.display = 'none';
+            if ($('newsTitle')) $('newsTitle').value = '';
+            if ($('newsContent')) $('newsContent').value = '';
+            if ($('pinNews')) $('pinNews').checked = false;
+            if ($('newsType')) $('newsType').value = 'update';
+        }
+
+        function saveNews() {
+            if (!verifyPassword()) return;
+
+            const title = ($('newsTitle')?.value || '').trim();
+            const content = ($('newsContent')?.value || '').trim();
+            const type = $('newsType')?.value || 'update';
+            const pinned = !!$('pinNews')?.checked;
+
+            if (!title || !content) {
+                alert('Completează titlul și conținutul!');
+                return;
+            }
+
+            try {
+                const existing = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
+                const newId = existing.length ? Math.max(...existing.map(n => Number(n.id) || 0)) + 1 : 1;
+
+                existing.push({
+                    id: newId,
+                    title,
+                    content,
+                    type,
+                    date: new Date().toISOString(),
+                    pinned
+                });
+
+                localStorage.setItem(LS_NEWS, JSON.stringify(existing));
+                cancelAddNews();
+                loadNews();
+                alert('Anunțul a fost adăugat!');
+            } catch (e) {
+                console.error('saveNews:', e);
+                alert('Eroare la salvare.');
+            }
+        }
+
+        function deleteNews(id) {
+            if (!verifyPassword()) return;
+            if (!confirm('Sigur vrei să ștergi acest anunț?')) return;
+
+            try {
+                const existing = JSON.parse(localStorage.getItem(LS_NEWS) || '[]');
+                const filtered = existing.filter(n => Number(n.id) !== Number(id));
+                localStorage.setItem(LS_NEWS, JSON.stringify(filtered));
+                loadNews();
+            } catch (e) {
+                console.error('deleteNews:', e);
+            }
+        }
+
+        function clearNews() {
+            if (!verifyPassword()) return;
+            if (!confirm('Sigur vrei să ștergi TOATE anunțurile?')) return;
+            localStorage.removeItem(LS_NEWS);
+            loadNews();
+        }
+
+        // Pentru butoanele existente în HTML (care apelează requestPassword)
+        function requestPassword(action, id) {
+            // păstrăm compatibilitatea cu HTML-ul existent
+            if (action === 'add') return addNews();
+            if (action === 'clear') return clearNews();
+
+            // Giveaway / promo
+            if (action === 'promoAdd') return showPromoForm();
+            if (action === 'promoClear') return clearPromos();
+
+            // fallback
+            if (action === 'deleteNews') return deleteNews(id);
+        }
+
+        // =============================================
+        // GIVEAWAY & PROMOȚII (local – varianta B)
+        // =============================================
+        function getPromos() {
+            try { return JSON.parse(localStorage.getItem(LS_PROMOS) || '[]'); }
+            catch { return []; }
+        }
+        function setPromos(arr) {
+            localStorage.setItem(LS_PROMOS, JSON.stringify(arr));
+        }
+
+        function showPromoForm() {
+            if (!verifyPassword()) return;
+            const f = $('promoForm');
+            if (f) f.style.display = 'block';
+        }
+
+        function cancelPromo() {
+            const f = $('promoForm');
+            if (f) f.style.display = 'none';
+            if ($('promoTitle')) $('promoTitle').value = '';
+            if ($('promoEndDate')) $('promoEndDate').value = '';
+            if ($('promoDesc')) $('promoDesc').value = '';
+        }
+
+        function savePromo() {
+            if (!verifyPassword()) return;
+
+            const title = ($('promoTitle')?.value || '').trim();
+            const endDate = ($('promoEndDate')?.value || '').trim();
+            const desc = ($('promoDesc')?.value || '').trim();
+
+            if (!title || !endDate || !desc) {
+                alert('Completează titlul, data de final și descrierea.');
+                return;
+            }
+
+            const promos = getPromos();
+            const newId = promos.length ? Math.max(...promos.map(p => Number(p.id) || 0)) + 1 : 1;
+
+            promos.push({
+                id: newId,
+                title,
+                endDate,
+                desc,
+                createdAt: new Date().toISOString(),
+                participants: [] // {name,wallet,points,joinedAt}
+            });
+
+            setPromos(promos);
+            cancelPromo();
+            renderPromos();
+            renderLeaderboard();
+            alert('Promoția/Giveaway-ul a fost adăugat.');
+        }
+
+        function clearPromos() {
+            if (!verifyPassword()) return;
+            if (!confirm('Ștergi toate promoțiile/giveaway-urile?')) return;
+            localStorage.removeItem(LS_PROMOS);
+            renderPromos();
+            renderLeaderboard();
+        }
+
+        function deletePromo(promoId) {
+            if (!verifyPassword()) return;
+            if (!confirm('Ștergi această promoție/giveaway?')) return;
+            const promos = getPromos().filter(p => Number(p.id) !== Number(promoId));
+            setPromos(promos);
+            renderPromos();
+            renderLeaderboard();
+        }
+
+        function joinPromo(promoId) {
+            const name = ($('joinName_' + promoId)?.value || '').trim();
+            const wallet = ($('joinWallet_' + promoId)?.value || '').trim();
+            const pointsStr = ($('joinPoints_' + promoId)?.value || '').trim();
+            const points = Math.max(0, parseInt(pointsStr || '0', 10) || 0);
+
+            if (!name || !wallet) {
+                alert('Completează numele și wallet-ul.');
+                return;
+            }
+
+            const promos = getPromos();
+            const p = promos.find(x => Number(x.id) === Number(promoId));
+            if (!p) return;
+
+            // expirare
+            const now = new Date();
+            const end = new Date(p.endDate + 'T23:59:59');
+            if (now > end) {
+                alert('Acest giveaway/promoție a expirat.');
+                return;
+            }
+
+            p.participants = p.participants || [];
+            const existing = p.participants.find(u => (u.wallet || '').toLowerCase() === wallet.toLowerCase());
+            if (existing) {
+                existing.name = name;
+                existing.points = Math.max(existing.points || 0, points);
+            } else {
+                p.participants.push({ name, wallet, points, joinedAt: new Date().toISOString() });
+            }
+
+            setPromos(promos);
+            renderPromos();
+            renderLeaderboard();
+            alert('Înscriere salvată (local pe device).');
+        }
+
+        function renderPromos() {
+            const list = $('promoList');
+            if (!list) return;
+
+            const promos = getPromos();
+            if (!promos.length) {
+                list.innerHTML = `<div style="opacity:0.85;">Nu există promoții active încă.</div>`;
+                return;
+            }
+
+            // sort: cele care expiră mai repede primele
+            promos.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+
+            list.innerHTML = '';
+            promos.forEach(p => {
+                const end = new Date(p.endDate + 'T23:59:59');
+                const expired = new Date() > end;
+
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.innerHTML = `
+                    <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
+                    <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
+                    <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.desc)}</p>
+                    <div class="news-date" style="margin-top:0.8rem;">
+                        <span>⏳</span> Expiră: ${new Date(p.endDate).toLocaleDateString('ro-RO')}
+                    </div>
+
+                    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+                        <h4 style="margin:0 0 0.6rem 0; color: var(--neon-cyan);">Înscriere</h4>
+                        <div class="form-row">
+                            <input id="joinName_${p.id}" type="text" placeholder="Nume" maxlength="60">
+                            <input id="joinWallet_${p.id}" type="text" placeholder="Wallet (0x...)" maxlength="60">
+                        </div>
+                        <div class="form-row">
+                            <input id="joinPoints_${p.id}" type="number" min="0" step="1" placeholder="Promovări (puncte)" />
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="news-btn" onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
+                            <button class="news-btn" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
+                        </div>
+                        <small style="display:block; margin-top:0.6rem; opacity:0.75;">
+                            În varianta B, înscrierile/clasamentul sunt salvate doar pe device-ul tău.
+                        </small>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function renderLeaderboard() {
+            const lb = $('leaderboard');
+            if (!lb) return;
+
+            const promos = getPromos();
+            const now = new Date();
+
+            // agregare participanți din promoțiile active (neexpirate)
+            const map = new Map(); // wallet -> {name,wallet,points}
+            promos.forEach(p => {
+                const end = new Date(p.endDate + 'T23:59:59');
+                if (now > end) return;
+                (p.participants || []).forEach(u => {
+                    const key = (u.wallet || '').toLowerCase();
+                    if (!key) return;
+                    const current = map.get(key);
+                    const pts = Number(u.points) || 0;
+                    if (!current || pts > current.points) {
+                        map.set(key, { name: u.name || 'Anonim', wallet: u.wallet, points: pts });
+                    }
+                });
+            });
+
+            const arr = Array.from(map.values()).sort((a, b) => b.points - a.points);
+            if (!arr.length) {
+                lb.innerHTML = `<div style="opacity:0.85;">Nu există participanți încă.</div>`;
+                return;
+            }
+
+            // tabel simplu
+            let html = `<div class="table-container"><table class="whitepaper-table">
+                <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>`;
+            arr.slice(0, 100).forEach((u, i) => {
+                html += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${escapeHtml(u.name)}</td>
+                    <td style="font-family: monospace; font-size: 0.9rem;">${escapeHtml(u.wallet)}</td>
+                    <td><span class="badge badge-success">${Number(u.points).toLocaleString('ro-RO')}</span></td>
+                </tr>`;
+            });
+            html += `</table></div>`;
+            lb.innerHTML = html;
+        }
+
+        // =============================================
+        // ETHERSCAN – DATE REALE (fără endpoint-uri inexistente)
+        // =============================================
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        function setStatusHtml(htmlStr) {
+            const el = $('serverStatus');
+            if (el) el.innerHTML = htmlStr;
+        }
+
+        async function fetchTokenSupplyAPI() {
+    const j = await etherscanProxyRequest('stats','tokensupply',{ contractaddress: CONTRACT_ADDRESS });
+    const weiStr = j.result;
+    const wei = Number(weiStr);
+    const tokens = wei / Math.pow(10, 18);
+    return { wei, tokens };
+}
+
+
+
+        // Tranzacții (Total TX) - varianta B: numărăm tranzacțiile găsite de Etherscan API.
+        // Notă: Etherscan limitează offset la 10k; pentru un contract nou e suficient.
+        async function fetchTransactionsCountAPI() {
+            const base = `https://api.etherscan.io/api?apikey=${ETHERSCAN_API_KEY}`;
+            let best = null;
+
+            // 1) Tranzacții normale către adresa contractului (deploy + interacțiuni)
+            try {
+                const url = `${base}&module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc`;
+                const r = await fetch(url);
+                const j = await r.json();
+                if (j.status === '1' && Array.isArray(j.result)) {
+                    best = Math.max(best || 0, j.result.length);
+                }
+            } catch (e) {
+                console.warn('txlist failed', e);
+            }
+
+            // 2) Token transfers (tokentx) - poate reprezenta mai bine "Transfers"
+            try {
+                const url = `${base}&module=account&action=tokentx&contractaddress=${CONTRACT_ADDRESS}&page=1&offset=10000&sort=asc`;
+                const r = await fetch(url);
+                const j = await r.json();
+                if (j.status === '1' && Array.isArray(j.result)) {
+                    best = Math.max(best || 0, j.result.length);
+                }
+            } catch (e) {
+                console.warn('tokentx failed', e);
+            }
+
+            return best;
+        }
+
+
         
-/* Legacy localStorage news system removed: using Firestore live news below. */
+        // Fallback public API (fără chei): Ethplorer
+        async function fetchEthplorerTokenInfo() {
+  // Disabled due to CORS/429 on GitHub Pages. Use Etherscan proxy instead.
+  return null;
+}
+
+// CORS-safe: r.jina.ai proxy (text)
+        async function fetchEtherscanTokenPageText() {
+            const url = `https://r.jina.ai/https://etherscan.io/token/${CONTRACT_ADDRESS}`;
+            const r = await fetch(url);
+            if (!r.ok) throw new Error('jina fetch failed');
+            return await r.text();
+        }
+
+        
+        async function parseFromEtherscanText(t) {
+            // încearcă mai multe regex-uri; Etherscan își schimbă des markup-ul
+            const clean = (t || '').replace(/\u00a0/g, ' ');
+
+            const pickNum = (arr) => {
+                if (!arr) return null;
+                const raw = String(arr).replace(/[^0-9.,]/g, '');
+                if (!raw) return null;
+                const n = parseFloat(raw.replace(/,/g, ''));
+                return Number.isFinite(n) ? n : null;
+            };
+
+            // Holders (ex: "Holders:" sau "Holders (xxx)")
+            let holders = null;
+            const holdersMatch =
+                clean.match(/Holders\s*[:\)]\s*<[^>]*>\s*([0-9.,]+)/i) ||
+                clean.match(/Holders\s*[:\)]\s*([0-9.,]+)/i) ||
+                clean.match(/Holders\s*\((\s*[0-9.,]+\s*)\)/i);
+            holders = pickNum(holdersMatch && holdersMatch[1]);
+
+            // Token Transfers / Transfers count (de obicei apare ca "Token Transfers (123,456)")
+            let transfers = null;
+            const transfersMatch =
+                clean.match(/Token\s*Transfers\s*\(\s*([0-9.,]+)\s*\)/i) ||
+                clean.match(/Transfers\s*\(\s*([0-9.,]+)\s*\)/i) ||
+                clean.match(/Token\s*Transfers\s*[:\)]\s*([0-9.,]+)/i);
+            transfers = pickNum(transfersMatch && transfersMatch[1]);
+
+            // Total Supply (text)
+            let supplyTokens = null;
+            const supplyMatch =
+                clean.match(/Total\s*Supply\s*[:\)]\s*<[^>]*>\s*([0-9.,]+)\s*([A-Z]{2,10})/i) ||
+                clean.match(/Total\s*Supply\s*[:\)]\s*([0-9.,]+)\s*([A-Z]{2,10})/i);
+            supplyTokens = pickNum(supplyMatch && supplyMatch[1]);
+
+            return { holders, transfers, supplyTokens };
+        }
+
+        async function fetchContractCreation() {
+    // Etherscan: module=contract&action=getcontractcreation&contractaddresses=...
+    const j = await etherscanProxyRequest('contract','getcontractcreation',{ contractaddresses: CONTRACT_ADDRESS });
+    if (!j.result || !Array.isArray(j.result) || !j.result.length) throw new Error('getcontractcreation failed');
+    return j.result[0];
+}
+
+
+        async function fetchTxTimestamp(txHash) {
+    // Disabled: requires Etherscan 'proxy' module which we do not expose in Cloud Function for safety.
+    throw new Error('tx timestamp not available');
+}
+
+        async function fetchAllData() {
+            const refreshBtn = $('refreshButton');
+            const original = refreshBtn ? refreshBtn.innerHTML : null;
+
+            try {
+                if (refreshBtn) {
+                    refreshBtn.classList.add('loading');
+                    refreshBtn.innerHTML = '<span class="refresh-icon">⏳</span><span class="refresh-text">Se actualizează...</span>';
+                }
+
+                // Supply (API)
+                let supplyTokens = null;
+                try {
+                    const supply = await fetchTokenSupplyAPI();
+                    supplyTokens = supply.tokens;
+                    const formatted = supplyTokens.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+                    setText('totalSupply', formatted);
+                    setText('supplyValue', formatted);
+                } catch (e) {
+                    console.warn('Supply API failed:', e);
+                }
+
+                // Holders/Transfers + (opțional supply fallback) din pagină Etherscan
+                try {
+                    const txt = await fetchEtherscanTokenPageText();
+                    const parsed = await parseFromEtherscanText(txt);
+
+                    if (parsed.holders != null) { setText('holdersCount', parsed.holders.toLocaleString('ro-RO')); } else { try { const info = await fetchEthplorerTokenInfo(); const hc = info && info.holdersCount; if (hc != null) setText('holdersCount', Number(hc).toLocaleString('ro-RO')); } catch(e){} }
+                    if (parsed.transfers != null) setText('transactionsCount', parsed.transfers.toLocaleString('ro-RO'));
+
+                    if (supplyTokens == null && parsed.supplyTokens != null) {
+                        const formatted = parsed.supplyTokens.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+                        setText('totalSupply', formatted);
+                        setText('supplyValue', formatted);
+                    }
+                } catch (e) {
+                    console.warn('Etherscan scrape failed:', e);
+                }
+
+
+                // Tranzacții (API) - dacă scrape nu a dat nimic
+                try {
+                    const txc = await fetchTransactionsCountAPI();
+                    if (txc != null) setText('transactionsCount', txc.toLocaleString('ro-RO'));
+                } catch (e) {
+                    console.warn('transactionsCount API failed', e);
+                // Fallback: Ethplorer transfersCount
+                try {
+                    const info = await fetchEthplorerTokenInfo();
+                    const tc = info && (info.transfersCount ?? info.transfersCount === 0 ? info.transfersCount : null);
+                    if (tc != null) setText('transactionsCount', Number(tc).toLocaleString('ro-RO'));
+                } catch(e2) {
+                    console.warn('Ethplorer transfersCount failed', e2);
+                }
+
+                }
+
+                // Contract creator + data aproximativă (din tx)
+                try {
+                    const cc = await fetchContractCreation();
+                    if (cc.contractCreator) setText('contractCreator', cc.contractCreator);
+                    if (cc.txHash) setText('creationTx', cc.txHash);
+
+                    try {
+                        const d = await fetchTxTimestamp(cc.txHash);
+                        setText('launchDate', d.toLocaleString('ro-RO'));
+                    } catch (_) {
+                        // dacă nu putem lua timestamp, nu inventăm
+                        setText('launchDate', '-');
+                    }
+                } catch (e) {
+                    console.warn('Contract creation failed:', e);
+                    setText('launchDate', '-');
+                }
+
+                
+                // Preț live + chart (DEX)
+                try { await updateLivePriceAndStats(); } catch(e){ console.warn('Dex price failed', e); }
+                try { await updateChart(currentPeriod); } catch(e){ console.warn('Chart update failed', e); }
+
+setStatusHtml('');
+
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('loading');
+                    refreshBtn.classList.add('success');
+                    refreshBtn.innerHTML = '<span class="refresh-icon">✅</span><span class="refresh-text">Actualizat</span>';
+                    setTimeout(() => {
+                        refreshBtn.classList.remove('success');
+                        refreshBtn.innerHTML = original;
+                    }, 1800);
+                }
+            } catch (e) {
+                console.error('fetchAllData fatal:', e);
+                setStatusHtml('<span class="status-offline">⚠️ Eroare la încărcarea datelor (verifică API / CORS)</span>');
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('loading');
+                    refreshBtn.innerHTML = '<span class="refresh-icon">❌</span><span class="refresh-text">Eroare</span>';
+                    setTimeout(() => refreshBtn.innerHTML = original, 2200);
+                }
+            }
+        }
+
+        // =============================================
+        // PREȚ LIVE + GRAFIC (VARIANTA B, fără CORS headache)
+        // =============================================
+        let priceChart = null;
+        let liveSeries = []; // [{t: Date, p: number}]
+        let lastPrice = null;
+        let currentPeriod = 'live';
+
+        function _maxPointsForPeriod(period) {
+            // doar pentru cât păstrăm în memorie (grafic live)
+            if (period === '1h') return 60;
+            if (period === '24h') return 144;
+            if (period === '7d') return 200;
+            if (period === '1m') return 250;
+            return 120; // 'live' sau default
+        }
+
+        
+        function initializeChart() {
+            const canvas = document.getElementById('priceChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            // dacă există deja, nu recrea
+            if (window.__stancu_priceChart) return;
+
+            const data = {
+                labels: [],
+                datasets: [{
+                    label: 'Preț (USD)',
+                    data: [],
+                    borderWidth: 2,
+                    tension: 0.25,
+                    pointRadius: 0
+                }]
+            };
+
+            window.__stancu_priceChart = new Chart(ctx, {
+                type: 'line',
+                data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { display: false } },
+                        y: {
+                            ticks: { callback: (v) => v },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+            // păstrează referința globală
+            priceChart = window.__stancu_priceChart;
+
+
+        function _renderLiveChart(period = 'live') {
+            if (!priceChart) return;
+            const maxPts = _maxPointsForPeriod(period);
+            const slice = liveSeries.slice(-maxPts);
+            const labels = slice.map(pt => {
+                const d = new Date(pt.t);
+                return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            });
+            const data = slice.map(pt => pt.p);
+
+            priceChart.data.labels = labels;
+            priceChart.data.datasets[0].data = data;
+            priceChart.update('none');
+        }
+
+        
+        function updatePriceChartLive(priceUsd) {
+            try {
+                const ch = window.__stancu_priceChart;
+                if (!ch) return;
+                const ts = new Date();
+                const lbl = ts.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                ch.data.labels.push(lbl);
+                ch.data.datasets[0].data.push(Number(priceUsd));
+                // păstrează ultimele 120 puncte (~20 minute la 10s)
+                const max = 120;
+                if (ch.data.labels.length > max) {
+                    ch.data.labels.shift();
+                    ch.data.datasets[0].data.shift();
+                }
+                ch.update();
+            } catch (e) {
+                console.warn('chart update failed', e);
+            }
+        }
+async function fetchDexScreenerBestPair() {
+            const url = `https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`;
+            const r = await fetch(url);
+            if (!r.ok) throw new Error('DexScreener fetch failed');
+            const data = await r.json();
+            const pairs = data?.pairs || [];
+            if (!pairs.length) throw new Error('No pairs for token');
+            // alege perechea cu cea mai mare lichiditate USD
+            pairs.sort((a, b) => (Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)));
+            return pairs[0];
+        }
+
+        
+        function startPriceAutoUpdate() {
+            // rulează imediat și apoi la fiecare 10s
+            updateLivePriceAndChart('live');
+            if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
+            window.__stancu_priceInterval = setInterval(() => updateLivePriceAndChart('live'), 10000);
+        }
+
+async function updateLivePriceAndChart(period = 'live') {
+            try {
+                const pair = await fetchDexScreenerBestPair();
+                const priceUsd = Number(pair.priceUsd);
+                // actualizează graficul live (fallback sigur)
+                updatePriceChartLive(priceUsd);
+                if (!Number.isFinite(priceUsd)) throw new Error('priceUsd missing');
+
+                // UI: preț + schimbare
+                const priceEl = document.getElementById('currentPrice');
+                if (priceEl) priceEl.textContent = '$' + priceUsd.toLocaleString('en-US', { maximumFractionDigits: 10 });
+
+                const changeEl = document.getElementById('priceChange');
+                const ch24 = pair?.priceChange?.h24;
+                if (changeEl) {
+                    if (typeof ch24 === 'number') {
+                        const sign = ch24 >= 0 ? '+' : '';
+                        changeEl.textContent = `${sign}${ch24.toFixed(2)}% (24h)`;
+                    } else {
+                        changeEl.textContent = '';
+                    }
+                }
+
+                const lastEl = document.getElementById('lastUpdated');
+                if (lastEl) lastEl.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                // MarketCap (DexScreener fdv) - dacă există element
+                const mcEl = document.getElementById('marketCap');
+                const fdv = Number(pair.fdv);
+                if (mcEl) mcEl.textContent = Number.isFinite(fdv) ? ('$' + fdv.toLocaleString('en-US', { maximumFractionDigits: 0 })) : mcEl.textContent;
+
+                // adaugă punct în serie
+                const now = new Date();
+                liveSeries.push({ t: now, p: priceUsd });
+                // nu păstra prea mult
+                if (liveSeries.length > 300) liveSeries = liveSeries.slice(-300);
+
+                _renderLiveChart(period);
+
+                lastPrice = priceUsd;
+            } catch (e) {
+                console.error('Live price update error:', e);
+            }
+        }
+
+        // Butoane perioadă (dacă există în UI)
+        async function changeChartPeriod(period) {
+            currentPeriod = period || 'live';
+            // resetează seria pentru o experiență “curată”
+            liveSeries = [];
+            _renderLiveChart(period);
+            // forțează update imediat
+            await updateLivePriceAndChart(period);
+        }
+
+
+        // Butoane tip grafic (lumânări/linie). În varianta B folosim linie (live).
+        // Dacă se apasă "Lumânări", nu crăpăm site-ul: rămânem pe linie.
+        function changeChartType(type) {
+            // compatibilitate cu UI existent
+            if (!type) return;
+            // În această implementare simplă rămânem pe line chart (Chart.js standard)
+            // pentru a evita probleme de CORS / OHLC. Doar re-render.
+            _renderLiveChart(currentPeriod || 'live');
+        }
+
+
+        // compatibilitate: unele versiuni apelau updateChart()
+        async function updateChart(period) {
+            await updateLivePriceAndChart(period);
+        }
+
+
+        window.addEventListener('load', () => {
+            initializeChart();
+            startPriceAutoUpdate();
+
+            // IMPORTANT: evită conflictul de id duplicat pentru contact din whitepaper
+            const wpContact = document.querySelector('#whitepaper #contact');
+            if (wpContact) wpContact.id = 'contact-wp';
+
+            initRouting();
+            updateVisitCounter();
+
+            loadNews();
+            renderPromos();
+            renderLeaderboard();
+
+            initializeChart();
+            fetchAllData();
+            setInterval(fetchAllData, 60000);
+            // Preț live + grafic fallback la 10 secunde
+            setInterval(() => { updateLivePriceAndStats().catch(()=>{}); }, 10000);
+            setInterval(() => { updateChart('live').catch(()=>{}); }, 15000);
+        });
+
+        // dacă utilizatorul schimbă hash manual
+        window.addEventListener('hashchange', initRouting);
+        // Expune funcțiile folosite în HTML (onclick) în scope global
+        try {
+            Object.assign(window, {
+                showSection,
+                scrollToSection,
+                requestPassword,
+                saveNews,
+                cancelAddNews,
+                deleteNewsItem,
+                clearAllNews,
+                changeChartPeriod,
+                changeChartType,
+                fetchAllData
+            });
+        } catch (e) {}
+
+    
+
+/* ============================================================
+   FIREBASE INIT + FINAL OVERRIDES (GLOBAL, CROSS-DEVICE)
+   ============================================================ */
+
+// Initialize Firebase only if SDK loaded
+try {
+  if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+      authDomain: "stancubyt-fc2b9.firebaseapp.com",
+      projectId: "stancubyt-fc2b9",
+      storageBucket: "stancubyt-fc2b9.appspot.com",
+      messagingSenderId: "263244200492",
+      appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+      measurementId: "G-272S9HSY3K"
+    });}
+} catch (e) {}
+
+
+/* ============================================================
+   FIREBASE AUTH ADMIN (Email/Password)
+   - Autentificare cu user + parola din Firebase Authentication
+   - Acces admin: custom claim (claims.admin === true) SAU whitelist email
+   ============================================================ */
+
+window.__SBYT_ADMIN = false;
+
+const ADMIN_EMAILS = ["stancubyt@gmail.com"];
+
+function maskEmail(email) {
+  if (!email || typeof email !== 'string') return '';
+  const [u, d] = email.split('@');
+  if (!d) return email;
+  const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
+  return `${u2}@${d}`;
+}
+
+function setAdminUI(isAdmin, user) {
+  const badge = document.getElementById('adminStatusBadge');
+  const label = document.getElementById('adminUserLabel');
+  const msg = document.getElementById('adminLoginMsg');
+  const logoutBtn = document.getElementById('adminLogoutBtn');
+
+  if (badge) {
+    badge.classList.remove('admin-badge-on','admin-badge-off');
+    badge.classList.add(isAdmin ? 'admin-badge-on' : 'admin-badge-off');
+    badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
+  }
+  if (label) {
+    label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
+  }
+  if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
+
+  if (msg) {
+    msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
+    msg.textContent = user
+      ? (isAdmin ? 'Mod administrator activ.' : 'Autentificat, dar fara drepturi admin.')
+      : 'Autentifica-te cu email + parola (Firebase).';
+  }
+
+  // arata/ascunde elemente admin-only daca exista
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? 'block' : 'none';
+  });
+  try { ensureNewsAdminUI(); } catch(e) {}
+  try { loadNews(); } catch(e) {}
+
+}
+
+async function computeIsAdmin(user) {
+  if (!user) return false;
+  try {
+    // 1) custom claim admin
+    const token = await user.getIdTokenResult(true);
+    if (token && token.claims && token.claims.admin === true) return true;
+  } catch (e) {}
+  // 2) whitelist email
+  const email = (user.email || '').toLowerCase();
+  return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
+}
+
+async function adminSignIn() {
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      alert('Firebase Auth nu este incarcat.');
+      return;
+    }
+    const email = (document.getElementById('adminEmail')?.value || '').trim();
+    const pass = (document.getElementById('adminPass')?.value || '');
+
+    if (!email || !pass) {
+      const msg = document.getElementById('adminLoginMsg');
+      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
+      return;
+    }
+
+    await firebase.auth().signInWithEmailAndPassword(email, pass);
+    // onAuthStateChanged va actualiza UI
+  } catch (e) {
+    const msg = document.getElementById('adminLoginMsg');
+    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
+  }
+}
+
+async function adminSignOut() {
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    await firebase.auth().signOut();
+  } catch (e) {}
+}
+
+// Listener global
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+      firebase.auth().onAuthStateChanged(async (user) => {
+        const isAdmin = await computeIsAdmin(user);
+        window.__SBYT_ADMIN = isAdmin;
+        setAdminUI(isAdmin, user);
+
+        // daca user e autentificat dar nu e admin -> optional delogare automata
+        // if (user && !isAdmin) await firebase.auth().signOut();
+      });
+    }
+  } catch (e) {}
+});
+
+// Emoji quick picker -> fills the emoji input
+document.addEventListener("DOMContentLoaded", () => {
+  const sel = document.getElementById("newsEmojiSelect");
+  const inp = document.getElementById("newsEmojiInput");
+  if (sel && inp) {
+    sel.addEventListener("change", () => {
+      if (sel.value) inp.value = sel.value;
+    });
+  }
+});
+
+
+const auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
+const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
+
+async function ensureAdminAuth() {
+  // admin login required for write actions
+  if (!auth) { alert("Firebase Auth nu este incarcat."); return false; }
+  if (auth.currentUser) return true;
+
+  const email = "admin@stancubyt.com";
+  const pass = prompt("Parola admin:");
+  if (!pass) return false;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    return true;
+  } catch (e) {
+    console.error("Auth error:", e);
+    alert("Nu te poti autentifica. Verifica in Firebase: Authentication -> Email/Password enabled si userul admin exista.");
+    return false;
+  }
+}
+
+// --- Helpers
+function _escapeHtml(str) {
+  return String(str).replace(/[&<>"'`=\/]/g, s => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;','\\':'&#92;'
+  }[s]));
+}
+
+function _badgeForType(type) {
+  const t = String(type||'update');
+  if (t === 'announcement') return { cls:'badge-announcement', txt:'Anunt Important' };
+  if (t === 'event') return { cls:'badge-event', txt:'Eveniment' };
+  return { cls:'badge-update', txt:'Update' };
+}
+
+// =========================
+// VIZITE (GLOBAL)
+// =========================
+async function updateVisitCounter() {
+  if (!db) return; // keep existing fallback if any
+  const ref = db.collection('stats').doc('visits');
+
+  try {
+    // increment once per session
+    if (!sessionStorage.getItem('stbytv_inc')) {
+      sessionStorage.setItem('stbytv_inc', '1');
+      await db.runTransaction(async (t) => {
+        const snap = await t.get(ref);
+        const current = snap.exists && typeof snap.data().count === 'number' ? snap.data().count : 0;
+        t.set(ref, { count: current + 1 }, { merge: true });
+      });
+    }
+
+    ref.onSnapshot(snap => {
+      const count = snap.exists && typeof snap.data().count === 'number' ? snap.data().count : 0;
+      const el = document.getElementById('visitCount');
+      if (el) el.textContent = count.toLocaleString('ro-RO');
+    });
+  } catch (e) {
+    console.error("visit error:", e);
+  }
+}
+
+// =========================
+// NEWS (GLOBAL, CROSS-DEVICE)
+// =========================
+let __newsUnsub = null;
 
 function loadNews() {
   const newsContainer = document.getElementById('newsContainer');
@@ -4032,7 +5017,7 @@ Object.assign(window, {
 
 // auto-init
 window.addEventListener('load', () => {
-  try { window.startVisits && window.startVisits(); } catch(e){}
+  try { updateVisitCounter(); } catch(e){}
   try { loadNews(); } catch(e){}
   try { listenPromos(); } catch(e){}
 });
@@ -4138,122 +5123,261 @@ window.addEventListener('load', () => {
   };
 
   // ---------- Vizite (cross-device) ----------
-  
-  /* Legacy visitCounterFirestore removed - using startVisits()/hitCounter + live stats/visits listener. */
-// ---------- News (Firestore live, cross-device) ----------
+  async function updateVisitCounterFirestore(){
+    try{
+      if (!db) return;
+      const ref = db.collection('stats').doc('visits');
+      await db.runTransaction(async (tx)=>{
+        const snap = await tx.get(ref);
+        const cur = snap.exists && snap.data().count ? Number(snap.data().count) : 0;
+        tx.set(ref, { count: cur + 1, updatedAt: Date.now() }, { merge:true });
+      });
+      const snap = await ref.get();
+      const count = snap.exists && snap.data().count ? Number(snap.data().count) : 0;
+      const el = $('visitCount') || $('visitsCount') || $('visitCounter') || $('visits');
+      if (el) el.textContent = count.toLocaleString('ro-RO');
+    } catch(e){
+      console.error('visits firestore:', e);
+    }
+  }
+
+  // Inlocuieste functia existenta, dar pastreaza fallback la localStorage daca nu e Firebase
+  const _origUpdateVisits = window.updateVisitCounter;
+  window.updateVisitCounter = function(){
+    if (db) { updateVisitCounterFirestore(); return; }
+    if (_origUpdateVisits) _origUpdateVisits();
+  };
+
+  // ---------- News (cross-device) ----------
   let __newsUnsub = null;
 
-  function _badgeForType(type) {
-    const t = String(type || "").toLowerCase();
-    if (t === "announcement" || t === "anunt") return {cls: "badge-announcement", txt: "ANUNȚ"};
-    if (t === "update" || t === "noutate") return {cls: "badge-update", txt: "NOUTATE"};
-    return {cls: "badge-news", txt: "ȘTIRE"};
-  }
-
-  function _escapeHtml(str) {
-    return String(str ?? "").replace(/[&<>"']/g, (m)=>({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[m]));
-  }
-  function _escapeAttr(str){ return _escapeHtml(str).replace(/"/g, "&quot;"); }
-
-  function _formatDate(item){
-    const ms = item.createdAtMs || (item.dateISO ? Date.parse(item.dateISO) : null) || null;
-    if (!ms) return "";
-    return new Date(ms).toLocaleString("ro-RO", { year:"numeric", month:"long", day:"2-digit", hour:"2-digit", minute:"2-digit" });
-  }
-
-  function _renderNews(items, isAdmin){
-    const container = $("newsContainer");
+  function _renderNews(items){
+    const container = $('newsContainer');
     if (!container) return;
+    container.innerHTML = '';
 
-    container.innerHTML = "";
-
-    if (!items.length) {
-      container.innerHTML = '<div style="opacity:0.85;">Nu exista anunturi inca.</div>';
+    if (!items.length){
+      container.innerHTML = '<div style="opacity:0.8;">Nu există anunțuri încă.</div>';
       return;
     }
 
-    items.forEach(item => {
-      const badge = _badgeForType(item.type);
-      const card = document.createElement("div");
-      const typeClass = "type-" + String(item.type || "news").toLowerCase();
-      card.className = "news-card " + typeClass + " " + badge.cls + (item.pinned ? " pinned" : "");
-      card.setAttribute("data-docid", item._id);
+    items.forEach(item=>{
+      const badge = (typeof _badgeForType === 'function') ? _badgeForType(item.type) : (item.type==='announcement'?{cls:'badge-announcement',txt:'Anunț Important'}:{cls:'badge-update',txt:'Update'});
+      const card = document.createElement('div');
+      card.className = item.pinned ? 'news-card pinned' : 'news-card';
 
-      const dateStr = _formatDate(item);
-      const emoji = (item.emoji || "").trim();
-      const title = (emoji ? (emoji + " ") : "") + (item.title || "");
-
+      const date = item.date || item.createdAt;
+      const d = date ? new Date(date) : new Date();
       card.innerHTML = `
-        ${item.bgUrl ? `<div class="news-bg" style="background-image:url('${_escapeAttr(item.bgUrl)}')"></div>` : ``}
         <div class="news-badge ${badge.cls}">${badge.txt}</div>
-        <div class="news-card-title">${_escapeHtml(title)}</div>
-        <div class="news-card-text">${_escapeHtml(item.content || "")}</div>
-        ${dateStr ? `<div class="news-date">${emoji ? _escapeHtml(emoji) + " " : ""}🕒 ${_escapeHtml(dateStr)}</div>` : ``}
-        ${isAdmin ? `<button class="news-del-btn" data-docid="${_escapeAttr(item._id)}">🗑️ Șterge</button>` : ``}
+        <h4 style="margin-bottom:0.5rem; color:white;">${_escape(item.title||'')}</h4>
+        <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
+        <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
+          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
+        </div>
       `;
-
       container.appendChild(card);
     });
   }
 
-  function loadNews(){
-    const db = getDb();
-    const container = $("newsContainer");
-    if (!container) return;
+  async function _listenNews(){
+    if (!db) return;
+    if (__newsUnsub) { try{__newsUnsub();}catch(e){} __newsUnsub=null; }
 
-    if (!db) {
-      container.innerHTML = '<div style="opacity:0.85;">Nu pot incarca stiri: Firestore indisponibil.</div>';
+    __newsUnsub = db.collection('news').orderBy('createdAt','desc').limit(50).onSnapshot((snap)=>{
+      const items=[];
+      snap.forEach(doc=>{
+        items.push({ _id: doc.id, ...doc.data() });
+      });
+      // pinned first (client side) + recent
+      items.sort((a,b)=>{
+        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+        return Number(b.createdAt||0)-Number(a.createdAt||0);
+      });
+      _renderNews(items);
+    }, (err)=>{
+      console.error('news listen:', err);
+    });
+  }
+
+  // override loadNews to use Firestore
+  const _origLoadNews = window.loadNews;
+  window.loadNews = function(){
+    if (db) { _listenNews(); return; }
+    if (_origLoadNews) _origLoadNews();
+  };
+
+  // save news to firestore
+  const _origSaveNews = window.saveNews;
+  window.saveNews = async function(){
+    if (!db) return _origSaveNews ? _origSaveNews() : undefined;
+
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+
+    const title = ($('newsTitle')?.value||'').trim();
+    const content = ($('newsContent')?.value||'').trim();
+    const type = $('newsType')?.value || 'update';
+    const pinned = !!$('pinNews')?.checked;
+
+    if (!title || !content) { alert('Completează titlul și conținutul!'); return; }
+
+    try{
+      await db.collection('news').add({
+        title, content, type, pinned,
+        createdAt: Date.now(),
+        date: new Date().toISOString()
+      });
+      if (typeof cancelAddNews === 'function') cancelAddNews();
+    }catch(e){
+      console.error('saveNews firestore:', e);
+      alert('Eroare la salvarea știrii (verifică Firestore Rules).');
+    }
+  };
+
+  // delete a single news doc
+  window.deleteNewsDoc = async function(docId){
+    if (!db) return;
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!docId) return;
+    if (!confirm('Ștergi acest anunț?')) return;
+    try{
+      await db.collection('news').doc(docId).delete();
+    }catch(e){
+      console.error('delete news:', e);
+      alert('Eroare la ștergere (Rules).');
+    }
+  };
+
+  // clear all news
+  const _origClear = window.clearNews || window.clearAllNews;
+  window.clearNews = async function(){
+    if (!db) return _origClear ? _origClear() : undefined;
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!confirm('Ștergi TOATE anunțurile?')) return;
+    const snap = await db.collection('news').get();
+    const batch = db.batch();
+    snap.forEach(doc=>batch.delete(doc.ref));
+    await batch.commit();
+  };
+
+  // ---------- Echipa (Firestore) ----------
+  let __teamUnsub = null;
+
+  function showTeamForm(){
+    const f = $('teamForm');
+    if (f) f.style.display='block';
+  }
+  window.cancelTeamMember = function(){
+    const f = $('teamForm');
+    if (f) f.style.display='none';
+    if ($('teamName')) $('teamName').value='';
+    if ($('teamRole')) $('teamRole').value='';
+    if ($('teamJoinDate')) $('teamJoinDate').value='';
+    if ($('teamAvatar')) $('teamAvatar').value='';
+  };
+
+  window.saveTeamMember = async function(){
+    if (!db) { alert('Firebase nu este încărcat.'); return; }
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+
+    const name = ($('teamName')?.value||'').trim();
+    const role = ($('teamRole')?.value||'').trim();
+    const joinDate = ($('teamJoinDate')?.value||'').trim();
+    const avatar = ($('teamAvatar')?.value||'').trim();
+
+    if (!name || !role || !joinDate) { alert('Completează nume, funcție și data înscrierii.'); return; }
+
+    try{
+      await db.collection('team').add({
+        name, role, joinDate,
+        avatar: avatar || null,
+        createdAt: Date.now()
+      });
+      cancelTeamMember();
+    }catch(e){
+      console.error('team save:', e);
+      alert('Eroare la salvare membru (Rules).');
+    }
+  };
+
+  async function deleteTeamMember(docId){
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!confirm('Ștergi acest membru?')) return;
+    try{ await db.collection('team').doc(docId).delete(); }
+    catch(e){ console.error('team delete:', e); alert('Eroare la ștergere (Rules).'); }
+  }
+  window.deleteTeamMember = deleteTeamMember;
+
+  async function clearTeam(){
+    if (!db) return;
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!confirm('Ștergi toți membrii adăugați?')) return;
+    const snap = await db.collection('team').get();
+    const batch = db.batch();
+    snap.forEach(doc=>batch.delete(doc.ref));
+    await batch.commit();
+  }
+
+  function renderTeam(items){
+    const list = $('teamList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!items.length){
+      list.innerHTML = '<div style="opacity:0.8;">Nu există membri suplimentari încă.</div>';
       return;
     }
-
-    try { if (__newsUnsub) { __newsUnsub(); __newsUnsub = null; } } catch(_) {}
-
-    __newsUnsub = db.collection("news")
-      .orderBy("pinned","desc")
-      .orderBy("createdAtMs","desc")
-      .limit(50)
-      .onSnapshot((snap)=>{
-        const items = [];
-        snap.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
-        _renderNews(items, !!window.__SBYT_ADMIN);
-      }, (err)=>{
-        console.warn("news onSnapshot error:", err);
-        container.innerHTML = '<div style="opacity:0.9; color:#ff6b6b;">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca match /news/{id} allow read: if true;</div>';
-      });
+    items.forEach(m=>{
+      const avatar = m.avatar ? `<img src="${_escape(m.avatar)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">`
+                              : `<div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);font-size:1.6rem;">👤</div>`;
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      card.style.margin = '0';
+      card.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:center;">
+          ${avatar}
+          <div style="flex:1;">
+            <div style="font-weight:700; color:#fff;">${_escape(m.name||'')}</div>
+            <div style="opacity:0.9;">${_escape(m.role||'')}</div>
+            <div style="opacity:0.75; font-size:0.9rem;">📅 ${_escape(m.joinDate||'')}</div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+          <button class="news-btn" onclick="deleteTeamMember('${_escape(m._id||'')}')">🗑️ Șterge</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
   }
-  window.loadNews = loadNews;
 
-  // Delete (admin only)
-  document.addEventListener("click", async (ev)=>{
-    const btn = ev.target && ev.target.closest ? ev.target.closest(".news-del-btn") : null;
-    if (!btn) return;
-    const auth = getAuth();
-    const user = auth && auth.currentUser ? auth.currentUser : null;
-    if (!isAdminUser(user) || !window.__SBYT_ADMIN) return alert("Doar admin poate sterge.");
-    const docId = btn.getAttribute("data-docid");
-    if (!docId) return;
-    if (!confirm("Stergi acest anunt?")) return;
-    const db = getDb();
-    if (!db) return alert("Firestore indisponibil.");
-    try {
-      await db.collection("news").doc(docId).delete();
-    } catch(e) {
-      console.error("delete news failed:", e);
-      alert("Eroare la stergere (rules/permisiuni).");
-    }
-  });
+  function listenTeam(){
+    if (!db) return;
+    if (__teamUnsub) { try{__teamUnsub();}catch(e){} __teamUnsub=null; }
+    __teamUnsub = db.collection('team').orderBy('createdAt','desc').limit(50).onSnapshot(snap=>{
+      const items=[]; snap.forEach(doc=>items.push({ _id: doc.id, ...doc.data() }));
+      renderTeam(items);
+    }, err=>console.error('team listen:', err));
+  }
 
-  // Emoji selector -> fills the emoji input
-  document.addEventListener("change", (ev)=>{
-    const sel = ev.target && ev.target.id === "newsEmojiSelect" ? ev.target : null;
-    if (!sel) return;
-    const val = String(sel.value || "");
-    const inp = $("newsEmojiInput");
-    if (inp) inp.value = val;
-  });
-window.savePromo = async function(){
+  // ---------- Giveaway/Promo (Firestore) ----------
+  // (1) show form with type
+  window.showPromoForm = async function(kind){
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    const f = $('promoForm');
+    if (f) f.style.display='block';
+    if ($('promoFormKind')) $('promoFormKind').textContent = (kind==='giveaway'?'giveaway':'promoție');
+    f && (f.dataset.kind = kind || 'promo');
+  };
+
+  // (2) ensure required fields exist by mapping old ids
+  window.savePromo = async function(){
     const ok = await _ensureAdmin();
     if (!ok) return;
     if (!db) { alert('Firebase nu este încărcat.'); return; }
@@ -4472,7 +5596,7 @@ window.savePromo = async function(){
   // ---------- Init ----------
   window.addEventListener('load', ()=>{
     try{ window.loadNews && window.loadNews(); }catch(e){}
-    try{ window.startVisits && window.startVisits(); }catch(e){}
+    try{ window.updateVisitCounter && window.updateVisitCounter(); }catch(e){}
     try{ listenTeam(); }catch(e){}
     try{ listenPromos(); }catch(e){}
     try{ initCmcEmbed(); }catch(e){}
@@ -5477,7 +6601,6 @@ try{
 
   function setAdminUI(isAdmin){
     window.__STBYT_IS_ADMIN__ = !!isAdmin;
-    window.__SBYT_ADMIN = !!isAdmin;
     document.querySelectorAll(".admin-only").forEach(el=>{
       el.style.display = isAdmin ? "" : "none";
     });
@@ -5692,9 +6815,29 @@ try{
     await statsDocSet("team", { members: current.filter(x=>x.id!==id) }, true);
   };
 
-  
-  /* Duplicate VISITS block removed - handled by startVisits(). */
-
+  // ===== VISITS (stats/visits: {count}) =====
+  window.updateVisitCounter = async function(){
+    const db = fs(); if(!db) return;
+    const ref = db.collection("stats").doc("visits");
+    try{
+      const key = "stbyt_visit_"+new Date().toISOString().slice(0,10);
+      if(!localStorage.getItem(key)){
+        localStorage.setItem(key,"1");
+        await db.runTransaction(async t=>{
+          const snap = await t.get(ref);
+          const c = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
+          t.set(ref, {count: c+1}, {merge:true});
+        });
+      }
+      ref.onSnapshot(s=>{
+        const c = s.exists && typeof s.data().count==="number" ? s.data().count : 0;
+        const el = $("visitsCounter") || $("visitCounter") || $("visitsCount");
+        if(el) el.textContent = String(c);
+      });
+    }catch(e){
+      console.error("visit counter:", e);
+    }
+  };
 
   // ===== PROMOS (collection promos) =====
   function promoGetVal(...ids){
@@ -5870,51 +7013,46 @@ try{
 
   // ===== init =====
   function init(){
-  const a = auth();
-  if (a){
-    a.onAuthStateChanged(u=>{
-      const isAdm = !!u && String(u.email||"").toLowerCase() === ADMIN_EMAIL.toLowerCase();
-      window.__isAdmin = isAdm;
-      setAdminUI(isAdm);
-      // Re-render news so delete buttons show/hide correctly
-      if (typeof window.loadNews === "function") window.loadNews();
+    const a = auth();
+    if(a){
+      a.onAuthStateChanged(u=>{
+        const isAdmin = !!u && String(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
+        setAdminUI(isAdmin);
+      });
+    }
+
+    // start listeners
+    window.loadNews();
+    window.loadTeam();
+    listenPromos();
+    window.updateVisitCounter();
+
+    // token updates
+    updateSupplyAndHolders();
+    window.updateLivePriceAndChart();
+    setInterval(()=>window.updateLivePriceAndChart(), 60*1000);
+
+    // remove/disable coinmarketcap frame if exists
+    document.querySelectorAll("iframe").forEach(fr=>{
+      const src = (fr.getAttribute("src")||"");
+      if(src.includes("coinmarketcap.com") || src.includes("dex.coinmarketcap.com")) {
+        fr.remove();
+      }
     });
   }
 
-  // Emoji select -> writes into text input (so you see the emoji in "sau scrie...")
-  const emojiSel = document.getElementById("newsEmojiSelect");
-  const emojiInp = document.getElementById("newsEmojiInput");
-  if (emojiSel && emojiInp){
-    const sync = ()=>{ emojiInp.value = emojiSel.value; };
-    emojiSel.addEventListener("change", sync);
-    if (!emojiInp.value) sync();
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  }else{
+    init();
   }
-
-  // Start cross-device listeners
-  if (typeof window.loadNews === "function") window.loadNews();
-
-  // Visits: increment once per session + listen live from Firestore if possible
-  if (typeof window.startVisits === "function") window.startVisits();
-  else if (typeof window.updateVisits === "function") window.updateVisits();
-
-  // Token stats (supply/holders)
-  try { updateSupplyAndHolders(); } catch(e) {}
-
-  // Price: Uniswap gateway is blocked by CORS in browser; we'll handle via proxy later.
-  // Keep the page quiet for now:
-  try{
-    const el = document.getElementById("livePrice");
-    if (el) el.textContent = "Pret: in configurare (proxy necesar)";
-  } catch(e) {}
-}
-
-document.addEventListener("DOMContentLoaded", init);
-
-// Backward-compat: some parts call this name
-window.updateVisitCounter = function(){ return (window.startVisits ? window.startVisits() : window.updateVisits()); };
-window.updateLivePriceAndStats = function(){ return window.updateLivePriceAndChart ? window.updateLivePriceAndChart() : undefined; }
+})();
 </script>
-<script>/* =======================
+<script>
+function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
+</script>
+<script>
+/* =======================
    STANCUBYT FIX OVERRIDES (fc2b9)
    - price (CoinGecko)
    - visits (hitCounter)
@@ -5935,45 +7073,18 @@ window.updateLivePriceAndStats = function(){ return window.updateLivePriceAndCha
   function getAuth(){ return (window.firebase && firebase.auth) ? firebase.auth() : null; }
   function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
 
-  // -------- VISITS (Cloud Function + Firestore live) --------
-let __visitsUnsub = null;
-
-async function updateVisits() {
-  try {
-    const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store", mode: "cors" });
-    const j = await r.json();
-    const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
-    if (n != null) safeText($("visitCount"), String(n));
-  } catch (e) {
-    console.warn("hitCounter failed:", e);
-  }
-}
-window.updateVisits = updateVisits;
-
-async function startVisits() {
-  // 1) live listener (so all devices update instantly when count changes)
-  const db = getDb();
-  if (db && !__visitsUnsub) {
+  // -------- VISITS (Cloud Function) --------
+  async function updateVisits() {
     try {
-      __visitsUnsub = db.collection("stats").doc("visits").onSnapshot((snap)=>{
-        if (!snap.exists) return;
-        const data = snap.data() || {};
-        const n = (data.count ?? data.visits ?? data.value);
-        if (typeof n !== "undefined" && n !== null) safeText($("visitCount"), String(n));
-      }, (err)=>{
-        console.warn("visits listen:", err);
-      });
+      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", {cache:"no-store"});
+      const j = await r.json();
+      const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
+      if (n != null) safeText($("visitCount"), String(n));
     } catch (e) {
-      console.warn("visits listener error:", e);
+      console.warn("hitCounter failed:", e);
     }
   }
-
-  // 2) increment only once per browser tab session
-  if (sessionStorage.getItem("sbyt_hit_done") === "1") return;
-  sessionStorage.setItem("sbyt_hit_done", "1");
-  await updateVisits();
-}
-window.startVisits = startVisits;
+  window.updateVisits = updateVisits;
 
   // Disable legacy password prompt buttons (we use Firebase Auth)
   window.requestPassword = function(){ alert("Autentifica-te ca administrator pentru a adauga/sterge anunturi."); };
@@ -6101,92 +7212,135 @@ window.startVisits = startVisits;
   window.updateTotalSupplyReal = updateTotalSupplyReal;
 
   // -------- NEWS (Firestore + Storage) --------
-  
-  /* Removed broken legacy renderNewsList - using _renderNews() */
-async function uploadNewsImage(file) {
-  if (!file) return "";
-  const storage = getStorage();
-  if (!storage) throw new Error("Storage SDK indisponibil");
+  function renderNewsList(items, isAdmin) {
+    const container = $("newsContainer");
+    if (!container) return;
 
-  const maxBytes = 5 * 1024 * 1024; // 5MB
-  if (file.size && file.size > maxBytes) throw new Error("Imagine prea mare (max 5MB).");
-
-  const safeName = (file.name || "img").replace(/[^A-Za-z0-9_.-]+/g, "_");
-  const path = "news/" + Date.now() + "_" + safeName;
-  const ref = storage.ref().child(path);
-
-  const uploadPromise = ref.put(file, { contentType: file.type || "image/jpeg" })
-    .then(() => ref.getDownloadURL());
-  const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Upload timeout")), 20000));
-
-  return await Promise.race([uploadPromise, timeoutPromise]);
-}
-
-
-async function adminCreateNews() {
-  const auth = getAuth();
-  const user = auth && auth.currentUser ? auth.currentUser : null;
-  if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
-
-  const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
-  const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-  const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
-  const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
-  const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
-  const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
-
-  if (!title || !content) return alert("Completeaza titlu si continut.");
-
-  const addBtn = $("newsAddBtn");
-  if (addBtn) { addBtn.disabled = true; addBtn.style.opacity = "0.7"; }
-
-  const db = getDb();
-  if (!db) {
-    if (addBtn) { addBtn.disabled = false; addBtn.style.opacity = "1"; }
-    return alert("Firestore indisponibil.");
-  }
-
-  try {
-    let bgUrl = "";
-    if (file) {
-      try {
-        bgUrl = (await uploadNewsImage(file)) || "";
-      } catch (upErr) {
-        console.warn("upload failed (continuing without image):", upErr);
-        bgUrl = "";
-      }
-    }
-
-    const now = new Date();
-    await db.collection("news").add({
-      title,
-      content,
-      emoji,
-      type,
-      pinned,
-      bgUrl,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdAtMs: now.getTime(),
-      dateISO: now.toISOString(),
+    // sort: pinned first, then newest
+    items.sort((a,b)=>{
+      const pa = a.pinned ? 1 : 0;
+      const pb = b.pinned ? 1 : 0;
+      if (pa !== pb) return pb - pa;
+      const ta = a.createdAtMs || 0;
+      const tb = b.createdAtMs || 0;
+      return tb - ta;
     });
 
-    // reset form
-    if ($("newsTitleInput")) $("newsTitleInput").value = "";
-    if ($("newsContentInput")) $("newsContentInput").value = "";
-    if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
-    if ($("newsEmojiSelect")) $("newsEmojiSelect").value = "";
-    if ($("newsBgInput")) $("newsBgInput").value = "";
-    if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
+    container.innerHTML = "";
+    items.forEach(item=>{
+      const card = document.createElement("div");
+      card.className = "news-card";
 
-  } catch (e) {
-    console.error("create news failed:", e);
-    alert("Eroare la salvare stire (rules/permisiuni).");
-  } finally {
-    if (addBtn) { addBtn.disabled = false; addBtn.style.opacity = "1"; }
+      // background image
+      if (item.bgUrl) {
+        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
+        card.style.backgroundSize = "cover";
+        card.style.backgroundPosition = "center";
+      }
+
+      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
+      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
+
+      card.innerHTML = `
+        <div class="news-card-head">
+          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
+          <div class="news-date">${when}</div>
+        </div>
+        <div class="news-card-title">${(item.emoji ? item.emoji + " " : "") + (item.title || "")}</div>
+        <div class="news-card-text">${item.content || ""}</div>
+      `;
+
+      if (isAdmin) {
+        const del = document.createElement("button");
+        del.className = "news-del-btn";
+        del.textContent = "🗑️ Sterge";
+        del.onclick = async ()=>{
+          if (!confirm("Stergi acest anunt?")) return;
+          const db = getDb();
+          if (!db) return alert("Firestore indisponibil.");
+          try {
+            await db.collection("news").doc(item._id).delete();
+          } catch (e) {
+            console.error("delete news failed:", e);
+            alert("Eroare la stergere (rules/permisiuni).");
+          }
+        };
+        card.appendChild(del);
+      }
+
+      container.appendChild(card);
+    });
   }
-}
-window.adminCreateNews = adminCreateNews;
 
+  async function uploadNewsImage(file) {
+    if (!file) return null;
+    const storage = getStorage();
+    if (!storage) throw new Error("Storage SDK indisponibil");
+    const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
+    const path = "news/" + Date.now() + "_" + safeName;
+    const ref = storage.ref().child(path);
+    await ref.put(file);
+    return await ref.getDownloadURL();
+  }
+
+  async function adminCreateNews() {
+    const auth = getAuth();
+    const user = auth && auth.currentUser ? auth.currentUser : null;
+    if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
+
+    const addBtn = $("newsAddBtn");
+    if (addBtn) { addBtn.disabled = true; addBtn.style.opacity = "0.7"; }
+
+    const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
+    const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
+    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
+    const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
+    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
+
+    if (!title || !content) return alert("Completeaza titlu si continut.");
+
+    const db = getDb();
+    if (!db) return alert("Firestore indisponibil.");
+
+    try {
+      let bgUrl = null;
+      if (file) {
+        try {
+          bgUrl = await uploadNewsImage(file);
+        } catch (upErr) {
+          console.warn("upload failed (continuing without image):", upErr);
+          bgUrl = null;
+        }
+      }
+
+      await db.collection("news").add({
+        title,
+        content,
+        emoji: emoji || "",
+        type,
+        pinned,
+        bgUrl: bgUrl || "",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAtMs: Date.now(),
+      });
+
+      // reset form
+      if ($("newsTitleInput")) $("newsTitleInput").value = "";
+      if ($("newsContentInput")) $("newsContentInput").value = "";
+      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
+      if ($("newsBgInput")) $("newsBgInput").value = "";
+      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
+    }
+    catch (e) {
+      console.error("create news failed:", e);
+      alert("Eroare la salvare stire (rules/permisiuni).");
+    } finally {
+      const addBtn2 = $("newsAddBtn");
+      if (addBtn2) { addBtn2.disabled = false; addBtn2.style.opacity = "1"; }
+    }
+  }
+  window.adminCreateNews = adminCreateNews;
 
   function setNewsAdminVisible(isAdmin) {
     const box = $("newsAdminBox");
@@ -6277,6 +7431,362 @@ window.adminCreateNews = adminCreateNews;
 })();
 </script>
 
+
+<script>
+/* ===== STANCUBYT HOTFIX (AUTH + VISITS + NEWS + UPLOAD BG + EMOJI) ===== */
+(function(){
+  "use strict";
+
+  const ADMIN_EMAIL = "stancubyt@gmail.com";
+  const HIT_COUNTER_URL = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/hitCounter";
+  const VISITS_DOC_PATH = "stats/visits"; // Firestore doc
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    storageBucket: "stancubyt-fc2b9.appspot.com",
+    messagingSenderId: "263244200492",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+    measurementId: "G-272S9HSY3K"
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function safeText(s){ return (s==null) ? "" : String(s); }
+
+  // Ensure firebase compat SDK loaded
+  if (!window.firebase || !firebase.apps) {
+    console.error("Firebase SDK not loaded.");
+    return;
+  }
+
+  // Init Firebase once
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  } catch (e) {
+    console.warn("firebase.initializeApp", e);
+  }
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  // ----- UI bindings -----
+  const adminBox = $("newsAdminBox");
+  const addBtn = $("newsAddBtn");
+  const logoutBtn = $("adminLogoutBtn");
+  const emailEl = $("adminEmail");
+  const passEl = $("adminPass");
+  const badgeEl = $("adminStatusBadge");
+  const userLabelEl = $("adminUserLabel");
+  const msgEl = $("adminLoginMsg");
+
+  const emojiSelect = $("newsEmojiSelect");
+  const emojiInput = $("newsEmojiInput");
+  const titleInput = $("newsTitleInput") || $("newsTitle");
+  const contentInput = $("newsContentInput") || $("newsContent");
+  const typeSelect = $("newsType");
+  const bgInput = $("newsBgInput");
+
+  // Emoji select -> fill input
+  if (emojiSelect && emojiInput) {
+    emojiSelect.addEventListener("change", () => {
+      emojiInput.value = emojiSelect.value || "";
+      emojiInput.dispatchEvent(new Event("input", {bubbles:true}));
+    });
+  }
+
+  function setAdminUI(user){
+    const isAdmin = !!(user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+    window.__STBYT_IS_ADMIN__ = isAdmin;
+
+    if (adminBox) adminBox.style.display = isAdmin ? "block" : "none";
+    if (addBtn) addBtn.style.display = isAdmin ? "inline-flex" : "none";
+    if (logoutBtn) logoutBtn.style.display = user ? "inline-flex" : "none";
+
+    if (badgeEl) {
+      badgeEl.classList.remove("admin-badge-on","admin-badge-off");
+      badgeEl.classList.add(isAdmin ? "admin-badge-on" : "admin-badge-off");
+      badgeEl.textContent = isAdmin ? "Admin" : (user ? "User" : "Neautentificat");
+    }
+    if (userLabelEl) userLabelEl.textContent = user ? (" " + user.email) : "";
+    if (msgEl) msgEl.textContent = "";
+    return isAdmin;
+  }
+
+  // Public functions used by onclick in HTML
+  window.adminSignIn = async function(){
+    try{
+      const email = safeText(emailEl && emailEl.value).trim();
+      const pass = safeText(passEl && passEl.value);
+      if (!email || !pass) { if (msgEl) msgEl.textContent = "Completeaza email si parola."; return; }
+      await auth.signInWithEmailAndPassword(email, pass);
+      if (msgEl) msgEl.textContent = "Autentificat.";
+    }catch(e){
+      console.error("adminSignIn", e);
+      if (msgEl) msgEl.textContent = "Eroare autentificare: " + (e && e.message ? e.message : e);
+    }
+  };
+
+  window.adminSignOut = async function(){
+    try{
+      await auth.signOut();
+      if (msgEl) msgEl.textContent = "Delogat.";
+    }catch(e){
+      console.error("adminSignOut", e);
+      if (msgEl) msgEl.textContent = "Eroare delogare.";
+    }
+  };
+
+  function fmtDate(ts){
+    try{
+      let d;
+      if (!ts) d = new Date();
+      else if (typeof ts === "number") d = new Date(ts);
+      else if (ts.toDate) d = ts.toDate();
+      else d = new Date(ts);
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mi = String(d.getMinutes()).padStart(2,"0");
+      return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+    } catch(_){ return ""; }
+  }
+
+  function typeMeta(t){
+    const type = (t || "announcement").toLowerCase();
+    if (type === "stire" || type === "news") return {label:"Știre", cls:"type-news"};
+    if (type === "noutate" || type === "update") return {label:"Noutate", cls:"type-update"};
+    return {label:"Anunț", cls:"type-announce"};
+  }
+
+  function renderNewsCard(docId, data, isAdmin){
+    const container = $("newsContainer");
+    if (!container) return;
+
+    const emoji = safeText(data.emoji).trim();
+    const meta = typeMeta(data.type);
+    const title = safeText(data.title);
+    const content = safeText(data.content);
+    const createdAt = fmtDate(data.createdAt || data.created || data.timestamp);
+    const bgUrl = safeText(data.bgUrl || data.imageUrl);
+
+    const card = document.createElement("div");
+    card.className = "news-card " + meta.cls;
+
+    // background
+    if (bgUrl) {
+      card.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.70)), url('${bgUrl.replace(/'/g,"%27")}')`;
+      card.style.backgroundSize = "cover";
+      card.style.backgroundPosition = "center";
+      card.style.backgroundRepeat = "no-repeat";
+    }
+
+    card.innerHTML = `
+      <div class="news-card-top">
+        <div class="news-badge">${meta.label}</div>
+        ${isAdmin ? `<button class="news-del" data-id="${docId}" title="Sterge">🗑️</button>` : ``}
+      </div>
+      <div class="news-card-title">${title}</div>
+      <div class="news-card-meta">${emoji ? `<span class="news-emoji">${emoji}</span>` : ``}<span>${createdAt}</span></div>
+      <div class="news-card-content">${content}</div>
+    `;
+    container.appendChild(card);
+  }
+
+  function ensureNewsGridLayout(){
+    // Force: title above and grid 2/row (1 on mobile)
+    const styleId = "stbyt-news-grid-style";
+    if (document.getElementById(styleId)) return;
+    const st = document.createElement("style");
+    st.id = styleId;
+    st.textContent = `
+      .news-section .news-header { display:block; }
+      .news-section .news-title { display:block; margin-bottom: 14px; }
+      .news-grid { display:grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 16px !important; }
+      @media (max-width: 820px){ .news-grid { grid-template-columns: 1fr !important; } }
+      .news-card { min-height: 220px; padding: 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.04); box-shadow: 0 10px 22px rgba(0,0,0,0.22); position: relative; overflow:hidden; }
+      .news-card .news-card-top{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;}
+      .news-badge{ font-weight:700; font-size: 0.85rem; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); backdrop-filter: blur(6px); }
+      .news-card-title{ font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; }
+      .news-card-meta{ display:flex; align-items:center; gap:10px; opacity:0.9; font-size: 0.88rem; margin-bottom: 10px; }
+      .news-emoji{ font-size: 1.05rem; }
+      .news-card-content{ font-size: 0.95rem; line-height: 1.35; opacity: 0.92; }
+      .news-del{ border:1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color:#fff; border-radius: 10px; padding: 6px 8px; cursor:pointer; }
+      .news-card.type-news{ border-color: rgba(0,170,255,0.28); }
+      .news-card.type-news .news-badge{ background: rgba(0,170,255,0.18); }
+      .news-card.type-update{ border-color: rgba(0,255,140,0.28); }
+      .news-card.type-update .news-badge{ background: rgba(0,255,140,0.16); }
+      .news-card.type-announce{ border-color: rgba(255,170,0,0.30); }
+      .news-card.type-announce .news-badge{ background: rgba(255,170,0,0.18); }
+      /* Make the "Revolutie Digitala..." line more attractive */
+      .hero-subtitle, .hero-description, .presentation-subtitle { color: rgba(0,255,255,0.95) !important; text-shadow: 0 0 14px rgba(0,255,255,0.25); }
+    `;
+    document.head.appendChild(st);
+  }
+
+  // Live news listener
+  let newsUnsub = null;
+  function startNewsListener(){
+    ensureNewsGridLayout();
+    const container = $("newsContainer");
+    if (!container) return;
+    if (newsUnsub) { try{ newsUnsub(); }catch(_){ } newsUnsub = null; }
+
+    newsUnsub = db.collection("news").orderBy("createdAt","desc").limit(50).onSnapshot((snap)=>{
+      container.innerHTML = "";
+      const isAdmin = !!window.__STBYT_IS_ADMIN__;
+      if (snap.empty){
+        container.innerHTML = '<div style="opacity:0.85;">Nu exista anunturi inca.</div>';
+        return;
+      }
+      snap.forEach(doc => renderNewsCard(doc.id, doc.data()||{}, isAdmin));
+      // Bind delete handlers
+      container.querySelectorAll(".news-del").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          if (!window.__STBYT_IS_ADMIN__) return;
+          const id = btn.getAttribute("data-id");
+          if (!id) return;
+          if (!confirm("Stergi acest anunt?")) return;
+          try{ await db.collection("news").doc(id).delete(); }
+          catch(e){ alert("Eroare stergere: " + (e && e.message ? e.message : e)); }
+        });
+      });
+    }, (err)=>{
+      console.error("news listener", err);
+      container.innerHTML = '<div style="opacity:0.85;">Eroare la incarcarea stirilor (rules/permisiuni).</div>';
+    });
+  }
+
+  // Resize image in browser -> jpeg blob
+  async function resizeToJpeg(file){
+    const MAX_W = 1400;
+    const MAX_H = 900;
+    const QUALITY = 0.82;
+
+    const bmp = await createImageBitmap(file);
+    let w = bmp.width, h = bmp.height;
+    const ratio = Math.min(MAX_W / w, MAX_H / h, 1);
+    w = Math.round(w * ratio);
+    h = Math.round(h * ratio);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(bmp, 0, 0, w, h);
+
+    const blob = await new Promise((resolve)=> canvas.toBlob(resolve, "image/jpeg", QUALITY));
+    return blob;
+  }
+
+  async function uploadBgIfAny(docId){
+    if (!bgInput || !bgInput.files || !bgInput.files[0]) return "";
+    const f = bgInput.files[0];
+    // basic validation
+    if (!f.type.startsWith("image/")) throw new Error("Fisier invalid (doar imagini).");
+    if (f.size > 6 * 1024 * 1024) throw new Error("Imagine prea mare (max 6MB).");
+
+    const blob = await resizeToJpeg(f);
+    const ref = storage.ref().child("news/" + docId + ".jpg");
+    await ref.put(blob, { contentType: "image/jpeg" });
+    return await ref.getDownloadURL();
+  }
+
+  window.adminCreateNews = async function(){
+    try{
+      if (!window.__STBYT_IS_ADMIN__) { alert("Doar admin poate adauga."); return; }
+      const title = safeText(titleInput && titleInput.value).trim();
+      const content = safeText(contentInput && contentInput.value).trim();
+      const type = safeText(typeSelect && typeSelect.value).trim() || "announcement";
+      const emoji = safeText(emojiInput && emojiInput.value).trim();
+
+      if (!title || !content) { alert("Completeaza titlu si continut."); return; }
+
+      // Create doc first
+      const docRef = db.collection("news").doc();
+      const baseData = {
+        title,
+        content,
+        type,
+        emoji,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      // Try upload (but don't block posting forever)
+      let bgUrl = "";
+      try{
+        bgUrl = await Promise.race([
+          uploadBgIfAny(docRef.id),
+          new Promise((_, reject)=> setTimeout(()=>reject(new Error("Upload timeout")), 20000))
+        ]);
+      }catch(e){
+        console.warn("bg upload skipped", e);
+        bgUrl = "";
+      }
+      if (bgUrl) baseData.bgUrl = bgUrl;
+
+      await docRef.set(baseData);
+
+      // clear form
+      if (titleInput) titleInput.value = "";
+      if (contentInput) contentInput.value = "";
+      if (emojiInput) emojiInput.value = "";
+      if (emojiSelect) emojiSelect.value = "";
+      if (bgInput) bgInput.value = "";
+
+    }catch(e){
+      console.error("adminCreateNews", e);
+      alert("Eroare la publicare: " + (e && e.message ? e.message : e));
+    }
+  };
+
+  // ----- Visits: live display + 1-per-tab increment -----
+  function startVisits(){
+    const countEl = $("visitCount");
+    // live display from Firestore
+    try{
+      db.doc(VISITS_DOC_PATH).onSnapshot((doc)=>{
+        if (!countEl) return;
+        const v = doc.exists ? (doc.data().count || doc.data().visits || doc.data().value || 0) : 0;
+        countEl.textContent = String(v);
+      }, (e)=> console.warn("visits onSnapshot", e));
+    }catch(e){
+      console.warn("visits listener failed", e);
+    }
+
+    // increment once per tab load
+    if (window.__STBYT_HIT_SENT__) return;
+    window.__STBYT_HIT_SENT__ = true;
+    if (sessionStorage.getItem("stbyt_hit_sent")) return;
+    sessionStorage.setItem("stbyt_hit_sent", "1");
+    fetch(HIT_COUNTER_URL, { method:"GET", mode:"cors" })
+      .then(r => r.json().catch(()=>null))
+      .then(j=>{
+        if (j && (j.count!=null) && countEl) countEl.textContent = String(j.count);
+      })
+      .catch(e=>console.warn("hitCounter fetch", e));
+  }
+
+  // ----- Auth state -----
+  auth.onAuthStateChanged((user)=>{
+    const isAdmin = setAdminUI(user);
+    startNewsListener();
+  });
+
+  // Ensure login UI visible (some versions hide it via JS)
+  try{
+    const loginSection = document.querySelector(".admin-section") || document.querySelector("#adminSection");
+    if (loginSection) loginSection.style.display = "block";
+  }catch(_){}
+
+  // Start visits and news immediately
+  startVisits();
+  startNewsListener();
+
+})();
+</script>
+
 </body>
 <script>
 /* =======================
@@ -6354,9 +7864,67 @@ window.adminCreateNews = adminCreateNews;
   window.updateTotalSupplyReal = updateTotalSupplyReal;
 
   // -------- NEWS (Firestore + Storage) --------
-  
-  /* Removed duplicate legacy news rendering block. */
-async function uploadNewsImage(file) {
+  function renderNewsList(items, isAdmin) {
+    const container = $("newsContainer");
+    if (!container) return;
+
+    // sort: pinned first, then newest
+    items.sort((a,b)=>{
+      const pa = a.pinned ? 1 : 0;
+      const pb = b.pinned ? 1 : 0;
+      if (pa !== pb) return pb - pa;
+      const ta = a.createdAtMs || 0;
+      const tb = b.createdAtMs || 0;
+      return tb - ta;
+    });
+
+    container.innerHTML = "";
+    items.forEach(item=>{
+      const card = document.createElement("div");
+      card.className = "news-card";
+
+      // background image
+      if (item.bgUrl) {
+        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
+        card.style.backgroundSize = "cover";
+        card.style.backgroundPosition = "center";
+      }
+
+      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
+      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
+
+      card.innerHTML = `
+        <div class="news-card-head">
+          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
+          <div class="news-date">${when}</div>
+        </div>
+        <div class="news-card-title">${(item.emoji ? item.emoji + " " : "") + (item.title || "")}</div>
+        <div class="news-card-text">${item.content || ""}</div>
+      `;
+
+      if (isAdmin) {
+        const del = document.createElement("button");
+        del.className = "news-del-btn";
+        del.textContent = "🗑️ Sterge";
+        del.onclick = async ()=>{
+          if (!confirm("Stergi acest anunt?")) return;
+          const db = getDb();
+          if (!db) return alert("Firestore indisponibil.");
+          try {
+            await db.collection("news").doc(item._id).delete();
+          } catch (e) {
+            console.error("delete news failed:", e);
+            alert("Eroare la stergere (rules/permisiuni).");
+          }
+        };
+        card.appendChild(del);
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  async function uploadNewsImage(file) {
     if (!file) return null;
     const storage = getStorage();
     if (!storage) throw new Error("Storage SDK indisponibil");
@@ -6507,6 +8075,362 @@ document.addEventListener("DOMContentLoaded", () => {
   try { listenNews(); } catch (e) {}
 });
 window.__SBYT_BOOT = true;
+</script>
+
+
+<script>
+/* ===== STANCUBYT HOTFIX (AUTH + VISITS + NEWS + UPLOAD BG + EMOJI) ===== */
+(function(){
+  "use strict";
+
+  const ADMIN_EMAIL = "stancubyt@gmail.com";
+  const HIT_COUNTER_URL = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/hitCounter";
+  const VISITS_DOC_PATH = "stats/visits"; // Firestore doc
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    storageBucket: "stancubyt-fc2b9.appspot.com",
+    messagingSenderId: "263244200492",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+    measurementId: "G-272S9HSY3K"
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function safeText(s){ return (s==null) ? "" : String(s); }
+
+  // Ensure firebase compat SDK loaded
+  if (!window.firebase || !firebase.apps) {
+    console.error("Firebase SDK not loaded.");
+    return;
+  }
+
+  // Init Firebase once
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  } catch (e) {
+    console.warn("firebase.initializeApp", e);
+  }
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  // ----- UI bindings -----
+  const adminBox = $("newsAdminBox");
+  const addBtn = $("newsAddBtn");
+  const logoutBtn = $("adminLogoutBtn");
+  const emailEl = $("adminEmail");
+  const passEl = $("adminPass");
+  const badgeEl = $("adminStatusBadge");
+  const userLabelEl = $("adminUserLabel");
+  const msgEl = $("adminLoginMsg");
+
+  const emojiSelect = $("newsEmojiSelect");
+  const emojiInput = $("newsEmojiInput");
+  const titleInput = $("newsTitleInput") || $("newsTitle");
+  const contentInput = $("newsContentInput") || $("newsContent");
+  const typeSelect = $("newsType");
+  const bgInput = $("newsBgInput");
+
+  // Emoji select -> fill input
+  if (emojiSelect && emojiInput) {
+    emojiSelect.addEventListener("change", () => {
+      emojiInput.value = emojiSelect.value || "";
+      emojiInput.dispatchEvent(new Event("input", {bubbles:true}));
+    });
+  }
+
+  function setAdminUI(user){
+    const isAdmin = !!(user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+    window.__STBYT_IS_ADMIN__ = isAdmin;
+
+    if (adminBox) adminBox.style.display = isAdmin ? "block" : "none";
+    if (addBtn) addBtn.style.display = isAdmin ? "inline-flex" : "none";
+    if (logoutBtn) logoutBtn.style.display = user ? "inline-flex" : "none";
+
+    if (badgeEl) {
+      badgeEl.classList.remove("admin-badge-on","admin-badge-off");
+      badgeEl.classList.add(isAdmin ? "admin-badge-on" : "admin-badge-off");
+      badgeEl.textContent = isAdmin ? "Admin" : (user ? "User" : "Neautentificat");
+    }
+    if (userLabelEl) userLabelEl.textContent = user ? (" " + user.email) : "";
+    if (msgEl) msgEl.textContent = "";
+    return isAdmin;
+  }
+
+  // Public functions used by onclick in HTML
+  window.adminSignIn = async function(){
+    try{
+      const email = safeText(emailEl && emailEl.value).trim();
+      const pass = safeText(passEl && passEl.value);
+      if (!email || !pass) { if (msgEl) msgEl.textContent = "Completeaza email si parola."; return; }
+      await auth.signInWithEmailAndPassword(email, pass);
+      if (msgEl) msgEl.textContent = "Autentificat.";
+    }catch(e){
+      console.error("adminSignIn", e);
+      if (msgEl) msgEl.textContent = "Eroare autentificare: " + (e && e.message ? e.message : e);
+    }
+  };
+
+  window.adminSignOut = async function(){
+    try{
+      await auth.signOut();
+      if (msgEl) msgEl.textContent = "Delogat.";
+    }catch(e){
+      console.error("adminSignOut", e);
+      if (msgEl) msgEl.textContent = "Eroare delogare.";
+    }
+  };
+
+  function fmtDate(ts){
+    try{
+      let d;
+      if (!ts) d = new Date();
+      else if (typeof ts === "number") d = new Date(ts);
+      else if (ts.toDate) d = ts.toDate();
+      else d = new Date(ts);
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mi = String(d.getMinutes()).padStart(2,"0");
+      return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+    } catch(_){ return ""; }
+  }
+
+  function typeMeta(t){
+    const type = (t || "announcement").toLowerCase();
+    if (type === "stire" || type === "news") return {label:"Știre", cls:"type-news"};
+    if (type === "noutate" || type === "update") return {label:"Noutate", cls:"type-update"};
+    return {label:"Anunț", cls:"type-announce"};
+  }
+
+  function renderNewsCard(docId, data, isAdmin){
+    const container = $("newsContainer");
+    if (!container) return;
+
+    const emoji = safeText(data.emoji).trim();
+    const meta = typeMeta(data.type);
+    const title = safeText(data.title);
+    const content = safeText(data.content);
+    const createdAt = fmtDate(data.createdAt || data.created || data.timestamp);
+    const bgUrl = safeText(data.bgUrl || data.imageUrl);
+
+    const card = document.createElement("div");
+    card.className = "news-card " + meta.cls;
+
+    // background
+    if (bgUrl) {
+      card.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.70)), url('${bgUrl.replace(/'/g,"%27")}')`;
+      card.style.backgroundSize = "cover";
+      card.style.backgroundPosition = "center";
+      card.style.backgroundRepeat = "no-repeat";
+    }
+
+    card.innerHTML = `
+      <div class="news-card-top">
+        <div class="news-badge">${meta.label}</div>
+        ${isAdmin ? `<button class="news-del" data-id="${docId}" title="Sterge">🗑️</button>` : ``}
+      </div>
+      <div class="news-card-title">${title}</div>
+      <div class="news-card-meta">${emoji ? `<span class="news-emoji">${emoji}</span>` : ``}<span>${createdAt}</span></div>
+      <div class="news-card-content">${content}</div>
+    `;
+    container.appendChild(card);
+  }
+
+  function ensureNewsGridLayout(){
+    // Force: title above and grid 2/row (1 on mobile)
+    const styleId = "stbyt-news-grid-style";
+    if (document.getElementById(styleId)) return;
+    const st = document.createElement("style");
+    st.id = styleId;
+    st.textContent = `
+      .news-section .news-header { display:block; }
+      .news-section .news-title { display:block; margin-bottom: 14px; }
+      .news-grid { display:grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 16px !important; }
+      @media (max-width: 820px){ .news-grid { grid-template-columns: 1fr !important; } }
+      .news-card { min-height: 220px; padding: 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.04); box-shadow: 0 10px 22px rgba(0,0,0,0.22); position: relative; overflow:hidden; }
+      .news-card .news-card-top{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;}
+      .news-badge{ font-weight:700; font-size: 0.85rem; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); backdrop-filter: blur(6px); }
+      .news-card-title{ font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; }
+      .news-card-meta{ display:flex; align-items:center; gap:10px; opacity:0.9; font-size: 0.88rem; margin-bottom: 10px; }
+      .news-emoji{ font-size: 1.05rem; }
+      .news-card-content{ font-size: 0.95rem; line-height: 1.35; opacity: 0.92; }
+      .news-del{ border:1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color:#fff; border-radius: 10px; padding: 6px 8px; cursor:pointer; }
+      .news-card.type-news{ border-color: rgba(0,170,255,0.28); }
+      .news-card.type-news .news-badge{ background: rgba(0,170,255,0.18); }
+      .news-card.type-update{ border-color: rgba(0,255,140,0.28); }
+      .news-card.type-update .news-badge{ background: rgba(0,255,140,0.16); }
+      .news-card.type-announce{ border-color: rgba(255,170,0,0.30); }
+      .news-card.type-announce .news-badge{ background: rgba(255,170,0,0.18); }
+      /* Make the "Revolutie Digitala..." line more attractive */
+      .hero-subtitle, .hero-description, .presentation-subtitle { color: rgba(0,255,255,0.95) !important; text-shadow: 0 0 14px rgba(0,255,255,0.25); }
+    `;
+    document.head.appendChild(st);
+  }
+
+  // Live news listener
+  let newsUnsub = null;
+  function startNewsListener(){
+    ensureNewsGridLayout();
+    const container = $("newsContainer");
+    if (!container) return;
+    if (newsUnsub) { try{ newsUnsub(); }catch(_){ } newsUnsub = null; }
+
+    newsUnsub = db.collection("news").orderBy("createdAt","desc").limit(50).onSnapshot((snap)=>{
+      container.innerHTML = "";
+      const isAdmin = !!window.__STBYT_IS_ADMIN__;
+      if (snap.empty){
+        container.innerHTML = '<div style="opacity:0.85;">Nu exista anunturi inca.</div>';
+        return;
+      }
+      snap.forEach(doc => renderNewsCard(doc.id, doc.data()||{}, isAdmin));
+      // Bind delete handlers
+      container.querySelectorAll(".news-del").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          if (!window.__STBYT_IS_ADMIN__) return;
+          const id = btn.getAttribute("data-id");
+          if (!id) return;
+          if (!confirm("Stergi acest anunt?")) return;
+          try{ await db.collection("news").doc(id).delete(); }
+          catch(e){ alert("Eroare stergere: " + (e && e.message ? e.message : e)); }
+        });
+      });
+    }, (err)=>{
+      console.error("news listener", err);
+      container.innerHTML = '<div style="opacity:0.85;">Eroare la incarcarea stirilor (rules/permisiuni).</div>';
+    });
+  }
+
+  // Resize image in browser -> jpeg blob
+  async function resizeToJpeg(file){
+    const MAX_W = 1400;
+    const MAX_H = 900;
+    const QUALITY = 0.82;
+
+    const bmp = await createImageBitmap(file);
+    let w = bmp.width, h = bmp.height;
+    const ratio = Math.min(MAX_W / w, MAX_H / h, 1);
+    w = Math.round(w * ratio);
+    h = Math.round(h * ratio);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(bmp, 0, 0, w, h);
+
+    const blob = await new Promise((resolve)=> canvas.toBlob(resolve, "image/jpeg", QUALITY));
+    return blob;
+  }
+
+  async function uploadBgIfAny(docId){
+    if (!bgInput || !bgInput.files || !bgInput.files[0]) return "";
+    const f = bgInput.files[0];
+    // basic validation
+    if (!f.type.startsWith("image/")) throw new Error("Fisier invalid (doar imagini).");
+    if (f.size > 6 * 1024 * 1024) throw new Error("Imagine prea mare (max 6MB).");
+
+    const blob = await resizeToJpeg(f);
+    const ref = storage.ref().child("news/" + docId + ".jpg");
+    await ref.put(blob, { contentType: "image/jpeg" });
+    return await ref.getDownloadURL();
+  }
+
+  window.adminCreateNews = async function(){
+    try{
+      if (!window.__STBYT_IS_ADMIN__) { alert("Doar admin poate adauga."); return; }
+      const title = safeText(titleInput && titleInput.value).trim();
+      const content = safeText(contentInput && contentInput.value).trim();
+      const type = safeText(typeSelect && typeSelect.value).trim() || "announcement";
+      const emoji = safeText(emojiInput && emojiInput.value).trim();
+
+      if (!title || !content) { alert("Completeaza titlu si continut."); return; }
+
+      // Create doc first
+      const docRef = db.collection("news").doc();
+      const baseData = {
+        title,
+        content,
+        type,
+        emoji,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      // Try upload (but don't block posting forever)
+      let bgUrl = "";
+      try{
+        bgUrl = await Promise.race([
+          uploadBgIfAny(docRef.id),
+          new Promise((_, reject)=> setTimeout(()=>reject(new Error("Upload timeout")), 20000))
+        ]);
+      }catch(e){
+        console.warn("bg upload skipped", e);
+        bgUrl = "";
+      }
+      if (bgUrl) baseData.bgUrl = bgUrl;
+
+      await docRef.set(baseData);
+
+      // clear form
+      if (titleInput) titleInput.value = "";
+      if (contentInput) contentInput.value = "";
+      if (emojiInput) emojiInput.value = "";
+      if (emojiSelect) emojiSelect.value = "";
+      if (bgInput) bgInput.value = "";
+
+    }catch(e){
+      console.error("adminCreateNews", e);
+      alert("Eroare la publicare: " + (e && e.message ? e.message : e));
+    }
+  };
+
+  // ----- Visits: live display + 1-per-tab increment -----
+  function startVisits(){
+    const countEl = $("visitCount");
+    // live display from Firestore
+    try{
+      db.doc(VISITS_DOC_PATH).onSnapshot((doc)=>{
+        if (!countEl) return;
+        const v = doc.exists ? (doc.data().count || doc.data().visits || doc.data().value || 0) : 0;
+        countEl.textContent = String(v);
+      }, (e)=> console.warn("visits onSnapshot", e));
+    }catch(e){
+      console.warn("visits listener failed", e);
+    }
+
+    // increment once per tab load
+    if (window.__STBYT_HIT_SENT__) return;
+    window.__STBYT_HIT_SENT__ = true;
+    if (sessionStorage.getItem("stbyt_hit_sent")) return;
+    sessionStorage.setItem("stbyt_hit_sent", "1");
+    fetch(HIT_COUNTER_URL, { method:"GET", mode:"cors" })
+      .then(r => r.json().catch(()=>null))
+      .then(j=>{
+        if (j && (j.count!=null) && countEl) countEl.textContent = String(j.count);
+      })
+      .catch(e=>console.warn("hitCounter fetch", e));
+  }
+
+  // ----- Auth state -----
+  auth.onAuthStateChanged((user)=>{
+    const isAdmin = setAdminUI(user);
+    startNewsListener();
+  });
+
+  // Ensure login UI visible (some versions hide it via JS)
+  try{
+    const loginSection = document.querySelector(".admin-section") || document.querySelector("#adminSection");
+    if (loginSection) loginSection.style.display = "block";
+  }catch(_){}
+
+  // Start visits and news immediately
+  startVisits();
+  startNewsListener();
+
+})();
 </script>
 
 </body></html>
