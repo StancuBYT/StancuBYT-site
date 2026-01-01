@@ -399,17 +399,47 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 1.5rem;
         }
+
+        @media (max-width: 980px) {
+            .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 640px) {
+            .news-grid { grid-template-columns: 1fr; }
+        }
+
 
         .news-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
-            padding: 1.5rem;
+            padding: 1.8rem;
+            min-height: 240px;
             border: 1px solid rgba(0, 102, 255, 0.2);
             transition: all 0.3s ease;
         }
+
+        .news-card { position: relative; overflow: hidden; }
+
+        .news-card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+        .news-type { font-weight:700; font-size:0.78rem; letter-spacing:0.6px; text-transform:uppercase; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); }
+        .news-date { font-size:0.82rem; opacity:0.9; display:flex; align-items:center; gap:8px; }
+        .news-date-emoji { font-size:1rem; line-height:1; }
+
+        /* Marketing colors: Stire=Blue trust, Noutate=Green growth, Anunt=Gold attention */
+        .news-card.news { border-color: rgba(0, 102, 255, 0.35); box-shadow: 0 0 0 1px rgba(0,102,255,0.15), 0 14px 40px rgba(0,0,0,0.25); }
+        .news-card.update { border-color: rgba(0, 255, 170, 0.35); box-shadow: 0 0 0 1px rgba(0,255,170,0.15), 0 14px 40px rgba(0,0,0,0.25); }
+        .news-card.announcement { border-color: rgba(255, 215, 0, 0.35); box-shadow: 0 0 0 1px rgba(255,215,0,0.16), 0 14px 40px rgba(0,0,0,0.25); }
+
+        .news-type.news { color: #9bd0ff; }
+        .news-type.update { color: #7dffce; }
+        .news-type.announcement { color: #ffe38a; }
+
+        .news-card-title { font-size:1.1rem; font-weight:800; margin:6px 0 6px; }
+        .news-card-text { opacity:0.92; line-height:1.35; }
+        .news-del-btn { position:absolute; right:14px; bottom:14px; }
+
 
         .news-card:hover {
             transform: translateY(-5px);
@@ -1235,7 +1265,7 @@
 </div>
 <div class="hero">
 <h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 1; color:#00ffff; text-shadow:0 0 12px rgba(0,255,255,0.35);">
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
             </p>
 <!-- Live Price Display -->
@@ -1279,7 +1309,7 @@
 <h2 class="news-title">
 <span>📢</span> Noutăți &amp; Anunțuri
                     </h2>
-<!-- legacy news-controls removed -->
+</div>
 <div id="newsAdminBox" class="admin-news-box" style="display:none; margin-bottom:1rem;">
   <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
     <select id="newsEmojiSelect" style="max-width:140px;">
@@ -1318,1435 +1348,6 @@
 
 <div class="news-grid" id="newsContainer">
 <!-- Noutățile vor fi adăugate aici dinamic -->
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
-                            Fixează această știre
-                        </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
-                    ✅ Date încărcate de pe Etherscan
-                </div>
-</div>
-</div>
-<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-</section>
-</section><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
-<style>
-        /* Variabile culori conform psihologiei marketingului */
-        :root {
-            --blue-tech: #0066ff;
-            --green-growth: #00ff88;
-            --purple-innov: #8a2be2;
-            --neon-cyan: #00ffff;
-            --dark-bg: #0a0a1f;
-            --darker-bg: #050510;
-            --orange-alert: #ff9500;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: var(--dark-bg);
-            color: white;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
-        }
-
-        /* Particle Animation Background */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        /* Logo Background pentru Hero Section */
-        .hero-logo-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            opacity: 0.05;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .logo-3d-bg {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            animation: float3d 20s infinite ease-in-out;
-        }
-
-        .logo-3d-bg img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            filter: blur(1px) brightness(1.2);
-        }
-
-        @keyframes float3d {
-            0%, 100% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
-            }
-            25% { 
-                transform: translateY(-20px) rotateX(5deg) rotateY(5deg); 
-            }
-            50% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(10deg); 
-            }
-            75% { 
-                transform: translateY(20px) rotateX(-5deg) rotateY(5deg); 
-            }
-        }
-
-        /* 3D Logo Animation */
-        .logo-3d-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            perspective: 1000px;
-        }
-
-        .logo-3d {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: rotate3d 8s infinite linear;
-        }
-
-        .logo-3d img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: absolute;
-            backface-visibility: hidden;
-        }
-
-        .backnote-orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120px;
-            height: 120px;
-            transform: translate(-50%, -50%);
-            animation: orbit 6s infinite linear;
-        }
-
-        .backnote {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            filter: blur(2px);
-            opacity: 0.7;
-        }
-
-        .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
-        .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
-
-        @keyframes rotate3d {
-            0% { transform: rotateY(0deg) rotateX(5deg); }
-            100% { transform: rotateY(360deg) rotateX(5deg); }
-        }
-
-        @keyframes orbit {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        /* Buton Modern Reîmprospătează Datele */
-        .btn-refresh-modern {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-            margin-top: 1rem;
-            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
-        }
-
-        .btn-refresh-modern:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
-        }
-
-        .btn-refresh-modern:active {
-            transform: translateY(0) scale(1);
-        }
-
-        .refresh-icon {
-            font-size: 1.3rem;
-            transition: transform 0.5s ease;
-        }
-
-        .btn-refresh-modern:hover .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
-
-        .refresh-pulse {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border-radius: 50px;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            opacity: 0;
-            z-index: -1;
-            animation: pulseEffect 2s infinite;
-        }
-
-        @keyframes rotate360 {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes pulseEffect {
-            0% { 
-                transform: scale(1); 
-                opacity: 0.7; 
-            }
-            100% { 
-                transform: scale(1.2); 
-                opacity: 0; 
-            }
-        }
-
-        /* Loading animation pentru buton */
-        .btn-refresh-modern.loading {
-            background: linear-gradient(45deg, #666, #888);
-            cursor: wait;
-        }
-
-        .btn-refresh-modern.loading .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
-
-        .btn-refresh-modern.loading .refresh-text {
-            opacity: 0.7;
-        }
-
-        /* Animatie pentru actualizare succes */
-        @keyframes successFlash {
-            0%, 100% { 
-                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
-            }
-            50% { 
-                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
-            }
-        }
-
-        .btn-refresh-modern.success {
-            animation: successFlash 0.5s ease 2;
-        }
-
-        /* Navigation - Scientific Style */
-        .scientific-nav {
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--blue-tech);
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-links a:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .nav-links a::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::before {
-            width: 100%;
-        }
-
-        /* Main Content Sections */
-        .page-section {
-            min-height: 100vh;
-            padding: 120px 2rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .active-section {
-            display: block;
-        }
-
-        /* Hero Section - Prezentare */
-        .hero {
-            text-align: center;
-            padding-top: 150px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 4.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease infinite;
-            text-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(45deg); }
-        }
-
-        /* Sectiune Noutati */
-        .news-section {
-            margin: 3rem 0;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .news-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--green-growth);
-        }
-
-        .news-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.8rem;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .news-controls {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .news-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .news-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .news-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 1.5rem;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--green-growth);
-            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
-        }
-
-        .news-card.pinned {
-            border: 2px solid var(--orange-alert);
-            background: rgba(255, 149, 0, 0.05);
-        }
-
-        .news-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .badge-update {
-            background: rgba(0, 102, 255, 0.2);
-            color: var(--blue-tech);
-            border: 1px solid var(--blue-tech);
-        }
-
-        .badge-announcement {
-            background: rgba(255, 149, 0, 0.2);
-            color: var(--orange-alert);
-            border: 1px solid var(--orange-alert);
-        }
-
-        .badge-event {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid var(--green-growth);
-        }
-
-        .news-date {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .news-form {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-row input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-row input:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        /* Contor Vizite */
-        .visit-counter {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--blue-tech);
-            border-radius: 15px;
-            padding: 0.8rem 1.2rem;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .visit-counter:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
-        }
-
-        .counter-icon {
-            animation: pulse 2s infinite;
-        }
-
-        .token-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .info-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--green-growth);
-        }
-
-        /* Social Links in Hero */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .social-btn {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 102, 255, 0.3);
-        }
-
-        .social-btn:hover {
-            background: rgba(0, 102, 255, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
-        }
-
-        /* Buton Uniswap */
-        .uniswap-btn {
-            background: linear-gradient(45deg, #ff007a, #8a2be2);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin: 1rem 0;
-            font-weight: bold;
-        }
-
-        .uniswap-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.4);
-        }
-
-        /* Scientific Data Visualization */
-        .data-visualization {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 2rem 0;
-        }
-
-        .chart-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .period-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .period-btn.active {
-            background: var(--blue-tech);
-            border-color: var(--blue-tech);
-        }
-
-        .period-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--neon-cyan);
-            margin: 0.5rem 0;
-        }
-
-        .neon-glow {
-            box-shadow: 
-                0 0 20px rgba(0, 102, 255, 0.3),
-                0 0 40px rgba(0, 255, 136, 0.2),
-                inset 0 0 20px rgba(138, 43, 226, 0.1);
-        }
-
-        /* Status Indicators */
-        .status-online {
-            color: #00ff88;
-            animation: pulse 2s infinite;
-        }
-
-        .status-offline {
-            color: #ff4444;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Token Price Display */
-        .price-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 1rem 0;
-        }
-
-        .price-change {
-            font-size: 1.2rem;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 0.5rem 0;
-        }
-
-        .positive { color: #00ff88; background: rgba(0, 255, 136, 0.1); }
-        .negative { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
-
-        /* Whitepaper Specific Styles */
-        .whitepaper-header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding-top: 20px;
-        }
-
-        .whitepaper-logo {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 1.5rem;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(0, 102, 255, 0.4);
-        }
-
-        .whitepaper-logo img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .toc {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid var(--green-growth);
-        }
-
-        .toc h3 {
-            margin-bottom: 1rem;
-            color: var(--neon-cyan);
-        }
-
-        .toc ul {
-            columns: 2;
-            column-gap: 3rem;
-        }
-
-        .toc li {
-            margin-bottom: 0.8rem;
-            break-inside: avoid;
-        }
-
-        .toc a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .toc a:hover {
-            color: var(--neon-cyan);
-            text-decoration: underline;
-        }
-
-        .section-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .section-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-cyan);
-        }
-
-        .section-card h3 {
-            color: var(--green-growth);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 1.5rem 0;
-        }
-
-        .whitepaper-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .whitepaper-table th {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .whitepaper-table td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .whitepaper-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .whitepaper-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin: 0.2rem;
-        }
-
-        .badge-success {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .badge-warning {
-            background: rgba(255, 204, 0, 0.2);
-            color: #ffcc00;
-            border: 1px solid rgba(255, 204, 0, 0.3);
-        }
-
-        .badge-info {
-            background: rgba(0, 204, 255, 0.2);
-            color: var(--neon-cyan);
-            border: 1px solid rgba(0, 204, 255, 0.3);
-        }
-
-        .roadmap-timeline {
-            position: relative;
-            padding-left: 30px;
-            margin: 2rem 0;
-        }
-
-        .roadmap-timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, var(--blue-tech), var(--purple-innov));
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding-left: 30px;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -33px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .timeline-date {
-            font-weight: bold;
-            color: var(--green-growth);
-            margin-bottom: 0.5rem;
-        }
-
-        .download-btn {
-            background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--neon-cyan);
-            font-size: 0.9rem;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .social-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 1rem;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .social-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
-            border-color: var(--blue-tech);
-        }
-
-        .social-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .required {
-            color: #ff4444;
-        }
-
-        .contact-card {
-            background: rgba(255,255,255,0.03);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 3px solid;
-            margin-bottom: 1rem;
-        }
-
-        .contact-card.business {
-            border-color: var(--green-growth);
-            background: rgba(0, 255, 136, 0.05);
-        }
-
-        .contact-card.partnership {
-            border-color: var(--blue-tech);
-            background: rgba(0, 102, 255, 0.05);
-        }
-
-        .contact-card.security {
-            border-color: var(--purple-innov);
-            background: rgba(138, 43, 226, 0.05);
-        }
-
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .time-item {
-            text-align: center;
-            padding: 1rem;
-        }
-
-        .time-item .icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-
-            .hero-logo-bg {
-                width: 400px;
-                height: 400px;
-            }
-
-            .token-info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .price-display {
-                font-size: 2rem;
-            }
-
-            .chart-container {
-                height: 300px;
-            }
-
-            .btn-refresh-modern {
-                padding: 0.8rem 1.5rem;
-                font-size: 1rem;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .social-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .toc ul {
-                columns: 1;
-            }
-
-            .whitepaper-table {
-                font-size: 0.9rem;
-            }
-
-            .whitepaper-table th,
-            .whitepaper-table td {
-                padding: 0.5rem;
-            }
-
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                flex-direction: column;
-            }
-
-            .visit-counter {
-                bottom: 10px;
-                right: 10px;
-                font-size: 0.8rem;
-                padding: 0.6rem 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .nav-links a {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.9rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .social-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .whitepaper-logo {
-                width: 100px;
-                height: 100px;
-            }
-        }
-    
-        .form-group select option {
-            background: var(--darker-bg);
-            color: #ffffff;
-        }
-
-    
-/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
-.admin-login{
-  margin-top: 80px;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
-  border-top: 2px solid rgba(122,92,255,.8);
-  text-align: center;
-  border-radius: 16px;
-}
-.admin-login h2{ color:#fff; margin:0 0 10px; }
-.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
-.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-.admin-login-box input{
-  padding:12px 14px; width:280px; max-width:92vw;
-  border-radius:10px; border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.25); color:#fff; outline:none;
-}
-.admin-login-box button{
-  padding:12px 16px; border-radius:10px; border:none;
-  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
-}
-.admin-login-box button:hover{ filter: brightness(1.08); }
-.admin-msg{ margin-top:12px; font-weight:700; }
-.admin-pill{
-  display:inline-flex; align-items:center; gap:8px;
-  padding:6px 10px; border-radius:999px; font-size:.9rem;
-  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
-}
-.admin-pill.off{
-  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
-}
-.admin-only{ display:none !important; }
-
-/* ====== TROPHY BUTTON (Giveaway add) ====== */
-.trophy-btn{
-  padding: 10px 14px !important;
-  display:inline-flex; align-items:center; justify-content:center; gap:10px;
-  min-width: 54px;
-}
-.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
-.trophy-btn .trophy-logo{
-  width: 22px; height: 22px; border-radius: 6px;
-  box-shadow: 0 0 12px rgba(0,255,136,.25);
-}
-.table-responsive{ overflow-x:auto; width:100%; }
-.lb-table{ width:100%; border-collapse: collapse; }
-.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
-.lb-top1{ background: rgba(255,215,0,.12); }
-.lb-top2{ background: rgba(192,192,192,.12); }
-.lb-top3{ background: rgba(205,127,50,.12); }
-.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
-
-</style>
-<!-- Firebase (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-<body>
-<!-- Particles Background -->
-<div id="particles-js"></div>
-<!-- Contor Vizite -->
-<div class="visit-counter" id="visitCounter">
-<span class="counter-icon">👁️</span>
-<span id="visitCount">0</span> vizite
-    </div>
-<!-- Scientific Navigation -->
-<nav class="scientific-nav">
-<div class="nav-container">
-<div class="logo">
-<div class="logo-3d-container">
-<div class="logo-3d">
-<img alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-<div class="backnote-orbit">
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-</div>
-</div>
-<div class="logo-text">StancuBYT</div>
-</div>
-<div class="nav-links">
-<a href="#prezentare" onclick="showSection('prezentare')">Prezentare</a>
-<a href="#statistici" onclick="showSection('statistici'); fetchAllData();">Statistici</a>
-<a href="#whitepaper" onclick="showSection('whitepaper')">Whitepaper</a>
-<a href="#contact" onclick="showSection('contact')">Contact</a>
-<a href="#giveaway" onclick="showSection('giveaway')">Giveaway &amp; Promoții</a>
-</div>
-</div>
-</nav>
-<!-- Prezentare Section -->
-<section class="page-section active-section" id="prezentare">
-<!-- Logo Background 3D -->
-<div class="hero-logo-bg">
-<div class="logo-3d-bg">
-<img alt="StancuBYT Logo Background" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-</div>
-<div class="hero">
-<h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
-                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
-            </p>
-<!-- Live Price Display -->
-<div id="livePriceDisplay" style="margin: 2rem 0;">
-<div class="price-display" id="currentPrice">Se încarcă...</div>
-<div class="price-change" id="priceChange"></div>
-<small id="lastUpdated">Ultima actualizare: --:--:--</small>
-</div>
-<!-- Buton Uniswap -->
-<a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
-                🔄 Tranzacționează pe Uniswap
-            </a>
-<a class="uniswap-btn" href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&amp;utm_medium=referral&amp;utm_campaign=searchresults" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));" target="_blank">
-                🦎 Vizualizează și Tranzacționează pe GeckoTerminal
-            </a>
-<div class="token-info-grid">
-<div class="info-card neon-glow">
-<h3>🔗 Contract Address</h3>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;" target="_blank">
-                        0x44Cf220399be798baeaE45fd7C4fF44623713833
-                    </a>
-<small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
-</div>
-<div class="info-card neon-glow">
-<h3>💰 Total Supply REAL</h3>
-<p id="mainTotalSupply" style="font-size: 2rem; font-weight: bold; color: var(--green-growth);">
-<span id="supplyValue">Se încarcă...</span> SBYT
-                    </p>
-<small style="color: #888;">Date live de pe Etherscan</small>
-</div>
-<div class="info-card neon-glow">
-<h3>🏆 Fondator</h3>
-<p style="font-size: 1.2rem; margin-top: 1rem;">
-                        Stancu Marian
-                    </p>
-</div>
-</div>
-<!-- SECTIUNE NOUTATI -->
-<div class="news-section">
-<div class="news-header">
-<h2 class="news-title">
-<span>📢</span> Noutăți &amp; Anunțuri
-                    </h2>
-<!-- legacy news-controls removed -->
-<div class="news-grid" id="newsContainer">
-<!-- Noutățile vor fi adăugate aici dinamic -->
-</div>
-<!-- Formular pentru adăugare știri -->
-<div class="news-form" id="newsForm" style="display: none;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
-<div class="form-row">
-<input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
-<select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
-</select>
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
-                            Fixează această știre
-                        </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
-                    ✅ Date încărcate de pe Etherscan
-                </div>
-</div>
-</div>
-<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email">
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password">
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</input></input></div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-</section>
-</section>
-<!-- Statistici Section -->
-<section class="page-section" id="statistici">
-<div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
-<h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
-<p>Date live preluate de pe Etherscan</p>
-<!-- Buton Modern Reîmprospătează Datele -->
-<button class="btn-refresh-modern" id="refreshButton" onclick="fetchAllData()">
-<span class="refresh-icon">🔄</span>
-<span class="refresh-text">Reîmprospătează Datele</span>
-<span class="refresh-pulse"></span>
-</button>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📈 Preț în Timp Real</h3>
-<!-- Chart Controls -->
-<div class="chart-controls">
-<button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
-<button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
-<button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
-<button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
-<button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
-<button class="period-btn" onclick="changeChartType('line')">Linie</button>
-</div>
-<div class="chart-container">
-<canvas id="priceChart"></canvas>
-</div>
-<div class="loading" id="priceData">Se încarcă datele live...</div>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📊 Metrici Contract - Live</h3>
-<div class="stats-grid" id="etherscanStats">
-<div class="stat-item">
-<div>Holders</div>
-<div class="stat-value" id="holdersCount">-</div>
-<div>Deținători</div>
-</div>
-<div class="stat-item">
-<div>Total Supply REAL</div>
-<div class="stat-value" id="totalSupply">-</div>
-<div>SBYT</div>
-</div>
-<div class="stat-item">
-<div>Tranzacții</div>
-<div class="stat-value" id="transactionsCount">-</div>
-<div>Total TX</div>
-</div>
-<div class="stat-item">
-<div>Market Cap</div>
-<div class="stat-value" id="marketCap">-</div>
-<div>USD</div>
-</div>
-<div class="stat-item">
-<div>Volum 24h</div>
-<div class="stat-value" id="volume24h">-</div>
-<div>USD</div>
-</div>
-</div>
 </div>
 <div class="data-visualization neon-glow">
 <h3>📋 Detalii Contract</h3>
@@ -6793,28 +5394,41 @@ try{
   };
 
   // ===== VISITS (stats/visits: {count}) =====
-  window.updateVisitCounter = async function(){
-    const db = fs(); if(!db) return;
-    const ref = db.collection("stats").doc("visits");
-    try{
-      const key = "stbyt_visit_"+new Date().toISOString().slice(0,10);
-      if(!localStorage.getItem(key)){
-        localStorage.setItem(key,"1");
-        await db.runTransaction(async t=>{
-          const snap = await t.get(ref);
-          const c = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
-          t.set(ref, {count: c+1}, {merge:true});
-        });
-      }
-      ref.onSnapshot(s=>{
-        const c = s.exists && typeof s.data().count==="number" ? s.data().count : 0;
-        const el = $("visitsCounter") || $("visitCounter") || $("visitsCount");
-        if(el) el.textContent = String(c);
+  // ===== VISITS (stats/visits: {count}) =====
+window.updateVisitCounter = async function(){
+  const db = fs(); if(!db) return;
+  const ref = db.collection("stats").doc("visits");
+
+  // run once per page load (avoid +3 increments due to multiple inits)
+  if (window.__STBYT_VISIT_INIT__) return;
+  window.__STBYT_VISIT_INIT__ = true;
+
+  // increment once per tab/session
+  const sessKey = "stbyt_visit_session_done";
+  if (!sessionStorage.getItem(sessKey)) {
+    sessionStorage.setItem(sessKey, "1");
+    try {
+      await db.runTransaction(async t=>{
+        const snap = await t.get(ref);
+        const c = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
+        t.set(ref, {count: c + 1}, {merge:true});
       });
-    }catch(e){
-      console.error("visit counter:", e);
+    } catch(e) {
+      console.error("visit tx failed:", e);
     }
-  };
+  }
+
+  // live update on all devices
+  try {
+    ref.onSnapshot(s=>{
+      const c = s.exists && typeof s.data().count==="number" ? s.data().count : 0;
+      const el = $("visitCounter") || $("visitsCounter") || $("visitsCount");
+      if (el) el.textContent = String(c);
+    });
+  } catch(e) {
+    console.error("visit onSnapshot failed:", e);
+  }
+};
 
   // ===== PROMOS (collection promos) =====
   function promoGetVal(...ids){
@@ -7672,7 +6286,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     container.innerHTML = "";
     items.forEach(item=>{
       const card = document.createElement("div");
-      card.className = "news-card";
+      card.className = "news-card " + (item.type || "news");
 
       // background image
       if (item.bgUrl) {
@@ -7687,9 +6301,9 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
       card.innerHTML = `
         <div class="news-card-head">
           <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
-          <div class="news-date">${when}</div>
+          <div class="news-date"><span class="news-date-emoji">${item.emoji || ""}</span>${when}</div>
         </div>
-        <div class="news-card-title"><span class="news-emoji">${item.emoji || ""}</span>${item.title || ""}</div>
+        <div class="news-card-title">${item.title || ""}</div>
         <div class="news-card-text">${item.content || ""}</div>
       `;
 
@@ -7716,15 +6330,61 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   }
 
   async function uploadNewsImage(file) {
-    if (!file) return null;
+  if (!file) return null;
+
+  try {
     const storage = getStorage();
     if (!storage) throw new Error("Storage SDK indisponibil");
-    const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
+
+    // Resize image in browser to avoid huge uploads + keep inside card nicely
+    const MAX_W = 1400;
+    const MAX_H = 900;
+    const blob = await new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        try {
+          let w = img.width;
+          let h = img.height;
+          const scale = Math.min(1, MAX_W / w, MAX_H / h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+
+          canvas.toBlob((b)=>{
+            URL.revokeObjectURL(url);
+            if (!b) return reject(new Error("Nu pot converti imaginea"));
+            resolve(b);
+          }, "image/jpeg", 0.86);
+        } catch (e) {
+          URL.revokeObjectURL(url);
+          reject(e);
+        }
+      };
+      img.onerror = (e) => {
+        URL.revokeObjectURL(url);
+        reject(e);
+      };
+      img.src = url;
+    });
+
+    const safeName = (file.name || "bg").replace(/[^\w.\-]+/g, "_").replace(/\.[^.]+$/, "") + ".jpg";
     const path = "news/" + Date.now() + "_" + safeName;
     const ref = storage.ref().child(path);
-    await ref.put(file);
+
+    await ref.put(blob, { contentType: "image/jpeg" });
     return await ref.getDownloadURL();
+  } catch (e) {
+    console.error("uploadNewsImage failed:", e);
+    // don't block posting if storage is not configured correctly
+    return null;
   }
+}
 
   async function adminCreateNews() {
     const auth = getAuth();
@@ -7774,6 +6434,19 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   function setNewsAdminVisible(isAdmin) {
     const box = $("newsAdminBox");
     if (box) box.style.display = isAdmin ? "block" : "none";
+
+    // wire emoji select -> input once
+    if (!window.__NEWS_EMOJI_WIRED__) {
+      const sel = $("newsEmojiSelect");
+      const inp = $("newsEmojiInput");
+      if (sel && inp) {
+        sel.addEventListener("change", ()=>{
+          inp.value = sel.value || "";
+          inp.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      }
+      window.__NEWS_EMOJI_WIRED__ = true;
+    }
     // hide any legacy admin section if exists
     const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
     if (legacyAdmin) legacyAdmin.style.display = "none";
