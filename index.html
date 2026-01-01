@@ -1269,7 +1269,19 @@
 <!-- legacy news-controls removed -->
 <div id="newsAdminBox" class="admin-news-box" style="display:none; margin-bottom:1rem;">
   <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
-    <input id="newsEmojiInput" type="text" placeholder="Emoji (ex: 🚀🔥)" maxlength="10" style="max-width:160px;" />
+    <select id="newsEmojiSelect" style="max-width:140px;">
+      <option value="">Emoji</option>
+      <option value="🚀">🚀</option>
+      <option value="🔥">🔥</option>
+      <option value="💎">💎</option>
+      <option value="📢">📢</option>
+      <option value="🎁">🎁</option>
+      <option value="✅">✅</option>
+      <option value="⚠️">⚠️</option>
+      <option value="📈">📈</option>
+      <option value="📰">📰</option>
+    </select>
+    <input id="newsEmojiInput" type="text" placeholder="sau scrie (ex: 🚀🔥)" maxlength="10" style="max-width:160px;" />
     <select id="newsTypeInput" style="max-width:220px;">
       <option value="update">Noutate</option>
       <option value="announcement">Anunt</option>
@@ -1287,7 +1299,7 @@
   </div>
   <div class="form-row" style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
     <input id="newsBgInput" type="file" accept="image/*" />
-    <button type="button" onclick="adminCreateNews()">➕ Adauga</button>
+    <button type="button" id="newsAddBtn" type="button" onclick="adminCreateNews()">➕ Adauga</button>
   </div>
 </div>
 
@@ -4508,6 +4520,17 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (e) {}
 });
 
+// Emoji quick picker -> fills the emoji input
+document.addEventListener("DOMContentLoaded", () => {
+  const sel = document.getElementById("newsEmojiSelect");
+  const inp = document.getElementById("newsEmojiInput");
+  if (sel && inp) {
+    sel.addEventListener("change", () => {
+      if (sel.value) inp.value = sel.value;
+    });
+  }
+});
+
 
 const auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
 const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
@@ -7067,7 +7090,55 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   window.requestPassword = function(){ alert("Autentifica-te ca administrator pentru a adauga/sterge anunturi."); };
 
   
-  // -------- PRICE (GeckoTerminal pool) --------
+  
+  // -------- PRICE (Real) --------
+  // Primary: CoinGecko by contract (works even when DexScreener/GeckoTerminal has no pairs)
+  const TOKEN_CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+
+  // Uniswap v4 position (provided by you). We try to read price from Uniswap interface gateway.
+  const UNISWAP_V4_POSITION_ID = "95049";
+
+  async function fetchPriceFromUniswapV4Position() {
+    // Uniswap interface gateway (CORS-friendly in most cases)
+    const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + encodeURIComponent(UNISWAP_V4_POSITION_ID);
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("Uniswap position HTTP " + r.status);
+    const j = await r.json();
+
+    // We search for common fields used by the interface responses
+    // Examples: { position: { priceUSD: "0.00123" } } or nested: data.position...
+    const candidates = [
+      j && j.priceUSD,
+      j && j.position && j.position.priceUSD,
+      j && j.position && j.position.token0PriceUSD,
+      j && j.position && j.position.token1PriceUSD,
+      j && j.data && j.data.position && j.data.position.priceUSD,
+      j && j.data && j.data.position && j.data.position.token0PriceUSD,
+      j && j.data && j.data.position && j.data.position.token1PriceUSD,
+      j && j.position && j.position.currentPriceUSD,
+    ];
+    for (const v of candidates) {
+      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
+      if (Number.isFinite(num) && num > 0) return num;
+    }
+    throw new Error("Uniswap position price missing");
+  }
+
+  async function fetchPriceCoinGeckoByContract() {
+    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
+      + "?contract_addresses=" + encodeURIComponent(TOKEN_CONTRACT)
+      + "&vs_currencies=usd";
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
+    const j = await r.json();
+    const key = TOKEN_CONTRACT.toLowerCase();
+    const usd = j && j[key] && j[key].usd;
+    const num = typeof usd === "number" ? usd : Number(usd);
+    if (!Number.isFinite(num) || num <= 0) throw new Error("CoinGecko price missing");
+    return num;
+  }
+
+  // Fallback: GeckoTerminal pool (if available)
   const GECKO_POOL = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4"; // ETH pool address already linked in page
 
   async function fetchPriceGeckoTerminal() {
@@ -7095,8 +7166,18 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     const el = $("liveTokenPrice") || $("currentPrice") || $("tokenPrice");
     const lastEl = $("lastUpdated");
     try {
-      const usd = await fetchPriceGeckoTerminal();
-      if (el) el.textContent = "$" + usd.toLocaleString("en-US", {maximumFractionDigits: 10});
+      let usd = null;
+      try {
+        usd = await fetchPriceFromUniswapV4Position();
+      } catch (e0) {
+        try {
+          usd = await fetchPriceCoinGeckoByContract();
+        } catch (e1) {
+          // fallback to pool-based price if CoinGecko doesn't know the token yet
+          usd = await fetchPriceGeckoTerminal();
+        }
+      }
+      if (el) el.textContent = "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 10 });
       if (lastEl) lastEl.textContent = "Ultima actualizare: " + new Date().toLocaleTimeString("ro-RO");
     } catch (e) {
       console.warn("price update failed:", e);
@@ -7105,7 +7186,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     }
   }
 
-  function startPriceAutoUpdate() {
+    function startPriceAutoUpdate() {
     updateTokenPrice();
     if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
     window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
@@ -7207,6 +7288,9 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     const user = auth && auth.currentUser ? auth.currentUser : null;
     if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
 
+    const addBtn = $("newsAddBtn");
+    if (addBtn) { addBtn.disabled = true; addBtn.style.opacity = "0.7"; }
+
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
     const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
@@ -7221,7 +7305,14 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     try {
       let bgUrl = null;
-      if (file) bgUrl = await uploadNewsImage(file);
+      if (file) {
+        try {
+          bgUrl = await uploadNewsImage(file);
+        } catch (upErr) {
+          console.warn("upload failed (continuing without image):", upErr);
+          bgUrl = null;
+        }
+      }
 
       await db.collection("news").add({
         title,
@@ -7240,9 +7331,13 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
       if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
       if ($("newsBgInput")) $("newsBgInput").value = "";
       if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
-    } catch (e) {
+    }
+    catch (e) {
       console.error("create news failed:", e);
       alert("Eroare la salvare stire (rules/permisiuni).");
+    } finally {
+      const addBtn2 = $("newsAddBtn");
+      if (addBtn2) { addBtn2.disabled = false; addBtn2.style.opacity = "1"; }
     }
   }
   window.adminCreateNews = adminCreateNews;
@@ -7385,21 +7480,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     return usd;
   }
 
-  async function updateTokenPrice() {
-    const el = $("liveTokenPrice") || $("currentPrice") || $("tokenPrice");
-    try {
-      const usd = await fetchPriceCoinGecko();
-      const formatted = "$" + usd.toLocaleString("en-US", {maximumFractionDigits: 10});
-      safeText(el, formatted);
-      // update chart if you have it
-      if (typeof window.updatePriceChartLive === "function") {
-        try { window.updatePriceChartLive(usd); } catch(_) {}
-      }
-    } catch (e) {
-      console.warn("price update failed:", e);
-      if (el) safeText(el, "N/A");
-    }
-  }
+  
   function startPriceAutoUpdate() {
     updateTokenPrice();
     if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
@@ -7630,6 +7711,14 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
   window.addEventListener("load", init);
 })();
+
+// Boot (runs on every page load)
+document.addEventListener("DOMContentLoaded", () => {
+  try { updateVisits(); } catch (e) {}
+  try { startPriceAutoUpdate(); } catch (e) {}
+  try { listenNews(); } catch (e) {}
+});
+window.__SBYT_BOOT = true;
 </script>
 
 </body></html>
