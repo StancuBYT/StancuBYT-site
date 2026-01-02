@@ -399,8 +399,13 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1.5rem;
+        }
+
+        /* NEWS GRID 2 COL */
+        @media (max-width: 900px) {
+            .news-grid { grid-template-columns: 1fr; }
         }
 
         .news-card {
@@ -410,6 +415,11 @@
             border: 1px solid rgba(0, 102, 255, 0.2);
             transition: all 0.3s ease;
         }
+        /* Diferentiere vizuala pe tip */
+        .news-card.type-update { border-color: rgba(0, 102, 255, 0.55); box-shadow: 0 0 18px rgba(0, 102, 255, 0.12); }
+        .news-card.type-announcement { border-color: rgba(255, 149, 0, 0.65); box-shadow: 0 0 18px rgba(255, 149, 0, 0.12); }
+        .news-card.type-news { border-color: rgba(0, 255, 163, 0.55); box-shadow: 0 0 18px rgba(0, 255, 163, 0.10); }
+
 
         .news-card:hover {
             transform: translateY(-5px);
@@ -435,7 +445,14 @@
             background: rgba(0, 102, 255, 0.2);
             color: var(--blue-tech);
             border: 1px solid var(--blue-tech);
+        
+
+        .badge-news {
+            background: rgba(0, 255, 163, 0.18);
+            color: var(--green-growth);
+            border: 1px solid var(--green-growth);
         }
+}
 
         .badge-announcement {
             background: rgba(255, 149, 0, 0.2);
@@ -1763,7 +1780,7 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1.5rem;
         }
 
@@ -2754,7 +2771,7 @@
 </div>
 <div class="data-visualization neon-glow">
 <h3>📋 Detalii Contract</h3>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem;">
 <div>
 <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
 <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
@@ -3427,7 +3444,7 @@
 </div>
 <div class="data-visualization neon-glow">
 <h3>📌 Promoții / Giveaway-uri</h3>
-<div id="promoList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
+<div id="promoList" style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
 <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
 <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
 <div class="form-row">
@@ -5162,9 +5179,11 @@ window.addEventListener('load', () => {
     }
 
     items.forEach(item=>{
-      const badge = (typeof _badgeForType === 'function') ? _badgeForType(item.type) : (item.type==='announcement'?{cls:'badge-announcement',txt:'Anunț Important'}:{cls:'badge-update',txt:'Update'});
+      const badge = (typeof _badgeForType === 'function') ? _badgeForType(item.type) : (item.type==='announcement'?{cls:'badge-announcement',txt:'Anunț'}:(item.type==='news'?{cls:'badge-news',txt:'Știre'}:{cls:'badge-update',txt:'Noutate'}));
       const card = document.createElement('div');
-      card.className = item.pinned ? 'news-card pinned' : 'news-card';
+      const t = (item.type||'update');
+      const typeClass = (t==='announcement') ? 'type-announcement' : (t==='news' ? 'type-news' : 'type-update');
+      card.className = (item.pinned ? 'news-card pinned ' : 'news-card ') + typeClass;
 
       const date = item.date || item.createdAt;
       const d = date ? new Date(date) : new Date();
