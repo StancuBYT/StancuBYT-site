@@ -399,8 +399,14 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .news-card {
@@ -422,6 +428,39 @@
             background: rgba(255, 149, 0, 0.05);
         }
 
+        
+        /* --- News card header layout + type highlighting --- */
+        .news-card-head{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:10px;
+        }
+        .news-type{
+            font-weight:700;
+            font-size:0.85rem;
+            padding:6px 10px;
+            border-radius:999px;
+            letter-spacing:0.2px;
+            text-transform:uppercase;
+            border:1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+        }
+        .news-date{
+            font-size:0.85rem;
+            opacity:0.85;
+            white-space:nowrap;
+        }
+        .news-type.update{ background: rgba(0,255,136,0.10); border-color: rgba(0,255,136,0.35); }
+        .news-type.announcement{ background: rgba(255,149,0,0.12); border-color: rgba(255,149,0,0.45); }
+        .news-type.news{ background: rgba(0,102,255,0.12); border-color: rgba(0,102,255,0.45); }
+
+        /* subtle left accent per type */
+        .news-card{ position:relative; overflow:hidden; }
+        .news-card.update{ border-left: 4px solid rgba(0,255,136,0.75); }
+        .news-card.announcement{ border-left: 4px solid rgba(255,149,0,0.9); }
+        .news-card.news{ border-left: 4px solid rgba(0,102,255,0.9); }
         .news-badge {
             display: inline-block;
             padding: 0.3rem 0.8rem;
@@ -1302,6 +1341,7 @@
     <button type="button" id="newsAddBtn" type="button" onclick="adminCreateNews()">➕ Adauga</button>
   </div>
 </div>
+</div>
 
 <div class="news-grid" id="newsContainer">
 <!-- Noutățile vor fi adăugate aici dinamic -->
@@ -1763,8 +1803,14 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .news-card {
@@ -7269,7 +7315,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     container.innerHTML = "";
     items.forEach(item=>{
       const card = document.createElement("div");
-      card.className = "news-card";
+      card.className = "news-card " + (item.type || "news");
 
       // background image
       if (item.bgUrl) {
@@ -7565,7 +7611,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     container.innerHTML = "";
     items.forEach(item=>{
       const card = document.createElement("div");
-      card.className = "news-card";
+      card.className = "news-card " + (item.type || "news");
 
       // background image
       if (item.bgUrl) {
