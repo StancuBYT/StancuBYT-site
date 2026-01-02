@@ -449,6 +449,15 @@
             border: 1px solid var(--green-growth);
         }
 
+        /* Tipuri noi (Noutate / Stire / Anunt) */
+        .news-card.type-noutate{ border-color: rgba(0,255,174,0.55); box-shadow: 0 0 22px rgba(0,255,174,0.18); }
+        .news-card.type-stire{ border-color: rgba(0,153,255,0.60); box-shadow: 0 0 22px rgba(0,153,255,0.18); }
+        .news-card.type-anunt{ border-color: rgba(255,199,0,0.65); box-shadow: 0 0 26px rgba(255,199,0,0.20); }
+
+        .badge-noutate{ background: rgba(0,255,174,0.16); border: 1px solid rgba(0,255,174,0.35); color: rgba(220,255,245,1); }
+        .badge-stire{ background: rgba(0,153,255,0.16); border: 1px solid rgba(0,153,255,0.35); color: rgba(235,248,255,1); }
+        .badge-anunt{ background: rgba(255,199,0,0.18); border: 1px solid rgba(255,199,0,0.40); color: rgba(255,246,220,1); }
+
         .news-date {
             font-size: 0.85rem;
             color: #888;
@@ -1148,7 +1157,7 @@
 .admin-pill.off{
   background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
 }
-.admin-only{ display:none !important; }
+.admin-only{ display:none; }
 
 /* ====== TROPHY BUTTON (Giveaway add) ====== */
 .trophy-btn{
@@ -1324,9 +1333,9 @@
 <div class="form-row">
 <input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
 <select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
+  <option value="noutate">Noutate</option>
+  <option value="stire">Stire</option>
+  <option value="anunt">Anunt</option>
 </select>
 </div>
 <div class="form-row">
@@ -1515,14 +1524,16 @@ async function updatePrice(){
      title, content, type, emoji, imageUrl, pinned, createdAt (serverTimestamp)
 */
 function badgeClass(type){
-  if(type === "announcement") return "badge-announcement";
-  if(type === "event") return "badge-event";
-  return "badge-update";
+  const t = String(type || "").toLowerCase();
+  if(t === "anunt" || t === "announcement") return "badge-anunt";
+  if(t === "stire" || t === "event") return "badge-stire";
+  return "badge-noutate";
 }
 function badgeText(type){
-  if(type === "announcement") return "Anunț";
-  if(type === "event") return "Eveniment";
-  return "Update";
+  const t = String(type || "").toLowerCase();
+  if(t === "anunt" || t === "announcement") return "Anunt";
+  if(t === "stire" || t === "event") return "Stire";
+  return "Noutate";
 }
 
 function renderNewsCard(doc){
@@ -1542,7 +1553,11 @@ function renderNewsCard(doc){
   const emoji = safeText(d.emoji).trim();
   const title = safeText(d.title);
   const content = safeText(d.content);
-  const type = safeText(d.type) || "update";
+  let typeRaw = safeText(d.type) || "noutate";
+  typeRaw = String(typeRaw).toLowerCase();
+  const type = (typeRaw === "announcement" || typeRaw === "anunt") ? "anunt"
+    : (typeRaw === "event" || typeRaw === "stire") ? "stire"
+    : "noutate";
   card.classList.add("type-"+type);
 
 
@@ -1733,6 +1748,8 @@ window.adminSignOut = async function(){
 auth.onAuthStateChanged((user)=>{
   isAdmin = !!(user && ADMIN_EMAILS.includes(String(user.email || "").toLowerCase()));
   setAdminUI();
+  // re-attach news listener after auth changes (useful if rules require auth)
+  try{ startNewsListener(); }catch(e){}
 });
 
 /* ---- Init ---- */
