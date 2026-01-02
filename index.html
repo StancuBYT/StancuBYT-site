@@ -399,17 +399,47 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 1.5rem;
         }
+
+        @media (max-width: 980px) {
+            .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 640px) {
+            .news-grid { grid-template-columns: 1fr; }
+        }
+
 
         .news-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
-            padding: 1.5rem;
+            padding: 1.8rem;
+            min-height: 240px;
             border: 1px solid rgba(0, 102, 255, 0.2);
             transition: all 0.3s ease;
         }
+
+        .news-card { position: relative; overflow: hidden; }
+
+        .news-card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+        .news-type { font-weight:700; font-size:0.78rem; letter-spacing:0.6px; text-transform:uppercase; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); }
+        .news-date { font-size:0.82rem; opacity:0.9; display:flex; align-items:center; gap:8px; }
+        .news-date-emoji { font-size:1rem; line-height:1; }
+
+        /* Marketing colors: Stire=Blue trust, Noutate=Green growth, Anunt=Gold attention */
+        .news-card.news { border-color: rgba(0, 102, 255, 0.35); box-shadow: 0 0 0 1px rgba(0,102,255,0.15), 0 14px 40px rgba(0,0,0,0.25); }
+        .news-card.update { border-color: rgba(0, 255, 170, 0.35); box-shadow: 0 0 0 1px rgba(0,255,170,0.15), 0 14px 40px rgba(0,0,0,0.25); }
+        .news-card.announcement { border-color: rgba(255, 215, 0, 0.35); box-shadow: 0 0 0 1px rgba(255,215,0,0.16), 0 14px 40px rgba(0,0,0,0.25); }
+
+        .news-type.news { color: #9bd0ff; }
+        .news-type.update { color: #7dffce; }
+        .news-type.announcement { color: #ffe38a; }
+
+        .news-card-title { font-size:1.1rem; font-weight:800; margin:6px 0 6px; }
+        .news-card-text { opacity:0.92; line-height:1.35; }
+        .news-del-btn { position:absolute; right:14px; bottom:14px; }
+
 
         .news-card:hover {
             transform: translateY(-5px);
@@ -1178,55 +1208,17 @@
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
 
-        /* === PATCH: News grid 2col + tipuri colorate === */
-        .news-header{ flex-direction: column; align-items: flex-start; gap: 10px; }
-        .news-controls{ width:100%; display:flex; justify-content:flex-end; }
-        .news-grid-2col{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-        @media (max-width: 900px){ .news-grid-2col{ grid-template-columns: 1fr; } }
-
-        .news-card{
-          position: relative;
-          overflow: hidden;
-          border-radius: 18px;
-          padding: 16px 16px 14px 16px;
-          background: rgba(0,0,0,0.35);
-          border: 1px solid rgba(255,255,255,0.12);
-          box-shadow: 0 10px 26px rgba(0,0,0,0.25);
-          min-height: 170px;
-        }
-        .news-card::before{
-          content:"";
-          position:absolute; inset:0;
-          background: linear-gradient(135deg, rgba(0,0,0,0.72), rgba(0,0,0,0.25));
-          z-index:0;
-        }
-        .news-card.has-bg{
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-        .news-card > *{ position:relative; z-index:1; }
-
-        .news-badge{
-          display:inline-flex;
-          align-items:center;
-          gap:8px;
-          font-size: 0.82rem;
-          padding: 6px 10px;
-          border-radius: 999px;
-          margin-bottom: 10px;
-          border: 1px solid rgba(255,255,255,0.16);
-          background: rgba(0,0,0,0.35);
-          backdrop-filter: blur(6px);
-        }
-        .news-type-noutate{ border-color: rgba(0,255,136,0.40); box-shadow: 0 0 0 1px rgba(0,255,136,0.10) inset; }
-        .news-type-stire{ border-color: rgba(0,204,255,0.40); box-shadow: 0 0 0 1px rgba(0,204,255,0.10) inset; }
-        .news-type-anunt{ border-color: rgba(255, 64, 129, 0.45); box-shadow: 0 0 0 1px rgba(255,64,129,0.12) inset; }
-
-        .news-meta{ opacity:0.9; font-size:0.9rem; display:flex; gap:10px; flex-wrap:wrap; }
-        .news-meta .dot{ opacity:0.5; }
-        .news-actions{ margin-top:12px; display:flex; justify-content:flex-end; }
-        .news-del{ cursor:pointer; border:none; border-radius:10px; padding:8px 10px; font-weight:700; }
+/* === STBYT News layout + type highlight === */
+.news-grid{display:flex !important; flex-direction:column !important; gap:16px !important;}
+.news-card{min-height:140px; padding:22px; border-radius:18px; position:relative; overflow:hidden;}
+.news-card.has-bg{background-size:cover; background-position:center; background-repeat:no-repeat;}
+.news-card::before{content:""; position:absolute; inset:0; border-radius:18px; background:linear-gradient(180deg, rgba(5,5,18,0.30), rgba(5,5,18,0.78)); z-index:0;}
+.news-card > *{position:relative; z-index:1;}
+.news-card.type-news{border-left:6px solid rgba(0,102,255,0.95); box-shadow:0 10px 28px rgba(0,102,255,0.12);}
+.news-card.type-update{border-left:6px solid rgba(0,255,136,0.95); box-shadow:0 10px 28px rgba(0,255,136,0.10);}
+.news-card.type-announcement{border-left:6px solid rgba(255,156,0,0.95); box-shadow:0 10px 28px rgba(255,156,0,0.10);}
+.news-date .news-emoji{margin-right:8px; font-size:1.05rem;}
+.news-actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
 
 </style>
 <!-- Firebase (compat) -->
@@ -1273,7 +1265,7 @@
 </div>
 <div class="hero">
 <h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 1; color:#00ffff; text-shadow:0 0 12px rgba(0,255,255,0.35);">
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
             </p>
 <!-- Live Price Display -->
@@ -1312,1490 +1304,50 @@
 </div>
 </div>
 <!-- SECTIUNE NOUTATI -->
-<div class="news-section" id="newsSection">
-  <div class="news-header">
-    <h2 class="news-title"><span>📢</span> Noutăți &amp; Anunțuri</h2>
-
-    <!-- butoane admin -->
-    <div class="news-controls" id="newsControls" style="display:none;">
-      <button class="news-btn" type="button" id="btnOpenNewsForm">➕ Adaugă</button>
-    </div>
+<div class="news-section">
+<div class="news-header">
+<h2 class="news-title">
+<span>📢</span> Noutăți &amp; Anunțuri
+                    </h2>
+</div>
+<div id="newsAdminBox" class="admin-news-box" style="display:none; margin-bottom:1rem;">
+  <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
+    <select id="newsEmojiSelect" style="max-width:140px;">
+      <option value="">Emoji</option>
+      <option value="🚀">🚀</option>
+      <option value="🔥">🔥</option>
+      <option value="💎">💎</option>
+      <option value="📢">📢</option>
+      <option value="🎁">🎁</option>
+      <option value="✅">✅</option>
+      <option value="⚠️">⚠️</option>
+      <option value="📈">📈</option>
+      <option value="📰">📰</option>
+    </select>
+    <input id="newsEmojiInput" type="text" placeholder="sau scrie (ex: 🚀🔥)" maxlength="10" style="max-width:160px;" />
+    <select id="newsTypeInput" style="max-width:220px;">
+      <option value="update">Noutate</option>
+      <option value="announcement">Anunt</option>
+      <option value="news">Stire</option>
+    </select>
+    <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.9);">
+      <input id="newsPinnedInput" type="checkbox" /> Pinned
+    </label>
   </div>
-
-  <!-- grid anunturi (2 pe linie, 1 pe mobil) -->
-  <div class="news-grid news-grid-2col" id="newsContainer"></div>
-
-  <!-- formular admin -->
-  <div class="news-form" id="newsForm" style="display:none;">
-    <h3 style="margin:0 0 14px 0; color: var(--neon-cyan);">Adaugă Noutate / Știre / Anunț</h3>
-
-    <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
-      <select id="newsType" style="max-width:220px;">
-        <option value="noutate">Noutate</option>
-        <option value="stire">Stire</option>
-        <option value="anunt">Anunt</option>
-      </select>
-
-      <select id="newsEmojiSelect" style="max-width:140px;">
-        <option value="">Emoji</option>
-        <option value="🚀">🚀</option>
-        <option value="🔥">🔥</option>
-        <option value="💎">💎</option>
-        <option value="📢">📢</option>
-        <option value="🎁">🎁</option>
-        <option value="✅">✅</option>
-        <option value="⚠️">⚠️</option>
-        <option value="📈">📈</option>
-        <option value="📰">📰</option>
-      </select>
-
-      <input id="newsEmoji" type="text" maxlength="12" placeholder="sau scrie (ex: 🚀🔥)" style="max-width:180px;" />
-
-      <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.9);">
-        <input id="pinNews" type="checkbox" /> Pinned
-      </label>
-    </div>
-
-    <div class="form-row" style="margin-top:10px;">
-      <input id="newsTitle" maxlength="120" placeholder="Titlu" type="text" />
-    </div>
-
-    <div class="form-row" style="margin-top:10px;">
-      <textarea id="newsContent" rows="4" maxlength="1200" placeholder="Continut"></textarea>
-    </div>
-
-    <div class="form-row" style="margin-top:10px;">
-      <label style="display:block; font-size:0.9rem; opacity:0.9; margin-bottom:6px;">Imagine fundal (optional)</label>
-      <input id="newsImage" accept="image/*" type="file" />
-      <small style="opacity:0.75; display:block; margin-top:6px;">Imaginea este redimensionata automat prin CSS ca fundal (cover) in chenar.</small>
-    </div>
-
-    <div style="display:flex; gap:12px; margin-top:14px; flex-wrap:wrap;">
-      <button class="news-btn" type="button" id="btnSaveNews">✅ Publică</button>
-      <button class="news-btn" type="button" id="btnCancelNews">❌ Anulează</button>
-    </div>
+  <div class="form-row" style="margin-top:10px;">
+    <input id="newsTitleInput" type="text" placeholder="Titlu" />
+  </div>
+  <div class="form-row" style="margin-top:10px;">
+    <textarea id="newsContentInput" rows="4" placeholder="Continut"></textarea>
+  </div>
+  <div class="form-row" style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <input id="newsBgInput" type="file" accept="image/*" />
+    <button type="button" id="newsAddBtn" type="button" onclick="adminCreateNews()">➕ Adauga</button>
   </div>
 </div>
 
-<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">
-    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
-    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
-  </p>
-</section>
-</section><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
-<style>
-        /* Variabile culori conform psihologiei marketingului */
-        :root {
-            --blue-tech: #0066ff;
-            --green-growth: #00ff88;
-            --purple-innov: #8a2be2;
-            --neon-cyan: #00ffff;
-            --dark-bg: #0a0a1f;
-            --darker-bg: #050510;
-            --orange-alert: #ff9500;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: var(--dark-bg);
-            color: white;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
-        }
-
-        /* Particle Animation Background */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        /* Logo Background pentru Hero Section */
-        .hero-logo-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            opacity: 0.05;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .logo-3d-bg {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            animation: float3d 20s infinite ease-in-out;
-        }
-
-        .logo-3d-bg img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            filter: blur(1px) brightness(1.2);
-        }
-
-        @keyframes float3d {
-            0%, 100% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
-            }
-            25% { 
-                transform: translateY(-20px) rotateX(5deg) rotateY(5deg); 
-            }
-            50% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(10deg); 
-            }
-            75% { 
-                transform: translateY(20px) rotateX(-5deg) rotateY(5deg); 
-            }
-        }
-
-        /* 3D Logo Animation */
-        .logo-3d-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            perspective: 1000px;
-        }
-
-        .logo-3d {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: rotate3d 8s infinite linear;
-        }
-
-        .logo-3d img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: absolute;
-            backface-visibility: hidden;
-        }
-
-        .backnote-orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120px;
-            height: 120px;
-            transform: translate(-50%, -50%);
-            animation: orbit 6s infinite linear;
-        }
-
-        .backnote {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            filter: blur(2px);
-            opacity: 0.7;
-        }
-
-        .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
-        .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
-
-        @keyframes rotate3d {
-            0% { transform: rotateY(0deg) rotateX(5deg); }
-            100% { transform: rotateY(360deg) rotateX(5deg); }
-        }
-
-        @keyframes orbit {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        /* Buton Modern Reîmprospătează Datele */
-        .btn-refresh-modern {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-            margin-top: 1rem;
-            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
-        }
-
-        .btn-refresh-modern:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
-        }
-
-        .btn-refresh-modern:active {
-            transform: translateY(0) scale(1);
-        }
-
-        .refresh-icon {
-            font-size: 1.3rem;
-            transition: transform 0.5s ease;
-        }
-
-        .btn-refresh-modern:hover .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
-
-        .refresh-pulse {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border-radius: 50px;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            opacity: 0;
-            z-index: -1;
-            animation: pulseEffect 2s infinite;
-        }
-
-        @keyframes rotate360 {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes pulseEffect {
-            0% { 
-                transform: scale(1); 
-                opacity: 0.7; 
-            }
-            100% { 
-                transform: scale(1.2); 
-                opacity: 0; 
-            }
-        }
-
-        /* Loading animation pentru buton */
-        .btn-refresh-modern.loading {
-            background: linear-gradient(45deg, #666, #888);
-            cursor: wait;
-        }
-
-        .btn-refresh-modern.loading .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
-
-        .btn-refresh-modern.loading .refresh-text {
-            opacity: 0.7;
-        }
-
-        /* Animatie pentru actualizare succes */
-        @keyframes successFlash {
-            0%, 100% { 
-                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
-            }
-            50% { 
-                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
-            }
-        }
-
-        .btn-refresh-modern.success {
-            animation: successFlash 0.5s ease 2;
-        }
-
-        /* Navigation - Scientific Style */
-        .scientific-nav {
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--blue-tech);
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-links a:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .nav-links a::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::before {
-            width: 100%;
-        }
-
-        /* Main Content Sections */
-        .page-section {
-            min-height: 100vh;
-            padding: 120px 2rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .active-section {
-            display: block;
-        }
-
-        /* Hero Section - Prezentare */
-        .hero {
-            text-align: center;
-            padding-top: 150px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 4.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease infinite;
-            text-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(45deg); }
-        }
-
-        /* Sectiune Noutati */
-        .news-section {
-            margin: 3rem 0;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .news-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--green-growth);
-        }
-
-        .news-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.8rem;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .news-controls {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .news-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .news-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .news-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 1.5rem;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--green-growth);
-            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
-        }
-
-        .news-card.pinned {
-            border: 2px solid var(--orange-alert);
-            background: rgba(255, 149, 0, 0.05);
-        }
-
-        .news-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .badge-update {
-            background: rgba(0, 102, 255, 0.2);
-            color: var(--blue-tech);
-            border: 1px solid var(--blue-tech);
-        }
-
-        .badge-announcement {
-            background: rgba(255, 149, 0, 0.2);
-            color: var(--orange-alert);
-            border: 1px solid var(--orange-alert);
-        }
-
-        .badge-event {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid var(--green-growth);
-        }
-
-        .news-date {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .news-form {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-row input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-row input:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        /* Contor Vizite */
-        .visit-counter {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--blue-tech);
-            border-radius: 15px;
-            padding: 0.8rem 1.2rem;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .visit-counter:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
-        }
-
-        .counter-icon {
-            animation: pulse 2s infinite;
-        }
-
-        .token-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .info-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--green-growth);
-        }
-
-        /* Social Links in Hero */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .social-btn {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 102, 255, 0.3);
-        }
-
-        .social-btn:hover {
-            background: rgba(0, 102, 255, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
-        }
-
-        /* Buton Uniswap */
-        .uniswap-btn {
-            background: linear-gradient(45deg, #ff007a, #8a2be2);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin: 1rem 0;
-            font-weight: bold;
-        }
-
-        .uniswap-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.4);
-        }
-
-        /* Scientific Data Visualization */
-        .data-visualization {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 2rem 0;
-        }
-
-        .chart-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .period-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .period-btn.active {
-            background: var(--blue-tech);
-            border-color: var(--blue-tech);
-        }
-
-        .period-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--neon-cyan);
-            margin: 0.5rem 0;
-        }
-
-        .neon-glow {
-            box-shadow: 
-                0 0 20px rgba(0, 102, 255, 0.3),
-                0 0 40px rgba(0, 255, 136, 0.2),
-                inset 0 0 20px rgba(138, 43, 226, 0.1);
-        }
-
-        /* Status Indicators */
-        .status-online {
-            color: #00ff88;
-            animation: pulse 2s infinite;
-        }
-
-        .status-offline {
-            color: #ff4444;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Token Price Display */
-        .price-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 1rem 0;
-        }
-
-        .price-change {
-            font-size: 1.2rem;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 0.5rem 0;
-        }
-
-        .positive { color: #00ff88; background: rgba(0, 255, 136, 0.1); }
-        .negative { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
-
-        /* Whitepaper Specific Styles */
-        .whitepaper-header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding-top: 20px;
-        }
-
-        .whitepaper-logo {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 1.5rem;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(0, 102, 255, 0.4);
-        }
-
-        .whitepaper-logo img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .toc {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid var(--green-growth);
-        }
-
-        .toc h3 {
-            margin-bottom: 1rem;
-            color: var(--neon-cyan);
-        }
-
-        .toc ul {
-            columns: 2;
-            column-gap: 3rem;
-        }
-
-        .toc li {
-            margin-bottom: 0.8rem;
-            break-inside: avoid;
-        }
-
-        .toc a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .toc a:hover {
-            color: var(--neon-cyan);
-            text-decoration: underline;
-        }
-
-        .section-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .section-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-cyan);
-        }
-
-        .section-card h3 {
-            color: var(--green-growth);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 1.5rem 0;
-        }
-
-        .whitepaper-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .whitepaper-table th {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .whitepaper-table td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .whitepaper-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .whitepaper-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin: 0.2rem;
-        }
-
-        .badge-success {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .badge-warning {
-            background: rgba(255, 204, 0, 0.2);
-            color: #ffcc00;
-            border: 1px solid rgba(255, 204, 0, 0.3);
-        }
-
-        .badge-info {
-            background: rgba(0, 204, 255, 0.2);
-            color: var(--neon-cyan);
-            border: 1px solid rgba(0, 204, 255, 0.3);
-        }
-
-        .roadmap-timeline {
-            position: relative;
-            padding-left: 30px;
-            margin: 2rem 0;
-        }
-
-        .roadmap-timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, var(--blue-tech), var(--purple-innov));
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding-left: 30px;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -33px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .timeline-date {
-            font-weight: bold;
-            color: var(--green-growth);
-            margin-bottom: 0.5rem;
-        }
-
-        .download-btn {
-            background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--neon-cyan);
-            font-size: 0.9rem;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .social-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 1rem;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .social-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
-            border-color: var(--blue-tech);
-        }
-
-        .social-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .required {
-            color: #ff4444;
-        }
-
-        .contact-card {
-            background: rgba(255,255,255,0.03);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 3px solid;
-            margin-bottom: 1rem;
-        }
-
-        .contact-card.business {
-            border-color: var(--green-growth);
-            background: rgba(0, 255, 136, 0.05);
-        }
-
-        .contact-card.partnership {
-            border-color: var(--blue-tech);
-            background: rgba(0, 102, 255, 0.05);
-        }
-
-        .contact-card.security {
-            border-color: var(--purple-innov);
-            background: rgba(138, 43, 226, 0.05);
-        }
-
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .time-item {
-            text-align: center;
-            padding: 1rem;
-        }
-
-        .time-item .icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-
-            .hero-logo-bg {
-                width: 400px;
-                height: 400px;
-            }
-
-            .token-info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .price-display {
-                font-size: 2rem;
-            }
-
-            .chart-container {
-                height: 300px;
-            }
-
-            .btn-refresh-modern {
-                padding: 0.8rem 1.5rem;
-                font-size: 1rem;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .social-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .toc ul {
-                columns: 1;
-            }
-
-            .whitepaper-table {
-                font-size: 0.9rem;
-            }
-
-            .whitepaper-table th,
-            .whitepaper-table td {
-                padding: 0.5rem;
-            }
-
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                flex-direction: column;
-            }
-
-            .visit-counter {
-                bottom: 10px;
-                right: 10px;
-                font-size: 0.8rem;
-                padding: 0.6rem 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .nav-links a {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.9rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .social-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .whitepaper-logo {
-                width: 100px;
-                height: 100px;
-            }
-        }
-    
-        .form-group select option {
-            background: var(--darker-bg);
-            color: #ffffff;
-        }
-
-    
-/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
-.admin-login{
-  margin-top: 80px;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
-  border-top: 2px solid rgba(122,92,255,.8);
-  text-align: center;
-  border-radius: 16px;
-}
-.admin-login h2{ color:#fff; margin:0 0 10px; }
-.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
-.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-.admin-login-box input{
-  padding:12px 14px; width:280px; max-width:92vw;
-  border-radius:10px; border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.25); color:#fff; outline:none;
-}
-.admin-login-box button{
-  padding:12px 16px; border-radius:10px; border:none;
-  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
-}
-.admin-login-box button:hover{ filter: brightness(1.08); }
-.admin-msg{ margin-top:12px; font-weight:700; }
-.admin-pill{
-  display:inline-flex; align-items:center; gap:8px;
-  padding:6px 10px; border-radius:999px; font-size:.9rem;
-  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
-}
-.admin-pill.off{
-  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
-}
-.admin-only{ display:none !important; }
-
-/* ====== TROPHY BUTTON (Giveaway add) ====== */
-.trophy-btn{
-  padding: 10px 14px !important;
-  display:inline-flex; align-items:center; justify-content:center; gap:10px;
-  min-width: 54px;
-}
-.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
-.trophy-btn .trophy-logo{
-  width: 22px; height: 22px; border-radius: 6px;
-  box-shadow: 0 0 12px rgba(0,255,136,.25);
-}
-.table-responsive{ overflow-x:auto; width:100%; }
-.lb-table{ width:100%; border-collapse: collapse; }
-.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
-.lb-top1{ background: rgba(255,215,0,.12); }
-.lb-top2{ background: rgba(192,192,192,.12); }
-.lb-top3{ background: rgba(205,127,50,.12); }
-.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
-
-</style>
-<!-- Firebase (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-<body>
-<!-- Particles Background -->
-<div id="particles-js"></div>
-<!-- Contor Vizite -->
-<div class="visit-counter" id="visitCounter">
-<span class="counter-icon">👁️</span>
-<span id="visitCount">0</span> vizite
-    </div>
-<!-- Scientific Navigation -->
-<nav class="scientific-nav">
-<div class="nav-container">
-<div class="logo">
-<div class="logo-3d-container">
-<div class="logo-3d">
-<img alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-<div class="backnote-orbit">
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-</div>
-</div>
-<div class="logo-text">StancuBYT</div>
-</div>
-<div class="nav-links">
-<a href="#prezentare" onclick="showSection('prezentare')">Prezentare</a>
-<a href="#statistici" onclick="showSection('statistici'); fetchAllData();">Statistici</a>
-<a href="#whitepaper" onclick="showSection('whitepaper')">Whitepaper</a>
-<a href="#contact" onclick="showSection('contact')">Contact</a>
-<a href="#giveaway" onclick="showSection('giveaway')">Giveaway &amp; Promoții</a>
-</div>
-</div>
-</nav>
-<!-- Prezentare Section -->
-<section class="page-section active-section" id="prezentare">
-<!-- Logo Background 3D -->
-<div class="hero-logo-bg">
-<div class="logo-3d-bg">
-<img alt="StancuBYT Logo Background" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-</div>
-<div class="hero">
-<h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
-                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
-            </p>
-<!-- Live Price Display -->
-<div id="livePriceDisplay" style="margin: 2rem 0;">
-<div class="price-display" id="currentPrice">Se încarcă...</div>
-<div class="price-change" id="priceChange"></div>
-<small id="lastUpdated">Ultima actualizare: --:--:--</small>
-</div>
-<!-- Buton Uniswap -->
-<a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
-                🔄 Tranzacționează pe Uniswap
-            </a>
-<a class="uniswap-btn" href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&amp;utm_medium=referral&amp;utm_campaign=searchresults" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));" target="_blank">
-                🦎 Vizualizează și Tranzacționează pe GeckoTerminal
-            </a>
-<div class="token-info-grid">
-<div class="info-card neon-glow">
-<h3>🔗 Contract Address</h3>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;" target="_blank">
-                        0x44Cf220399be798baeaE45fd7C4fF44623713833
-                    </a>
-<small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
-</div>
-<div class="info-card neon-glow">
-<h3>💰 Total Supply REAL</h3>
-<p id="mainTotalSupply" style="font-size: 2rem; font-weight: bold; color: var(--green-growth);">
-<span id="supplyValue">Se încarcă...</span> SBYT
-                    </p>
-<small style="color: #888;">Date live de pe Etherscan</small>
-</div>
-<div class="info-card neon-glow">
-<h3>🏆 Fondator</h3>
-<p style="font-size: 1.2rem; margin-top: 1rem;">
-                        Stancu Marian
-                    </p>
-</div>
-</div>
-<!-- SECTIUNE NOUTATI -->
-<div class="news-section" id="newsSection">
-  <div class="news-header">
-    <h2 class="news-title"><span>📢</span> Noutăți &amp; Anunțuri</h2>
-
-    <!-- butoane admin -->
-    <div class="news-controls" id="newsControls" style="display:none;">
-      <button class="news-btn" type="button" id="btnOpenNewsForm">➕ Adaugă</button>
-    </div>
-  </div>
-
-  <!-- grid anunturi (2 pe linie, 1 pe mobil) -->
-  <div class="news-grid news-grid-2col" id="newsContainer"></div>
-
-  <!-- formular admin -->
-  <div class="news-form" id="newsForm" style="display:none;">
-    <h3 style="margin:0 0 14px 0; color: var(--neon-cyan);">Adaugă Noutate / Știre / Anunț</h3>
-
-    <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
-      <select id="newsType" style="max-width:220px;">
-        <option value="noutate">Noutate</option>
-        <option value="stire">Stire</option>
-        <option value="anunt">Anunt</option>
-      </select>
-
-      <select id="newsEmojiSelect" style="max-width:140px;">
-        <option value="">Emoji</option>
-        <option value="🚀">🚀</option>
-        <option value="🔥">🔥</option>
-        <option value="💎">💎</option>
-        <option value="📢">📢</option>
-        <option value="🎁">🎁</option>
-        <option value="✅">✅</option>
-        <option value="⚠️">⚠️</option>
-        <option value="📈">📈</option>
-        <option value="📰">📰</option>
-      </select>
-
-      <input id="newsEmoji" type="text" maxlength="12" placeholder="sau scrie (ex: 🚀🔥)" style="max-width:180px;" />
-
-      <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.9);">
-        <input id="pinNews" type="checkbox" /> Pinned
-      </label>
-    </div>
-
-    <div class="form-row" style="margin-top:10px;">
-      <input id="newsTitle" maxlength="120" placeholder="Titlu" type="text" />
-    </div>
-
-    <div class="form-row" style="margin-top:10px;">
-      <textarea id="newsContent" rows="4" maxlength="1200" placeholder="Continut"></textarea>
-    </div>
-
-    <div class="form-row" style="margin-top:10px;">
-      <label style="display:block; font-size:0.9rem; opacity:0.9; margin-bottom:6px;">Imagine fundal (optional)</label>
-      <input id="newsImage" accept="image/*" type="file" />
-      <small style="opacity:0.75; display:block; margin-top:6px;">Imaginea este redimensionata automat prin CSS ca fundal (cover) in chenar.</small>
-    </div>
-
-    <div style="display:flex; gap:12px; margin-top:14px; flex-wrap:wrap;">
-      <button class="news-btn" type="button" id="btnSaveNews">✅ Publică</button>
-      <button class="news-btn" type="button" id="btnCancelNews">❌ Anulează</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email">
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password">
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</input></input></div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">
-    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
-    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
-  </p>
-</section>
-</section>
-<!-- Statistici Section -->
-<section class="page-section" id="statistici">
-<div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
-<h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
-<p>Date live preluate de pe Etherscan</p>
-<!-- Buton Modern Reîmprospătează Datele -->
-<button class="btn-refresh-modern" id="refreshButton" onclick="fetchAllData()">
-<span class="refresh-icon">🔄</span>
-<span class="refresh-text">Reîmprospătează Datele</span>
-<span class="refresh-pulse"></span>
-</button>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📈 Preț în Timp Real</h3>
-<!-- Chart Controls -->
-<div class="chart-controls">
-<button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
-<button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
-<button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
-<button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
-<button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
-<button class="period-btn" onclick="changeChartType('line')">Linie</button>
-</div>
-<div class="chart-container">
-<canvas id="priceChart"></canvas>
-</div>
-<div class="loading" id="priceData">Se încarcă datele live...</div>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📊 Metrici Contract - Live</h3>
-<div class="stats-grid" id="etherscanStats">
-<div class="stat-item">
-<div>Holders</div>
-<div class="stat-value" id="holdersCount">-</div>
-<div>Deținători</div>
-</div>
-<div class="stat-item">
-<div>Total Supply REAL</div>
-<div class="stat-value" id="totalSupply">-</div>
-<div>SBYT</div>
-</div>
-<div class="stat-item">
-<div>Tranzacții</div>
-<div class="stat-value" id="transactionsCount">-</div>
-<div>Total TX</div>
-</div>
-<div class="stat-item">
-<div>Market Cap</div>
-<div class="stat-value" id="marketCap">-</div>
-<div>USD</div>
-</div>
-<div class="stat-item">
-<div>Volum 24h</div>
-<div class="stat-value" id="volume24h">-</div>
-<div>USD</div>
-</div>
-</div>
+<div class="news-grid" id="newsContainer">
+<!-- Noutățile vor fi adăugate aici dinamic -->
 </div>
 <div class="data-visualization neon-glow">
 <h3>📋 Detalii Contract</h3>
@@ -4324,48 +2876,29 @@ async function fetchDexScreenerBestPair() {
 
 async function updateLivePriceAndChart(period = 'live') {
             try {
-                const pair = await fetchDexScreenerBestPair();
-                const priceUsd = Number(pair.priceUsd);
-                // actualizează graficul live (fallback sigur)
-                updatePriceChartLive(priceUsd);
-                if (!Number.isFinite(priceUsd)) throw new Error('priceUsd missing');
+                const priceUsd = await fetchPriceUsd();
+                if (!Number.isFinite(priceUsd)) throw new Error("price unavailable");
 
-                // UI: preț + schimbare
+                updatePriceChartLive(Number(priceUsd));
+
                 const priceEl = document.getElementById('currentPrice');
-                if (priceEl) priceEl.textContent = '$' + priceUsd.toLocaleString('en-US', { maximumFractionDigits: 10 });
+                if (priceEl) priceEl.textContent = '$' + Number(priceUsd).toLocaleString('en-US', { maximumFractionDigits: 10 });
 
                 const changeEl = document.getElementById('priceChange');
-                const ch24 = pair?.priceChange?.h24;
-                if (changeEl) {
-                    if (typeof ch24 === 'number') {
-                        const sign = ch24 >= 0 ? '+' : '';
-                        changeEl.textContent = `${sign}${ch24.toFixed(2)}% (24h)`;
-                    } else {
-                        changeEl.textContent = '';
-                    }
-                }
+                if (changeEl) changeEl.textContent = "";
 
-                const lastEl = document.getElementById('lastUpdated');
-                if (lastEl) lastEl.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const lastEl = document.getElementById('lastUpdate');
+                if (lastEl) lastEl.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO');
 
-                // MarketCap (DexScreener fdv) - dacă există element
-                const mcEl = document.getElementById('marketCap');
-                const fdv = Number(pair.fdv);
-                if (mcEl) mcEl.textContent = Number.isFinite(fdv) ? ('$' + fdv.toLocaleString('en-US', { maximumFractionDigits: 0 })) : mcEl.textContent;
-
-                // adaugă punct în serie
-                const now = new Date();
-                liveSeries.push({ t: now, p: priceUsd });
-                // nu păstra prea mult
-                if (liveSeries.length > 300) liveSeries = liveSeries.slice(-300);
-
-                _renderLiveChart(period);
-
-                lastPrice = priceUsd;
+                lastPrice = Number(priceUsd);
             } catch (e) {
                 console.error('Live price update error:', e);
+                const priceEl = document.getElementById('currentPrice');
+                if (priceEl) priceEl.textContent = '-';
             }
         }
+
+        // Butoane perioadă
 
         // Butoane perioadă (dacă există în UI)
         async function changeChartPeriod(period) {
@@ -5248,11 +3781,38 @@ window.addEventListener('load', () => {
 
   // override loadNews to use Firestore
   const _origLoadNews = window.loadNews;
-  window.loadNews = function(){};
+  window.loadNews = function(){
+    if (db) { _listenNews(); return; }
+    if (_origLoadNews) _origLoadNews();
+  };
 
   // save news to firestore
   const _origSaveNews = window.saveNews;
-  window.saveNews = async function(){};
+  window.saveNews = async function(){
+    if (!db) return _origSaveNews ? _origSaveNews() : undefined;
+
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+
+    const title = ($('newsTitle')?.value||'').trim();
+    const content = ($('newsContent')?.value||'').trim();
+    const type = $('newsType')?.value || 'update';
+    const pinned = !!$('pinNews')?.checked;
+
+    if (!title || !content) { alert('Completează titlul și conținutul!'); return; }
+
+    try{
+      await db.collection('news').add({
+        title, content, type, pinned,
+        createdAt: Date.now(),
+        date: new Date().toISOString()
+      });
+      if (typeof cancelAddNews === 'function') cancelAddNews();
+    }catch(e){
+      console.error('saveNews firestore:', e);
+      alert('Eroare la salvarea știrii (verifică Firestore Rules).');
+    }
+  };
 
   // delete a single news doc
   window.deleteNewsDoc = async function(docId){
@@ -6618,7 +5178,6 @@ try{
   window.__STBYT_IS_ADMIN__ = false;
 
   function setAdminUI(isAdmin){
-    window.__stbytIsAdmin = !!isAdmin;
     window.__STBYT_IS_ADMIN__ = !!isAdmin;
     document.querySelectorAll(".admin-only").forEach(el=>{
       el.style.display = isAdmin ? "" : "none";
@@ -6741,9 +5300,34 @@ try{
     });
   }
 
-  window.loadNews = function(){};
+  window.loadNews = function(){
+    // start listener
+    statsDocListen("news", data=>renderNewsFromDoc(data));
+  };
 
-  window.saveNews = async function(){};
+  window.saveNews = async function(){
+    const ok = await window.ensureAdminAuth(); if(!ok) return;
+    const title = ($("newsTitle")?.value||"").trim();
+    const content = ($("newsContent")?.value||"").trim();
+    const type = ($("newsType")?.value||"update");
+    const pinned = !!$("pinNews")?.checked;
+
+    if(!title || !content){
+      alert("Completeaza titlu si continut.");
+      return;
+    }
+
+    const snap = await statsDocGet("news");
+    const current = snap.exists && Array.isArray(snap.data().items) ? snap.data().items : [];
+    const item = { id: rid(), title, content, type, pinned, createdAt: now() };
+    current.push(item);
+    await statsDocSet("news", { items: current }, true);
+    // clear
+    if($("newsTitle")) $("newsTitle").value="";
+    if($("newsContent")) $("newsContent").value="";
+    if($("pinNews")) $("pinNews").checked=false;
+    alert("Stire/Noutate salvata.");
+  };
 
   window.deleteNewsDoc = async function(id){
     const ok = await window.ensureAdminAuth(); if(!ok) return;
@@ -6810,27 +5394,41 @@ try{
   };
 
   // ===== VISITS (stats/visits: {count}) =====
-  window.updateVisitCounter = async function(){
-    const db = fs(); if(!db) return;
-    const ref = db.collection("stats").doc("visits");
-    try{
-      if(!window.__stbytVisitCounted){
-        window.__stbytVisitCounted = true;
-        await db.runTransaction(async t=>{
-          const snap = await t.get(ref);
-          const c = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
-          t.set(ref, {count: c+1}, {merge:true});
-        });
-      }
-      ref.onSnapshot(s=>{
-        const c = s.exists && typeof s.data().count==="number" ? s.data().count : 0;
-        const el = $("visitsCounter") || $("visitCounter") || $("visitsCount");
-        if(el) el.textContent = String(c);
+  // ===== VISITS (stats/visits: {count}) =====
+window.updateVisitCounter = async function(){
+  const db = fs(); if(!db) return;
+  const ref = db.collection("stats").doc("visits");
+
+  // run once per page load (avoid +3 increments due to multiple inits)
+  if (window.__STBYT_VISIT_INIT__) return;
+  window.__STBYT_VISIT_INIT__ = true;
+
+  // increment once per tab/session
+  const sessKey = "stbyt_visit_session_done";
+  if (!sessionStorage.getItem(sessKey)) {
+    sessionStorage.setItem(sessKey, "1");
+    try {
+      await db.runTransaction(async t=>{
+        const snap = await t.get(ref);
+        const c = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
+        t.set(ref, {count: c + 1}, {merge:true});
       });
-    }catch(e){
-      console.error("visits:", e);
+    } catch(e) {
+      console.error("visit tx failed:", e);
     }
-  };
+  }
+
+  // live update on all devices
+  try {
+    ref.onSnapshot(s=>{
+      const c = s.exists && typeof s.data().count==="number" ? s.data().count : 0;
+      const el = $("visitCounter") || $("visitsCounter") || $("visitsCount");
+      if (el) el.textContent = String(c);
+    });
+  } catch(e) {
+    console.error("visit onSnapshot failed:", e);
+  }
+};
 
   // ===== PROMOS (collection promos) =====
   function promoGetVal(...ids){
@@ -7011,30 +5609,26 @@ try{
       a.onAuthStateChanged(u=>{
         const isAdmin = !!u && String(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
         setAdminUI(isAdmin);
-        const ctrls = $("newsControls");
-        if(ctrls) ctrls.style.display = isAdmin ? "flex" : "none";
       });
     }
 
-    // listeners / counters
+    // start listeners
     window.loadNews();
+    window.loadTeam();
+    listenPromos();
     window.updateVisitCounter();
 
-    // wire UI
-    $("btnOpenNewsForm")?.addEventListener("click", ()=>{ $("newsForm").style.display="block"; });
-    $("btnCancelNews")?.addEventListener("click", ()=>{ $("newsForm").style.display="none"; });
-    $("btnSaveNews")?.addEventListener("click", ()=>window.saveNews());
+    // token updates
+    updateSupplyAndHolders();
+    window.updateLivePriceAndChart();
+    setInterval(()=>window.updateLivePriceAndChart(), 60*1000);
 
-    $("newsEmojiSelect")?.addEventListener("change", (e)=>{
-      const v = e.target.value || "";
-      const inp = $("newsEmoji");
-      if(inp) inp.value = v;
-    });
-
-    // remove coinmarketcap iframes if exist
+    // remove/disable coinmarketcap frame if exists
     document.querySelectorAll("iframe").forEach(fr=>{
       const src = (fr.getAttribute("src")||"");
-      if(src.includes("coinmarketcap.com") || src.includes("dex.coinmarketcap.com")) fr.remove();
+      if(src.includes("coinmarketcap.com") || src.includes("dex.coinmarketcap.com")) {
+        fr.remove();
+      }
     });
   }
 
@@ -7044,191 +5638,1235 @@ try{
     init();
   }
 })();
+</script>
+<script>
+function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
+</script>
+<script>
+/* =======================
+   STANCUBYT FIX OVERRIDES (fc2b9)
+   - price (CoinGecko)
+   - visits (hitCounter)
+   - news CRUD + emoji + image bg (Firestore+Storage)
+   ======================= */
+(function() {
+  const CONTRACT_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+  const FUNCTIONS_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net";
+  const ADMIN_EMAIL = "stancubyt@gmail.com";
 
-  // ===== PATCH: NEWS in collection("news") + Storage background =====
-  (function(){
-    function db(){ return fs(); }
-    function st(){ try{ return firebase.storage(); }catch(e){ return null; } }
+  function $(id){ return document.getElementById(id); }
+  function safeText(el, txt){ if (el) el.textContent = txt; }
+  function isAdminUser(user){
+    if(!user || !user.email) return false;
+    return String(user.email).toLowerCase() === String(ADMIN_EMAIL).toLowerCase();
+  }
+  function getDb(){ return (window.firebase && firebase.firestore) ? firebase.firestore() : null; }
+  function getAuth(){ return (window.firebase && firebase.auth) ? firebase.auth() : null; }
+  function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
 
-    function mapTypeToClass(t){
-      if(t==="stire") return "news-type-stire";
-      if(t==="anunt") return "news-type-anunt";
-      return "news-type-noutate";
+  // -------- VISITS (Cloud Function) --------
+  async function updateVisits() {
+    // Global counter (all devices) via Cloud Function hitCounter
+    try {
+      // prevent multiple increments per page load (some scripts call it multiple times)
+      if (window.__STBYT_VISIT_VALUE != null) {
+        const val = String(window.__STBYT_VISIT_VALUE);
+        ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id)=>{
+          const el = document.getElementById(id);
+          if (el) el.textContent = val;
+        });
+        return;
+      }
+      if (window.__STBYT_VISIT_CALLING) return;
+      window.__STBYT_VISIT_CALLING = true;
+
+      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store" });
+      const j = await r.json();
+      const n = (j && (j.count ?? j.visits ?? j.value ?? j.total ?? j.data)) ?? null;
+      const val = (n != null) ? String(n) : "-";
+      window.__STBYT_VISIT_VALUE = val;
+      ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id)=>{
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      });
+    } catch (e) {
+      console.warn("hitCounter failed:", e);
+    } finally {
+      window.__STBYT_VISIT_CALLING = false;
     }
-    function mapTypeLabel(t){
-      if(t==="stire") return "Știre";
-      if(t==="anunt") return "Anunț";
-      return "Noutate";
+  }
+  window.updateVisits = updateVisits;
+
+  // Disable legacy password prompt buttons (we use Firebase Auth)
+  window.requestPassword = function(){ alert("Autentifica-te ca administrator pentru a adauga/sterge anunturi."); };
+
+  
+  
+  // -------- PRICE (Real) --------
+  // -------- PRICE helpers --------
+  async function fetchJson(url){
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    return await r.json();
+  }
+  function deepFindNumber(obj, keysLike){
+    try{
+      const stack=[obj];
+      while(stack.length){
+        const cur=stack.pop();
+        if(!cur) continue;
+        if(Array.isArray(cur)){
+          for(const v of cur) stack.push(v);
+          continue;
+        }
+        if(typeof cur === "object"){
+          for(const [k,v] of Object.entries(cur)){
+            const lk = String(k).toLowerCase();
+            if(typeof v === "number" && Number.isFinite(v)){
+              if(keysLike.some(s=>lk.includes(s))) return v;
+            }
+            stack.push(v);
+          }
+        }
+      }
+    }catch(_){}
+    return null;
+  }
+
+  async function fetchPriceUsd(){
+    // 1) Uniswap interface gateway (v4 position) - best effort
+    try{
+      const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + String(UNISWAP_V4_POSITION_ID);
+      const j = await fetchJson(url);
+      const n1 = deepFindNumber(j, ["priceusd","usd","price_usd"]);
+      if(n1 != null) return n1;
+    }catch(e){}
+
+    // 2) CoinGecko by contract (works if token is indexed/listed)
+    try{
+      const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=" + TOKEN_CONTRACT + "&vs_currencies=usd";
+      const j = await fetchJson(url);
+      const key = TOKEN_CONTRACT.toLowerCase();
+      const v = j && j[key] && j[key].usd ? Number(j[key].usd) : null;
+      if (v != null && Number.isFinite(v) && v > 0) return v;
+    }catch(e){}
+
+    // 3) GeckoTerminal pool
+    try{
+      const pool = String(GECKO_POOL_ADDRESS || "").toLowerCase();
+      if(pool){
+        const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + pool;
+        const j = await fetchJson(url);
+        const v = Number(j?.data?.attributes?.base_token_price_usd);
+        if(Number.isFinite(v) && v > 0) return v;
+      }
+    }catch(e){}
+
+    return null;
+  }
+
+  // Primary: CoinGecko by contract (works even when DexScreener/GeckoTerminal has no pairs)
+  const TOKEN_CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+
+  // Uniswap v4 position (provided by you). We try to read price from Uniswap interface gateway.
+  const GECKO_POOL_ADDRESS = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4";
+  const UNISWAP_V4_POSITION_ID = "95049";
+
+  async function fetchPriceFromUniswapV4Position() {
+    // Uniswap interface gateway (CORS-friendly in most cases)
+    const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + encodeURIComponent(UNISWAP_V4_POSITION_ID);
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("Uniswap position HTTP " + r.status);
+    const j = await r.json();
+
+    // We search for common fields used by the interface responses
+    // Examples: { position: { priceUSD: "0.00123" } } or nested: data.position...
+    const candidates = [
+      j && j.priceUSD,
+      j && j.position && j.position.priceUSD,
+      j && j.position && j.position.token0PriceUSD,
+      j && j.position && j.position.token1PriceUSD,
+      j && j.data && j.data.position && j.data.position.priceUSD,
+      j && j.data && j.data.position && j.data.position.token0PriceUSD,
+      j && j.data && j.data.position && j.data.position.token1PriceUSD,
+      j && j.position && j.position.currentPriceUSD,
+    ];
+    for (const v of candidates) {
+      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
+      if (Number.isFinite(num) && num > 0) return num;
+    }
+    throw new Error("Uniswap position price missing");
+  }
+
+  async function fetchPriceCoinGeckoByContract() {
+    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
+      + "?contract_addresses=" + encodeURIComponent(TOKEN_CONTRACT)
+      + "&vs_currencies=usd";
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
+    const j = await r.json();
+    const key = TOKEN_CONTRACT.toLowerCase();
+    const usd = j && j[key] && j[key].usd;
+    const num = typeof usd === "number" ? usd : Number(usd);
+    if (!Number.isFinite(num) || num <= 0) throw new Error("CoinGecko price missing");
+    return num;
+  }
+
+  // Fallback: GeckoTerminal pool (if available)
+  const GECKO_POOL = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4"; // ETH pool address already linked in page
+
+  async function fetchPriceGeckoTerminal() {
+    const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + GECKO_POOL;
+    const r = await fetch(url, {cache:"no-store"});
+    if (!r.ok) throw new Error("GeckoTerminal HTTP " + r.status);
+    const j = await r.json();
+    const a = j && j.data && j.data.attributes ? j.data.attributes : null;
+    // Try multiple possible fields (API may differ)
+    const candidates = [
+      a && a.base_token_price_usd,
+      a && a.quote_token_price_usd,
+      a && a.price_in_usd,
+      a && a.pool_price_usd,
+      a && a.token_price_usd,
+    ];
+    for (const v of candidates) {
+      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
+      if (Number.isFinite(num) && num > 0) return num;
+    }
+    throw new Error("GeckoTerminal price missing");
+  }
+
+  async function updateTokenPrice() {
+    const el = $("liveTokenPrice") || $("currentPrice") || $("tokenPrice");
+    const lastEl = $("lastUpdated");
+    try {
+      let usd = null;
+      try {
+        usd = await fetchPriceFromUniswapV4Position();
+      } catch (e0) {
+        try {
+          usd = await fetchPriceCoinGeckoByContract();
+        } catch (e1) {
+          // fallback to pool-based price if CoinGecko doesn't know the token yet
+          usd = await fetchPriceGeckoTerminal();
+        }
+      }
+      if (el) el.textContent = "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 10 });
+      if (lastEl) lastEl.textContent = "Ultima actualizare: " + new Date().toLocaleTimeString("ro-RO");
+    } catch (e) {
+      console.warn("price update failed:", e);
+      if (el) el.textContent = "-";
+      if (lastEl) lastEl.textContent = "Ultima actualizare: --:--:--";
+    }
+  }
+
+    function startPriceAutoUpdate() {
+    updateTokenPrice();
+    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
+    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
+  }
+  window.startPriceAutoUpdate = startPriceAutoUpdate;
+  window.updateTokenPrice = updateTokenPrice;
+// -------- TOTAL SUPPLY (etherscanProxy) --------
+  async function updateTotalSupplyReal() {
+    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
+    try {
+      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
+      const r = await fetch(url, {cache:"no-store"});
+      const j = await r.json();
+      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
+      if (!raw || raw === "0") return;
+      // raw is integer with 18 decimals
+      const supply = Number(raw) / 1e18;
+      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
+    } catch (e) {
+      console.warn("totalSupplyReal failed:", e);
+    }
+  }
+  window.updateTotalSupplyReal = updateTotalSupplyReal;
+
+  // -------- NEWS (Firestore collection) --------
+  // Requirements:
+  // - public read on /news
+  // - admin (email) can add/delete
+  // - emoji shown near date/time
+  // - optional background image (auto-resized to fit card)
+
+  function injectNewsStyles(){
+    if(document.getElementById("stbyt-news-style")) return;
+    const style = document.createElement("style");
+    style.id = "stbyt-news-style";
+    style.textContent = `
+      /* Bigger cards (+~20%) + stronger differentiation */
+      .news-card{ padding: 1.2rem !important; border-radius: 18px !important; min-height: 220px !important; }
+      .news-card h3{ font-size: 1.15rem !important; margin-bottom: .55rem !important; }
+      .news-card .meta{ font-size: .92rem; opacity: .9; margin-bottom: .55rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+      .news-card .badge{ display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .6rem; border-radius:999px; font-weight:700; font-size:.78rem; letter-spacing:.02em; }
+      .news-card.type-news{ border: 2px solid rgba(90,140,255,.55) !important; box-shadow: 0 10px 28px rgba(90,140,255,.14) !important; }
+      .news-card.type-announcement{ border: 2px solid rgba(255,200,80,.55) !important; box-shadow: 0 10px 28px rgba(255,200,80,.14) !important; }
+      .news-card.type-update{ border: 2px solid rgba(120,255,180,.55) !important; box-shadow: 0 10px 28px rgba(120,255,180,.14) !important; }
+
+      .news-card.type-news .badge{ background: rgba(90,140,255,.18); border:1px solid rgba(90,140,255,.35); }
+      .news-card.type-announcement .badge{ background: rgba(255,200,80,.18); border:1px solid rgba(255,200,80,.35); }
+      .news-card.type-update .badge{ background: rgba(120,255,180,.18); border:1px solid rgba(120,255,180,.35); }
+
+      .news-card.has-bg{ background-size: cover !important; background-position: center !important; position: relative; overflow: hidden; }
+      .news-card.has-bg::before{
+        content:""; position:absolute; inset:0;
+        background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.70));
+        pointer-events:none;
+      }
+      .news-card.has-bg > *{ position: relative; z-index: 1; }
+      .news-card .news-actions{ margin-top: .8rem; display:flex; gap:.5rem; flex-wrap:wrap; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureNewsFormExtras(){
+    // Find a reasonable container near the existing news inputs
+    const host =
+      document.getElementById("newsForm") ||
+      document.getElementById("newsAdminPanel") ||
+      document.getElementById("newsAdmin") ||
+      document.querySelector("[data-news-form]") ||
+      document.querySelector(".news-form") ||
+      document.querySelector("#newsSection form");
+
+    if(!host) return;
+
+    // Emoji input + picker
+    if(!document.getElementById("newsEmoji")){
+      const wrap = document.createElement("div");
+      wrap.className = "form-row";
+      wrap.style.marginTop = "10px";
+      wrap.innerHTML = `
+        <label style="display:block;margin-bottom:6px;font-weight:700;">Emoji (optional)</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <select id="newsEmojiPicker" style="min-width:180px;padding:10px;border-radius:12px;">
+            <option value="">Alege emoji…</option>
+            <option value="🚀">🚀 Rocket</option>
+            <option value="🔥">🔥 Hot</option>
+            <option value="📣">📣 Announcement</option>
+            <option value="📰">📰 News</option>
+            <option value="✅">✅ Update</option>
+            <option value="🎁">🎁 Giveaway</option>
+            <option value="💎">💎 Diamond</option>
+            <option value="⚡">⚡ Power</option>
+            <option value="📈">📈 Growth</option>
+            <option value="🔔">🔔 Alert</option>
+          </select>
+          <input id="newsEmoji" type="text" placeholder="sau scrie un emoji" style="width:140px;padding:10px;border-radius:12px;">
+        </div>
+      `;
+      host.appendChild(wrap);
+
+      const picker = document.getElementById("newsEmojiPicker");
+      const input = document.getElementById("newsEmoji");
+      if(picker && input){
+        picker.addEventListener("change", ()=>{ input.value = picker.value || ""; });
+      }
     }
 
-    window.loadNews = function(){
-      const _db = db(); if(!_db) return;
-      const container = $("newsContainer");
-      if(!container) return;
+    // Image upload
+    if(!document.getElementById("newsImage")){
+      const wrap2 = document.createElement("div");
+      wrap2.className = "form-row";
+      wrap2.style.marginTop = "10px";
+      wrap2.innerHTML = `
+        <label style="display:block;margin-bottom:6px;font-weight:700;">Imagine fundal (optional)</label>
+        <input id="newsImage" type="file" accept="image/*" style="padding:10px;border-radius:12px;">
+        <div style="font-size:.9rem;opacity:.8;margin-top:6px;">Imaginea este redimensionata automat ca sa se incadreze in chenar.</div>
+      `;
+      host.appendChild(wrap2);
+    }
+  }
 
-      _db.collection("news")
-        .orderBy("pinned","desc")
+  function fmtDateTime(ts){
+    try{
+      const d = new Date(Number(ts)||Date.now());
+      const dd = d.toLocaleDateString(undefined, {year:"numeric", month:"2-digit", day:"2-digit"});
+      const tt = d.toLocaleTimeString(undefined, {hour:"2-digit", minute:"2-digit"});
+      return { dd, tt };
+    }catch(e){
+      return { dd:"", tt:"" };
+    }
+  }
+
+  function typeClass(type){
+    const t = String(type||"update").toLowerCase();
+    if(t.includes("anunt")) return "type-announcement";
+    if(t.includes("stire") || t.includes("news")) return "type-news";
+    if(t.includes("nout")) return "type-update";
+    if(t === "announcement") return "type-announcement";
+    if(t === "news") return "type-news";
+    return "type-update";
+  }
+
+  function typeLabel(type){
+    const t = String(type||"update").toLowerCase();
+    if(t.includes("anunt") || t==="announcement") return "Anunt";
+    if(t.includes("stire") || t==="news") return "Stire";
+    if(t.includes("nout")) return "Noutate";
+    return "Noutate";
+  }
+
+  function renderNewsItems(items){
+    injectNewsStyles();
+    const container = $("newsList") || $("newsContainer") || $("newsGrid");
+    if(!container) return;
+    container.innerHTML = "";
+    items.forEach(it=>{
+      const {dd, tt} = fmtDateTime(it.createdAt || it.date || Date.now());
+      const emoji = (it.emoji||"").trim();
+      const cls = typeClass(it.type);
+      const div = document.createElement("div");
+      div.className = `news-card ${cls} ${it.bgUrl ? "has-bg":""}`;
+      if(it.bgUrl){
+        div.style.backgroundImage = `url('${it.bgUrl}')`;
+      }
+      div.innerHTML = `
+        <div class="meta">
+          <span class="badge">${typeLabel(it.type)}</span>
+          <span>${emoji ? emoji + " " : ""}${dd} ${tt}</span>
+        </div>
+        <h3>${(it.title||"")}</h3>
+        <p>${(it.content||"")}</p>
+        ${window.__STBYT_IS_ADMIN__ ? `<div class="news-actions"><button class="news-btn" onclick="deleteNewsDoc('${it.id}')">🗑️ Sterge</button></div>` : ""}
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  let _newsUnsub = null;
+
+  function startNewsRealtime(){
+    if(!db) return;
+    try{
+      if(_newsUnsub) { _newsUnsub(); _newsUnsub = null; }
+      // Live list for all devices
+      _newsUnsub = db.collection("news")
         .orderBy("createdAt","desc")
-        .limit(50)
+        .limit(100)
         .onSnapshot((snap)=>{
           const items = [];
           snap.forEach(doc=>{
             items.push({ id: doc.id, ...doc.data() });
           });
-          render(items);
+          renderNewsItems(items);
+          // clear any permission message if present
+          const err = document.getElementById("newsError");
+          if(err) err.remove();
         }, (err)=>{
-          console.error("news listen:", err);
-          container.innerHTML = '<div style="opacity:0.85">Eroare la încărcare știri (rules/permisiuni).</div>';
-        });
-    };
-
-    function fmtDate(ts){
-      try{
-        const d = ts && ts.toDate ? ts.toDate() : (typeof ts==="number" ? new Date(ts) : new Date());
-        return d.toLocaleDateString("ro-RO") + " " + d.toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
-      }catch(e){ return ""; }
-    }
-
-    function render(items){
-      const container = $("newsContainer");
-      if(!container) return;
-
-      container.innerHTML = "";
-      if(!items.length){
-        container.innerHTML = '<div style="opacity:0.7">Nu există încă anunțuri.</div>';
-        return;
-      }
-
-      const isAdmin = !!window.__stbytIsAdmin;
-      items.forEach(it=>{
-        const card = document.createElement("div");
-        card.className = "news-card " + mapTypeToClass(it.type||"noutate") + (it.imageUrl ? " has-bg" : "");
-        if(it.imageUrl){
-          card.style.backgroundImage =
-            'linear-gradient(135deg, rgba(0,0,0,0.75), rgba(0,0,0,0.25)), url("' + it.imageUrl + '")';
-        }
-
-        const emoji = (it.emoji||"").trim();
-        const badge = document.createElement("div");
-        badge.className = "news-badge";
-        badge.innerHTML = '<span style="font-size:1.05rem">' + (emoji||"📌") + '</span>' +
-                          '<span style="font-weight:800">' + mapTypeLabel(it.type||"noutate") + '</span>';
-        card.appendChild(badge);
-
-        const h = document.createElement("div");
-        h.style.fontSize = "1.15rem";
-        h.style.fontWeight = "900";
-        h.style.marginBottom = "8px";
-        h.textContent = it.title || "Fără titlu";
-        card.appendChild(h);
-
-        const meta = document.createElement("div");
-        meta.className = "news-meta";
-        const dt = fmtDate(it.createdAt);
-        meta.innerHTML = '<span>' + (dt || "") + '</span>';
-        card.appendChild(meta);
-
-        const p = document.createElement("div");
-        p.style.marginTop = "10px";
-        p.style.opacity = "0.92";
-        p.style.lineHeight = "1.45";
-        p.textContent = it.content || "";
-        card.appendChild(p);
-
-        if(isAdmin){
-          const actions = document.createElement("div");
-          actions.className = "news-actions";
-          const del = document.createElement("button");
-          del.className = "news-btn news-del";
-          del.textContent = "🗑️ Șterge";
-          del.addEventListener("click", async ()=>{
-            if(!confirm("Ștergi acest anunț?")) return;
-            await window.deleteNews(it.id, it.imagePath || null);
-          });
-          actions.appendChild(del);
-          card.appendChild(actions);
-        }
-
-        container.appendChild(card);
-      });
-    }
-
-    window.saveNews = async function(){
-      const ok = await window.ensureAdminAuth?.(); if(!ok) return;
-
-      const title = ($("newsTitle")?.value||"").trim();
-      const content = ($("newsContent")?.value||"").trim();
-      const type = ($("newsType")?.value||"noutate");
-      const pinned = !!$("pinNews")?.checked;
-      const emoji = ($("newsEmoji")?.value||"").trim();
-
-      if(!title || !content){
-        alert("Completează titlul și conținutul!");
-        return;
-      }
-
-      const _db = db(); if(!_db) return;
-      const file = $("newsImage")?.files?.[0] || null;
-
-      try{
-        // 1) Creeaza doc ca sa avem id pt storage path
-        const docRef = await _db.collection("news").add({
-          title, content, type, pinned, emoji,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          imageUrl: "",
-          imagePath: ""
-        });
-
-        // 2) Upload imagine (optional)
-        if(file){
-          const storage = st();
-          if(!storage) throw new Error("storage_unavailable");
-          const path = "news/" + docRef.id + "/" + Date.now() + "_" + (file.name || "bg");
-          const ref = storage.ref().child(path);
-          await ref.put(file);
-          const url = await ref.getDownloadURL();
-          await docRef.update({ imageUrl: url, imagePath: path });
-        }
-
-        // reset form
-        if($("newsForm")) $("newsForm").style.display="none";
-        if($("newsTitle")) $("newsTitle").value="";
-        if($("newsContent")) $("newsContent").value="";
-        if($("newsEmoji")) $("newsEmoji").value="";
-        if($("newsEmojiSelect")) $("newsEmojiSelect").value="";
-        if($("newsType")) $("newsType").value="noutate";
-        if($("pinNews")) $("pinNews").checked=false;
-        if($("newsImage")) $("newsImage").value="";
-
-      }catch(e){
-        console.error("saveNews:", e);
-        alert("Eroare la publicare. Verifică Firestore/Storage rules și consola.");
-      }
-    };
-
-    window.deleteNews = async function(id, imagePath){
-      const ok = await window.ensureAdminAuth?.(); if(!ok) return;
-      const _db = db(); if(!_db) return;
-      try{
-        await _db.collection("news").doc(id).delete();
-        if(imagePath){
-          const storage = st();
-          if(storage){
-            try{ await storage.ref().child(imagePath).delete(); }catch(e){ /* ignore */ }
+          console.error("news onSnapshot error:", err);
+          const container = $("newsList") || $("newsContainer") || $("newsGrid");
+          if(container && !document.getElementById("newsError")){
+            const div = document.createElement("div");
+            div.id = "newsError";
+            div.style.margin = "12px 0";
+            div.style.padding = "12px 14px";
+            div.style.borderRadius = "14px";
+            div.style.border = "1px solid rgba(255,90,90,.35)";
+            div.style.background = "rgba(255,90,90,.12)";
+            div.textContent = "Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca match /news/{id} allow read: if true;";
+            container.parentNode.insertBefore(div, container);
           }
-        }
-      }catch(e){
-        console.error("deleteNews:", e);
-        alert("Eroare la ștergere. Verifică Rules.");
-      }
-    };
-  })();
+        });
+    }catch(e){
+      console.error("startNewsRealtime failed:", e);
+    }
+  }
 
+  window.startNewsRealtime = startNewsRealtime;
+
+  async function resizeImageToBlob(file, maxW=1600, maxH=900, quality=0.82){
+    // Client-side resize for background images (keeps within card, reduces upload issues)
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    try{
+      await new Promise((res, rej)=>{
+        img.onload = ()=>res();
+        img.onerror = (e)=>rej(e);
+        img.src = url;
+      });
+      let {width:w, height:h} = img;
+      const ratio = Math.min(maxW / w, maxH / h, 1);
+      const nw = Math.round(w * ratio);
+      const nh = Math.round(h * ratio);
+      const canvas = document.createElement("canvas");
+      canvas.width = nw;
+      canvas.height = nh;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, nw, nh);
+      const mime = (file.type && file.type.startsWith("image/")) ? file.type : "image/jpeg";
+      const blob = await new Promise((res)=>canvas.toBlob(res, mime, quality));
+      return blob || file;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function uploadNewsImageIfAny(file){
+    if(!file) return "";
+    if(!window.firebase || !firebase.storage) return "";
+    try{
+      // hard limit to avoid hangs
+      const MAX_MB = 6;
+      if(file.size > MAX_MB*1024*1024){
+        alert("Imagine prea mare. Te rog max " + MAX_MB + "MB.");
+        return "";
+      }
+      const blob = await resizeImageToBlob(file);
+      const storage = firebase.storage();
+      const path = "news/" + Date.now() + "_" + Math.random().toString(16).slice(2) + ".jpg";
+      const ref = storage.ref().child(path);
+      const task = ref.put(blob);
+      // simple timeout guard (25s)
+      await Promise.race([
+        task,
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error("upload-timeout")), 25000))
+      ]);
+      const url = await ref.getDownloadURL();
+      return url || "";
+    }catch(e){
+      console.warn("upload image failed:", e);
+      // do not block posting
+      return "";
+    }
+  }
+
+  window.saveNews = async function(){
+    if(!db) return;
+    const ok = await _ensureAdmin();
+    if(!ok) return;
+
+    // support multiple possible ids from original page
+    const titleEl = $("newsTitle") || $("titleNews") || $("anuntTitle");
+    const contentEl = $("newsContent") || $("contentNews") || $("anuntContent");
+    const typeEl = $("newsType") || $("typeNews") || $("anuntType");
+    const pinnedEl = $("pinNews") || $("newsPinned");
+    const emojiEl = $("newsEmoji");
+    const imgEl = $("newsImage");
+
+    const title = (titleEl?.value||"").trim();
+    const content = (contentEl?.value||"").trim();
+    const type = typeEl?.value || "noutate";
+    const pinned = !!pinnedEl?.checked;
+    const emoji = (emojiEl?.value||"").trim();
+
+    if (!title || !content) { alert("Completeaza titlul si continutul!"); return; }
+
+    const btn = $("saveNewsBtn") || $("addNewsBtn") || document.querySelector("[data-save-news]");
+    if(btn) { btn.disabled = true; btn.textContent = "Se publica..."; }
+
+    try{
+      const file = imgEl?.files?.[0] || null;
+      const bgUrl = await uploadNewsImageIfAny(file);
+
+      await db.collection("news").add({
+        title,
+        content,
+        type,
+        pinned,
+        emoji,
+        bgUrl: bgUrl || "",
+        createdAt: Date.now()
+      });
+
+      // reset form so you can add more
+      if(titleEl) titleEl.value = "";
+      if(contentEl) contentEl.value = "";
+      if(emojiEl) emojiEl.value = "";
+      const picker = $("newsEmojiPicker");
+      if(picker) picker.value = "";
+      if(imgEl) imgEl.value = "";
+      if(pinnedEl) pinnedEl.checked = false;
+
+    } catch(e){
+      console.error("save news failed:", e);
+      alert("Nu s-a putut salva anuntul. Verifica Firestore Rules si conexiunea.");
+    } finally {
+      if(btn) { btn.disabled = false; btn.textContent = "Adauga"; }
+    }
+  };
+
+  window.deleteNewsDoc = async function(docId){
+    if(!db) return;
+    const ok = await _ensureAdmin();
+    if(!ok) return;
+    if(!docId) return;
+    if(!confirm("Stergi acest anunt?")) return;
+    try{
+      await db.collection("news").doc(docId).delete();
+    }catch(e){
+      console.error("delete news:", e);
+      alert("Nu s-a putut sterge. Verifica permisiunile.");
+    }
+  };
+
+  // Hook admin UI + start realtime
+  function wireNewsAdminUI(){
+    ensureNewsFormExtras();
+    // show/hide buttons based on admin
+    const adminBar = $("newsAdminControls") || $("newsControls") || document.querySelector("[data-news-controls]");
+    const addBtn = $("saveNewsBtn") || $("addNewsBtn") || document.querySelector("[data-save-news]");
+    if(addBtn){
+      addBtn.onclick = (e)=>{ e.preventDefault(); window.saveNews(); };
+    }
+    if(adminBar){
+      adminBar.style.display = window.__STBYT_IS_ADMIN__ ? "" : "none";
+    }
+    // Some pages hide the whole admin panel by default
+    const adminPanel = $("newsAdminPanel") || $("newsAdmin");
+    if(adminPanel){
+      adminPanel.style.display = window.__STBYT_IS_ADMIN__ ? "" : "none";
+    }
+  }
+
+  window.wireNewsAdminUI = wireNewsAdminUI;
+
+  // Start now if possible
+  try { ensureNewsFormExtras(); } catch(e) {}
+  // -------- PRICE
+  // -------- PRICE// -------- PRICE (CoinGecko token_price) --------
+  async function fetchPriceCoinGecko() {
+    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
+      + "?contract_addresses=" + encodeURIComponent(CONTRACT_ADDRESS)
+      + "&vs_currencies=usd";
+    const r = await fetch(url, {cache:"no-store"});
+    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
+    const j = await r.json();
+    const key = CONTRACT_ADDRESS.toLowerCase();
+    const usd = j && j[key] && typeof j[key].usd === "number" ? j[key].usd : null;
+    if (usd == null) throw new Error("CoinGecko no price for contract");
+    return usd;
+  }
+
+  
+  function startPriceAutoUpdate() {
+    updateTokenPrice();
+    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
+    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
+  }
+  window.startPriceAutoUpdate = startPriceAutoUpdate;
+  window.updateTokenPrice = updateTokenPrice;
+
+  // -------- TOTAL SUPPLY (etherscanProxy) --------
+  async function updateTotalSupplyReal() {
+    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
+    try {
+      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
+      const r = await fetch(url, {cache:"no-store"});
+      const j = await r.json();
+      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
+      if (!raw || raw === "0") return;
+      // raw is integer with 18 decimals
+      const supply = Number(raw) / 1e18;
+      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
+    } catch (e) {
+      console.warn("totalSupplyReal failed:", e);
+    }
+  }
+  window.updateTotalSupplyReal = updateTotalSupplyReal;
+
+  // -------- NEWS (Firestore + Storage) --------
+  function renderNewsList(items, isAdmin) {
+    const container = $("newsContainer");
+    if (!container) return;
+
+    // sort: pinned first, then newest
+    items.sort((a,b)=>{
+      const pa = a.pinned ? 1 : 0;
+      const pb = b.pinned ? 1 : 0;
+      if (pa !== pb) return pb - pa;
+      const ta = a.createdAtMs || 0;
+      const tb = b.createdAtMs || 0;
+      return tb - ta;
+    });
+
+    container.innerHTML = "";
+    items.forEach(item=>{
+      const card = document.createElement("div");
+      card.className = "news-card " + (item.type || "news");
+
+      // background image
+      if (item.bgUrl) {
+        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
+        card.style.backgroundSize = "cover";
+        card.style.backgroundPosition = "center";
+      }
+
+      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
+      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
+
+      card.innerHTML = `
+        <div class="news-card-head">
+          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
+          <div class="news-date"><span class="news-date-emoji">${item.emoji || ""}</span>${when}</div>
+        </div>
+        <div class="news-card-title">${item.title || ""}</div>
+        <div class="news-card-text">${item.content || ""}</div>
+      `;
+
+      if (isAdmin) {
+        const del = document.createElement("button");
+        del.className = "news-del-btn";
+        del.textContent = "🗑️ Sterge";
+        del.onclick = async ()=>{
+          if (!confirm("Stergi acest anunt?")) return;
+          const db = getDb();
+          if (!db) return alert("Firestore indisponibil.");
+          try {
+            await db.collection("news").doc(item._id).delete();
+          } catch (e) {
+            console.error("delete news failed:", e);
+            alert("Eroare la stergere (rules/permisiuni).");
+          }
+        };
+        card.appendChild(del);
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  async function uploadNewsImage(file) {
+  if (!file) return null;
+
+  try {
+    const storage = getStorage();
+    if (!storage) throw new Error("Storage SDK indisponibil");
+
+    // Resize image in browser to avoid huge uploads + keep inside card nicely
+    const MAX_W = 1400;
+    const MAX_H = 900;
+    const blob = await new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        try {
+          let w = img.width;
+          let h = img.height;
+          const scale = Math.min(1, MAX_W / w, MAX_H / h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+
+          canvas.toBlob((b)=>{
+            URL.revokeObjectURL(url);
+            if (!b) return reject(new Error("Nu pot converti imaginea"));
+            resolve(b);
+          }, "image/jpeg", 0.86);
+        } catch (e) {
+          URL.revokeObjectURL(url);
+          reject(e);
+        }
+      };
+      img.onerror = (e) => {
+        URL.revokeObjectURL(url);
+        reject(e);
+      };
+      img.src = url;
+    });
+
+    const safeName = (file.name || "bg").replace(/[^\w.\-]+/g, "_").replace(/\.[^.]+$/, "") + ".jpg";
+    const path = "news/" + Date.now() + "_" + safeName;
+    const ref = storage.ref().child(path);
+
+    await ref.put(blob, { contentType: "image/jpeg" });
+    return await ref.getDownloadURL();
+  } catch (e) {
+    console.error("uploadNewsImage failed:", e);
+    // don't block posting if storage is not configured correctly
+    return null;
+  }
+}
+
+  async function adminCreateNews() {
+    const auth = getAuth();
+    const user = auth && auth.currentUser ? auth.currentUser : null;
+    if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
+
+    const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
+    const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
+    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
+    const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
+    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
+
+    if (!title || !content) return alert("Completeaza titlu si continut.");
+
+    const db = getDb();
+    if (!db) return alert("Firestore indisponibil.");
+
+    try {
+      let bgUrl = null;
+      if (file) bgUrl = await uploadNewsImage(file);
+
+      await db.collection("news").add({
+        title,
+        content,
+        emoji: emoji || "",
+        type,
+        pinned,
+        bgUrl: bgUrl || "",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAtMs: Date.now(),
+      });
+
+      // reset form
+      if ($("newsTitleInput")) $("newsTitleInput").value = "";
+      if ($("newsContentInput")) $("newsContentInput").value = "";
+      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
+      if ($("newsBgInput")) $("newsBgInput").value = "";
+      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
+    } catch (e) {
+      console.error("create news failed:", e);
+      alert("Eroare la salvare stire (rules/permisiuni).");
+    }
+  }
+  window.adminCreateNews = adminCreateNews;
+
+  function setNewsAdminVisible(isAdmin) {
+    const box = $("newsAdminBox");
+    if (box) box.style.display = isAdmin ? "block" : "none";
+
+    // wire emoji select -> input once
+    if (!window.__NEWS_EMOJI_WIRED__) {
+      const sel = $("newsEmojiSelect");
+      const inp = $("newsEmojiInput");
+      if (sel && inp) {
+        sel.addEventListener("change", ()=>{
+          inp.value = sel.value || "";
+          inp.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      }
+      window.__NEWS_EMOJI_WIRED__ = true;
+    }
+    // hide any legacy admin section if exists
+    const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
+    if (legacyAdmin) legacyAdmin.style.display = "none";
+  }
+
+  function startNewsRealtime() {
+    const db = getDb();
+    const container = $("newsContainer");
+    if (!db || !container) return;
+    try {
+      db.collection("news")
+        .orderBy("createdAtMs", "desc")
+        .limit(50)
+        .onSnapshot((snap)=>{
+          const items=[];
+          snap.forEach(doc=> items.push({_id: doc.id, ...doc.data()}));
+          const auth = getAuth();
+          const isAdmin = isAdminUser(auth && auth.currentUser);
+          renderNewsList(items, isAdmin);
+        }, (err)=>{
+          console.error("news onSnapshot error:", err);
+          container.innerHTML = '<div style="color:#ffb3b3; padding:12px; border:1px solid rgba(255,255,255,.15); border-radius:12px; background:rgba(0,0,0,.35)">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca <b>match /news/{id} allow read: if true;</b></div>';
+        });
+    } catch (e) {
+      console.error("startNewsRealtime failed:", e);
+    }
+  }
+
+  function wireAuthUI() {
+    const auth = getAuth();
+    if (!auth) return;
+
+    // show admin box if admin
+    auth.onAuthStateChanged((user)=>{
+      const isAdmin = isAdminUser(user);
+      setNewsAdminVisible(isAdmin);
+
+      // also re-render delete buttons after login
+      // force refresh by re-reading current DOM content
+      // (snapshot callback will also run)
+    });
+
+    // attach login form if present
+    const loginBtn = $("adminLoginBtn");
+    const logoutBtn = $("adminLogoutBtn");
+
+    if (loginBtn) {
+      loginBtn.onclick = async ()=>{
+        const email = ($("adminEmail") && $("adminEmail").value || "").trim();
+        const pass  = ($("adminPassword") && $("adminPassword").value || "").trim();
+        try {
+          await auth.signInWithEmailAndPassword(email, pass);
+        } catch (e) {
+          console.error("login failed:", e);
+          alert("Eroare autentificare: " + (e && e.message ? e.message : e));
+        }
+      };
+    }
+    if (logoutBtn) {
+      logoutBtn.onclick = async ()=> { try { await auth.signOut(); } catch(_){} };
+    }
+  }
+
+  function init() {
+    // remove junk texts if still present
+    try {
+      document.body.innerHTML = document.body.innerHTML
+        .replace(/Particles Background Contor Vizite[^<]*Scientific Navigation/g, "")
+        .replace(/coinmarketcap LIVE/g, "");
+    } catch(_) {}
+
+    updateVisits();
+    startPriceAutoUpdate();
+    updateTotalSupplyReal();
+    wireAuthUI();
+    startNewsRealtime();
+
+    // if there is a visible price placeholder under hero text
+    const heroPrice = $("liveTokenPrice") || $("currentPrice");
+    if (heroPrice && heroPrice.textContent.trim() === "") heroPrice.textContent = "Loading...";
+  }
+
+  window.addEventListener("load", init);
+})();
+
+// Boot (runs on every page load)
+document.addEventListener("DOMContentLoaded", () => {
+  try { window.updateVisits && window.updateVisits(); } catch (e) {}
+  // price will be handled next (kept if existing function is present)
+  try { window.startPriceAutoUpdate && window.startPriceAutoUpdate(); } catch (e) {}
+  try { window.wireNewsAdminUI && window.wireNewsAdminUI(); } catch (e) {}
+  try { window.startNewsRealtime && window.startNewsRealtime(); } catch (e) {}
+});
+window.__SBYT_BOOT = true;
 </script>
 
 
+<script>
+/* ===== STANCUBYT HOTFIX v10 (use THIS file) ===== */
+(function(){
+  const ADMIN_EMAIL = "stancubyt@gmail.com";
+  const CONTRACT_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+  const FUNCTIONS_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net";
 
-</body>
+  // Helpers
+  const $ = (id)=>document.getElementById(id);
+  const esc = (s)=>String(s??"").replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const nowMs = ()=>Date.now();
 
+  // ---------- VISITS (increment exactly once per page-load tab session) ----------
+  async function updateVisits(){
+    try{
+      const key = "__STBYT_HIT_DONE__" + location.pathname;
+      // Prevent multiple increments on same tab load (some scripts call twice)
+      if (sessionStorage.getItem(key)==="1"){
+        if (window.__STBYT_VISIT_VALUE!=null){
+          const val = String(window.__STBYT_VISIT_VALUE);
+          ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id)=>{
+            const el = $(id); if(el) el.textContent = val;
+          });
+        }
+        return;
+      }
+      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", {cache:"no-store"});
+      const j = await r.json();
+      const n = (j && (j.count ?? j.visits ?? j.value ?? j.total ?? j.data)) ?? null;
+      const val = (n!=null)? String(n) : "-";
+      window.__STBYT_VISIT_VALUE = val;
+      ["visitCount","visitCounter","visitsCounter","visitsCount"].forEach((id)=>{
+        const el = $(id); if(el) el.textContent = val;
+      });
+      sessionStorage.setItem(key,"1");
+    }catch(e){
+      console.warn("hitCounter failed", e);
+    }
+  }
+  window.updateVisits = updateVisits;
+
+  // ---------- ADMIN (Firebase Auth) ----------
+  function computeIsAdmin(user){
+    return !!(user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+  }
+  function setAdminUI(isAdmin, user){
+    window.__STBYT_IS_ADMIN__ = !!isAdmin;
+    const addBtn = $("newsAddBtn");
+    const box = document.querySelector(".admin-news-box");
+    // admin box should only appear for admin
+    if (box) box.style.display = isAdmin ? "block" : "none";
+    if (addBtn) addBtn.disabled = !isAdmin;
+    // re-render news to show/hide delete buttons
+    if (typeof window.__STBYT_RENDER_NEWS__ === "function") window.__STBYT_RENDER_NEWS__();
+    // status badge
+    const badge = $("adminStatusBadge");
+    const label = $("adminUserLabel");
+    if (badge){
+      badge.textContent = isAdmin ? "Admin" : "Neautentificat";
+      badge.className = isAdmin ? "admin-badge admin-badge-on" : "admin-badge admin-badge-off";
+    }
+    if (label) label.textContent = user && user.email ? user.email : "";
+    const logout = $("adminLogoutBtn");
+    if (logout) logout.style.display = user ? "inline-flex" : "none";
+  }
+
+  // If page already has adminSignIn/adminSignOut, we keep, but ensure UI updates:
+  const origSignIn = window.adminSignIn;
+  const origSignOut = window.adminSignOut;
+
+  window.adminSignIn = async function(){
+    const email = ($("adminEmail")?.value||"").trim();
+    const pass  = ($("adminPass")?.value||"").trim();
+    const msgEl = $("adminLoginMsg");
+    try{
+      if (!window.firebase || !window.firebase.auth) throw new Error("Firebase Auth nu este incarcat.");
+      const res = await window.firebase.auth().signInWithEmailAndPassword(email, pass);
+      if (msgEl) msgEl.textContent = "Autentificat.";
+      setAdminUI(computeIsAdmin(res.user), res.user);
+    }catch(e){
+      if (msgEl) msgEl.textContent = "Eroare autentificare: " + (e && e.message ? e.message : e);
+      console.error(e);
+    }
+  };
+
+  window.adminSignOut = async function(){
+    const msgEl = $("adminLoginMsg");
+    try{
+      if (window.firebase && window.firebase.auth) await window.firebase.auth().signOut();
+      if (msgEl) msgEl.textContent = "Delogat.";
+      setAdminUI(false, null);
+    }catch(e){
+      if (msgEl) msgEl.textContent = "Eroare delogare: " + (e && e.message ? e.message : e);
+    }
+  };
+
+  function wireAuthListener(){
+    try{
+      if (!window.firebase || !window.firebase.auth) return;
+      window.firebase.auth().onAuthStateChanged((user)=>{
+        setAdminUI(computeIsAdmin(user), user);
+      });
+    }catch(e){
+      console.warn("auth listener", e);
+    }
+  }
+
+  // ---------- NEWS (Firestore collection 'news') ----------
+  let db = null;
+  let storage = null;
+  let unsubNews = null;
+  let lastNewsItems = [];
+
+  function typeClass(type){
+    if (type === "announcement") return "type-announcement";
+    if (type === "news") return "type-news";
+    return "type-update";
+  }
+  function typeLabel(type){
+    if (type === "announcement") return "Anunt";
+    if (type === "news") return "Stire";
+    return "Noutate";
+  }
+
+  function renderNews(){
+    const container = $("newsContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    if (!lastNewsItems.length){
+      container.innerHTML = '<div style="opacity:0.85;">Nu există anunțuri încă.</div>';
+      return;
+    }
+    lastNewsItems.forEach((item)=>{
+      const card = document.createElement("div");
+      const tCls = typeClass(item.type);
+      card.className = `news-card ${tCls}` + (item.bgUrl ? " has-bg" : "");
+      if (item.bgUrl) card.style.backgroundImage = `url('${item.bgUrl}')`;
+
+      const d = item.createdAt ? new Date(item.createdAt) : new Date();
+      const dt = d.toLocaleDateString("ro-RO",{year:"numeric",month:"2-digit",day:"2-digit"}) +
+                 " " + d.toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
+      const emoji = (item.emoji||"").trim();
+      const canDelete = !!window.__STBYT_IS_ADMIN__;
+
+      card.innerHTML = `
+        <div class="news-badge ${item.type==='announcement'?'badge-announcement':(item.type==='news'?'badge-news':'badge-update')}">${typeLabel(item.type)}</div>
+        <h4 style="margin-bottom:0.5rem; color:white;">${esc(item.title||"")}</h4>
+        <p style="opacity:0.92; line-height:1.55; margin:0;">${esc(item.content||"")}</p>
+        <div class="news-date" style="margin-top:10px;">
+          <span class="news-emoji">${emoji?esc(emoji):"🗓️"}</span>
+          <span>${dt}</span>
+        </div>
+        ${canDelete ? `<div class="news-actions"><button class="news-delete-btn" type="button" data-id="${esc(item.id)}">🗑️ Sterge</button></div>` : ``}
+      `;
+      if (canDelete){
+        const btn = card.querySelector("button[data-id]");
+        if (btn){
+          btn.addEventListener("click", ()=>deleteNews(btn.getAttribute("data-id")));
+        }
+      }
+      container.appendChild(card);
+    });
+  }
+  window.__STBYT_RENDER_NEWS__ = renderNews;
+
+  async function listenNews(){
+    if (!db) return;
+    if (unsubNews){ try{unsubNews();}catch(e){} unsubNews=null; }
+    unsubNews = db.collection("news").orderBy("createdAt","desc").limit(50).onSnapshot((snap)=>{
+      const items = [];
+      snap.forEach((doc)=>{
+        const data = doc.data() || {};
+        const createdAt = data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : (data.createdAt||0);
+        items.push({
+          id: doc.id,
+          title: data.title || "",
+          content: data.content || "",
+          type: data.type || "update",
+          emoji: data.emoji || "",
+          bgUrl: data.bgUrl || "",
+          createdAt
+        });
+      });
+      lastNewsItems = items;
+      renderNews();
+    }, (err)=>{
+      console.error("news onSnapshot error", err);
+      const container = $("newsContainer");
+      if (container){
+        container.innerHTML = '<div style="opacity:0.9; color:#ff6b6b;">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca match /news/{id} allow read: if true;</div>';
+      }
+    });
+  }
+
+  function resizeImageToJpeg(file, maxSide=1400, quality=0.86){
+    return new Promise((resolve, reject)=>{
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = ()=>{
+        try{
+          let w = img.width, h = img.height;
+          const scale = Math.min(1, maxSide / Math.max(w,h));
+          const nw = Math.max(1, Math.round(w*scale));
+          const nh = Math.max(1, Math.round(h*scale));
+          const c = document.createElement("canvas");
+          c.width = nw; c.height = nh;
+          const ctx = c.getContext("2d");
+          ctx.drawImage(img, 0, 0, nw, nh);
+          c.toBlob((blob)=>{
+            URL.revokeObjectURL(url);
+            if (!blob) return reject(new Error("Nu pot procesa imaginea."));
+            resolve(blob);
+          }, "image/jpeg", quality);
+        }catch(e){ URL.revokeObjectURL(url); reject(e); }
+      };
+      img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error("Imagine invalida.")); };
+      img.src = url;
+    });
+  }
+
+  async function adminCreateNews(){
+    try{
+      if (!window.__STBYT_IS_ADMIN__){
+        alert("Doar admin poate adauga anunturi.");
+        return;
+      }
+      const title = ($("newsTitleInput")?.value||"").trim();
+      const content = ($("newsContentInput")?.value||"").trim();
+      const type = ($("newsTypeInput")?.value||"update").trim();
+      const emoji = ($("newsEmojiInput")?.value||"").trim();
+
+      if (!title || !content){
+        alert("Completeaza Titlu si Continut.");
+        return;
+      }
+
+      // disable button while publishing
+      const btn = $("newsAddBtn"); if (btn) { btn.disabled = true; btn.textContent = "Se publica..."; }
+
+      let bgUrl = "";
+      const fileEl = $("newsBgInput");
+      const file = fileEl && fileEl.files && fileEl.files[0] ? fileEl.files[0] : null;
+
+      if (file){
+        try{
+          if (!storage) throw new Error("Storage neinitializat.");
+          const blob = await resizeImageToJpeg(file, 1400, 0.86);
+          const nameSafe = (file.name||"bg").replace(/[^\w.-]+/g,"_");
+          const path = "news/" + nowMs() + "_" + nameSafe.replace(/\.(png|jpg|jpeg|webp|gif)$/i,".jpg");
+          const ref = storage.ref().child(path);
+          const snap = await ref.put(blob, { contentType: "image/jpeg" });
+          bgUrl = await snap.ref.getDownloadURL();
+        }catch(upErr){
+          console.warn("upload failed, posting without image:", upErr);
+          bgUrl = "";
+        }
+      }
+
+      await db.collection("news").add({
+        title, content, type,
+        emoji,
+        bgUrl,
+        createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+        createdBy: ADMIN_EMAIL
+      });
+
+      // reset form for next post
+      if ($("newsTitleInput")) $("newsTitleInput").value = "";
+      if ($("newsContentInput")) $("newsContentInput").value = "";
+      if ($("newsBgInput")) $("newsBgInput").value = "";
+      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
+      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
+
+      alert("Anunt publicat.");
+    }catch(e){
+      console.error("adminCreateNews error", e);
+      alert("Eroare publicare anunt: " + (e && e.message ? e.message : e));
+    }finally{
+      const btn = $("newsAddBtn"); if (btn) { btn.disabled = false; btn.textContent = "➕ Adauga"; }
+    }
+  }
+  window.adminCreateNews = adminCreateNews;
+
+  async function deleteNews(id){
+    try{
+      if (!window.__STBYT_IS_ADMIN__) return;
+      if (!confirm("Stergi acest anunt?")) return;
+      await db.collection("news").doc(id).delete();
+    }catch(e){
+      console.error("delete news", e);
+      alert("Eroare la stergere: " + (e && e.message ? e.message : e));
+    }
+  }
+  window.deleteNewsDoc = deleteNews;
+
+  // ---------- PRICE (leave for later; keep existing logic) ----------
+  // For now we do nothing here, as requested.
+
+  function initFirebaseHandles(){
+    try{
+      if (!window.firebase) return false;
+      // Firestore
+      if (window.firebase.firestore) db = window.firebase.firestore();
+      // Storage (v8 compat)
+      if (window.firebase.storage) storage = window.firebase.storage();
+      return !!db;
+    }catch(e){
+      console.warn("firebase init handles failed", e);
+      return false;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    updateVisits();
+    initFirebaseHandles();
+    wireAuthListener();
+    // Start realtime news once db is ready
+    if (initFirebaseHandles()) listenNews();
+    // Ensure admin box hidden by default until auth state
+    const box = document.querySelector(".admin-news-box");
+    if (box) box.style.display = "none";
+  });
+})();
+</script>
 
 </body></html>
