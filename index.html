@@ -7025,7 +7025,7 @@ try{
     window.loadNews();
     window.loadTeam();
     listenPromos();
-    window.updateVisitCounter();
+    try { window.updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
 
     // token updates
     updateSupplyAndHolders();
@@ -7086,7 +7086,14 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   }
   window.updateVisits = updateVisits;
 
-  // Disable legacy password prompt buttons (we use Firebase Auth)
+  
+  function updateVisitsOnce(){
+    if (window.__SBYT_VISIT_SENT) return;
+    window.__SBYT_VISIT_SENT = true;
+    return updateVisits();
+  }
+  window.updateVisitsOnce = updateVisitsOnce;
+// Disable legacy password prompt buttons (we use Firebase Auth)
   window.requestPassword = function(){ alert("Autentifica-te ca administrator pentru a adauga/sterge anunturi."); };
 
   
@@ -7416,7 +7423,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
         .replace(/coinmarketcap LIVE/g, "");
     } catch(_) {}
 
-    updateVisits();
+    try { updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
     startPriceAutoUpdate();
     updateTotalSupplyReal();
     wireAuthUI();
@@ -7698,7 +7705,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
         .replace(/coinmarketcap LIVE/g, "");
     } catch(_) {}
 
-    updateVisits();
+    try { updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
     startPriceAutoUpdate();
     updateTotalSupplyReal();
     wireAuthUI();
@@ -7712,13 +7719,6 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   window.addEventListener("load", init);
 })();
 
-// Boot (runs on every page load)
-document.addEventListener("DOMContentLoaded", () => {
-  try { updateVisits(); } catch (e) {}
-  try { startPriceAutoUpdate(); } catch (e) {}
-  try { listenNews(); } catch (e) {}
-});
-window.__SBYT_BOOT = true;
 </script>
 
 </body></html>
