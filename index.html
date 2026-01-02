@@ -359,9 +359,10 @@
 
         .news-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid var(--green-growth);
         }
@@ -380,12 +381,6 @@
             display: flex;
             gap: 1rem;
         }
-
-        /* FIX layout: titlu deasupra, carduri sub titlu, sectiune full-width */
-        .news-section{width:100%; max-width:100%; grid-column: 1 / -1;}
-        .news-header{flex-direction:column; align-items:flex-start; gap:1rem;}
-        .news-controls{width:100%; justify-content:flex-end; flex-wrap:wrap;}
-
 
         .news-btn {
             background: rgba(255, 255, 255, 0.1);
@@ -408,7 +403,8 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1.5rem;
         }
-        @media (max-width: 768px) {
+
+        @media (max-width: 768px){
             .news-grid { grid-template-columns: 1fr; }
         }
 
@@ -420,17 +416,21 @@
             transition: all 0.3s ease;
         }
 
-        /* Diferentiere vizuala dupa tip (marketing) */
-        .news-card.type-anunt { border-color: rgba(255, 187, 0, 0.75); box-shadow: 0 0 25px rgba(255, 187, 0, 0.18); }
-        .news-card.type-noutate { border-color: rgba(0, 255, 160, 0.75); box-shadow: 0 0 25px rgba(0, 255, 160, 0.14); }
-        .news-card.type-stire { border-color: rgba(0, 170, 255, 0.75); box-shadow: 0 0 25px rgba(0, 170, 255, 0.14); }
-
-        .news-badge.badge-anunt { background: rgba(255, 187, 0, 0.18); border: 1px solid rgba(255, 187, 0, 0.55); color: #ffd25a; }
-        .news-badge.badge-noutate { background: rgba(0, 255, 160, 0.14); border: 1px solid rgba(0, 255, 160, 0.45); color: #7dffd1; }
-        .news-badge.badge-stire { background: rgba(0, 170, 255, 0.14); border: 1px solid rgba(0, 170, 255, 0.45); color: #78d6ff; }
-
-
-        .news-card:hover {
+        
+        /* Tipuri: Noutate / Stire / Anunt (accent vizual) */
+        .news-card.type-noutate{
+            border-color: rgba(0, 255, 136, 0.55);
+            box-shadow: 0 10px 28px rgba(0,255,136,0.10);
+        }
+        .news-card.type-stire{
+            border-color: rgba(0, 200, 255, 0.45);
+            box-shadow: 0 10px 28px rgba(0,200,255,0.10);
+        }
+        .news-card.type-anunt{
+            border-color: rgba(255, 170, 0, 0.55);
+            box-shadow: 0 10px 28px rgba(255,170,0,0.12);
+        }
+.news-card:hover {
             transform: translateY(-5px);
             border-color: var(--green-growth);
             box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
@@ -1480,33 +1480,23 @@ async function updatePrice(){
    Fields:
      title, content, type, emoji, imageUrl, pinned, createdAt (serverTimestamp)
 */
-function normalizeNewsType(type){
-  const t = (type || "").toString().toLowerCase();
-  if(t === "anunt" || t === "announcement") return "anunt";
-  if(t === "noutate" || t === "event") return "noutate";
-  if(t === "stire" || t === "update") return "stire";
-  return "stire";
-}
 function badgeClass(type){
-  const t = normalizeNewsType(type);
-  if(t === "anunt") return "badge-anunt";
-  if(t === "noutate") return "badge-noutate";
-  return "badge-stire";
+  if(type === "anunt") return "badge-announcement";
+  if(type === "stire") return "badge-event";
+  return "badge-update";
 }
 function badgeText(type){
-  const t = normalizeNewsType(type);
-  if(t === "anunt") return "Anunt";
-  if(t === "noutate") return "Noutate";
-  return "Stire";
+  if(type === "anunt") return "Anunt";
+  if(type === "stire") return "Stire";
+  return "Noutate";
 }
-
 
 function renderNewsCard(doc){
   const d = doc.data();
   const id = doc.id;
 
   const card = document.createElement("div");
-  card.className = "news-card" + (d.pinned ? " pinned" : "");
+  card.className = "news-card type-" + (safeText(d.type)||"noutate") + (d.pinned ? " pinned" : "");
   // background image (optional)
   if(d.imageUrl){
     card.style.backgroundImage = `linear-gradient(180deg, rgba(5,5,16,0.55), rgba(5,5,16,0.85)), url("${d.imageUrl}")`;
@@ -1518,9 +1508,7 @@ function renderNewsCard(doc){
   const emoji = safeText(d.emoji).trim();
   const title = safeText(d.title);
   const content = safeText(d.content);
-  const typeRaw = safeText(d.type) || "stire";
-  const type = normalizeNewsType(typeRaw);
-  card.classList.add("type-" + type);
+  const type = safeText(d.type) || "noutate";
 
   let dateStr = "";
   try{
