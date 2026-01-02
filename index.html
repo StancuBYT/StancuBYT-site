@@ -359,10 +359,9 @@
 
         .news-header {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 1.5rem;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid var(--green-growth);
         }
@@ -400,12 +399,8 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
-        }
-
-        @media (max-width: 768px){
-            .news-grid { grid-template-columns: 1fr; }
         }
 
         .news-card {
@@ -416,21 +411,7 @@
             transition: all 0.3s ease;
         }
 
-        
-        /* Tipuri: Noutate / Stire / Anunt (accent vizual) */
-        .news-card.type-noutate{
-            border-color: rgba(0, 255, 136, 0.55);
-            box-shadow: 0 10px 28px rgba(0,255,136,0.10);
-        }
-        .news-card.type-stire{
-            border-color: rgba(0, 200, 255, 0.45);
-            box-shadow: 0 10px 28px rgba(0,200,255,0.10);
-        }
-        .news-card.type-anunt{
-            border-color: rgba(255, 170, 0, 0.55);
-            box-shadow: 0 10px 28px rgba(255,170,0,0.12);
-        }
-.news-card:hover {
+        .news-card:hover {
             transform: translateY(-5px);
             border-color: var(--green-growth);
             box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
@@ -1188,6 +1169,59 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+/* ==== NEWS LAYOUT FIX (stack title above cards + 2/row, 1 on mobile) ==== */
+.news-section{
+  width: 100% !important;
+  display: block !important;
+  clear: both !important;
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+}
+.news-header{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.news-title{ width:100%; margin:0 0 6px 0; }
+#newsList{
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  width: 100% !important;
+}
+@media (max-width: 768px){
+  #newsList{ grid-template-columns: 1fr !important; }
+}
+
+/* ==== Type styling (marketing) ==== */
+.news-card.type-update{
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  box-shadow: 0 10px 30px rgba(46, 204, 113, 0.10);
+}
+.news-card.type-news{
+  border: 1px solid rgba(52, 152, 219, 0.35);
+  box-shadow: 0 10px 30px rgba(52, 152, 219, 0.10);
+}
+.news-card.type-announcement{
+  border: 1px solid rgba(241, 196, 15, 0.40);
+  box-shadow: 0 10px 30px rgba(241, 196, 15, 0.12);
+}
+.news-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.3px;
+}
+.news-badge.update{ background: rgba(46,204,113,0.16); border:1px solid rgba(46,204,113,0.28); }
+.news-badge.news{ background: rgba(52,152,219,0.14); border:1px solid rgba(52,152,219,0.28); }
+.news-badge.announcement{ background: rgba(241,196,15,0.14); border:1px solid rgba(241,196,15,0.30); }
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1290,9 +1324,9 @@
 <div class="form-row">
 <input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
 <select id="newsType">
-<option value="noutate">Noutate</option>
-<option value="stire">Stire</option>
-<option value="anunt">Anunt</option>
+<option value="update">Update</option>
+<option value="announcement">Anunț Important</option>
+<option value="event">Eveniment</option>
 </select>
 </div>
 <div class="form-row">
@@ -1481,14 +1515,14 @@ async function updatePrice(){
      title, content, type, emoji, imageUrl, pinned, createdAt (serverTimestamp)
 */
 function badgeClass(type){
-  if(type === "anunt") return "badge-announcement";
-  if(type === "stire") return "badge-event";
+  if(type === "announcement") return "badge-announcement";
+  if(type === "event") return "badge-event";
   return "badge-update";
 }
 function badgeText(type){
-  if(type === "anunt") return "Anunt";
-  if(type === "stire") return "Stire";
-  return "Noutate";
+  if(type === "announcement") return "Anunț";
+  if(type === "event") return "Eveniment";
+  return "Update";
 }
 
 function renderNewsCard(doc){
@@ -1496,7 +1530,7 @@ function renderNewsCard(doc){
   const id = doc.id;
 
   const card = document.createElement("div");
-  card.className = "news-card type-" + (safeText(d.type)||"noutate") + (d.pinned ? " pinned" : "");
+  card.className = "news-card" + (d.pinned ? " pinned" : "");
   // background image (optional)
   if(d.imageUrl){
     card.style.backgroundImage = `linear-gradient(180deg, rgba(5,5,16,0.55), rgba(5,5,16,0.85)), url("${d.imageUrl}")`;
@@ -1508,7 +1542,9 @@ function renderNewsCard(doc){
   const emoji = safeText(d.emoji).trim();
   const title = safeText(d.title);
   const content = safeText(d.content);
-  const type = safeText(d.type) || "noutate";
+  const type = safeText(d.type) || "update";
+  card.classList.add("type-"+type);
+
 
   let dateStr = "";
   try{
