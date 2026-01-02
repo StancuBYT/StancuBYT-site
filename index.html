@@ -7075,15 +7075,48 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
   // -------- VISITS (Cloud Function) --------
   async function updateVisits() {
+    // 1) Increment via Cloud Function (ignore response shape)
     try {
-      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", {cache:"no-store"});
-      const j = await r.json();
-      const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
-      if (n != null) safeText($("visitCount"), String(n));
+      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store" });
+      // Some deployments may not return JSON; don't let UI break.
+      try {
+        const j = await r.clone().json();
+        const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
+        if (n != null) {
+          safeText($("visitCount"), String(n));
+          safeText($("visitCounter"), $("visitCounter")?.textContent ? $("visitCounter").textContent : "");
+        }
+      } catch (_) {}
     } catch (e) {
       console.warn("hitCounter failed:", e);
     }
+
+    // 2) Always update UI from Firestore (source of truth)
+    try {
+      const db = getDb();
+      if (!db) return;
+      const ref = db.doc("stats/visits");
+      // attach once
+      if (!window.__SBYT_VISITS_LISTENING__) {
+        window.__SBYT_VISITS_LISTENING__ = true;
+        ref.onSnapshot((snap) => {
+          const data = snap && snap.data ? snap.data() : null;
+          const val = data ? (data.count ?? data.visits ?? data.value ?? data.total ?? null) : null;
+          if (val != null) safeText($("visitCount"), String(val));
+        }, (err) => {
+          console.warn("visits listener error:", err);
+        });
+      }
+      // one-time fetch in case snapshot delayed
+      const snap = await ref.get();
+      const data = snap && snap.data ? snap.data() : null;
+      const val = data ? (data.count ?? data.visits ?? data.value ?? data.total ?? null) : null;
+      if (val != null) safeText($("visitCount"), String(val));
+    } catch (e) {
+      console.warn("visits read failed:", e);
+    }
   }
+
   window.updateVisits = updateVisits;
 
   
