@@ -1402,10 +1402,7 @@
 <span class="admin-user-label" id="adminUserLabel"></span>
 </div>
 <p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">
-    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
-    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
-  </p>
+
 </section>
 </section><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
@@ -2734,10 +2731,7 @@
 <span class="admin-user-label" id="adminUserLabel"></span>
 </div>
 <p class="admin-msg" id="adminLoginMsg"></p>
-<p class="admin-hint">
-    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
-    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
-  </p>
+
 </section>
 </section>
 <!-- Statistici Section -->
@@ -3543,7 +3537,23 @@ async function etherscanProxyRequest(module, action, params = {}) {
         // =============================================
         function $(id) { return document.getElementById(id); }
 
-        function escapeHtml(str) {
+        
+  // --- Emoji select -> input sync (News) ---
+  (function setupNewsEmojiSync() {
+    try {
+      const sel = $("newsEmojiSelect");
+      const input = $("newsEmojiInput");
+      if (sel && input) {
+        sel.addEventListener("change", () => {
+          input.value = sel.value || "";
+          // keep cursor at end
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+        });
+      }
+    } catch (e) { /* ignore */ }
+  })();
+function escapeHtml(str) {
             return String(str).replace(/[&<>"'`=\/]/g, s => ({
                 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
             }[s]));
@@ -7330,9 +7340,9 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
       card.innerHTML = `
         <div class="news-card-head">
           <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
-          <div class="news-date">${when}</div>
+          <div class="news-date">${(item.emoji ? item.emoji + " " : "")}${when}</div>
         </div>
-        <div class="news-card-title">${(item.emoji ? item.emoji + " " : "") + (item.title || "")}</div>
+        <div class="news-card-title">${(item.title || "")}</div>
         <div class="news-card-text">${item.content || ""}</div>
       `;
 
@@ -7626,9 +7636,9 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
       card.innerHTML = `
         <div class="news-card-head">
           <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
-          <div class="news-date">${when}</div>
+          <div class="news-date">${(item.emoji ? item.emoji + " " : "")}${when}</div>
         </div>
-        <div class="news-card-title">${(item.emoji ? item.emoji + " " : "") + (item.title || "")}</div>
+        <div class="news-card-title">${(item.title || "")}</div>
         <div class="news-card-text">${item.content || ""}</div>
       `;
 
