@@ -3559,20 +3559,30 @@ async function etherscanProxyRequest(module, action, params = {}) {
 
         
   // --- Emoji select -> input sync (News) ---
-  (function setupNewsEmojiSync() {
-    try {
-      const sel = $("newsEmojiSelect");
-      const input = $("newsEmojiInput");
-      if (sel && input) {
-        sel.addEventListener("change", () => {
-          input.value = sel.value || "";
-          // keep cursor at end
-          input.focus();
-          input.setSelectionRange(input.value.length, input.value.length);
-        });
-      }
-    } catch (e) { /* ignore */ }
-  })();
+  // --- Emoji select -> input sync (News) ---
+function initNewsEmojiSync() {
+  try {
+    const sel = $("newsEmojiSelect");
+    const input = $("newsEmojiInput");
+    if (!sel || !input) return;
+
+    const sync = () => {
+      const v = sel.value || "";
+      input.value = v;
+      input.focus();
+      try { input.setSelectionRange(input.value.length, input.value.length); } catch (_) {}
+    };
+
+    // avoid duplicate listeners
+    if (!sel.__sbyt_bound) {
+      sel.addEventListener("change", sync);
+      sel.__sbyt_bound = true;
+    }
+  } catch (e) { /* ignore */ }
+}
+
+document.addEventListener("DOMContentLoaded", initNewsEmojiSync);
+
 function escapeHtml(str) {
             return String(str).replace(/[&<>"'`=\/]/g, s => ({
                 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
@@ -7390,13 +7400,64 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
   async function uploadNewsImage(file) {
     if (!file) return null;
+
+    // Resize/compress in browser (keeps cards light & always fits nicely)
+    async function toResizedBlob(f) {
+      try {
+        const img = await new Promise((resolve, reject) => {
+          const i = new Image();
+          i.onload = () => resolve(i);
+          i.onerror = reject;
+          i.src = URL.createObjectURL(f);
+        });
+
+        const MAX_W = 1200;
+        const MAX_H = 800;
+        const ratio = Math.min(MAX_W / img.width, MAX_H / img.height, 1);
+        const w = Math.round(img.width * ratio);
+        const h = Math.round(img.height * ratio);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+
+        // Prefer JPEG for backgrounds (smaller)
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.86));
+        try { URL.revokeObjectURL(img.src); } catch (_) {}
+        return blob || f;
+      } catch (e) {
+        return f; // fallback: original file
+      }
+    }
+
     const storage = getStorage();
     if (!storage) throw new Error("Storage SDK indisponibil");
+
     const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
-    const path = "news/" + Date.now() + "_" + safeName;
-    const ref = storage.ref().child(path);
-    await ref.put(file);
-    return await ref.getDownloadURL();
+    const blob = await toResizedBlob(file);
+
+    // Default bucket (from firebaseConfig) + fallback bucket (for setups where Storage bucket differs)
+    const bucketFallback = "gs://gcf-v2-uploads-263244200492.europe-west1.cloudfunctions.appspot.com";
+
+    async function putToStorage(stor, path) {
+      const ref = stor.ref().child(path);
+      await ref.put(blob);
+      return await ref.getDownloadURL();
+    }
+
+    const path = "news/" + Date.now() + "_" + safeName.replace(/\.(png|webp|jpeg|jpg)$/i, ".jpg");
+    try {
+      return await putToStorage(storage, path);
+    } catch (e1) {
+      // try fallback bucket if default fails (common when storageBucket in config differs)
+      try {
+        const altStorage = (firebase.app && firebase.app().storage) ? firebase.app().storage(bucketFallback) : null;
+        if (altStorage) return await putToStorage(altStorage, path);
+      } catch (e2) {}
+      throw e1;
+    }
   }
 
   async function adminCreateNews() {
@@ -7409,7 +7470,9 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const emojiInputVal = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const emojiSelVal = ($("newsEmojiSelect") && $("newsEmojiSelect").value || "").trim();
+    const emoji = (emojiInputVal || emojiSelVal || "").trim();
     const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
     const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
     const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
@@ -7458,9 +7521,8 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   }
   window.adminCreateNews = adminCreateNews;
 
-  function setNewsAdminVisible(isAdmin) {
-    const box = $("newsAdminBox");
-    if (box) box.style.display = isAdmin ? "block" : "none";
+  \1
+    if (isAdmin) { try { initNewsEmojiSync(); } catch (_) {} }
     // hide any legacy admin section if exists
     const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
     if (legacyAdmin) legacyAdmin.style.display = "none";
@@ -7702,7 +7764,9 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const emojiInputVal = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
+    const emojiSelVal = ($("newsEmojiSelect") && $("newsEmojiSelect").value || "").trim();
+    const emoji = (emojiInputVal || emojiSelVal || "").trim();
     const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
     const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
     const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
