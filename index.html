@@ -428,30 +428,6 @@
             background: rgba(255, 149, 0, 0.05);
         }
 
-        /* Fundal imagine pentru stiri (cover) */
-        .news-card.has-bg{
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            position: relative;
-            overflow: hidden;
-        }
-        .news-card.has-bg::before{
-            content:"";
-            position:absolute;
-            inset:0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.65));
-            pointer-events:none;
-        }
-        .news-card.has-bg > *{
-            position: relative;
-            z-index: 1;
-        }
-        .news-date .news-emoji{
-            margin-left:8px;
-            font-size: 1.05em;
-        }
-
         
         /* --- News card header layout + type highlighting --- */
         .news-card-head{
@@ -1246,6 +1222,26 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+  // Firebase init (must run before any firebase.auth()/firestore/storage usage)
+  window.firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+    messagingSenderId: "263244200492",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+    measurementId: "G-272S9HSY3K"
+  };
+  try {
+    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  } catch (e) {
+    console.warn("Firebase init warning:", e);
+  }
+</script>
+
 </head><body>
 <div id="particles-js"></div>
 <div class="visit-counter" id="visitCounter">
@@ -1851,30 +1847,6 @@
         .news-card.pinned {
             border: 2px solid var(--orange-alert);
             background: rgba(255, 149, 0, 0.05);
-        }
-
-        /* Fundal imagine pentru stiri (cover) */
-        .news-card.has-bg{
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            position: relative;
-            overflow: hidden;
-        }
-        .news-card.has-bg::before{
-            content:"";
-            position:absolute;
-            inset:0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.65));
-            pointer-events:none;
-        }
-        .news-card.has-bg > *{
-            position: relative;
-            z-index: 1;
-        }
-        .news-date .news-emoji{
-            margin-left:8px;
-            font-size: 1.05em;
         }
 
         .news-badge {
@@ -5268,10 +5240,7 @@ window.addEventListener('load', () => {
     items.forEach(item=>{
       const badge = (typeof _badgeForType === 'function') ? _badgeForType(item.type) : (item.type==='announcement'?{cls:'badge-announcement',txt:'Anunț Important'}:{cls:'badge-update',txt:'Update'});
       const card = document.createElement('div');
-      card.className = (item.pinned ? 'news-card pinned' : 'news-card') + ((item.bgUrl && String(item.bgUrl).trim()) ? ' has-bg' : '');
-      if (item.bgUrl && String(item.bgUrl).trim()) {
-        card.style.backgroundImage = `url(${String(item.bgUrl).trim()})`;
-      }
+      card.className = item.pinned ? 'news-card pinned' : 'news-card';
 
       const date = item.date || item.createdAt;
       const d = date ? new Date(date) : new Date();
@@ -5279,7 +5248,7 @@ window.addEventListener('load', () => {
         <div class="news-badge ${badge.cls}">${badge.txt}</div>
         <h4 style="margin-bottom:0.5rem; color:white;">${_escape(item.title||'')}</h4>
         <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
-        <div class="news-date"><span>📅</span>${(item.emoji && String(item.emoji).trim()) ? ` <span class="news-emoji">${_escape(String(item.emoji).trim())}</span>` : ""} ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
         <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
           <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
         </div>
@@ -7148,19 +7117,6 @@ try{
     });
   }
 
-
-  function initNewsEmojiSync(){
-    const sel = $("newsEmojiSelect");
-    const inp = $("newsEmojiInput");
-    if(sel && inp){
-      sel.addEventListener("change", ()=>{
-        if(sel.value){
-          inp.value = sel.value;
-          try{ inp.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
-        }
-      });
-    }
-  }
   if(document.readyState==="loading"){
     document.addEventListener("DOMContentLoaded", init);
   }else{
@@ -7453,7 +7409,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = (($("newsEmojiInput") && $("newsEmojiInput").value) || ($("newsEmojiSelect") && $("newsEmojiSelect").value) || "").trim();
+    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
     const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
     const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
     const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
@@ -7746,7 +7702,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = (($("newsEmojiInput") && $("newsEmojiInput").value) || ($("newsEmojiSelect") && $("newsEmojiSelect").value) || "").trim();
+    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
     const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
     const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
     const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
