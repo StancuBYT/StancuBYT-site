@@ -452,6 +452,9 @@
             opacity:0.85;
             white-space:nowrap;
         }
+        .news-emoji{ margin-left:8px; font-size:1.05rem; }
+        .news-card.has-bg{ background-blend-mode: normal; }
+
         .news-type.update{ background: rgba(0,255,136,0.10); border-color: rgba(0,255,136,0.35); }
         .news-type.announcement{ background: rgba(255,149,0,0.12); border-color: rgba(255,149,0,0.45); }
         .news-type.news{ background: rgba(0,102,255,0.12); border-color: rgba(0,102,255,0.45); }
@@ -4480,7 +4483,7 @@ try {
       apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
       authDomain: "stancubyt-fc2b9.firebaseapp.com",
       projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.appspot.com",
+      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
       messagingSenderId: "263244200492",
       appId: "1:263244200492:web:28adf253b726cfdafaaf89",
       measurementId: "G-272S9HSY3K"
@@ -4588,6 +4591,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAdmin = await computeIsAdmin(user);
         window.__SBYT_ADMIN = isAdmin;
         setAdminUI(isAdmin, user);
+
+        // Emoji dropdown -> scrie automat in campul "sau scrie..."
+        try {
+          const emojiSel = document.getElementById('newsEmojiSelect');
+          const emojiInp = document.getElementById('newsEmojiInput');
+          if (emojiSel && emojiInp && !emojiSel.__bound) {
+            emojiSel.__bound = true;
+            emojiSel.addEventListener('change', () => {
+              const v = (emojiSel.value || '').trim();
+              if (v) {
+                emojiInp.value = v;
+                emojiInp.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            });
+          }
+        } catch(e) {}
 
         // daca user e autentificat dar nu e admin -> optional delogare automata
         // if (user && !isAdmin) await firebase.auth().signOut();
@@ -5244,16 +5263,36 @@ window.addEventListener('load', () => {
 
       const date = item.date || item.createdAt;
       const d = date ? new Date(date) : new Date();
+      const emojiSpan = item.emoji ? `<span class="news-emoji">${_escape(item.emoji)}</span>` : '';
+      const delBtn = (window.isAdmin) ? `<button class="delete-news-btn" data-id="${item.id}">Șterge</button>` : '';
+
       card.innerHTML = `
         <div class="news-badge ${badge.cls}">${badge.txt}</div>
         <h4 style="margin-bottom:0.5rem; color:white;">${_escape(item.title||'')}</h4>
         <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
-        <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
-        <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
-          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
+        <div class="news-date">
+          <span>📅</span>
+          <span>${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+          ${emojiSpan}
         </div>
+        ${delBtn}
       `;
-      container.appendChild(card);
+
+
+      // fundal imagine (daca exista)
+      try {
+        if (item.bgUrl) {
+          card.classList.add('has-bg');
+          const safeUrl = String(item.bgUrl).replace(/["'()\\]/g, '');
+          card.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.70)), url(${safeUrl})`;
+          card.style.backgroundSize = 'cover';
+          card.style.backgroundPosition = 'center';
+        } else {
+          card.classList.remove('has-bg');
+          card.style.backgroundImage = '';
+        }
+      } catch(e) {}
+container.appendChild(card);
     });
   }
 
@@ -6623,12 +6662,6 @@ try{
     }
   };
 
-  // ---------- Admin panel (hidden) ----------
-  function { return; }
-
-    `);
-  }
-
   // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', ()=>{
     
@@ -7395,8 +7428,19 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
     const path = "news/" + Date.now() + "_" + safeName;
     const ref = storage.ref().child(path);
-    await ref.put(file);
-    return await ref.getDownloadURL();
+
+    // NU blocam publicarea daca upload-ul se blocheaza / esueaza
+    try {
+      const task = ref.put(file);
+      await Promise.race([
+        task,
+        new Promise((_, rej) => setTimeout(() => rej(new Error("upload-timeout")), 8000))
+      ]);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      console.warn("uploadNewsImage failed:", e);
+      return null;
+    }
   }
 
   async function adminCreateNews() {
@@ -7700,50 +7744,29 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     const user = auth && auth.currentUser ? auth.currentUser : null;
     if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
 
-    const addBtn = $("newsAddBtn");
-    if (addBtn) { addBtn.disabled = true; addBtn.style.opacity = "0.7"; }
-
     const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
     const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    // Prefer emoji input, but if empty use select value
-    const emojiInputVal = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
-    const emojiSelectVal = ($("newsEmojiSelect") && $("newsEmojiSelect").value || "").trim();
-    const emoji = (emojiInputVal || emojiSelectVal || "").trim();
-
+    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
     const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
     const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
-    const fileEl = $("newsBgInput");
-    const file = fileEl && fileEl.files && fileEl.files[0] ? fileEl.files[0] : null;
+    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
 
-    if (!title || !content) {
-      if (addBtn) { addBtn.disabled = false; addBtn.style.opacity = "1"; }
-      return alert("Completeaza titlu si continut.");
-    }
+    if (!title || !content) return alert("Completeaza titlu si continut.");
 
     const db = getDb();
-    if (!db) {
-      if (addBtn) { addBtn.disabled = false; addBtn.style.opacity = "1"; }
-      return alert("Firestore indisponibil.");
-    }
+    if (!db) return alert("Firestore indisponibil.");
 
     try {
-      let bgUrl = "";
-      if (file) {
-        try {
-          bgUrl = await uploadNewsImage(file);
-        } catch (upErr) {
-          console.warn("upload failed (publishing without image):", upErr);
-          bgUrl = "";
-        }
-      }
+      let bgUrl = null;
+      if (file) bgUrl = await uploadNewsImage(file);
 
       await db.collection("news").add({
         title,
         content,
-        emoji,
+        emoji: emoji || "",
         type,
         pinned,
-        bgUrl,
+        bgUrl: bgUrl || "",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         createdAtMs: Date.now(),
       });
@@ -7752,14 +7775,11 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
       if ($("newsTitleInput")) $("newsTitleInput").value = "";
       if ($("newsContentInput")) $("newsContentInput").value = "";
       if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
-      if ($("newsEmojiSelect")) $("newsEmojiSelect").value = "";
+      if ($("newsBgInput")) $("newsBgInput").value = "";
       if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
-      if (fileEl) fileEl.value = "";
     } catch (e) {
       console.error("create news failed:", e);
       alert("Eroare la salvare stire (rules/permisiuni).");
-    } finally {
-      if (addBtn) { addBtn.disabled = false; addBtn.style.opacity = "1"; }
     }
   }
   window.adminCreateNews = adminCreateNews;
