@@ -7873,5 +7873,42 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 })();
 
 </script>
+<script>
+(async function loadSBYTPrice() {
+  const priceEl = document.getElementById("currentPrice");
+  const changeEl = document.getElementById("priceChange");
+  const updatedEl = document.getElementById("lastUpdated");
+
+  try {
+    const res = await fetch(
+      "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice",
+      { cache: "no-store" }
+    );
+
+    const data = await res.json();
+
+    if (!data.ok || !data.priceUsd) {
+      priceEl.textContent = "Pret indisponibil";
+      changeEl.textContent = "";
+      return;
+    }
+
+    const price = Number(data.priceUsd);
+
+    priceEl.textContent = `$${price.toFixed(8)} USD`;
+    changeEl.textContent = "Live din Uniswap";
+    changeEl.className = "price-change positive";
+
+    const now = new Date();
+    updatedEl.textContent =
+      "Ultima actualizare: " + now.toLocaleTimeString("ro-RO");
+
+  } catch (err) {
+    console.error("Eroare pret SBYT:", err);
+    priceEl.textContent = "Eroare incarcare";
+    changeEl.textContent = "";
+  }
+})();
+</script>
 
 </body></html>
