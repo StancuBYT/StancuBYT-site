@@ -7098,6 +7098,26 @@ try{
     }
   }
 
+
+  async function updateSbytPrice(){
+    try{
+      const url = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice?tokenId=95049";
+      const resp = await fetch(url, { cache: "no-store" });
+      const data = await resp.json();
+      if(data && data.ok && typeof data.priceUsd === "number" && isFinite(data.priceUsd)){
+        const priceEl = document.getElementById("currentPrice");
+        if(priceEl) priceEl.textContent = `1 SBYT = $${data.priceUsd.toFixed(8)}`;
+        const changeEl = document.getElementById("priceChange");
+        if(changeEl) changeEl.textContent = "";
+        const updatedEl = document.getElementById("lastUpdated");
+        if(updatedEl) updatedEl.textContent = "Updated: " + new Date().toLocaleTimeString();
+      }
+    }catch(e){
+      console.warn("SBYT price update error:", e);
+    }
+  }
+
+
   async function updateEthPrice(){
     const r = await etherscan("stats","ethprice",{});
     const usd = Number(r?.result?.ethusd || r?.result?.ethusd || 0);
@@ -7106,6 +7126,7 @@ try{
 
   window.updateLivePriceAndChart = async function(){
     try{
+      await updateSbytPrice();
       await updateEthPrice();
     }catch(e){
       console.warn("Live price update error:", e);
@@ -7872,43 +7893,6 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   window.addEventListener("load", init);
 })();
 
-</script>
-<script>
-(async function loadSBYTPrice() {
-  const priceEl = document.getElementById("currentPrice");
-  const changeEl = document.getElementById("priceChange");
-  const updatedEl = document.getElementById("lastUpdated");
-
-  try {
-    const res = await fetch(
-      "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice",
-      { cache: "no-store" }
-    );
-
-    const data = await res.json();
-
-    if (!data.ok || !data.priceUsd) {
-      priceEl.textContent = "Pret indisponibil";
-      changeEl.textContent = "";
-      return;
-    }
-
-    const price = Number(data.priceUsd);
-
-    priceEl.textContent = `$${price.toFixed(8)} USD`;
-    changeEl.textContent = "Live din Uniswap";
-    changeEl.className = "price-change positive";
-
-    const now = new Date();
-    updatedEl.textContent =
-      "Ultima actualizare: " + now.toLocaleTimeString("ro-RO");
-
-  } catch (err) {
-    console.error("Eroare pret SBYT:", err);
-    priceEl.textContent = "Eroare incarcare";
-    changeEl.textContent = "";
-  }
-})();
 </script>
 
 </body></html>
