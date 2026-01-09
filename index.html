@@ -7098,26 +7098,6 @@ try{
     }
   }
 
-
-  async function updateSbytPrice(){
-    try{
-      const url = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice?tokenId=95049";
-      const resp = await fetch(url, { cache: "no-store" });
-      const data = await resp.json();
-      if(data && data.ok && typeof data.priceUsd === "number" && isFinite(data.priceUsd)){
-        const priceEl = document.getElementById("currentPrice");
-        if(priceEl) priceEl.textContent = `1 SBYT = $${data.priceUsd.toFixed(8)}`;
-        const changeEl = document.getElementById("priceChange");
-        if(changeEl) changeEl.textContent = "";
-        const updatedEl = document.getElementById("lastUpdated");
-        if(updatedEl) updatedEl.textContent = "Updated: " + new Date().toLocaleTimeString();
-      }
-    }catch(e){
-      console.warn("SBYT price update error:", e);
-    }
-  }
-
-
   async function updateEthPrice(){
     const r = await etherscan("stats","ethprice",{});
     const usd = Number(r?.result?.ethusd || r?.result?.ethusd || 0);
@@ -7126,7 +7106,6 @@ try{
 
   window.updateLivePriceAndChart = async function(){
     try{
-      await updateSbytPrice();
       await updateEthPrice();
     }catch(e){
       console.warn("Live price update error:", e);
@@ -7269,29 +7248,24 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   const UNISWAP_V4_POSITION_ID = "95049";
 
   async function fetchPriceFromUniswapV4Position() {
-    // Uniswap interface gateway (CORS-friendly in most cases)
-    const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + encodeURIComponent(UNISWAP_V4_POSITION_ID);
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("Uniswap position HTTP " + r.status);
-    const j = await r.json();
+    try {
+      // IMPORTANT: do NOT call Uniswap Interface Gateway from the browser (CORS).
+      // We call our Firebase Function which reads on-chain and returns priceUsd.
+      const url = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice?tokenId=95049";
+      const r = await fetch(url, { cache: "no-store" });
+      const j = await r.json();
 
-    // We search for common fields used by the interface responses
-    // Examples: { position: { priceUSD: "0.00123" } } or nested: data.position...
-    const candidates = [
-      j && j.priceUSD,
-      j && j.position && j.position.priceUSD,
-      j && j.position && j.position.token0PriceUSD,
-      j && j.position && j.position.token1PriceUSD,
-      j && j.data && j.data.position && j.data.position.priceUSD,
-      j && j.data && j.data.position && j.data.position.token0PriceUSD,
-      j && j.data && j.data.position && j.data.position.token1PriceUSD,
-      j && j.position && j.position.currentPriceUSD,
-    ];
-    for (const v of candidates) {
-      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
-      if (Number.isFinite(num) && num > 0) return num;
+      if (j && j.ok && j.priceUsd != null) {
+        const n = Number(j.priceUsd);
+        if (Number.isFinite(n) && n > 0) return n;
+      }
+
+      console.warn("sbytPrice returned no price yet:", j);
+      return null;
+    } catch (e) {
+      console.warn("sbytPrice fetch failed:", e);
+      return null;
     }
-    throw new Error("Uniswap position price missing");
   }
 
   async function fetchPriceCoinGeckoByContract() {
