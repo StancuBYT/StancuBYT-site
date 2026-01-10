@@ -399,14 +399,8 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .news-card {
@@ -428,42 +422,6 @@
             background: rgba(255, 149, 0, 0.05);
         }
 
-        
-        /* --- News card header layout + type highlighting --- */
-        .news-card-head{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:12px;
-            margin-bottom:10px;
-        }
-        .news-type{
-            font-weight:700;
-            font-size:0.85rem;
-            padding:6px 10px;
-            border-radius:999px;
-            letter-spacing:0.2px;
-            text-transform:uppercase;
-            border:1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
-        }
-        .news-date{
-            font-size:0.85rem;
-            opacity:0.85;
-            white-space:nowrap;
-        }
-        .news-emoji{ margin-left:8px; font-size:1.05rem; }
-        .news-card.has-bg{ background-blend-mode: normal; }
-
-        .news-type.update{ background: rgba(0,255,136,0.10); border-color: rgba(0,255,136,0.35); }
-        .news-type.announcement{ background: rgba(255,149,0,0.12); border-color: rgba(255,149,0,0.45); }
-        .news-type.news{ background: rgba(0,102,255,0.12); border-color: rgba(0,102,255,0.45); }
-
-        /* subtle left accent per type */
-        .news-card{ position:relative; overflow:hidden; }
-        .news-card.update{ border-left: 4px solid rgba(0,255,136,0.75); }
-        .news-card.announcement{ border-left: 4px solid rgba(255,149,0,0.9); }
-        .news-card.news{ border-left: 4px solid rgba(0,102,255,0.9); }
         .news-badge {
             display: inline-block;
             padding: 0.3rem 0.8rem;
@@ -1219,32 +1177,63 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+        /* === PATCH: News grid 2col + tipuri colorate === */
+        .news-header{ flex-direction: column; align-items: flex-start; gap: 10px; }
+        .news-controls{ width:100%; display:flex; justify-content:flex-end; }
+        .news-grid-2col{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        @media (max-width: 900px){ .news-grid-2col{ grid-template-columns: 1fr; } }
+
+        .news-card{
+          position: relative;
+          overflow: hidden;
+          border-radius: 18px;
+          padding: 16px 16px 14px 16px;
+          background: rgba(0,0,0,0.35);
+          border: 1px solid rgba(255,255,255,0.12);
+          box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+          min-height: 170px;
+        }
+        .news-card::before{
+          content:"";
+          position:absolute; inset:0;
+          background: linear-gradient(135deg, rgba(0,0,0,0.72), rgba(0,0,0,0.25));
+          z-index:0;
+        }
+        .news-card.has-bg{
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+        .news-card > *{ position:relative; z-index:1; }
+
+        .news-badge{
+          display:inline-flex;
+          align-items:center;
+          gap:8px;
+          font-size: 0.82rem;
+          padding: 6px 10px;
+          border-radius: 999px;
+          margin-bottom: 10px;
+          border: 1px solid rgba(255,255,255,0.16);
+          background: rgba(0,0,0,0.35);
+          backdrop-filter: blur(6px);
+        }
+        .news-type-noutate{ border-color: rgba(0,255,136,0.40); box-shadow: 0 0 0 1px rgba(0,255,136,0.10) inset; }
+        .news-type-stire{ border-color: rgba(0,204,255,0.40); box-shadow: 0 0 0 1px rgba(0,204,255,0.10) inset; }
+        .news-type-anunt{ border-color: rgba(255, 64, 129, 0.45); box-shadow: 0 0 0 1px rgba(255,64,129,0.12) inset; }
+
+        .news-meta{ opacity:0.9; font-size:0.9rem; display:flex; gap:10px; flex-wrap:wrap; }
+        .news-meta .dot{ opacity:0.5; }
+        .news-actions{ margin-top:12px; display:flex; justify-content:flex-end; }
+        .news-del{ cursor:pointer; border:none; border-radius:10px; padding:8px 10px; font-weight:700; }
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script>
-  // Firebase init (must run before any firebase.auth()/firestore/storage usage)
-  window.firebaseConfig = {
-    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-    authDomain: "stancubyt-fc2b9.firebaseapp.com",
-    projectId: "stancubyt-fc2b9",
-    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
-    messagingSenderId: "263244200492",
-    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-    measurementId: "G-272S9HSY3K"
-  };
-  try {
-    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
-      firebase.initializeApp(window.firebaseConfig);
-    }
-  } catch (e) {
-    console.warn("Firebase init warning:", e);
-  }
-</script>
-
 </head><body>
 <div id="particles-js"></div>
 <div class="visit-counter" id="visitCounter">
@@ -1323,93 +1312,71 @@
 </div>
 </div>
 <!-- SECTIUNE NOUTATI -->
-<div class="news-section">
-<div class="news-header">
-<h2 class="news-title">
-<span>📢</span> Noutăți &amp; Anunțuri
-                    </h2>
-<!-- legacy news-controls removed -->
-<div id="newsAdminBox" class="admin-news-box" style="display:none; margin-bottom:1rem;">
-  <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
-    <select id="newsEmojiSelect" style="max-width:140px;">
-      <option value="">Emoji</option>
-      <option value="🚀">🚀</option>
-      <option value="🔥">🔥</option>
-      <option value="💎">💎</option>
-      <option value="📢">📢</option>
-      <option value="🎁">🎁</option>
-      <option value="✅">✅</option>
-      <option value="⚠️">⚠️</option>
-      <option value="📈">📈</option>
-      <option value="📰">📰</option>
-    </select>
-    <input id="newsEmojiInput" type="text" placeholder="sau scrie (ex: 🚀🔥)" maxlength="10" style="max-width:160px;" />
-    <select id="newsTypeInput" style="max-width:220px;">
-      <option value="update">Noutate</option>
-      <option value="announcement">Anunt</option>
-      <option value="news">Stire</option>
-    </select>
-    <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.9);">
-      <input id="newsPinnedInput" type="checkbox" /> Pinned
-    </label>
+<div class="news-section" id="newsSection">
+  <div class="news-header">
+    <h2 class="news-title"><span>📢</span> Noutăți &amp; Anunțuri</h2>
+
+    <!-- butoane admin -->
+    <div class="news-controls" id="newsControls" style="display:none;">
+      <button class="news-btn" type="button" id="btnOpenNewsForm">➕ Adaugă</button>
+    </div>
   </div>
-  <div class="form-row" style="margin-top:10px;">
-    <input id="newsTitleInput" type="text" placeholder="Titlu" />
+
+  <!-- grid anunturi (2 pe linie, 1 pe mobil) -->
+  <div class="news-grid news-grid-2col" id="newsContainer"></div>
+
+  <!-- formular admin -->
+  <div class="news-form" id="newsForm" style="display:none;">
+    <h3 style="margin:0 0 14px 0; color: var(--neon-cyan);">Adaugă Noutate / Știre / Anunț</h3>
+
+    <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
+      <select id="newsType" style="max-width:220px;">
+        <option value="noutate">Noutate</option>
+        <option value="stire">Stire</option>
+        <option value="anunt">Anunt</option>
+      </select>
+
+      <select id="newsEmojiSelect" style="max-width:140px;">
+        <option value="">Emoji</option>
+        <option value="🚀">🚀</option>
+        <option value="🔥">🔥</option>
+        <option value="💎">💎</option>
+        <option value="📢">📢</option>
+        <option value="🎁">🎁</option>
+        <option value="✅">✅</option>
+        <option value="⚠️">⚠️</option>
+        <option value="📈">📈</option>
+        <option value="📰">📰</option>
+      </select>
+
+      <input id="newsEmoji" type="text" maxlength="12" placeholder="sau scrie (ex: 🚀🔥)" style="max-width:180px;" />
+
+      <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.9);">
+        <input id="pinNews" type="checkbox" /> Pinned
+      </label>
+    </div>
+
+    <div class="form-row" style="margin-top:10px;">
+      <input id="newsTitle" maxlength="120" placeholder="Titlu" type="text" />
+    </div>
+
+    <div class="form-row" style="margin-top:10px;">
+      <textarea id="newsContent" rows="4" maxlength="1200" placeholder="Continut"></textarea>
+    </div>
+
+    <div class="form-row" style="margin-top:10px;">
+      <label style="display:block; font-size:0.9rem; opacity:0.9; margin-bottom:6px;">Imagine fundal (optional)</label>
+      <input id="newsImage" accept="image/*" type="file" />
+      <small style="opacity:0.75; display:block; margin-top:6px;">Imaginea este redimensionata automat prin CSS ca fundal (cover) in chenar.</small>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-top:14px; flex-wrap:wrap;">
+      <button class="news-btn" type="button" id="btnSaveNews">✅ Publică</button>
+      <button class="news-btn" type="button" id="btnCancelNews">❌ Anulează</button>
+    </div>
   </div>
-  <div class="form-row" style="margin-top:10px;">
-    <textarea id="newsContentInput" rows="4" placeholder="Continut"></textarea>
-  </div>
-  <div class="form-row" style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <input id="newsBgInput" type="file" accept="image/*" />
-    <button type="button" id="newsAddBtn" type="button" onclick="adminCreateNews()">➕ Adauga</button>
-  </div>
-</div>
 </div>
 
-<div class="news-grid" id="newsContainer">
-<!-- Noutățile vor fi adăugate aici dinamic -->
-</div>
-<!-- Formular pentru adăugare știri -->
-<div class="news-form" id="newsForm" style="display: none;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
-<div class="form-row">
-<input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
-<select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
-</select>
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
-                            Fixează această știre
-                        </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
-                    ✅ Date încărcate de pe Etherscan
-                </div>
-</div>
-</div>
 <!-- ADMIN LOGIN (Prezentare - josul paginii) -->
 <section class="admin-login" id="admin-login">
 <h2>🔐 Administrator Login</h2>
@@ -1425,7 +1392,10 @@
 <span class="admin-user-label" id="adminUserLabel"></span>
 </div>
 <p class="admin-msg" id="adminLoginMsg"></p>
-
+<p class="admin-hint">
+    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
+    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
+  </p>
 </section>
 </section><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
@@ -1823,14 +1793,8 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .news-card {
@@ -2689,56 +2653,71 @@
 </div>
 </div>
 <!-- SECTIUNE NOUTATI -->
-<div class="news-section">
-<div class="news-header">
-<h2 class="news-title">
-<span>📢</span> Noutăți &amp; Anunțuri
-                    </h2>
-<!-- legacy news-controls removed -->
-<div class="news-grid" id="newsContainer">
-<!-- Noutățile vor fi adăugate aici dinamic -->
+<div class="news-section" id="newsSection">
+  <div class="news-header">
+    <h2 class="news-title"><span>📢</span> Noutăți &amp; Anunțuri</h2>
+
+    <!-- butoane admin -->
+    <div class="news-controls" id="newsControls" style="display:none;">
+      <button class="news-btn" type="button" id="btnOpenNewsForm">➕ Adaugă</button>
+    </div>
+  </div>
+
+  <!-- grid anunturi (2 pe linie, 1 pe mobil) -->
+  <div class="news-grid news-grid-2col" id="newsContainer"></div>
+
+  <!-- formular admin -->
+  <div class="news-form" id="newsForm" style="display:none;">
+    <h3 style="margin:0 0 14px 0; color: var(--neon-cyan);">Adaugă Noutate / Știre / Anunț</h3>
+
+    <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
+      <select id="newsType" style="max-width:220px;">
+        <option value="noutate">Noutate</option>
+        <option value="stire">Stire</option>
+        <option value="anunt">Anunt</option>
+      </select>
+
+      <select id="newsEmojiSelect" style="max-width:140px;">
+        <option value="">Emoji</option>
+        <option value="🚀">🚀</option>
+        <option value="🔥">🔥</option>
+        <option value="💎">💎</option>
+        <option value="📢">📢</option>
+        <option value="🎁">🎁</option>
+        <option value="✅">✅</option>
+        <option value="⚠️">⚠️</option>
+        <option value="📈">📈</option>
+        <option value="📰">📰</option>
+      </select>
+
+      <input id="newsEmoji" type="text" maxlength="12" placeholder="sau scrie (ex: 🚀🔥)" style="max-width:180px;" />
+
+      <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.9);">
+        <input id="pinNews" type="checkbox" /> Pinned
+      </label>
+    </div>
+
+    <div class="form-row" style="margin-top:10px;">
+      <input id="newsTitle" maxlength="120" placeholder="Titlu" type="text" />
+    </div>
+
+    <div class="form-row" style="margin-top:10px;">
+      <textarea id="newsContent" rows="4" maxlength="1200" placeholder="Continut"></textarea>
+    </div>
+
+    <div class="form-row" style="margin-top:10px;">
+      <label style="display:block; font-size:0.9rem; opacity:0.9; margin-bottom:6px;">Imagine fundal (optional)</label>
+      <input id="newsImage" accept="image/*" type="file" />
+      <small style="opacity:0.75; display:block; margin-top:6px;">Imaginea este redimensionata automat prin CSS ca fundal (cover) in chenar.</small>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-top:14px; flex-wrap:wrap;">
+      <button class="news-btn" type="button" id="btnSaveNews">✅ Publică</button>
+      <button class="news-btn" type="button" id="btnCancelNews">❌ Anulează</button>
+    </div>
+  </div>
 </div>
-<!-- Formular pentru adăugare știri -->
-<div class="news-form" id="newsForm" style="display: none;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
-<div class="form-row">
-<input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
-<select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
-</select>
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
-                            Fixează această știre
-                        </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
-                    ✅ Date încărcate de pe Etherscan
-                </div>
-</div>
-</div>
+
 <!-- ADMIN LOGIN (Prezentare - josul paginii) -->
 <section class="admin-login" id="admin-login">
 <h2>🔐 Administrator Login</h2>
@@ -2754,7 +2733,10 @@
 <span class="admin-user-label" id="adminUserLabel"></span>
 </div>
 <p class="admin-msg" id="adminLoginMsg"></p>
-
+<p class="admin-hint">
+    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
+    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
+  </p>
 </section>
 </section>
 <!-- Statistici Section -->
@@ -3560,23 +3542,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
         // =============================================
         function $(id) { return document.getElementById(id); }
 
-        
-  // --- Emoji select -> input sync (News) ---
-  (function setupNewsEmojiSync() {
-    try {
-      const sel = $("newsEmojiSelect");
-      const input = $("newsEmojiInput");
-      if (sel && input) {
-        sel.addEventListener("change", () => {
-          input.value = sel.value || "";
-          // keep cursor at end
-          input.focus();
-          input.setSelectionRange(input.value.length, input.value.length);
-        });
-      }
-    } catch (e) { /* ignore */ }
-  })();
-function escapeHtml(str) {
+        function escapeHtml(str) {
             return String(str).replace(/[&<>"'`=\/]/g, s => ({
                 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
             }[s]));
@@ -4483,7 +4449,7 @@ try {
       apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
       authDomain: "stancubyt-fc2b9.firebaseapp.com",
       projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+      storageBucket: "stancubyt-fc2b9.appspot.com",
       messagingSenderId: "263244200492",
       appId: "1:263244200492:web:28adf253b726cfdafaaf89",
       measurementId: "G-272S9HSY3K"
@@ -4591,22 +4557,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAdmin = await computeIsAdmin(user);
         window.__SBYT_ADMIN = isAdmin;
         setAdminUI(isAdmin, user);
-
-        // Emoji dropdown -> scrie automat in campul "sau scrie..."
-        try {
-          const emojiSel = document.getElementById('newsEmojiSelect');
-          const emojiInp = document.getElementById('newsEmojiInput');
-          if (emojiSel && emojiInp && !emojiSel.__bound) {
-            emojiSel.__bound = true;
-            emojiSel.addEventListener('change', () => {
-              const v = (emojiSel.value || '').trim();
-              if (v) {
-                emojiInp.value = v;
-                emojiInp.dispatchEvent(new Event('input', { bubbles: true }));
-              }
-            });
-          }
-        } catch(e) {}
 
         // daca user e autentificat dar nu e admin -> optional delogare automata
         // if (user && !isAdmin) await firebase.auth().signOut();
@@ -5263,36 +5213,16 @@ window.addEventListener('load', () => {
 
       const date = item.date || item.createdAt;
       const d = date ? new Date(date) : new Date();
-      const emojiSpan = item.emoji ? `<span class="news-emoji">${_escape(item.emoji)}</span>` : '';
-      const delBtn = (window.isAdmin) ? `<button class="delete-news-btn" data-id="${item.id}">Șterge</button>` : '';
-
       card.innerHTML = `
         <div class="news-badge ${badge.cls}">${badge.txt}</div>
         <h4 style="margin-bottom:0.5rem; color:white;">${_escape(item.title||'')}</h4>
         <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
-        <div class="news-date">
-          <span>📅</span>
-          <span>${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
-          ${emojiSpan}
+        <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
+          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
         </div>
-        ${delBtn}
       `;
-
-
-      // fundal imagine (daca exista)
-      try {
-        if (item.bgUrl) {
-          card.classList.add('has-bg');
-          const safeUrl = String(item.bgUrl).replace(/["'()\\]/g, '');
-          card.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.70)), url(${safeUrl})`;
-          card.style.backgroundSize = 'cover';
-          card.style.backgroundPosition = 'center';
-        } else {
-          card.classList.remove('has-bg');
-          card.style.backgroundImage = '';
-        }
-      } catch(e) {}
-container.appendChild(card);
+      container.appendChild(card);
     });
   }
 
@@ -5318,38 +5248,11 @@ container.appendChild(card);
 
   // override loadNews to use Firestore
   const _origLoadNews = window.loadNews;
-  window.loadNews = function(){
-    if (db) { _listenNews(); return; }
-    if (_origLoadNews) _origLoadNews();
-  };
+  window.loadNews = function(){};
 
   // save news to firestore
   const _origSaveNews = window.saveNews;
-  window.saveNews = async function(){
-    if (!db) return _origSaveNews ? _origSaveNews() : undefined;
-
-    const ok = await _ensureAdmin();
-    if (!ok) return;
-
-    const title = ($('newsTitle')?.value||'').trim();
-    const content = ($('newsContent')?.value||'').trim();
-    const type = $('newsType')?.value || 'update';
-    const pinned = !!$('pinNews')?.checked;
-
-    if (!title || !content) { alert('Completează titlul și conținutul!'); return; }
-
-    try{
-      await db.collection('news').add({
-        title, content, type, pinned,
-        createdAt: Date.now(),
-        date: new Date().toISOString()
-      });
-      if (typeof cancelAddNews === 'function') cancelAddNews();
-    }catch(e){
-      console.error('saveNews firestore:', e);
-      alert('Eroare la salvarea știrii (verifică Firestore Rules).');
-    }
-  };
+  window.saveNews = async function(){};
 
   // delete a single news doc
   window.deleteNewsDoc = async function(docId){
@@ -6662,6 +6565,12 @@ try{
     }
   };
 
+  // ---------- Admin panel (hidden) ----------
+  function { return; }
+
+    `);
+  }
+
   // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', ()=>{
     
@@ -6709,6 +6618,7 @@ try{
   window.__STBYT_IS_ADMIN__ = false;
 
   function setAdminUI(isAdmin){
+    window.__stbytIsAdmin = !!isAdmin;
     window.__STBYT_IS_ADMIN__ = !!isAdmin;
     document.querySelectorAll(".admin-only").forEach(el=>{
       el.style.display = isAdmin ? "" : "none";
@@ -6831,34 +6741,9 @@ try{
     });
   }
 
-  window.loadNews = function(){
-    // start listener
-    statsDocListen("news", data=>renderNewsFromDoc(data));
-  };
+  window.loadNews = function(){};
 
-  window.saveNews = async function(){
-    const ok = await window.ensureAdminAuth(); if(!ok) return;
-    const title = ($("newsTitle")?.value||"").trim();
-    const content = ($("newsContent")?.value||"").trim();
-    const type = ($("newsType")?.value||"update");
-    const pinned = !!$("pinNews")?.checked;
-
-    if(!title || !content){
-      alert("Completeaza titlu si continut.");
-      return;
-    }
-
-    const snap = await statsDocGet("news");
-    const current = snap.exists && Array.isArray(snap.data().items) ? snap.data().items : [];
-    const item = { id: rid(), title, content, type, pinned, createdAt: now() };
-    current.push(item);
-    await statsDocSet("news", { items: current }, true);
-    // clear
-    if($("newsTitle")) $("newsTitle").value="";
-    if($("newsContent")) $("newsContent").value="";
-    if($("pinNews")) $("pinNews").checked=false;
-    alert("Stire/Noutate salvata.");
-  };
+  window.saveNews = async function(){};
 
   window.deleteNewsDoc = async function(id){
     const ok = await window.ensureAdminAuth(); if(!ok) return;
@@ -6929,9 +6814,8 @@ try{
     const db = fs(); if(!db) return;
     const ref = db.collection("stats").doc("visits");
     try{
-      const key = "stbyt_visit_"+new Date().toISOString().slice(0,10);
-      if(!localStorage.getItem(key)){
-        localStorage.setItem(key,"1");
+      if(!window.__stbytVisitCounted){
+        window.__stbytVisitCounted = true;
         await db.runTransaction(async t=>{
           const snap = await t.get(ref);
           const c = snap.exists && typeof snap.data().count==="number" ? snap.data().count : 0;
@@ -6944,7 +6828,7 @@ try{
         if(el) el.textContent = String(c);
       });
     }catch(e){
-      console.error("visit counter:", e);
+      console.error("visits:", e);
     }
   };
 
@@ -7127,26 +7011,30 @@ try{
       a.onAuthStateChanged(u=>{
         const isAdmin = !!u && String(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
         setAdminUI(isAdmin);
+        const ctrls = $("newsControls");
+        if(ctrls) ctrls.style.display = isAdmin ? "flex" : "none";
       });
     }
 
-    // start listeners
+    // listeners / counters
     window.loadNews();
-    window.loadTeam();
-    listenPromos();
-    try { window.updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
+    window.updateVisitCounter();
 
-    // token updates
-    updateSupplyAndHolders();
-    window.updateLivePriceAndChart();
-    setInterval(()=>window.updateLivePriceAndChart(), 60*1000);
+    // wire UI
+    $("btnOpenNewsForm")?.addEventListener("click", ()=>{ $("newsForm").style.display="block"; });
+    $("btnCancelNews")?.addEventListener("click", ()=>{ $("newsForm").style.display="none"; });
+    $("btnSaveNews")?.addEventListener("click", ()=>window.saveNews());
 
-    // remove/disable coinmarketcap frame if exists
+    $("newsEmojiSelect")?.addEventListener("change", (e)=>{
+      const v = e.target.value || "";
+      const inp = $("newsEmoji");
+      if(inp) inp.value = v;
+    });
+
+    // remove coinmarketcap iframes if exist
     document.querySelectorAll("iframe").forEach(fr=>{
       const src = (fr.getAttribute("src")||"");
-      if(src.includes("coinmarketcap.com") || src.includes("dex.coinmarketcap.com")) {
-        fr.remove();
-      }
+      if(src.includes("coinmarketcap.com") || src.includes("dex.coinmarketcap.com")) fr.remove();
     });
   }
 
@@ -7156,873 +7044,293 @@ try{
     init();
   }
 })();
-</script>
-<script>
-function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
-</script>
-<script>
-/* =======================
-   STANCUBYT FIX OVERRIDES (fc2b9)
-   - price (CoinGecko)
-   - visits (hitCounter)
-   - news CRUD + emoji + image bg (Firestore+Storage)
-   ======================= */
-(function() {
-  const CONTRACT_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-  const FUNCTIONS_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net";
-  const ADMIN_EMAIL = "stancubyt@gmail.com";
 
-  function $(id){ return document.getElementById(id); }
-  function safeText(el, txt){ if (el) el.textContent = txt; }
-  function isAdminUser(user){
-    if(!user || !user.email) return false;
-    return String(user.email).toLowerCase() === String(ADMIN_EMAIL).toLowerCase();
-  }
-  function getDb(){ return (window.firebase && firebase.firestore) ? firebase.firestore() : null; }
-  function getAuth(){ return (window.firebase && firebase.auth) ? firebase.auth() : null; }
-  function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
+  // ===== PATCH: NEWS in collection("news") + Storage background =====
+  (function(){
+    function db(){ return fs(); }
+    function st(){ try{ return firebase.storage(); }catch(e){ return null; } }
 
-  // -------- VISITS (Cloud Function) --------
-  async function updateVisits() {
-    // 1) Increment via Cloud Function (ignore response shape)
-    try {
-      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store" });
-      // Some deployments may not return JSON; don't let UI break.
-      try {
-        const j = await r.clone().json();
-        const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
-        if (n != null) {
-          safeText($("visitCount"), String(n));
-          safeText($("visitCounter"), $("visitCounter")?.textContent ? $("visitCounter").textContent : "");
-        }
-      } catch (_) {}
-    } catch (e) {
-      console.warn("hitCounter failed:", e);
+    function mapTypeToClass(t){
+      if(t==="stire") return "news-type-stire";
+      if(t==="anunt") return "news-type-anunt";
+      return "news-type-noutate";
+    }
+    function mapTypeLabel(t){
+      if(t==="stire") return "Știre";
+      if(t==="anunt") return "Anunț";
+      return "Noutate";
     }
 
-    // 2) Always update UI from Firestore (source of truth)
-    try {
-      const db = getDb();
-      if (!db) return;
-      const ref = db.doc("stats/visits");
-      // attach once
-      if (!window.__SBYT_VISITS_LISTENING__) {
-        window.__SBYT_VISITS_LISTENING__ = true;
-        ref.onSnapshot((snap) => {
-          const data = snap && snap.data ? snap.data() : null;
-          const val = data ? (data.count ?? data.visits ?? data.value ?? data.total ?? null) : null;
-          if (val != null) safeText($("visitCount"), String(val));
-        }, (err) => {
-          console.warn("visits listener error:", err);
-        });
-      }
-      // one-time fetch in case snapshot delayed
-      const snap = await ref.get();
-      const data = snap && snap.data ? snap.data() : null;
-      const val = data ? (data.count ?? data.visits ?? data.value ?? data.total ?? null) : null;
-      if (val != null) safeText($("visitCount"), String(val));
-    } catch (e) {
-      console.warn("visits read failed:", e);
-    }
-  }
+    window.loadNews = function(){
+      const _db = db(); if(!_db) return;
+      const container = $("newsContainer");
+      if(!container) return;
 
-  window.updateVisits = updateVisits;
-
-  
-  function updateVisitsOnce(){
-    if (window.__SBYT_VISIT_SENT) return;
-    window.__SBYT_VISIT_SENT = true;
-    return updateVisits();
-  }
-  window.updateVisitsOnce = updateVisitsOnce;
-// Disable legacy password prompt buttons (we use Firebase Auth)
-  window.requestPassword = function(){ alert("Autentifica-te ca administrator pentru a adauga/sterge anunturi."); };
-
-  
-  
-  // -------- PRICE (Real) --------
-  // Primary: CoinGecko by contract (works even when DexScreener/GeckoTerminal has no pairs)
-  const TOKEN_CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-
-  // Uniswap v4 position (provided by you). We try to read price from Uniswap interface gateway.
-  const UNISWAP_V4_POSITION_ID = "95049";
-
-  async function fetchPriceFromUniswapV4Position() {
-    // Uniswap interface gateway (CORS-friendly in most cases)
-    const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + encodeURIComponent(UNISWAP_V4_POSITION_ID);
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("Uniswap position HTTP " + r.status);
-    const j = await r.json();
-
-    // We search for common fields used by the interface responses
-    // Examples: { position: { priceUSD: "0.00123" } } or nested: data.position...
-    const candidates = [
-      j && j.priceUSD,
-      j && j.position && j.position.priceUSD,
-      j && j.position && j.position.token0PriceUSD,
-      j && j.position && j.position.token1PriceUSD,
-      j && j.data && j.data.position && j.data.position.priceUSD,
-      j && j.data && j.data.position && j.data.position.token0PriceUSD,
-      j && j.data && j.data.position && j.data.position.token1PriceUSD,
-      j && j.position && j.position.currentPriceUSD,
-    ];
-    for (const v of candidates) {
-      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
-      if (Number.isFinite(num) && num > 0) return num;
-    }
-    throw new Error("Uniswap position price missing");
-  }
-
-  async function fetchPriceCoinGeckoByContract() {
-    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
-      + "?contract_addresses=" + encodeURIComponent(TOKEN_CONTRACT)
-      + "&vs_currencies=usd";
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
-    const j = await r.json();
-    const key = TOKEN_CONTRACT.toLowerCase();
-    const usd = j && j[key] && j[key].usd;
-    const num = typeof usd === "number" ? usd : Number(usd);
-    if (!Number.isFinite(num) || num <= 0) throw new Error("CoinGecko price missing");
-    return num;
-  }
-
-  // Fallback: GeckoTerminal pool (if available)
-  const GECKO_POOL = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4"; // ETH pool address already linked in page
-
-  async function fetchPriceGeckoTerminal() {
-    const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + GECKO_POOL;
-    const r = await fetch(url, {cache:"no-store"});
-    if (!r.ok) throw new Error("GeckoTerminal HTTP " + r.status);
-    const j = await r.json();
-    const a = j && j.data && j.data.attributes ? j.data.attributes : null;
-    // Try multiple possible fields (API may differ)
-    const candidates = [
-      a && a.base_token_price_usd,
-      a && a.quote_token_price_usd,
-      a && a.price_in_usd,
-      a && a.pool_price_usd,
-      a && a.token_price_usd,
-    ];
-    for (const v of candidates) {
-      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
-      if (Number.isFinite(num) && num > 0) return num;
-    }
-    throw new Error("GeckoTerminal price missing");
-  }
-
-  async function updateTokenPrice() {
-    const el = $("liveTokenPrice") || $("currentPrice") || $("tokenPrice");
-    const lastEl = $("lastUpdated");
-    try {
-      let usd = null;
-      try {
-        usd = await fetchPriceFromUniswapV4Position();
-      } catch (e0) {
-        try {
-          usd = await fetchPriceCoinGeckoByContract();
-        } catch (e1) {
-          // fallback to pool-based price if CoinGecko doesn't know the token yet
-          usd = await fetchPriceGeckoTerminal();
-        }
-      }
-      if (el) el.textContent = "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 10 });
-      if (lastEl) lastEl.textContent = "Ultima actualizare: " + new Date().toLocaleTimeString("ro-RO");
-    } catch (e) {
-      console.warn("price update failed:", e);
-      if (el) el.textContent = "-";
-      if (lastEl) lastEl.textContent = "Ultima actualizare: --:--:--";
-    }
-  }
-
-    function startPriceAutoUpdate() {
-    updateTokenPrice();
-    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
-    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
-  }
-  window.startPriceAutoUpdate = startPriceAutoUpdate;
-  window.updateTokenPrice = updateTokenPrice;
-// -------- TOTAL SUPPLY (etherscanProxy) --------
-  async function updateTotalSupplyReal() {
-    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
-    try {
-      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
-      const r = await fetch(url, {cache:"no-store"});
-      const j = await r.json();
-      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
-      if (!raw || raw === "0") return;
-      // raw is integer with 18 decimals
-      const supply = Number(raw) / 1e18;
-      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
-    } catch (e) {
-      console.warn("totalSupplyReal failed:", e);
-    }
-  }
-  window.updateTotalSupplyReal = updateTotalSupplyReal;
-
-  // -------- NEWS (Firestore + Storage) --------
-  function renderNewsList(items, isAdmin) {
-    const container = $("newsContainer");
-    if (!container) return;
-
-    // sort: pinned first, then newest
-    items.sort((a,b)=>{
-      const pa = a.pinned ? 1 : 0;
-      const pb = b.pinned ? 1 : 0;
-      if (pa !== pb) return pb - pa;
-      const ta = a.createdAtMs || 0;
-      const tb = b.createdAtMs || 0;
-      return tb - ta;
-    });
-
-    container.innerHTML = "";
-    items.forEach(item=>{
-      const card = document.createElement("div");
-      card.className = "news-card " + (item.type || "news");
-
-      // background image
-      if (item.bgUrl) {
-        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
-        card.style.backgroundSize = "cover";
-        card.style.backgroundPosition = "center";
-      }
-
-      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
-      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
-
-      card.innerHTML = `
-        <div class="news-card-head">
-          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
-          <div class="news-date">${(item.emoji ? item.emoji + " " : "")}${when}</div>
-        </div>
-        <div class="news-card-title">${(item.title || "")}</div>
-        <div class="news-card-text">${item.content || ""}</div>
-      `;
-
-      if (isAdmin) {
-        const del = document.createElement("button");
-        del.className = "news-del-btn";
-        del.textContent = "🗑️ Sterge";
-        del.onclick = async ()=>{
-          if (!confirm("Stergi acest anunt?")) return;
-          const db = getDb();
-          if (!db) return alert("Firestore indisponibil.");
-          try {
-            await db.collection("news").doc(item._id).delete();
-          } catch (e) {
-            console.error("delete news failed:", e);
-            alert("Eroare la stergere (rules/permisiuni).");
-          }
-        };
-        card.appendChild(del);
-      }
-
-      container.appendChild(card);
-    });
-  }
-
-  async function uploadNewsImage(file) {
-    if (!file) return null;
-    const storage = getStorage();
-    if (!storage) throw new Error("Storage SDK indisponibil");
-    const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
-    const path = "news/" + Date.now() + "_" + safeName;
-    const ref = storage.ref().child(path);
-
-    // NU blocam publicarea daca upload-ul se blocheaza / esueaza
-    try {
-      const task = ref.put(file);
-      await Promise.race([
-        task,
-        new Promise((_, rej) => setTimeout(() => rej(new Error("upload-timeout")), 8000))
-      ]);
-      return await ref.getDownloadURL();
-    } catch (e) {
-      console.warn("uploadNewsImage failed:", e);
-      return null;
-    }
-  }
-
-  async function adminCreateNews() {
-    const auth = getAuth();
-    const user = auth && auth.currentUser ? auth.currentUser : null;
-    if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
-
-    const addBtn = $("newsAddBtn");
-    if (addBtn) { addBtn.disabled = true; addBtn.style.opacity = "0.7"; }
-
-    const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
-    const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
-    const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
-    const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
-    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
-
-    if (!title || !content) return alert("Completeaza titlu si continut.");
-
-    const db = getDb();
-    if (!db) return alert("Firestore indisponibil.");
-
-    try {
-      let bgUrl = null;
-      if (file) {
-        try {
-          bgUrl = await uploadNewsImage(file);
-        } catch (upErr) {
-          console.warn("upload failed (continuing without image):", upErr);
-          bgUrl = null;
-        }
-      }
-
-      await db.collection("news").add({
-        title,
-        content,
-        emoji: emoji || "",
-        type,
-        pinned,
-        bgUrl: bgUrl || "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        createdAtMs: Date.now(),
-      });
-
-      // reset form
-      if ($("newsTitleInput")) $("newsTitleInput").value = "";
-      if ($("newsContentInput")) $("newsContentInput").value = "";
-      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
-      if ($("newsBgInput")) $("newsBgInput").value = "";
-      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
-    }
-    catch (e) {
-      console.error("create news failed:", e);
-      alert("Eroare la salvare stire (rules/permisiuni).");
-    } finally {
-      const addBtn2 = $("newsAddBtn");
-      if (addBtn2) { addBtn2.disabled = false; addBtn2.style.opacity = "1"; }
-    }
-  }
-  window.adminCreateNews = adminCreateNews;
-
-  function setNewsAdminVisible(isAdmin) {
-    const box = $("newsAdminBox");
-    if (box) box.style.display = isAdmin ? "block" : "none";
-    // hide any legacy admin section if exists
-    const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
-    if (legacyAdmin) legacyAdmin.style.display = "none";
-  }
-
-  function startNewsRealtime() {
-    const db = getDb();
-    const container = $("newsContainer");
-    if (!db || !container) return;
-    try {
-      db.collection("news")
-        .orderBy("createdAtMs", "desc")
+      _db.collection("news")
+        .orderBy("pinned","desc")
+        .orderBy("createdAt","desc")
         .limit(50)
         .onSnapshot((snap)=>{
-          const items=[];
-          snap.forEach(doc=> items.push({_id: doc.id, ...doc.data()}));
-          const auth = getAuth();
-          const isAdmin = isAdminUser(auth && auth.currentUser);
-          renderNewsList(items, isAdmin);
+          const items = [];
+          snap.forEach(doc=>{
+            items.push({ id: doc.id, ...doc.data() });
+          });
+          render(items);
         }, (err)=>{
-          console.error("news onSnapshot error:", err);
-          container.innerHTML = '<div style="color:#ffb3b3; padding:12px; border:1px solid rgba(255,255,255,.15); border-radius:12px; background:rgba(0,0,0,.35)">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca <b>match /news/{id} allow read: if true;</b></div>';
+          console.error("news listen:", err);
+          container.innerHTML = '<div style="opacity:0.85">Eroare la încărcare știri (rules/permisiuni).</div>';
         });
-    } catch (e) {
-      console.error("startNewsRealtime failed:", e);
+    };
+
+    function fmtDate(ts){
+      try{
+        const d = ts && ts.toDate ? ts.toDate() : (typeof ts==="number" ? new Date(ts) : new Date());
+        return d.toLocaleDateString("ro-RO") + " " + d.toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
+      }catch(e){ return ""; }
     }
-  }
 
-  function wireAuthUI() {
-    const auth = getAuth();
-    if (!auth) return;
+    function render(items){
+      const container = $("newsContainer");
+      if(!container) return;
 
-    // show admin box if admin
-    auth.onAuthStateChanged((user)=>{
-      const isAdmin = isAdminUser(user);
-      setNewsAdminVisible(isAdmin);
-
-      // also re-render delete buttons after login
-      // force refresh by re-reading current DOM content
-      // (snapshot callback will also run)
-    });
-
-    // attach login form if present
-    const loginBtn = $("adminLoginBtn");
-    const logoutBtn = $("adminLogoutBtn");
-
-    if (loginBtn) {
-      loginBtn.onclick = async ()=>{
-        const email = ($("adminEmail") && $("adminEmail").value || "").trim();
-        const pass  = ($("adminPassword") && $("adminPassword").value || "").trim();
-        try {
-          await auth.signInWithEmailAndPassword(email, pass);
-        } catch (e) {
-          console.error("login failed:", e);
-          alert("Eroare autentificare: " + (e && e.message ? e.message : e));
-        }
-      };
-    }
-    if (logoutBtn) {
-      logoutBtn.onclick = async ()=> { try { await auth.signOut(); } catch(_){} };
-    }
-  }
-
-  function init() {
-    // remove junk texts if still present
-    try {
-      document.body.innerHTML = document.body.innerHTML
-        .replace(/Particles Background Contor Vizite[^<]*Scientific Navigation/g, "")
-        .replace(/coinmarketcap LIVE/g, "");
-    } catch(_) {}
-
-    try { updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
-    startPriceAutoUpdate();
-    updateTotalSupplyReal();
-    wireAuthUI();
-    startNewsRealtime();
-
-    // if there is a visible price placeholder under hero text
-    const heroPrice = $("liveTokenPrice") || $("currentPrice");
-    if (heroPrice && heroPrice.textContent.trim() === "") heroPrice.textContent = "Loading...";
-  }
-
-  window.addEventListener("load", init);
-})();
-</script>
-
-
-<script>
-/* ===== SBYT Live Price (updates every 30s) ===== */
-(function(){
-  const PRICE_URL_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice?tokenId=95049";
-
-  const elDisplay = document.getElementById("livePriceDisplay");
-  const elPrice = document.getElementById("livePriceValue");
-  const elTime = document.getElementById("livePriceTime");
-
-  async function updateLivePriceAndStats(){
-    try{
-      if (elDisplay) elDisplay.style.display = "";
-      if (elPrice) elPrice.textContent = "Se încarcă...";
-      if (elTime) elTime.textContent = "";
-
-      const url = PRICE_URL_BASE + "&_t=" + Date.now();
-      const r = await fetch(url, { method: "GET", cache: "no-store" });
-      const j = await r.json().catch(()=>null);
-
-      // Cloud Function can answer 200 with ok:false
-      const ok = j && (j.ok === true);
-      const priceUsd = ok ? (j.priceUsd ?? j.priceUSD ?? j.price) : null;
-
-      if (!ok || !priceUsd || !isFinite(Number(priceUsd)) || Number(priceUsd) <= 0){
-        const msg = (j && (j.message || j.error)) ? String(j.message || j.error) : "Preț indisponibil momentan";
-        if (elPrice) elPrice.textContent = msg;
-        if (elTime) elTime.textContent = new Date().toLocaleString();
+      container.innerHTML = "";
+      if(!items.length){
+        container.innerHTML = '<div style="opacity:0.7">Nu există încă anunțuri.</div>';
         return;
       }
 
-      const n = Number(priceUsd);
-      // Format like $0.00001234 (keep up to 10 decimals for tiny prices)
-      const formatted =
-        n >= 1 ? n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })
-      : n >= 0.01 ? n.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 8 })
-      : n.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 12 });
+      const isAdmin = !!window.__stbytIsAdmin;
+      items.forEach(it=>{
+        const card = document.createElement("div");
+        card.className = "news-card " + mapTypeToClass(it.type||"noutate") + (it.imageUrl ? " has-bg" : "");
+        if(it.imageUrl){
+          card.style.backgroundImage =
+            'linear-gradient(135deg, rgba(0,0,0,0.75), rgba(0,0,0,0.25)), url("' + it.imageUrl + '")';
+        }
 
-      if (elPrice) elPrice.textContent = "$" + formatted;
-      if (elTime) elTime.textContent = new Date().toLocaleString();
-    } catch(e){
-      if (elPrice) elPrice.textContent = "Eroare la preț";
-      if (elTime) elTime.textContent = new Date().toLocaleString();
-      // console only, don't break page
-      console.error("[SBYT price] fetch failed", e);
+        const emoji = (it.emoji||"").trim();
+        const badge = document.createElement("div");
+        badge.className = "news-badge";
+        badge.innerHTML = '<span style="font-size:1.05rem">' + (emoji||"📌") + '</span>' +
+                          '<span style="font-weight:800">' + mapTypeLabel(it.type||"noutate") + '</span>';
+        card.appendChild(badge);
+
+        const h = document.createElement("div");
+        h.style.fontSize = "1.15rem";
+        h.style.fontWeight = "900";
+        h.style.marginBottom = "8px";
+        h.textContent = it.title || "Fără titlu";
+        card.appendChild(h);
+
+        const meta = document.createElement("div");
+        meta.className = "news-meta";
+        const dt = fmtDate(it.createdAt);
+        meta.innerHTML = '<span>' + (dt || "") + '</span>';
+        card.appendChild(meta);
+
+        const p = document.createElement("div");
+        p.style.marginTop = "10px";
+        p.style.opacity = "0.92";
+        p.style.lineHeight = "1.45";
+        p.textContent = it.content || "";
+        card.appendChild(p);
+
+        if(isAdmin){
+          const actions = document.createElement("div");
+          actions.className = "news-actions";
+          const del = document.createElement("button");
+          del.className = "news-btn news-del";
+          del.textContent = "🗑️ Șterge";
+          del.addEventListener("click", async ()=>{
+            if(!confirm("Ștergi acest anunț?")) return;
+            await window.deleteNews(it.id, it.imagePath || null);
+          });
+          actions.appendChild(del);
+          card.appendChild(actions);
+        }
+
+        container.appendChild(card);
+      });
+    }
+
+    window.saveNews = async function(){
+      const ok = await window.ensureAdminAuth?.(); if(!ok) return;
+
+      const title = ($("newsTitle")?.value||"").trim();
+      const content = ($("newsContent")?.value||"").trim();
+      const type = ($("newsType")?.value||"noutate");
+      const pinned = !!$("pinNews")?.checked;
+      const emoji = ($("newsEmoji")?.value||"").trim();
+
+      if(!title || !content){
+        alert("Completează titlul și conținutul!");
+        return;
+      }
+
+      const _db = db(); if(!_db) return;
+      const file = $("newsImage")?.files?.[0] || null;
+
+      try{
+        // 1) Creeaza doc ca sa avem id pt storage path
+        const docRef = await _db.collection("news").add({
+          title, content, type, pinned, emoji,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          imageUrl: "",
+          imagePath: ""
+        });
+
+        // 2) Upload imagine (optional)
+        if(file){
+          const storage = st();
+          if(!storage) throw new Error("storage_unavailable");
+          const path = "news/" + docRef.id + "/" + Date.now() + "_" + (file.name || "bg");
+          const ref = storage.ref().child(path);
+          await ref.put(file);
+          const url = await ref.getDownloadURL();
+          await docRef.update({ imageUrl: url, imagePath: path });
+        }
+
+        // reset form
+        if($("newsForm")) $("newsForm").style.display="none";
+        if($("newsTitle")) $("newsTitle").value="";
+        if($("newsContent")) $("newsContent").value="";
+        if($("newsEmoji")) $("newsEmoji").value="";
+        if($("newsEmojiSelect")) $("newsEmojiSelect").value="";
+        if($("newsType")) $("newsType").value="noutate";
+        if($("pinNews")) $("pinNews").checked=false;
+        if($("newsImage")) $("newsImage").value="";
+
+      }catch(e){
+        console.error("saveNews:", e);
+        alert("Eroare la publicare. Verifică Firestore/Storage rules și consola.");
+      }
+    };
+
+    window.deleteNews = async function(id, imagePath){
+      const ok = await window.ensureAdminAuth?.(); if(!ok) return;
+      const _db = db(); if(!_db) return;
+      try{
+        await _db.collection("news").doc(id).delete();
+        if(imagePath){
+          const storage = st();
+          if(storage){
+            try{ await storage.ref().child(imagePath).delete(); }catch(e){ /* ignore */ }
+          }
+        }
+      }catch(e){
+        console.error("deleteNews:", e);
+        alert("Eroare la ștergere. Verifică Rules.");
+      }
+    };
+  })();
+
+</script>
+
+
+
+<!-- ===== SBYT PRICE (USD) ===== -->
+<div id="sbytPriceBox" style="margin-top:14px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); max-width:420px;">
+  <div style="font-weight:700; font-size:14px; opacity:0.9;">1 SBYT in USD</div>
+  <div id="sbytPriceValue" style="font-size:22px; font-weight:800; margin-top:6px;">—</div>
+  <div id="sbytPriceMeta" style="font-size:12px; opacity:0.75; margin-top:6px;">Loading...</div>
+</div>
+
+<script>
+(function(){
+  // Cloud Function endpoint (Gen2)
+  const PRICE_URL = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+
+  function fmtUsd(x){
+    try{
+      const n = Number(x);
+      if(!isFinite(n) || n<=0) return "—";
+      // show more decimals for tiny prices
+      const opts = n < 0.01 ? {maximumFractionDigits: 8} : {maximumFractionDigits: 6};
+      return "$" + n.toLocaleString(undefined, opts);
+    }catch(e){ return "—"; }
+  }
+
+  async function refreshPrice(){
+    const v = document.getElementById("sbytPriceValue");
+    const m = document.getElementById("sbytPriceMeta");
+    if(!v || !m) return;
+
+    m.textContent = "Updating...";
+    try{
+      const r = await fetch(PRICE_URL, { method:"GET" });
+      const j = await r.json();
+
+      if(j && j.ok && j.priceUsd){
+        v.textContent = fmtUsd(j.priceUsd);
+        m.textContent = "Updated: " + (j.ts || new Date().toISOString());
+      } else {
+        v.textContent = "—";
+        m.textContent = "No price yet: " + (j && (j.message || j.hint) ? (j.message || j.hint) : "unknown");
+      }
+    }catch(err){
+      v.textContent = "—";
+      m.textContent = "Error: " + (err && err.message ? err.message : String(err));
     }
   }
 
-  // expose for debugging
-  window.updateLivePriceAndStats = updateLivePriceAndStats;
-
-  // start + refresh
-  updateLivePriceAndStats();
-  setInterval(updateLivePriceAndStats, 30000);
+  refreshPrice();
+  setInterval(refreshPrice, 30000);
 })();
 </script>
+<!-- ===== /SBYT PRICE (USD) ===== -->
 
 </body>
-<script>
-/* =======================
-   STANCUBYT FIX OVERRIDES (fc2b9)
-   - price (CoinGecko)
-   - visits (hitCounter)
-   - news CRUD + emoji + image bg (Firestore+Storage)
-   ======================= */
-(function() {
-  const CONTRACT_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-  const FUNCTIONS_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net";
-  const ADMIN_EMAIL = "stancubyt@gmail.com";
 
-  function $(id){ return document.getElementById(id); }
-  function safeText(el, txt){ if (el) el.textContent = txt; }
-  function isAdminUser(user){
-    return !!(user && user.email && String(user.email).toLowerCase() === ADMIN_EMAIL);
-  }
-  function getDb(){ return (window.firebase && firebase.firestore) ? firebase.firestore() : null; }
-  function getAuth(){ return (window.firebase && firebase.auth) ? firebase.auth() : null; }
-  function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
 
-  // -------- VISITS (Cloud Function) --------
-  async function updateVisits() {
-    try {
-      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", {cache:"no-store"});
-      const j = await r.json();
-      const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
-      if (n != null) safeText($("visitCount"), String(n));
-    } catch (e) {
-      console.warn("hitCounter failed:", e);
-    }
-  }
-  window.updateVisits = updateVisits;
-
-  // -------- PRICE (CoinGecko token_price) --------
-  async function fetchPriceCoinGecko() {
-    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
-      + "?contract_addresses=" + encodeURIComponent(CONTRACT_ADDRESS)
-      + "&vs_currencies=usd";
-    const r = await fetch(url, {cache:"no-store"});
-    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
-    const j = await r.json();
-    const key = CONTRACT_ADDRESS.toLowerCase();
-    const usd = j && j[key] && typeof j[key].usd === "number" ? j[key].usd : null;
-    if (usd == null) throw new Error("CoinGecko no price for contract");
-    return usd;
-  }
-
-  
-  function startPriceAutoUpdate() {
-    updateTokenPrice();
-    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
-    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
-  }
-  window.startPriceAutoUpdate = startPriceAutoUpdate;
-  window.updateTokenPrice = updateTokenPrice;
-
-  // -------- TOTAL SUPPLY (etherscanProxy) --------
-  async function updateTotalSupplyReal() {
-    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
-    try {
-      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
-      const r = await fetch(url, {cache:"no-store"});
-      const j = await r.json();
-      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
-      if (!raw || raw === "0") return;
-      // raw is integer with 18 decimals
-      const supply = Number(raw) / 1e18;
-      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
-    } catch (e) {
-      console.warn("totalSupplyReal failed:", e);
-    }
-  }
-  window.updateTotalSupplyReal = updateTotalSupplyReal;
-
-  // -------- NEWS (Firestore + Storage) --------
-  function renderNewsList(items, isAdmin) {
-    const container = $("newsContainer");
-    if (!container) return;
-
-    // sort: pinned first, then newest
-    items.sort((a,b)=>{
-      const pa = a.pinned ? 1 : 0;
-      const pb = b.pinned ? 1 : 0;
-      if (pa !== pb) return pb - pa;
-      const ta = a.createdAtMs || 0;
-      const tb = b.createdAtMs || 0;
-      return tb - ta;
-    });
-
-    container.innerHTML = "";
-    items.forEach(item=>{
-      const card = document.createElement("div");
-      card.className = "news-card " + (item.type || "news");
-
-      // background image
-      if (item.bgUrl) {
-        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
-        card.style.backgroundSize = "cover";
-        card.style.backgroundPosition = "center";
-      }
-
-      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
-      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
-
-      card.innerHTML = `
-        <div class="news-card-head">
-          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
-          <div class="news-date">${(item.emoji ? item.emoji + " " : "")}${when}</div>
-        </div>
-        <div class="news-card-title">${(item.title || "")}</div>
-        <div class="news-card-text">${item.content || ""}</div>
-      `;
-
-      if (isAdmin) {
-        const del = document.createElement("button");
-        del.className = "news-del-btn";
-        del.textContent = "🗑️ Sterge";
-        del.onclick = async ()=>{
-          if (!confirm("Stergi acest anunt?")) return;
-          const db = getDb();
-          if (!db) return alert("Firestore indisponibil.");
-          try {
-            await db.collection("news").doc(item._id).delete();
-          } catch (e) {
-            console.error("delete news failed:", e);
-            alert("Eroare la stergere (rules/permisiuni).");
-          }
-        };
-        card.appendChild(del);
-      }
-
-      container.appendChild(card);
-    });
-  }
-
-  async function uploadNewsImage(file) {
-    if (!file) return null;
-    const storage = getStorage();
-    if (!storage) throw new Error("Storage SDK indisponibil");
-    const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
-    const path = "news/" + Date.now() + "_" + safeName;
-    const ref = storage.ref().child(path);
-    await ref.put(file);
-    return await ref.getDownloadURL();
-  }
-
-  async function adminCreateNews() {
-    const auth = getAuth();
-    const user = auth && auth.currentUser ? auth.currentUser : null;
-    if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
-
-    const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
-    const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
-    const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
-    const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
-    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
-
-    if (!title || !content) return alert("Completeaza titlu si continut.");
-
-    const db = getDb();
-    if (!db) return alert("Firestore indisponibil.");
-
-    try {
-      let bgUrl = null;
-      if (file) bgUrl = await uploadNewsImage(file);
-
-      await db.collection("news").add({
-        title,
-        content,
-        emoji: emoji || "",
-        type,
-        pinned,
-        bgUrl: bgUrl || "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        createdAtMs: Date.now(),
-      });
-
-      // reset form
-      if ($("newsTitleInput")) $("newsTitleInput").value = "";
-      if ($("newsContentInput")) $("newsContentInput").value = "";
-      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
-      if ($("newsBgInput")) $("newsBgInput").value = "";
-      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
-    } catch (e) {
-      console.error("create news failed:", e);
-      alert("Eroare la salvare stire (rules/permisiuni).");
-    }
-  }
-  window.adminCreateNews = adminCreateNews;
-
-  function setNewsAdminVisible(isAdmin) {
-    const box = $("newsAdminBox");
-    if (box) box.style.display = isAdmin ? "block" : "none";
-    // hide any legacy admin section if exists
-    const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
-    if (legacyAdmin) legacyAdmin.style.display = "none";
-  }
-
-  function startNewsRealtime() {
-    const db = getDb();
-    const container = $("newsContainer");
-    if (!db || !container) return;
-    try {
-      db.collection("news")
-        .orderBy("createdAtMs", "desc")
-        .limit(50)
-        .onSnapshot((snap)=>{
-          const items=[];
-          snap.forEach(doc=> items.push({_id: doc.id, ...doc.data()}));
-          const auth = getAuth();
-          const isAdmin = isAdminUser(auth && auth.currentUser);
-          renderNewsList(items, isAdmin);
-        }, (err)=>{
-          console.error("news onSnapshot error:", err);
-          container.innerHTML = '<div style="color:#ffb3b3; padding:12px; border:1px solid rgba(255,255,255,.15); border-radius:12px; background:rgba(0,0,0,.35)">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca <b>match /news/{id} allow read: if true;</b></div>';
-        });
-    } catch (e) {
-      console.error("startNewsRealtime failed:", e);
-    }
-  }
-
-  function wireAuthUI() {
-    const auth = getAuth();
-    if (!auth) return;
-
-    // show admin box if admin
-    auth.onAuthStateChanged((user)=>{
-      const isAdmin = isAdminUser(user);
-      setNewsAdminVisible(isAdmin);
-
-      // also re-render delete buttons after login
-      // force refresh by re-reading current DOM content
-      // (snapshot callback will also run)
-    });
-
-    // attach login form if present
-    const loginBtn = $("adminLoginBtn");
-    const logoutBtn = $("adminLogoutBtn");
-
-    if (loginBtn) {
-      loginBtn.onclick = async ()=>{
-        const email = ($("adminEmail") && $("adminEmail").value || "").trim();
-        const pass  = ($("adminPassword") && $("adminPassword").value || "").trim();
-        try {
-          await auth.signInWithEmailAndPassword(email, pass);
-        } catch (e) {
-          console.error("login failed:", e);
-          alert("Eroare autentificare: " + (e && e.message ? e.message : e));
-        }
-      };
-    }
-    if (logoutBtn) {
-      logoutBtn.onclick = async ()=> { try { await auth.signOut(); } catch(_){} };
-    }
-  }
-
-  function init() {
-    // remove junk texts if still present
-    try {
-      document.body.innerHTML = document.body.innerHTML
-        .replace(/Particles Background Contor Vizite[^<]*Scientific Navigation/g, "")
-        .replace(/coinmarketcap LIVE/g, "");
-    } catch(_) {}
-
-    try { updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
-    startPriceAutoUpdate();
-    updateTotalSupplyReal();
-    wireAuthUI();
-    startNewsRealtime();
-
-    // if there is a visible price placeholder under hero text
-    const heroPrice = $("liveTokenPrice") || $("currentPrice");
-    if (heroPrice && heroPrice.textContent.trim() === "") heroPrice.textContent = "Loading...";
-  }
-
-  window.addEventListener("load", init);
-})();
-
-</script>
-<script>
-(async function loadSBYTPrice() {
-  const priceEl = document.getElementById("currentPrice");
-  const changeEl = document.getElementById("priceChange");
-  const updatedEl = document.getElementById("lastUpdated");
-
-  try {
-    const res = await fetch(
-      "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice",
-      { cache: "no-store" }
-    );
-
-    const data = await res.json();
-
-    if (!data.ok || !data.priceUsd) {
-      priceEl.textContent = "Pret indisponibil";
-      changeEl.textContent = "";
-      return;
-    }
-
-    const price = Number(data.priceUsd);
-
-    priceEl.textContent = `$${price.toFixed(8)} USD`;
-    changeEl.textContent = "Live din Uniswap";
-    changeEl.className = "price-change positive";
-
-    const now = new Date();
-    updatedEl.textContent =
-      "Ultima actualizare: " + now.toLocaleTimeString("ro-RO");
-
-  } catch (err) {
-    console.error("Eroare pret SBYT:", err);
-    priceEl.textContent = "Eroare incarcare";
-    changeEl.textContent = "";
-  }
-})();
-</script>
-
+<!-- ===== SBYT PRICE (USD) ===== -->
+<div id="sbytPriceBox" style="margin-top:14px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); max-width:420px;">
+  <div style="font-weight:700; font-size:14px; opacity:0.9;">1 SBYT in USD</div>
+  <div id="sbytPriceValue" style="font-size:22px; font-weight:800; margin-top:6px;">—</div>
+  <div id="sbytPriceMeta" style="font-size:12px; opacity:0.75; margin-top:6px;">Loading...</div>
+</div>
 
 <script>
-/* ===== SBYT Live Price (updates every 30s) ===== */
 (function(){
-  const PRICE_URL_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice?tokenId=95049";
+  // Cloud Function endpoint (Gen2)
+  const PRICE_URL = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
 
-  const elDisplay = document.getElementById("livePriceDisplay");
-  const elPrice = document.getElementById("livePriceValue");
-  const elTime = document.getElementById("livePriceTime");
-
-  async function updateLivePriceAndStats(){
+  function fmtUsd(x){
     try{
-      if (elDisplay) elDisplay.style.display = "";
-      if (elPrice) elPrice.textContent = "Se încarcă...";
-      if (elTime) elTime.textContent = "";
+      const n = Number(x);
+      if(!isFinite(n) || n<=0) return "—";
+      // show more decimals for tiny prices
+      const opts = n < 0.01 ? {maximumFractionDigits: 8} : {maximumFractionDigits: 6};
+      return "$" + n.toLocaleString(undefined, opts);
+    }catch(e){ return "—"; }
+  }
 
-      const url = PRICE_URL_BASE + "&_t=" + Date.now();
-      const r = await fetch(url, { method: "GET", cache: "no-store" });
-      const j = await r.json().catch(()=>null);
+  async function refreshPrice(){
+    const v = document.getElementById("sbytPriceValue");
+    const m = document.getElementById("sbytPriceMeta");
+    if(!v || !m) return;
 
-      // Cloud Function can answer 200 with ok:false
-      const ok = j && (j.ok === true);
-      const priceUsd = ok ? (j.priceUsd ?? j.priceUSD ?? j.price) : null;
+    m.textContent = "Updating...";
+    try{
+      const r = await fetch(PRICE_URL, { method:"GET" });
+      const j = await r.json();
 
-      if (!ok || !priceUsd || !isFinite(Number(priceUsd)) || Number(priceUsd) <= 0){
-        const msg = (j && (j.message || j.error)) ? String(j.message || j.error) : "Preț indisponibil momentan";
-        if (elPrice) elPrice.textContent = msg;
-        if (elTime) elTime.textContent = new Date().toLocaleString();
-        return;
+      if(j && j.ok && j.priceUsd){
+        v.textContent = fmtUsd(j.priceUsd);
+        m.textContent = "Updated: " + (j.ts || new Date().toISOString());
+      } else {
+        v.textContent = "—";
+        m.textContent = "No price yet: " + (j && (j.message || j.hint) ? (j.message || j.hint) : "unknown");
       }
-
-      const n = Number(priceUsd);
-      // Format like $0.00001234 (keep up to 10 decimals for tiny prices)
-      const formatted =
-        n >= 1 ? n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })
-      : n >= 0.01 ? n.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 8 })
-      : n.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 12 });
-
-      if (elPrice) elPrice.textContent = "$" + formatted;
-      if (elTime) elTime.textContent = new Date().toLocaleString();
-    } catch(e){
-      if (elPrice) elPrice.textContent = "Eroare la preț";
-      if (elTime) elTime.textContent = new Date().toLocaleString();
-      // console only, don't break page
-      console.error("[SBYT price] fetch failed", e);
+    }catch(err){
+      v.textContent = "—";
+      m.textContent = "Error: " + (err && err.message ? err.message : String(err));
     }
   }
 
-  // expose for debugging
-  window.updateLivePriceAndStats = updateLivePriceAndStats;
-
-  // start + refresh
-  updateLivePriceAndStats();
-  setInterval(updateLivePriceAndStats, 30000);
+  refreshPrice();
+  setInterval(refreshPrice, 30000);
 })();
 </script>
+<!-- ===== /SBYT PRICE (USD) ===== -->
 
 </body></html>
