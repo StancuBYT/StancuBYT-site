@@ -1277,11 +1277,14 @@
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
             </p>
 <!-- Live Price Display -->
-<div id="livePriceDisplay" style="margin: 2rem 0;">
-<div class="price-display" id="currentPrice">Se încarcă...</div>
-<div class="price-change" id="priceChange"></div>
-<small id="lastUpdated">Ultima actualizare: --:--:--</small>
+<div id="sbyt-price-box" style="margin-top:20px;">
+  <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
+  <div id="sbyt-price"
+       style="font-size:32px; font-weight:bold; color:#00ff88;">
+       Se încarcă...
+  </div>
 </div>
+
 <!-- Buton Uniswap -->
 <a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
                 🔄 Tranzacționează pe Uniswap
@@ -7290,47 +7293,30 @@ try{
 </div>
 
 <script>
-(function(){
-  // Cloud Function endpoint (Gen2)
-  const PRICE_URL = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+const SBYT_PRICE_ENDPOINT =
+  "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
 
-  function fmtUsd(x){
-    try{
-      const n = Number(x);
-      if(!isFinite(n) || n<=0) return "—";
-      // show more decimals for tiny prices
-      const opts = n < 0.01 ? {maximumFractionDigits: 8} : {maximumFractionDigits: 6};
-      return "$" + n.toLocaleString(undefined, opts);
-    }catch(e){ return "—"; }
-  }
+async function updateSBYTPrice() {
+  try {
+    const res = await fetch(SBYT_PRICE_ENDPOINT);
+    const data = await res.json();
 
-  async function refreshPrice(){
-    const v = document.getElementById("sbytPriceValue");
-    const m = document.getElementById("sbytPriceMeta");
-    if(!v || !m) return;
-
-    m.textContent = "Updating...";
-    try{
-      const r = await fetch(PRICE_URL, { method:"GET" });
-      const j = await r.json();
-
-      if(j && j.ok && j.priceUsd){
-        v.textContent = fmtUsd(j.priceUsd);
-        m.textContent = "Updated: " + (j.ts || new Date().toISOString());
-      } else {
-        v.textContent = "—";
-        m.textContent = "No price yet: " + (j && (j.message || j.hint) ? (j.message || j.hint) : "unknown");
-      }
-    }catch(err){
-      v.textContent = "—";
-      m.textContent = "Error: " + (err && err.message ? err.message : String(err));
+    if (data.ok && data.priceUsd) {
+      document.getElementById("sbyt-price").innerText =
+        "$" + Number(data.priceUsd).toFixed(8);
+    } else {
+      document.getElementById("sbyt-price").innerText = "—";
     }
+  } catch (e) {
+    document.getElementById("sbyt-price").innerText = "—";
   }
+}
 
-  refreshPrice();
-  setInterval(refreshPrice, 30000);
-})();
+// prima rulare
+updateSBYTPrice();
+
+// auto-refresh la 30 secunde
+setInterval(updateSBYTPrice, 30000);
 </script>
-<!-- ===== /SBYT PRICE (USD) ===== -->
 
 </body></html>
