@@ -1288,11 +1288,14 @@
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
             </p>
 <!-- Live Price Display -->
-<div id="livePriceDisplay" style="margin: 2rem 0;">
-<div class="price-display" id="currentPrice">Se încarcă...</div>
-<div class="price-change" id="priceChange"></div>
-<small id="lastUpdated">Ultima actualizare: --:--:--</small>
+<div id="sbyt-price-box" style="margin-top:20px;">
+  <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
+  <div id="sbyt-price"
+       style="font-size:32px; font-weight:bold; color:#00ff88;">
+       Se încarcă...
+  </div>
 </div>
+
 <!-- Buton Uniswap -->
 <a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
                 🔄 Tranzacționează pe Uniswap
@@ -7872,6 +7875,32 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
   window.addEventListener("load", init);
 })();
 
+<script>
+const SBYT_PRICE_ENDPOINT =
+  "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+
+async function updateSBYTPrice() {
+  try {
+    const res = await fetch(SBYT_PRICE_ENDPOINT);
+    const data = await res.json();
+
+    if (data.ok && data.priceUsd) {
+      document.getElementById("sbyt-price").innerText =
+        "$" + Number(data.priceUsd).toFixed(8);
+    } else {
+      document.getElementById("sbyt-price").innerText = "—";
+    }
+  } catch (e) {
+    document.getElementById("sbyt-price").innerText = "—";
+  }
+}
+
+// prima rulare
+updateSBYTPrice();
+
+// auto-refresh la 30 secunde
+setInterval(updateSBYTPrice, 30000);
 </script>
+
 
 </body></html>
