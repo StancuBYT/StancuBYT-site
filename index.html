@@ -2654,7 +2654,11 @@
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
             </p>
 <!-- Live Price Display -->
-
+<div id="livePriceDisplay" style="margin: 2rem 0;">
+<div class="price-display" id="currentPrice">Se încarcă...</div>
+<div class="price-change" id="priceChange"></div>
+<small id="lastUpdated">Ultima actualizare: --:--:--</small>
+</div>
 <!-- Buton Uniswap -->
 <a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
                 🔄 Tranzacționează pe Uniswap
@@ -7587,6 +7591,63 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 })();
 </script>
 
+
+<script>
+/* ===== SBYT Live Price (updates every 30s) ===== */
+(function(){
+  const PRICE_URL_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice?tokenId=95049";
+
+  const elDisplay = document.getElementById("livePriceDisplay");
+  const elPrice = document.getElementById("livePriceValue");
+  const elTime = document.getElementById("livePriceTime");
+
+  async function updateLivePriceAndStats(){
+    try{
+      if (elDisplay) elDisplay.style.display = "";
+      if (elPrice) elPrice.textContent = "Se încarcă...";
+      if (elTime) elTime.textContent = "";
+
+      const url = PRICE_URL_BASE + "&_t=" + Date.now();
+      const r = await fetch(url, { method: "GET", cache: "no-store" });
+      const j = await r.json().catch(()=>null);
+
+      // Cloud Function can answer 200 with ok:false
+      const ok = j && (j.ok === true);
+      const priceUsd = ok ? (j.priceUsd ?? j.priceUSD ?? j.price) : null;
+
+      if (!ok || !priceUsd || !isFinite(Number(priceUsd)) || Number(priceUsd) <= 0){
+        const msg = (j && (j.message || j.error)) ? String(j.message || j.error) : "Preț indisponibil momentan";
+        if (elPrice) elPrice.textContent = msg;
+        if (elTime) elTime.textContent = new Date().toLocaleString();
+        return;
+      }
+
+      const n = Number(priceUsd);
+      // Format like $0.00001234 (keep up to 10 decimals for tiny prices)
+      const formatted =
+        n >= 1 ? n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })
+      : n >= 0.01 ? n.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 8 })
+      : n.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 12 });
+
+      if (elPrice) elPrice.textContent = "$" + formatted;
+      if (elTime) elTime.textContent = new Date().toLocaleString();
+    } catch(e){
+      if (elPrice) elPrice.textContent = "Eroare la preț";
+      if (elTime) elTime.textContent = new Date().toLocaleString();
+      // console only, don't break page
+      console.error("[SBYT price] fetch failed", e);
+    }
+  }
+
+  // expose for debugging
+  window.updateLivePriceAndStats = updateLivePriceAndStats;
+
+  // start + refresh
+  updateLivePriceAndStats();
+  setInterval(updateLivePriceAndStats, 30000);
+})();
+</script>
+
 </body>
 <script>
 /* =======================
@@ -7904,6 +7965,63 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
     priceEl.textContent = "Eroare incarcare";
     changeEl.textContent = "";
   }
+})();
+</script>
+
+
+<script>
+/* ===== SBYT Live Price (updates every 30s) ===== */
+(function(){
+  const PRICE_URL_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice?tokenId=95049";
+
+  const elDisplay = document.getElementById("livePriceDisplay");
+  const elPrice = document.getElementById("livePriceValue");
+  const elTime = document.getElementById("livePriceTime");
+
+  async function updateLivePriceAndStats(){
+    try{
+      if (elDisplay) elDisplay.style.display = "";
+      if (elPrice) elPrice.textContent = "Se încarcă...";
+      if (elTime) elTime.textContent = "";
+
+      const url = PRICE_URL_BASE + "&_t=" + Date.now();
+      const r = await fetch(url, { method: "GET", cache: "no-store" });
+      const j = await r.json().catch(()=>null);
+
+      // Cloud Function can answer 200 with ok:false
+      const ok = j && (j.ok === true);
+      const priceUsd = ok ? (j.priceUsd ?? j.priceUSD ?? j.price) : null;
+
+      if (!ok || !priceUsd || !isFinite(Number(priceUsd)) || Number(priceUsd) <= 0){
+        const msg = (j && (j.message || j.error)) ? String(j.message || j.error) : "Preț indisponibil momentan";
+        if (elPrice) elPrice.textContent = msg;
+        if (elTime) elTime.textContent = new Date().toLocaleString();
+        return;
+      }
+
+      const n = Number(priceUsd);
+      // Format like $0.00001234 (keep up to 10 decimals for tiny prices)
+      const formatted =
+        n >= 1 ? n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })
+      : n >= 0.01 ? n.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 8 })
+      : n.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 12 });
+
+      if (elPrice) elPrice.textContent = "$" + formatted;
+      if (elTime) elTime.textContent = new Date().toLocaleString();
+    } catch(e){
+      if (elPrice) elPrice.textContent = "Eroare la preț";
+      if (elTime) elTime.textContent = new Date().toLocaleString();
+      // console only, don't break page
+      console.error("[SBYT price] fetch failed", e);
+    }
+  }
+
+  // expose for debugging
+  window.updateLivePriceAndStats = updateLivePriceAndStats;
+
+  // start + refresh
+  updateLivePriceAndStats();
+  setInterval(updateLivePriceAndStats, 30000);
 })();
 </script>
 
