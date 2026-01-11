@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>StancuBYT | Token Digital Avansat</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
-<style>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StancuBYT | Token Digital Avansat</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+    <style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
             --blue-tech: #0066ff;
@@ -399,1440 +400,8 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .news-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 1.5rem;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--green-growth);
-            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
-        }
-
-        .news-card.pinned {
-            border: 2px solid var(--orange-alert);
-            background: rgba(255, 149, 0, 0.05);
-        }
-
-        
-        /* --- News card header layout + type highlighting --- */
-        .news-card-head{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:12px;
-            margin-bottom:10px;
-        }
-        .news-type{
-            font-weight:700;
-            font-size:0.85rem;
-            padding:6px 10px;
-            border-radius:999px;
-            letter-spacing:0.2px;
-            text-transform:uppercase;
-            border:1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
-        }
-        .news-date{
-            font-size:0.85rem;
-            opacity:0.85;
-            white-space:nowrap;
-        }
-        .news-emoji{ margin-left:8px; font-size:1.05rem; }
-        .news-card.has-bg{ background-blend-mode: normal; }
-
-        .news-type.update{ background: rgba(0,255,136,0.10); border-color: rgba(0,255,136,0.35); }
-        .news-type.announcement{ background: rgba(255,149,0,0.12); border-color: rgba(255,149,0,0.45); }
-        .news-type.news{ background: rgba(0,102,255,0.12); border-color: rgba(0,102,255,0.45); }
-
-        /* subtle left accent per type */
-        .news-card{ position:relative; overflow:hidden; }
-        .news-card.update{ border-left: 4px solid rgba(0,255,136,0.75); }
-        .news-card.announcement{ border-left: 4px solid rgba(255,149,0,0.9); }
-        .news-card.news{ border-left: 4px solid rgba(0,102,255,0.9); }
-        .news-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .badge-update {
-            background: rgba(0, 102, 255, 0.2);
-            color: var(--blue-tech);
-            border: 1px solid var(--blue-tech);
-        }
-
-        .badge-announcement {
-            background: rgba(255, 149, 0, 0.2);
-            color: var(--orange-alert);
-            border: 1px solid var(--orange-alert);
-        }
-
-        .badge-event {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid var(--green-growth);
-        }
-
-        .news-date {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .news-form {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-row input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-row input:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        
-.news-card{position:relative; overflow:hidden;}
-.news-bg{position:absolute; inset:0; background-size:cover; background-position:center; filter:brightness(0.55) blur(0px); transform:scale(1.08);}
-.news-card > *{position:relative; z-index:2;}
-.news-delete-btn{margin-top:10px; background:rgba(255,77,109,0.15); border:1px solid rgba(255,77,109,0.55); color:#fff; padding:8px 10px; border-radius:10px; cursor:pointer;}
-.news-delete-btn:hover{background:rgba(255,77,109,0.25);}
-.admin-news-box{background:rgba(10,10,31,0.55); border:1px solid rgba(0,255,255,0.25); padding:14px; border-radius:14px;}
-
-/* Contor Vizite */
-        .visit-counter {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--blue-tech);
-            border-radius: 15px;
-            padding: 0.8rem 1.2rem;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .visit-counter:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
-        }
-
-        .counter-icon {
-            animation: pulse 2s infinite;
-        }
-
-        .token-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .info-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--green-growth);
-        }
-
-        /* Social Links in Hero */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .social-btn {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 102, 255, 0.3);
-        }
-
-        .social-btn:hover {
-            background: rgba(0, 102, 255, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
-        }
-
-        /* Buton Uniswap */
-        .uniswap-btn {
-            background: linear-gradient(45deg, #ff007a, #8a2be2);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin: 1rem 0;
-            font-weight: bold;
-        }
-
-        .uniswap-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.4);
-        }
-
-        /* Scientific Data Visualization */
-        .data-visualization {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 2rem 0;
-        }
-
-        .chart-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .period-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .period-btn.active {
-            background: var(--blue-tech);
-            border-color: var(--blue-tech);
-        }
-
-        .period-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--neon-cyan);
-            margin: 0.5rem 0;
-        }
-
-        .neon-glow {
-            box-shadow: 
-                0 0 20px rgba(0, 102, 255, 0.3),
-                0 0 40px rgba(0, 255, 136, 0.2),
-                inset 0 0 20px rgba(138, 43, 226, 0.1);
-        }
-
-        /* Status Indicators */
-        .status-online {
-            color: #00ff88;
-            animation: pulse 2s infinite;
-        }
-
-        .status-offline {
-            color: #ff4444;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Token Price Display */
-        .price-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 1rem 0;
-        }
-
-        .price-change {
-            font-size: 1.2rem;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 0.5rem 0;
-        }
-
-        .positive { color: #00ff88; background: rgba(0, 255, 136, 0.1); }
-        .negative { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
-
-        /* Whitepaper Specific Styles */
-        .whitepaper-header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding-top: 20px;
-        }
-
-        .whitepaper-logo {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 1.5rem;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(0, 102, 255, 0.4);
-        }
-
-        .whitepaper-logo img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .toc {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid var(--green-growth);
-        }
-
-        .toc h3 {
-            margin-bottom: 1rem;
-            color: var(--neon-cyan);
-        }
-
-        .toc ul {
-            columns: 2;
-            column-gap: 3rem;
-        }
-
-        .toc li {
-            margin-bottom: 0.8rem;
-            break-inside: avoid;
-        }
-
-        .toc a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .toc a:hover {
-            color: var(--neon-cyan);
-            text-decoration: underline;
-        }
-
-        .section-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .section-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-cyan);
-        }
-
-        .section-card h3 {
-            color: var(--green-growth);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 1.5rem 0;
-        }
-
-        .whitepaper-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .whitepaper-table th {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .whitepaper-table td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .whitepaper-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .whitepaper-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin: 0.2rem;
-        }
-
-        .badge-success {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .badge-warning {
-            background: rgba(255, 204, 0, 0.2);
-            color: #ffcc00;
-            border: 1px solid rgba(255, 204, 0, 0.3);
-        }
-
-        .badge-info {
-            background: rgba(0, 204, 255, 0.2);
-            color: var(--neon-cyan);
-            border: 1px solid rgba(0, 204, 255, 0.3);
-        }
-
-        .roadmap-timeline {
-            position: relative;
-            padding-left: 30px;
-            margin: 2rem 0;
-        }
-
-        .roadmap-timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, var(--blue-tech), var(--purple-innov));
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding-left: 30px;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -33px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .timeline-date {
-            font-weight: bold;
-            color: var(--green-growth);
-            margin-bottom: 0.5rem;
-        }
-
-        .download-btn {
-            background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--neon-cyan);
-            font-size: 0.9rem;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .social-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 1rem;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .social-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
-            border-color: var(--blue-tech);
-        }
-
-        .social-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .required {
-            color: #ff4444;
-        }
-
-        .contact-card {
-            background: rgba(255,255,255,0.03);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 3px solid;
-            margin-bottom: 1rem;
-        }
-
-        .contact-card.business {
-            border-color: var(--green-growth);
-            background: rgba(0, 255, 136, 0.05);
-        }
-
-        .contact-card.partnership {
-            border-color: var(--blue-tech);
-            background: rgba(0, 102, 255, 0.05);
-        }
-
-        .contact-card.security {
-            border-color: var(--purple-innov);
-            background: rgba(138, 43, 226, 0.05);
-        }
-
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .time-item {
-            text-align: center;
-            padding: 1rem;
-        }
-
-        .time-item .icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-
-            .hero-logo-bg {
-                width: 400px;
-                height: 400px;
-            }
-
-            .token-info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .price-display {
-                font-size: 2rem;
-            }
-
-            .chart-container {
-                height: 300px;
-            }
-
-            .btn-refresh-modern {
-                padding: 0.8rem 1.5rem;
-                font-size: 1rem;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .social-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .toc ul {
-                columns: 1;
-            }
-
-            .whitepaper-table {
-                font-size: 0.9rem;
-            }
-
-            .whitepaper-table th,
-            .whitepaper-table td {
-                padding: 0.5rem;
-            }
-
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                flex-direction: column;
-            }
-
-            .visit-counter {
-                bottom: 10px;
-                right: 10px;
-                font-size: 0.8rem;
-                padding: 0.6rem 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .nav-links a {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.9rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .social-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .whitepaper-logo {
-                width: 100px;
-                height: 100px;
-            }
-        }
-    
-        .form-group select option {
-            background: var(--darker-bg);
-            color: #ffffff;
-        }
-
-    
-/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
-.admin-login{
-  margin-top: 80px;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
-  border-top: 2px solid rgba(122,92,255,.8);
-  text-align: center;
-  border-radius: 16px;
-}
-.admin-login h2{ color:#fff; margin:0 0 10px; }
-.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
-.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-.admin-login-box input{
-  padding:12px 14px; width:280px; max-width:92vw;
-  border-radius:10px; border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.25); color:#fff; outline:none;
-}
-.admin-login-box button{
-  padding:12px 16px; border-radius:10px; border:none;
-  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
-}
-.admin-login-box button:hover{ filter: brightness(1.08); }
-.admin-msg{ margin-top:12px; font-weight:700; }
-.admin-pill{
-  display:inline-flex; align-items:center; gap:8px;
-  padding:6px 10px; border-radius:999px; font-size:.9rem;
-  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
-}
-.admin-pill.off{
-  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
-}
-.admin-only{ display:none !important; }
-
-/* ====== TROPHY BUTTON (Giveaway add) ====== */
-.trophy-btn{
-  padding: 10px 14px !important;
-  display:inline-flex; align-items:center; justify-content:center; gap:10px;
-  min-width: 54px;
-}
-.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
-.trophy-btn .trophy-logo{
-  width: 22px; height: 22px; border-radius: 6px;
-  box-shadow: 0 0 12px rgba(0,255,136,.25);
-}
-.table-responsive{ overflow-x:auto; width:100%; }
-.lb-table{ width:100%; border-collapse: collapse; }
-.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
-.lb-top1{ background: rgba(255,215,0,.12); }
-.lb-top2{ background: rgba(192,192,192,.12); }
-.lb-top3{ background: rgba(205,127,50,.12); }
-.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
-
-</style>
-<!-- Firebase (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script>
-  // Firebase init (must run before any firebase.auth()/firestore/storage usage)
-  window.firebaseConfig = {
-    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-    authDomain: "stancubyt-fc2b9.firebaseapp.com",
-    projectId: "stancubyt-fc2b9",
-    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
-    messagingSenderId: "263244200492",
-    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-    measurementId: "G-272S9HSY3K"
-  };
-  try {
-    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
-      firebase.initializeApp(window.firebaseConfig);
-    }
-  } catch (e) {
-    console.warn("Firebase init warning:", e);
-  }
-</script>
-
-</head><body>
-<div id="particles-js"></div>
-<div class="visit-counter" id="visitCounter">
-<span class="counter-icon">👁️</span>
-<span id="visitCount">0</span> vizite
-    </div>
-<nav class="scientific-nav">
-<div class="nav-container">
-<div class="logo">
-<div class="logo-3d-container">
-<div class="logo-3d">
-<img alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-<div class="backnote-orbit">
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-</div>
-</div>
-<div class="logo-text">StancuBYT</div>
-</div>
-<div class="nav-links">
-<a href="#prezentare" onclick="showSection('prezentare')">Prezentare</a>
-
-
-
-
-</div>
-</div>
-</nav><section class="page-section active-section" id="prezentare">
-<!-- Logo Background 3D -->
-<div class="hero-logo-bg">
-<div class="logo-3d-bg">
-<img alt="StancuBYT Logo Background" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-</div>
-<div class="hero">
-<h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
-                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
-            </p>
-<!-- Live Price Display -->
-<div id="sbyt-price-box" style="margin-top:20px;">
-  <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
-  <div id="sbyt-price"
-       style="font-size:32px; font-weight:bold; color:#00ff88;">
-       Se încarcă...
-  </div>
-</div>
-<!-- Buton Uniswap -->
-<a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
-                🔄 Tranzacționează pe Uniswap
-            </a>
-<a class="uniswap-btn" href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&amp;utm_medium=referral&amp;utm_campaign=searchresults" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));" target="_blank">
-                🦎 Vizualizează și Tranzacționează pe GeckoTerminal
-            </a>
-<div class="token-info-grid">
-<div class="info-card neon-glow">
-<h3>🔗 Contract Address</h3>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;" target="_blank">
-                        0x44Cf220399be798baeaE45fd7C4fF44623713833
-                    </a>
-<small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
-</div>
-<div class="info-card neon-glow">
-<h3>💰 Total Supply REAL</h3>
-<p id="mainTotalSupply" style="font-size: 2rem; font-weight: bold; color: var(--green-growth);">
-<span id="supplyValue">Se încarcă...</span> SBYT
-                    </p>
-<small style="color: #888;">Date live de pe Etherscan</small>
-</div>
-<div class="info-card neon-glow">
-<h3>🏆 Fondator</h3>
-<p style="font-size: 1.2rem; margin-top: 1rem;">
-                        Stancu Marian
-                    </p>
-</div>
-</div>
-<!-- SECTIUNE NOUTATI -->
-<div class="news-section">
-<div class="news-header">
-<h2 class="news-title">
-<span>📢</span> Noutăți &amp; Anunțuri
-                    </h2>
-<!-- legacy news-controls removed -->
-<div id="newsAdminBox" class="admin-news-box" style="display:none; margin-bottom:1rem;">
-  <div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
-    <select id="newsEmojiSelect" style="max-width:140px;">
-      <option value="">Emoji</option>
-      <option value="🚀">🚀</option>
-      <option value="🔥">🔥</option>
-      <option value="💎">💎</option>
-      <option value="📢">📢</option>
-      <option value="🎁">🎁</option>
-      <option value="✅">✅</option>
-      <option value="⚠️">⚠️</option>
-      <option value="📈">📈</option>
-      <option value="📰">📰</option>
-    </select>
-    <input id="newsEmojiInput" type="text" placeholder="sau scrie (ex: 🚀🔥)" maxlength="10" style="max-width:160px;" />
-    <select id="newsTypeInput" style="max-width:220px;">
-      <option value="update">Noutate</option>
-      <option value="announcement">Anunt</option>
-      <option value="news">Stire</option>
-    </select>
-    <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.9);">
-      <input id="newsPinnedInput" type="checkbox" /> Pinned
-    </label>
-  </div>
-  <div class="form-row" style="margin-top:10px;">
-    <input id="newsTitleInput" type="text" placeholder="Titlu" />
-  </div>
-  <div class="form-row" style="margin-top:10px;">
-    <textarea id="newsContentInput" rows="4" placeholder="Continut"></textarea>
-  </div>
-  <div class="form-row" style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <input id="newsBgInput" type="file" accept="image/*" />
-    <button type="button" id="newsAddBtn" type="button" onclick="adminCreateNews()">➕ Adauga</button>
-  </div>
-</div>
-</div>
-
-<div class="news-grid" id="newsContainer">
-<!-- Noutățile vor fi adăugate aici dinamic -->
-</div>
-<!-- Formular pentru adăugare știri -->
-<div class="news-form" id="newsForm" style="display: none;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
-<div class="form-row">
-<input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
-<select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
-</select>
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
-                            Fixează această știre
-                        </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
-                    ✅ Date încărcate de pe Etherscan
-                </div>
-</div>
-</div>
-<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-
-</section>
-</section><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
-<style>
-        /* Variabile culori conform psihologiei marketingului */
-        :root {
-            --blue-tech: #0066ff;
-            --green-growth: #00ff88;
-            --purple-innov: #8a2be2;
-            --neon-cyan: #00ffff;
-            --dark-bg: #0a0a1f;
-            --darker-bg: #050510;
-            --orange-alert: #ff9500;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: var(--dark-bg);
-            color: white;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
-        }
-
-        /* Particle Animation Background */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        /* Logo Background pentru Hero Section */
-        .hero-logo-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            opacity: 0.05;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .logo-3d-bg {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            animation: float3d 20s infinite ease-in-out;
-        }
-
-        .logo-3d-bg img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            filter: blur(1px) brightness(1.2);
-        }
-
-        @keyframes float3d {
-            0%, 100% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
-            }
-            25% { 
-                transform: translateY(-20px) rotateX(5deg) rotateY(5deg); 
-            }
-            50% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(10deg); 
-            }
-            75% { 
-                transform: translateY(20px) rotateX(-5deg) rotateY(5deg); 
-            }
-        }
-
-        /* 3D Logo Animation */
-        .logo-3d-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            perspective: 1000px;
-        }
-
-        .logo-3d {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: rotate3d 8s infinite linear;
-        }
-
-        .logo-3d img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: absolute;
-            backface-visibility: hidden;
-        }
-
-        .backnote-orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120px;
-            height: 120px;
-            transform: translate(-50%, -50%);
-            animation: orbit 6s infinite linear;
-        }
-
-        .backnote {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            filter: blur(2px);
-            opacity: 0.7;
-        }
-
-        .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
-        .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
-
-        @keyframes rotate3d {
-            0% { transform: rotateY(0deg) rotateX(5deg); }
-            100% { transform: rotateY(360deg) rotateX(5deg); }
-        }
-
-        @keyframes orbit {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        /* Buton Modern Reîmprospătează Datele */
-        .btn-refresh-modern {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-            margin-top: 1rem;
-            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
-        }
-
-        .btn-refresh-modern:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
-        }
-
-        .btn-refresh-modern:active {
-            transform: translateY(0) scale(1);
-        }
-
-        .refresh-icon {
-            font-size: 1.3rem;
-            transition: transform 0.5s ease;
-        }
-
-        .btn-refresh-modern:hover .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
-
-        .refresh-pulse {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border-radius: 50px;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            opacity: 0;
-            z-index: -1;
-            animation: pulseEffect 2s infinite;
-        }
-
-        @keyframes rotate360 {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes pulseEffect {
-            0% { 
-                transform: scale(1); 
-                opacity: 0.7; 
-            }
-            100% { 
-                transform: scale(1.2); 
-                opacity: 0; 
-            }
-        }
-
-        /* Loading animation pentru buton */
-        .btn-refresh-modern.loading {
-            background: linear-gradient(45deg, #666, #888);
-            cursor: wait;
-        }
-
-        .btn-refresh-modern.loading .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
-
-        .btn-refresh-modern.loading .refresh-text {
-            opacity: 0.7;
-        }
-
-        /* Animatie pentru actualizare succes */
-        @keyframes successFlash {
-            0%, 100% { 
-                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
-            }
-            50% { 
-                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
-            }
-        }
-
-        .btn-refresh-modern.success {
-            animation: successFlash 0.5s ease 2;
-        }
-
-        /* Navigation - Scientific Style */
-        .scientific-nav {
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--blue-tech);
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-links a:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .nav-links a::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::before {
-            width: 100%;
-        }
-
-        /* Main Content Sections */
-        .page-section {
-            min-height: 100vh;
-            padding: 120px 2rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .active-section {
-            display: block;
-        }
-
-        /* Hero Section - Prezentare */
-        .hero {
-            text-align: center;
-            padding-top: 150px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 4.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease infinite;
-            text-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(45deg); }
-        }
-
-        /* Sectiune Noutati */
-        .news-section {
-            margin: 3rem 0;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .news-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--green-growth);
-        }
-
-        .news-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.8rem;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .news-controls {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .news-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .news-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .news-card {
@@ -2607,930 +1176,1046 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
+</head>
 <body>
-<!-- Particles Background -->
-<div id="particles-js"></div>
-<!-- Contor Vizite -->
-<div class="visit-counter" id="visitCounter">
-<span class="counter-icon">👁️</span>
-<span id="visitCount">0</span> vizite
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- Contor Vizite -->
+    <div class="visit-counter" id="visitCounter">
+        <span class="counter-icon">👁️</span>
+        <span id="visitCount">0</span> vizite
     </div>
-<!-- Scientific Navigation -->
-<nav class="scientific-nav">
-<div class="nav-container">
-<div class="logo">
-<div class="logo-3d-container">
-<div class="logo-3d">
-<img alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-<div class="backnote-orbit">
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-<div class="backnote"></div>
-</div>
-</div>
-<div class="logo-text">StancuBYT</div>
-</div>
-<div class="nav-links">
-<a href="#prezentare" onclick="showSection('prezentare')">Prezentare</a>
-<a href="#statistici" onclick="showSection('statistici'); fetchAllData();">Statistici</a>
-<a href="#whitepaper" onclick="showSection('whitepaper')">Whitepaper</a>
-<a href="#contact" onclick="showSection('contact')">Contact</a>
-<a href="#giveaway" onclick="showSection('giveaway')">Giveaway &amp; Promoții</a>
-</div>
-</div>
-</nav>
-<!-- Prezentare Section -->
-<section class="page-section active-section" id="prezentare">
-<!-- Logo Background 3D -->
-<div class="hero-logo-bg">
-<div class="logo-3d-bg">
-<img alt="StancuBYT Logo Background" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-</div>
-<div class="hero">
-<h1>StancuBYT Token</h1>
-<p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+
+    <!-- Scientific Navigation -->
+    <nav class="scientific-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-3d-container">
+                    <div class="logo-3d">
+                        <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'">
+                    </div>
+                    <div class="backnote-orbit">
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                    </div>
+                </div>
+                <div class="logo-text">StancuBYT</div>
+            </div>
+            <div class="nav-links">
+                <a href="#prezentare" onclick="showSection('prezentare')">Prezentare</a>
+                <a href="#statistici" onclick="showSection('statistici'); fetchAllData();">Statistici</a>
+                <a href="#whitepaper" onclick="showSection('whitepaper')">Whitepaper</a>
+                <a href="#contact" onclick="showSection('contact')">Contact</a>
+                <a href="#giveaway" onclick="showSection('giveaway')">Giveaway & Promoții</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Prezentare Section -->
+    <section id="prezentare" class="page-section active-section">
+        <!-- Logo Background 3D -->
+        <div class="hero-logo-bg">
+            <div class="logo-3d-bg">
+                <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo Background">
+            </div>
+        </div>
+
+        <div class="hero">
+            <h1>StancuBYT Token</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
                 Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
             </p>
-<!-- Live Price Display -->
-<div id="livePriceDisplay" style="margin: 2rem 0;">
-<div class="price-display" id="currentPrice">Se încarcă...</div>
-<div class="price-change" id="priceChange"></div>
-<small id="lastUpdated">Ultima actualizare: --:--:--</small>
-</div>
-<!-- Buton Uniswap -->
-<a class="uniswap-btn" href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
+            
+            <!-- Live Price Display -->
+            <div id="livePriceDisplay" style="margin: 2rem 0;">
+                <div class="price-display" id="currentPrice">Se încarcă...</div>
+                <div id="priceChange" class="price-change"></div>
+                <small id="lastUpdated">Ultima actualizare: --:--:--</small>
+            </div>
+            
+            <!-- Buton Uniswap -->
+            <a href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+               target="_blank" class="uniswap-btn">
                 🔄 Tranzacționează pe Uniswap
             </a>
-<a class="uniswap-btn" href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&amp;utm_medium=referral&amp;utm_campaign=searchresults" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));" target="_blank">
+            <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="uniswap-btn" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));">
                 🦎 Vizualizează și Tranzacționează pe GeckoTerminal
             </a>
-<div class="token-info-grid">
-<div class="info-card neon-glow">
-<h3>🔗 Contract Address</h3>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;" target="_blank">
+
+            
+            <div class="token-info-grid">
+                <div class="info-card neon-glow">
+                    <h3>🔗 Contract Address</h3>
+                    <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                       target="_blank" 
+                       style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;">
                         0x44Cf220399be798baeaE45fd7C4fF44623713833
                     </a>
-<small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
-</div>
-<div class="info-card neon-glow">
-<h3>💰 Total Supply REAL</h3>
-<p id="mainTotalSupply" style="font-size: 2rem; font-weight: bold; color: var(--green-growth);">
-<span id="supplyValue">Se încarcă...</span> SBYT
+                    <small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
+                </div>
+                <div class="info-card neon-glow">
+                    <h3>💰 Total Supply REAL</h3>
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--green-growth);" id="mainTotalSupply">
+                        <span id="supplyValue">Se încarcă...</span> SBYT
                     </p>
-<small style="color: #888;">Date live de pe Etherscan</small>
-</div>
-<div class="info-card neon-glow">
-<h3>🏆 Fondator</h3>
-<p style="font-size: 1.2rem; margin-top: 1rem;">
+                    <small style="color: #888;">Date live de pe Etherscan</small>
+                </div>
+                <div class="info-card neon-glow">
+                    <h3>🏆 Fondator</h3>
+                    <p style="font-size: 1.2rem; margin-top: 1rem;">
                         Stancu Marian
                     </p>
-</div>
-</div>
-<!-- SECTIUNE NOUTATI -->
-<div class="news-section">
-<div class="news-header">
-<h2 class="news-title">
-<span>📢</span> Noutăți &amp; Anunțuri
+                </div>
+            </div>
+
+            <!-- SECTIUNE NOUTATI -->
+            <div class="news-section">
+                <div class="news-header">
+                    <h2 class="news-title">
+                        <span>📢</span> Noutăți & Anunțuri
                     </h2>
-<!-- legacy news-controls removed -->
-<div class="news-grid" id="newsContainer">
-<!-- Noutățile vor fi adăugate aici dinamic -->
-</div>
-<!-- Formular pentru adăugare știri -->
-<div class="news-form" id="newsForm" style="display: none;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
-<div class="form-row">
-<input id="newsTitle" maxlength="100" placeholder="Titlu știre" type="text"/>
-<select id="newsType">
-<option value="update">Update</option>
-<option value="announcement">Anunț Important</option>
-<option value="event">Eveniment</option>
-</select>
-</div>
-<div class="form-row">
-<input id="newsContent" maxlength="500" placeholder="Conținut știre" type="text"/>
-</div>
-<div class="form-row">
-<label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
-<input id="pinNews" type="checkbox"/>
+                    <div class="news-controls">
+                        <button class="news-btn" onclick="requestPassword('add')">➕ Adaugă știre</button>
+                        <button class="news-btn" onclick="requestPassword('clear')">🗑️ Șterge toate</button>
+                    </div>
+                </div>
+                
+                <div class="news-grid" id="newsContainer">
+                    <!-- Noutățile vor fi adăugate aici dinamic -->
+                </div>
+                
+                <!-- Formular pentru adăugare știri -->
+                <div class="news-form" id="newsForm" style="display: none;">
+                    <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
+                    <div class="form-row">
+                        <input type="text" id="newsTitle" placeholder="Titlu știre" maxlength="100">
+                        <select id="newsType">
+                            <option value="update">Update</option>
+                            <option value="announcement">Anunț Important</option>
+                            <option value="event">Eveniment</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" id="newsContent" placeholder="Conținut știre" maxlength="500">
+                    </div>
+                    <div class="form-row">
+                        <label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
+                            <input type="checkbox" id="pinNews">
                             Fixează această știre
                         </label>
-</div>
-<div style="display: flex; gap: 1rem; margin-top: 1rem;">
-<button class="news-btn" onclick="saveNews()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
-</div>
-</div>
-</div>
-<div class="social-links">
-<a class="social-btn" href="https://twitter.com/StancuBYT" title="Twitter">🐦</a>
-<a class="social-btn" href="https://t.me/StancuBYT_Official" title="Telegram">📢</a>
-<a class="social-btn" href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" title="Reddit">👽</a>
-<a class="social-btn" href="https://github.com/StancuBYT" title="GitHub">💻</a>
-<a class="social-btn" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" title="LinkedIn">👔</a>
-<a class="social-btn" href="https://stancubyt.com" title="Website">🌐</a>
-</div>
-<!-- Status Server -->
-<div style="margin-top: 2rem; text-align: center;">
-<div class="status-online" id="serverStatus">
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button class="news-btn" onclick="saveNews()">💾 Salvează</button>
+                        <button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="https://twitter.com/StancuBYT" class="social-btn" title="Twitter">🐦</a>
+                <a href="https://t.me/StancuBYT_Official" class="social-btn" title="Telegram">📢</a>
+            <a href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" class="social-btn" title="Reddit">👽</a>
+                <a href="https://github.com/StancuBYT" class="social-btn" title="GitHub">💻</a>
+                <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" class="social-btn" title="LinkedIn">👔</a>
+                <a href="https://stancubyt.com" class="social-btn" title="Website">🌐</a>
+            </div>
+
+            <!-- Status Server -->
+            <div style="margin-top: 2rem; text-align: center;">
+                <div id="serverStatus" class="status-online">
                     ✅ Date încărcate de pe Etherscan
                 </div>
-</div>
-</div>
+            </div>
+        </div>
+    
 <!-- ADMIN LOGIN (Prezentare - josul paginii) -->
-<section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email">
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password">
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</input></input></div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
+<section id="admin-login" class="admin-login">
+  <h2>🔐 Administrator Login</h2>
+  <p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
+
+  <div class="admin-login-box">
+    <input type="email" id="adminEmail" placeholder="Email administrator" autocomplete="username" />
+    <input type="password" id="adminPass" placeholder="Parola administrator" autocomplete="current-password" />
+    <button type="button" onclick="adminSignIn()">Autentificare</button>
+    <button type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Delogare</button>
+  </div>
+
+  <div class="admin-status-row">
+    <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
+    <span id="adminUserLabel" class="admin-user-label"></span>
+  </div>
+
+  <p id="adminLoginMsg" class="admin-msg"></p>
+
+  <p class="admin-hint">
+    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
+    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
+  </p>
+</section>
 
 </section>
-</section>
-<!-- Statistici Section -->
-<section class="page-section" id="statistici">
-<div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
-<h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
-<p>Date live preluate de pe Etherscan</p>
-<!-- Buton Modern Reîmprospătează Datele -->
-<button class="btn-refresh-modern" id="refreshButton" onclick="fetchAllData()">
-<span class="refresh-icon">🔄</span>
-<span class="refresh-text">Reîmprospătează Datele</span>
-<span class="refresh-pulse"></span>
-</button>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📈 Preț în Timp Real</h3>
-<!-- Chart Controls -->
-<div class="chart-controls">
-<button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
-<button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
-<button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
-<button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
-<button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
-<button class="period-btn" onclick="changeChartType('line')">Linie</button>
-</div>
-<div class="chart-container">
-<canvas id="priceChart"></canvas>
-</div>
-<div class="loading" id="priceData">Se încarcă datele live...</div>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📊 Metrici Contract - Live</h3>
-<div class="stats-grid" id="etherscanStats">
-<div class="stat-item">
-<div>Holders</div>
-<div class="stat-value" id="holdersCount">-</div>
-<div>Deținători</div>
-</div>
-<div class="stat-item">
-<div>Total Supply REAL</div>
-<div class="stat-value" id="totalSupply">-</div>
-<div>SBYT</div>
-</div>
-<div class="stat-item">
-<div>Tranzacții</div>
-<div class="stat-value" id="transactionsCount">-</div>
-<div>Total TX</div>
-</div>
-<div class="stat-item">
-<div>Market Cap</div>
-<div class="stat-value" id="marketCap">-</div>
-<div>USD</div>
-</div>
-<div class="stat-item">
-<div>Volum 24h</div>
-<div class="stat-value" id="volume24h">-</div>
-<div>USD</div>
-</div>
-</div>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📋 Detalii Contract</h3>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
-<div>
-<p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
-<p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
-<p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
-<p><strong>Creation Date:</strong> <span id="creationDate">-</span></p>
-</div>
-<div>
-<p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
-<p><strong>Contract Age:</strong> <span id="contractAge">-</span> zile</p>
-<p><strong>Last Update:</strong> <span id="lastUpdateTime">-</span></p>
-<p><strong>Contract verificat pe Etherscan</strong></p>
-</div>
-</div>
-</div>
-<div class="token-info-grid">
-<div class="info-card">
-<h3>🔍 Vezi pe Etherscan</h3>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="color: var(--neon-cyan); text-decoration: none;" target="_blank">
+
+    <!-- Statistici Section -->
+    <section id="statistici" class="page-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
+            <p>Date live preluate de pe Etherscan</p>
+            
+            <!-- Buton Modern Reîmprospătează Datele -->
+            <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
+                <span class="refresh-icon">🔄</span>
+                <span class="refresh-text">Reîmprospătează Datele</span>
+                <span class="refresh-pulse"></span>
+            </button>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📈 Preț în Timp Real</h3>
+            
+            <!-- Chart Controls -->
+            <div class="chart-controls">
+                <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
+                <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
+                <button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
+                <button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
+                <button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
+                <button class="period-btn" onclick="changeChartType('line')">Linie</button>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+            <div id="priceData" class="loading">Se încarcă datele live...</div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📊 Metrici Contract - coinmarketcap LIVE</h3>
+            <div class="stats-grid" id="etherscanStats">
+                <div class="stat-item">
+                    <div>Holders</div>
+                    <div class="stat-value" id="holdersCount">-</div>
+                    <div>Deținători</div>
+                </div>
+                <div class="stat-item">
+                    <div>Total Supply REAL</div>
+                    <div class="stat-value" id="totalSupply">-</div>
+                    <div>SBYT</div>
+                </div>
+                <div class="stat-item">
+                    <div>Tranzacții</div>
+                    <div class="stat-value" id="transactionsCount">-</div>
+                    <div>Total TX</div>
+                </div>
+                <div class="stat-item">
+                    <div>Market Cap</div>
+                    <div class="stat-value" id="marketCap">-</div>
+                    <div>USD</div>
+                </div>
+                <div class="stat-item">
+                    <div>Volum 24h</div>
+                    <div class="stat-value" id="volume24h">-</div>
+                    <div>USD</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📋 Detalii Contract</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
+                    <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
+                    <p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
+                    <p><strong>Creation Date:</strong> <span id="creationDate">-</span></p>
+                </div>
+                <div>
+                    <p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
+                    <p><strong>Contract Age:</strong> <span id="contractAge">-</span> zile</p>
+                    <p><strong>Last Update:</strong> <span id="lastUpdateTime">-</span></p>
+                    <p><strong>Contract verificat pe Etherscan</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="token-info-grid">
+            <div class="info-card">
+                <h3>🔍 Vezi pe Etherscan</h3>
+                <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     Analiză detaliată Etherscan ›
                 </a>
-</div>
-<div class="info-card">
-<h3>📈 Vezi pe DexTools</h3>
-<a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462" style="color: var(--neon-cyan); text-decoration: none;" target="_blank">
+            </div>
+            <div class="info-card">
+                <h3>📈 Vezi pe DexTools</h3>
+                <a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     Chart live DexTools ›
                 </a>
-</div>
-<div class="info-card">
-<h3>🦍 Vezi pe Apespace</h3>
-<a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368" style="color: var(--neon-cyan); text-decoration: none;" target="_blank">
+            </div>
+            <div class="info-card">
+                <h3>🦍 Vezi pe Apespace</h3>
+                <a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     Analiză Apespace ›
                 </a>
-</div>
-<div class="info-card">
-<h3>🦎 Vezi pe GeckoTerminal</h3>
-<a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&amp;utm_medium=referral&amp;utm_campaign=searchresults" style="color: var(--neon-cyan); text-decoration: none;" target="_blank">
-                    Pool &amp; tranzacționare GeckoTerminal ›
+            </div>
+        
+            <div class="info-card">
+                <h3>🦎 Vezi pe GeckoTerminal</h3>
+                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Pool & tranzacționare GeckoTerminal ›
                 </a>
-</div>
-<div class="info-card">
-<h3>📌 Vezi pe CoinMarketCap DEX</h3>
-<a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" style="color: var(--neon-cyan); text-decoration: none;" target="_blank">
+            </div>
+            <div class="info-card">
+                <h3>📌 Vezi pe CoinMarketCap DEX</h3>
+                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     coinmarketcap DEX ›
                 </a>
+            </div>
 </div>
-</div>
-</section>
-<!-- Whitepaper Section - VERSIUNE PROFESIONALĂ -->
-<section class="page-section" id="whitepaper">
-<div class="whitepaper-header">
-<div class="whitepaper-logo">
-<img alt="StancuBYT Logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
-</div>
-<h1 style="font-size: 3rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+    </section>
+
+    <!-- Whitepaper Section - VERSIUNE PROFESIONALĂ -->
+    <section id="whitepaper" class="page-section">
+        <div class="whitepaper-header">
+            <div class="whitepaper-logo">
+                <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo">
+            </div>
+            <h1 style="font-size: 3rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 StancuBYT (SBYT) Whitepaper
             </h1>
-<p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 0.5rem;">
+            <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 0.5rem;">
                 Documentație Tehnologică Completă
             </p>
-<p style="color: var(--neon-cyan); font-family: monospace;">
+            <p style="color: var(--neon-cyan); font-family: monospace;">
                 Lansare token: Oct 26, 2025 — 11:23:11 PM +UTC
             </p>
-<!-- Butoane Download -->
-<div style="margin: 2rem 0; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-<button class="download-btn" onclick="downloadWhitepaper('ro')">
-<span>📥</span> Descarcă Whitepaper RO
+            
+            <!-- Butoane Download -->
+            <div style="margin: 2rem 0; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="downloadWhitepaper('ro')" class="download-btn">
+                    <span>📥</span> Descarcă Whitepaper RO
                 </button>
-<button class="download-btn" onclick="downloadWhitepaper('en')">
-<span>📥</span> Download Whitepaper EN
+                <button onclick="downloadWhitepaper('en')" class="download-btn">
+                    <span>📥</span> Download Whitepaper EN
                 </button>
-<button class="download-btn" onclick="window.open('https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833', '_blank')">
-<span>🔍</span> Vezi Contract pe Etherscan
+                <button onclick="window.open('https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833', '_blank')" class="download-btn">
+                    <span>🔍</span> Vezi Contract pe Etherscan
                 </button>
-</div>
-</div>
-<!-- Cuprins -->
-<div class="toc neon-glow">
-<h3>📚 Cuprins</h3>
-<ul>
-<li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">1. Executive Summary</a></li>
-<li><a href="#informatii-generale" onclick="scrollToSection('informatii-generale')">2. Informații generale</a></li>
-<li><a href="#tokenomics" onclick="scrollToSection('tokenomics')">3. Tokenomics &amp; Distribuție</a></li>
-<li><a href="#utilitate" onclick="scrollToSection('utilitate')">4. Utilitate &amp; Scop</a></li>
-<li><a href="#roadmap" onclick="scrollToSection('roadmap')">5. Plan de lansare / Roadmap</a></li>
-<li><a href="#taxe" onclick="scrollToSection('taxe')">6. Taxe &amp; Tranzacții</a></li>
-<li><a href="#echipa" onclick="scrollToSection('echipa')">7. Echipa</a></li>
-<li><a href="#contact-wp" onclick="scrollToSection('contact-wp')">8. Contact &amp; Linkuri</a></li>
-<li><a href="#recomandari" onclick="scrollToSection('recomandari')">9. Note &amp; Recomandări</a></li>
-<li><a href="#disclaimer" onclick="scrollToSection('disclaimer')">10. Disclaimer &amp; Riscuri</a></li>
-</ul>
-</div>
-<!-- 1. Executive Summary -->
-<div class="section-card neon-glow" id="executive-summary">
-<h3>1. Executive Summary</h3>
-<p>StancuBYT (SBYT) este un token ERC‑20 creat pentru a susține o comunitate digitală modernă, transparentă și orientată spre utilitate. Cu un supply total de 4.000.000 SBYT și un preț de lansare de 200 000 SBYT = 1 ETH, SBYT este conceput pentru a oferi utilitate reală — plăți interne, recompense, acces la servicii și participare comunitară. Lansarea oficială a avut loc pe 26 octombrie 2025.</p>
-</div>
-<!-- 2. Informații generale -->
-<div class="section-card neon-glow" id="informatii-generale">
-<h3>2. Informații generale</h3>
-<div class="table-container">
-<table class="whitepaper-table">
-<tr>
-<th>Parametru</th>
-<th>Valoare</th>
-</tr>
-<tr>
-<td><strong>Token</strong></td>
-<td>StancuBYT (SBYT)</td>
-</tr>
-<tr>
-<td><strong>Standard</strong></td>
-<td>ERC‑20</td>
-</tr>
-<tr>
-<td><strong>Smart‑contract address</strong></td>
-<td>
-<a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" style="color: var(--neon-cyan); text-decoration: none; font-family: monospace;" target="_blank">
+            </div>
+        </div>
+
+        <!-- Cuprins -->
+        <div class="toc neon-glow">
+            <h3>📚 Cuprins</h3>
+            <ul>
+                <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">1. Executive Summary</a></li>
+                <li><a href="#informatii-generale" onclick="scrollToSection('informatii-generale')">2. Informații generale</a></li>
+                <li><a href="#tokenomics" onclick="scrollToSection('tokenomics')">3. Tokenomics & Distribuție</a></li>
+                <li><a href="#utilitate" onclick="scrollToSection('utilitate')">4. Utilitate & Scop</a></li>
+                <li><a href="#roadmap" onclick="scrollToSection('roadmap')">5. Plan de lansare / Roadmap</a></li>
+                <li><a href="#taxe" onclick="scrollToSection('taxe')">6. Taxe & Tranzacții</a></li>
+                <li><a href="#echipa" onclick="scrollToSection('echipa')">7. Echipa</a></li>
+                <li><a href="#contact-wp" onclick="scrollToSection('contact-wp')">8. Contact & Linkuri</a></li>
+                <li><a href="#recomandari" onclick="scrollToSection('recomandari')">9. Note & Recomandări</a></li>
+                <li><a href="#disclaimer" onclick="scrollToSection('disclaimer')">10. Disclaimer & Riscuri</a></li>
+            </ul>
+        </div>
+
+        <!-- 1. Executive Summary -->
+        <div id="executive-summary" class="section-card neon-glow">
+            <h3>1. Executive Summary</h3>
+            <p>StancuBYT (SBYT) este un token ERC‑20 creat pentru a susține o comunitate digitală modernă, transparentă și orientată spre utilitate. Cu un supply total de 4.000.000 SBYT și un preț de lansare de 200 000 SBYT = 1 ETH, SBYT este conceput pentru a oferi utilitate reală — plăți interne, recompense, acces la servicii și participare comunitară. Lansarea oficială a avut loc pe 26 octombrie 2025.</p>
+        </div>
+
+        <!-- 2. Informații generale -->
+        <div id="informatii-generale" class="section-card neon-glow">
+            <h3>2. Informații generale</h3>
+            <div class="table-container">
+                <table class="whitepaper-table">
+                    <tr>
+                        <th>Parametru</th>
+                        <th>Valoare</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Token</strong></td>
+                        <td>StancuBYT (SBYT)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Standard</strong></td>
+                        <td>ERC‑20</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Smart‑contract address</strong></td>
+                        <td>
+                            <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                               target="_blank" 
+                               style="color: var(--neon-cyan); text-decoration: none; font-family: monospace;">
                                 0x44Cf220399be798baeaE45fd7C4fF44623713833
                             </a>
-</td>
-</tr>
-<tr>
-<td><strong>Website oficial</strong></td>
-<td>
-<a href="https://stancubyt.com/" style="color: var(--neon-cyan); text-decoration: none;" target="_blank">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Website oficial</strong></td>
+                        <td>
+                            <a href="https://stancubyt.com/" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                                 https://stancubyt.com/
                             </a>
-</td>
-</tr>
-</table>
-</div>
-<div style="margin-top: 2rem;">
-<h4 style="color: var(--blue-tech); margin-bottom: 1rem;">Social Media / Comunicare</h4>
-<div class="social-grid">
-<a class="social-card" href="https://twitter.com/StancuBYT" target="_blank">
-<div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h4 style="color: var(--blue-tech); margin-bottom: 1rem;">Social Media / Comunicare</h4>
+                <div class="social-grid">
+                    <a href="https://twitter.com/StancuBYT" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">
                             🐦
                         </div>
-<div>
-<strong>Twitter</strong>
-<small>@StancuBYT</small>
-</div>
-</a>
-<a class="social-card" href="https://t.me/StancuBYT_Official" target="_blank">
-<div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">
+                        <div>
+                            <strong>Twitter</strong>
+                            <small>@StancuBYT</small>
+                        </div>
+                    </a>
+                    <a href="https://t.me/StancuBYT_Official" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">
                             📢
                         </div>
-<div>
-<strong>Telegram</strong>
-<small>Official Channel</small>
-</div>
-</a>
-<a class="social-card" href="https://github.com/StancuBYT" target="_blank">
-<div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">
+                        <div>
+                            <strong>Telegram</strong>
+                            <small>Official Channel</small>
+                        </div>
+                    </a>
+                    <a href="https://github.com/StancuBYT" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">
                             💻
                         </div>
-<div>
-<strong>GitHub</strong>
-<small>Cod sursă</small>
-</div>
-</a>
-</div>
-</div>
-</div>
-<!-- 3. Tokenomics & Distribuție -->
-<div class="section-card neon-glow" id="tokenomics">
-<h3>3. Tokenomics &amp; Distribuție</h3>
-<div class="table-container">
-<table class="whitepaper-table">
-<tr>
-<th>Aspect</th>
-<th>Valoare</th>
-</tr>
-<tr>
-<td><strong>Total supply</strong></td>
-<td>4.000.000 SBYT (18 decimale)</td>
-</tr>
-<tr>
-<td><strong>Preț inițial</strong></td>
-<td>200.000 SBYT = 1 ETH</td>
-</tr>
-</table>
-</div>
-<div style="margin: 2rem 0;">
-<h4 style="color: var(--green-growth); margin-bottom: 1rem;">Distribuție Token</h4>
-<div class="table-container">
-<table class="whitepaper-table">
-<tr>
-<th>Categorie</th>
-<th>Procentaj</th>
-<th>Cantitate SBYT</th>
-</tr>
-<tr>
-<td>Fondator / Echipa</td>
-<td>15%</td>
-<td>600.000 SBYT</td>
-</tr>
-<tr>
-<td>Rezervă proiect / Dezvoltare</td>
-<td>40%</td>
-<td>1.600.000 SBYT</td>
-</tr>
-<tr>
-<td>Marketing &amp; Comunitate</td>
-<td>15%</td>
-<td>600.000 SBYT</td>
-</tr>
-<tr>
-<td>Presale / Investitori</td>
-<td>30%</td>
-<td>1.200.000 SBYT</td>
-</tr>
-</table>
-</div>
-</div>
-<div style="background: rgba(0, 255, 136, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--green-growth); margin-top: 1.5rem;">
-<p style="margin: 0; font-size: 0.9rem;">
-<strong>📝 Notă:</strong> Se recomandă lock‑up pentru partea echipei (ex: 12 luni cu eliberare treptată) pentru a asigura stabilitate și încredere.
+                        <div>
+                            <strong>GitHub</strong>
+                            <small>Cod sursă</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Tokenomics & Distribuție -->
+        <div id="tokenomics" class="section-card neon-glow">
+            <h3>3. Tokenomics & Distribuție</h3>
+            
+            <div class="table-container">
+                <table class="whitepaper-table">
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Valoare</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Total supply</strong></td>
+                        <td>4.000.000 SBYT (18 decimale)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Preț inițial</strong></td>
+                        <td>200.000 SBYT = 1 ETH</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin: 2rem 0;">
+                <h4 style="color: var(--green-growth); margin-bottom: 1rem;">Distribuție Token</h4>
+                <div class="table-container">
+                    <table class="whitepaper-table">
+                        <tr>
+                            <th>Categorie</th>
+                            <th>Procentaj</th>
+                            <th>Cantitate SBYT</th>
+                        </tr>
+                        <tr>
+                            <td>Fondator / Echipa</td>
+                            <td>15%</td>
+                            <td>600.000 SBYT</td>
+                        </tr>
+                        <tr>
+                            <td>Rezervă proiect / Dezvoltare</td>
+                            <td>40%</td>
+                            <td>1.600.000 SBYT</td>
+                        </tr>
+                        <tr>
+                            <td>Marketing & Comunitate</td>
+                            <td>15%</td>
+                            <td>600.000 SBYT</td>
+                        </tr>
+                        <tr>
+                            <td>Presale / Investitori</td>
+                            <td>30%</td>
+                            <td>1.200.000 SBYT</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div style="background: rgba(0, 255, 136, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--green-growth); margin-top: 1.5rem;">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    <strong>📝 Notă:</strong> Se recomandă lock‑up pentru partea echipei (ex: 12 luni cu eliberare treptată) pentru a asigura stabilitate și încredere.
                 </p>
-</div>
-</div>
-<!-- 4. Utilitate & Scop -->
-<div class="section-card neon-glow" id="utilitate">
-<h3>4. Utilitate &amp; Scop</h3>
-<p>SBYT este conceput să fie coloana vertebrală a ecosistemului digital al comunității StancuBYT. Utilități anticipate:</p>
-<div style="margin: 1.5rem 0;">
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-<div style="padding: 1rem; background: rgba(0, 102, 255, 0.1); border-radius: 10px;">
-<div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
-<strong>Tranzacții interne</strong>
-<p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Rapide și sigure pe blockchain</p>
-</div>
-<div style="padding: 1rem; background: rgba(0, 255, 136, 0.1); border-radius: 10px;">
-<div style="font-size: 2rem; margin-bottom: 0.5rem;">🏆</div>
-<strong>Recompense comunitate</strong>
-<p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Beneficii pentru membri activi</p>
-</div>
-<div style="padding: 1rem; background: rgba(138, 43, 226, 0.1); border-radius: 10px;">
-<div style="font-size: 2rem; margin-bottom: 0.5rem;">🔒</div>
-<strong>Acces exclusiv</strong>
-<p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Servicii și conținut premium</p>
-</div>
-</div>
-</div>
-<p style="margin-top: 1.5rem;">
+            </div>
+        </div>
+
+        <!-- 4. Utilitate & Scop -->
+        <div id="utilitate" class="section-card neon-glow">
+            <h3>4. Utilitate & Scop</h3>
+            <p>SBYT este conceput să fie coloana vertebrală a ecosistemului digital al comunității StancuBYT. Utilități anticipate:</p>
+            
+            <div style="margin: 1.5rem 0;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1rem; background: rgba(0, 102, 255, 0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
+                        <strong>Tranzacții interne</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Rapide și sigure pe blockchain</p>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(0, 255, 136, 0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏆</div>
+                        <strong>Recompense comunitate</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Beneficii pentru membri activi</p>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(138, 43, 226, 0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔒</div>
+                        <strong>Acces exclusiv</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Servicii și conținut premium</p>
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
                 Prin tokenomics clar și supply limitat, SBYT urmărește să devină un instrument util — nu doar un obiect de speculație.
             </p>
-</div>
-<!-- 5. Plan de lansare / Roadmap -->
-<div class="section-card neon-glow" id="roadmap">
-<h3>5. Plan de lansare / Roadmap</h3>
-<div class="roadmap-timeline">
-<div class="timeline-item">
-<div class="timeline-date">Faza 1: Lansare</div>
-<p>Publicare smart‑contract, verificare pe Etherscan, vânzare către investitori early adopters.</p>
-<span class="badge badge-success">Completat</span>
-</div>
-<div class="timeline-item">
-<div class="timeline-date">Faza 2: Listare</div>
-<p>Creare pool lichiditate pe Uniswap, listare pe DEX, campanii marketing, construire comunitate.</p>
-<span class="badge badge-warning">În Curs</span>
-</div>
-<div class="timeline-item">
-<div class="timeline-date">Faza 3: Dezvoltare</div>
-<p>Integrare token în platforme, servicii, funcții extra, gestionare rezervă, update‑uri periodice.</p>
-<span class="badge badge-info">Planificat</span>
-</div>
-<div class="timeline-item">
-<div class="timeline-date">Faza 4: Extindere</div>
-<p>Integrare token în platforme/servicii, funcționalități suplimentare, audit smart-contract.</p>
-<span class="badge badge-info">Planificat</span>
-</div>
-</div>
-</div>
-<!-- 6. Taxe & Tranzacții -->
-<div class="section-card neon-glow" id="taxe">
-<h3>6. Taxe &amp; Tranzacții</h3>
-<div class="table-container">
-<table class="whitepaper-table">
-<tr>
-<th>Tip Taxă</th>
-<th>Procent</th>
-<th>Destinație</th>
-</tr>
-<tr>
-<td>Comision DEX (Uniswap)</td>
-<td>≈ 0.30%</td>
-<td>Lichiditate &amp; Furnizori</td>
-</tr>
-<tr>
-<td>Gas Fee (Ethereum)</td>
-<td>Variabil</td>
-<td>Rețea Ethereum</td>
-</tr>
-<tr>
-<td>Taxă suplimentară*</td>
-<td>Configurabilă</td>
-<td>Marketing / Burn / Recompense</td>
-</tr>
-</table>
-</div>
-<div style="background: rgba(255, 204, 0, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid #ffcc00; margin-top: 1.5rem;">
-<p style="margin: 0; font-size: 0.9rem;">
-<strong>⚠️ Notă:</strong> Dacă implementezi *taxă suplimentară pe transfer*, aceasta trebuie definită clar în smart‑contract și poate merge spre lichiditate, marketing, burn sau recompense comunitate.
+        </div>
+
+        <!-- 5. Plan de lansare / Roadmap -->
+        <div id="roadmap" class="section-card neon-glow">
+            <h3>5. Plan de lansare / Roadmap</h3>
+            
+            <div class="roadmap-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 1: Lansare</div>
+                    <p>Publicare smart‑contract, verificare pe Etherscan, vânzare către investitori early adopters.</p>
+                    <span class="badge badge-success">Completat</span>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 2: Listare</div>
+                    <p>Creare pool lichiditate pe Uniswap, listare pe DEX, campanii marketing, construire comunitate.</p>
+                    <span class="badge badge-warning">În Curs</span>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 3: Dezvoltare</div>
+                    <p>Integrare token în platforme, servicii, funcții extra, gestionare rezervă, update‑uri periodice.</p>
+                    <span class="badge badge-info">Planificat</span>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 4: Extindere</div>
+                    <p>Integrare token în platforme/servicii, funcționalități suplimentare, audit smart-contract.</p>
+                    <span class="badge badge-info">Planificat</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Taxe & Tranzacții -->
+        <div id="taxe" class="section-card neon-glow">
+            <h3>6. Taxe & Tranzacții</h3>
+            
+            <div class="table-container">
+                <table class="whitepaper-table">
+                    <tr>
+                        <th>Tip Taxă</th>
+                        <th>Procent</th>
+                        <th>Destinație</th>
+                    </tr>
+                    <tr>
+                        <td>Comision DEX (Uniswap)</td>
+                        <td>≈ 0.30%</td>
+                        <td>Lichiditate & Furnizori</td>
+                    </tr>
+                    <tr>
+                        <td>Gas Fee (Ethereum)</td>
+                        <td>Variabil</td>
+                        <td>Rețea Ethereum</td>
+                    </tr>
+                    <tr>
+                        <td>Taxă suplimentară*</td>
+                        <td>Configurabilă</td>
+                        <td>Marketing / Burn / Recompense</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="background: rgba(255, 204, 0, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid #ffcc00; margin-top: 1.5rem;">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    <strong>⚠️ Notă:</strong> Dacă implementezi *taxă suplimentară pe transfer*, aceasta trebuie definită clar în smart‑contract și poate merge spre lichiditate, marketing, burn sau recompense comunitate.
                 </p>
-</div>
-</div>
-<!-- 7. Echipa -->
-<div class="section-card neon-glow" id="echipa">
-<h3>7. Echipa</h3>
-<div style="display: flex; align-items: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
-<div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
+            </div>
+        </div>
+
+        <!-- 7. Echipa -->
+        <div id="echipa" class="section-card neon-glow">
+            <h3>7. Echipa</h3>
+            
+            <div style="display: flex; align-items: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
+                <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
                     👨‍💼
                 </div>
-<div>
-<h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Stancu Marian</h4>
-<p><strong>Fondator &amp; CEO</strong></p>
-<p style="opacity: 0.8; margin-top: 0.5rem;">Inițiator și coordonator proiect StancuBYT</p>
-</div>
-</div>
-<!-- Management echipa (salvare permanenta - Firebase) -->
-<div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.12);">
-<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-<h4 style="margin:0; color: var(--neon-cyan);">Membri echipa (Live)</h4>
-<div style="display:flex; gap:10px; flex-wrap:wrap;">
-<button class="news-btn" onclick="requestPassword('teamAdd')">➕ Adaugă membru</button>
-<button class="news-btn" onclick="requestPassword('teamClear')">🗑️ Șterge toți</button>
-</div>
-</div>
-<div id="teamList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; margin-top:1rem;"></div>
-<div id="teamForm" style="display:none; margin-top:1rem; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:1rem;">
-<div class="form-row">
-<input id="teamName" maxlength="80" placeholder="Nume membru" type="text"/>
-<input id="teamRole" maxlength="80" placeholder="Funcția / rol" type="text"/>
-</div>
-<div class="form-row">
-<input id="teamJoinDate" placeholder="Data înscrierii" type="date"/>
-<input id="teamAvatar" maxlength="240" placeholder="Link foto / avatar (opțional)" type="url"/>
-</div>
-<div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:10px;">
-<button class="news-btn" onclick="saveTeamMember()">💾 Salvează</button>
-<button class="news-btn" onclick="cancelTeamMember()">✖ Anulează</button>
-</div>
-</div>
-</div>
-<div style="background: rgba(0, 204, 255, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
-<p style="margin: 0; font-size: 0.9rem;">
-<strong>💼 Echipa în formare:</strong> Vor fi incluși dezvoltatori blockchain, marketeri, manager comunitate. Informațiile vor fi actualizate pe măsură ce echipa se extinde.
+                <div>
+                    <h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Stancu Marian</h4>
+                    <p><strong>Fondator & CEO</strong></p>
+                    <p style="opacity: 0.8; margin-top: 0.5rem;">Inițiator și coordonator proiect StancuBYT</p>
+                </div>
+            </div>
+            <!-- Management echipa (salvare permanenta - Firebase) -->
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.12);">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <h4 style="margin:0; color: var(--neon-cyan);">Membri echipa (Live)</h4>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="news-btn" onclick="requestPassword('teamAdd')">➕ Adaugă membru</button>
+                        <button class="news-btn" onclick="requestPassword('teamClear')">🗑️ Șterge toți</button>
+                    </div>
+                </div>
+
+                <div id="teamList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; margin-top:1rem;"></div>
+
+                <div id="teamForm" style="display:none; margin-top:1rem; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:1rem;">
+                    <div class="form-row">
+                        <input type="text" id="teamName" placeholder="Nume membru" maxlength="80">
+                        <input type="text" id="teamRole" placeholder="Funcția / rol" maxlength="80">
+                    </div>
+                    <div class="form-row">
+                        <input type="date" id="teamJoinDate" placeholder="Data înscrierii">
+                        <input type="url" id="teamAvatar" placeholder="Link foto / avatar (opțional)" maxlength="240">
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:10px;">
+                        <button class="news-btn" onclick="saveTeamMember()">💾 Salvează</button>
+                        <button class="news-btn" onclick="cancelTeamMember()">✖ Anulează</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="background: rgba(0, 204, 255, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    <strong>💼 Echipa în formare:</strong> Vor fi incluși dezvoltatori blockchain, marketeri, manager comunitate. Informațiile vor fi actualizate pe măsură ce echipa se extinde.
                 </p>
-</div>
-</div>
-<!-- 8. Contact & Linkuri -->
-<div class="section-card neon-glow" id="contact-wp">
-<h3>8. Contact &amp; Linkuri</h3>
-<div style="margin: 1.5rem 0;">
-<div class="social-grid">
-<a class="social-card" href="https://stancubyt.com/" target="_blank">
-<div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">
+            </div>
+        </div>
+
+        <!-- 8. Contact & Linkuri -->
+        <div id="contact-wp" class="section-card neon-glow">
+            <h3>8. Contact & Linkuri</h3>
+            
+            <div style="margin: 1.5rem 0;">
+                <div class="social-grid">
+                    <a href="https://stancubyt.com/" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">
                             🌐
                         </div>
-<div>
-<strong>Website</strong>
-<small>stancubyt.com</small>
-</div>
-</a>
-<a class="social-card" href="mailto:contact@stancubyt.com">
-<div class="social-icon" style="background: rgba(255, 68, 68, 0.2);">
+                        <div>
+                            <strong>Website</strong>
+                            <small>stancubyt.com</small>
+                        </div>
+                    </a>
+                    <a href="mailto:contact@stancubyt.com" class="social-card">
+                        <div class="social-icon" style="background: rgba(255, 68, 68, 0.2);">
                             📧
                         </div>
-<div>
-<strong>Email</strong>
-<small>contact@stancubyt.com</small>
-</div>
-</a>
-<a class="social-card" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank">
-<div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">
+                        <div>
+                            <strong>Email</strong>
+                            <small>contact@stancubyt.com</small>
+                        </div>
+                    </a>
+                    <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">
                             👔
                         </div>
-<div>
-<strong>LinkedIn</strong>
-<small>Business Network</small>
-</div>
-</a>
-</div>
-</div>
-</div>
-<!-- 9. Note & Recomandări -->
-<div class="section-card neon-glow" id="recomandari">
-<h3>9. Note &amp; Recomandări</h3>
-<div style="margin: 1.5rem 0;">
-<div style="display: grid; gap: 1rem;">
-<div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(0, 102, 255, 0.05); border-radius: 10px;">
-<span style="font-size: 1.5rem;">🔍</span>
-<div>
-<strong>Audit Smart‑Contract</strong>
-<p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Recomandat pentru credibilitate și securitate suplimentară înainte de listare.</p>
-</div>
-</div>
-<div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(0, 255, 136, 0.05); border-radius: 10px;">
-<span style="font-size: 1.5rem;">📊</span>
-<div>
-<strong>Transparență Distribuție</strong>
-<p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.</p>
-</div>
-</div>
-<div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(138, 43, 226, 0.05); border-radius: 10px;">
-<span style="font-size: 1.5rem;">💬</span>
-<div>
-<strong>Comunicare Comunitate</strong>
-<p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Menține comunicare constantă: actualizări, roadmap, planuri, echipă.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- 10. Disclaimer & Riscuri -->
-<div class="section-card neon-glow" id="disclaimer">
-<h3>10. Disclaimer &amp; Riscuri</h3>
-<div style="background: rgba(255, 68, 68, 0.05); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255, 68, 68, 0.2); margin-top: 1rem;">
-<div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
-<span style="font-size: 1.5rem; color: #ff4444;">⚠️</span>
-<div>
-<h4 style="color: #ff4444; margin-bottom: 0.5rem;">Avertisment important</h4>
-<p>Tokenul SBYT este un <strong>token de utilitate</strong>. Nu este garantat un instrument financiar, nici un venit garantat.</p>
-</div>
-</div>
-<div style="display: grid; gap: 0.8rem;">
-<p style="margin: 0; font-size: 0.9rem;">
+                        <div>
+                            <strong>LinkedIn</strong>
+                            <small>Business Network</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. Note & Recomandări -->
+        <div id="recomandari" class="section-card neon-glow">
+            <h3>9. Note & Recomandări</h3>
+            
+            <div style="margin: 1.5rem 0;">
+                <div style="display: grid; gap: 1rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(0, 102, 255, 0.05); border-radius: 10px;">
+                        <span style="font-size: 1.5rem;">🔍</span>
+                        <div>
+                            <strong>Audit Smart‑Contract</strong>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Recomandat pentru credibilitate și securitate suplimentară înainte de listare.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(0, 255, 136, 0.05); border-radius: 10px;">
+                        <span style="font-size: 1.5rem;">📊</span>
+                        <div>
+                            <strong>Transparență Distribuție</strong>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(138, 43, 226, 0.05); border-radius: 10px;">
+                        <span style="font-size: 1.5rem;">💬</span>
+                        <div>
+                            <strong>Comunicare Comunitate</strong>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Menține comunicare constantă: actualizări, roadmap, planuri, echipă.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. Disclaimer & Riscuri -->
+        <div id="disclaimer" class="section-card neon-glow">
+            <h3>10. Disclaimer & Riscuri</h3>
+            
+            <div style="background: rgba(255, 68, 68, 0.05); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255, 68, 68, 0.2); margin-top: 1rem;">
+                <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
+                    <span style="font-size: 1.5rem; color: #ff4444;">⚠️</span>
+                    <div>
+                        <h4 style="color: #ff4444; margin-bottom: 0.5rem;">Avertisment important</h4>
+                        <p>Tokenul SBYT este un <strong>token de utilitate</strong>. Nu este garantat un instrument financiar, nici un venit garantat.</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; gap: 0.8rem;">
+                    <p style="margin: 0; font-size: 0.9rem;">
                         • Investițiile implică riscuri — prețul este volatil, depinde de adopție și acceptare.
                     </p>
-<p style="margin: 0; font-size: 0.9rem;">
+                    <p style="margin: 0; font-size: 0.9rem;">
                         • Smart‑contractele pot avea vulnerabilități — recomandăm audit extern înainte de utilizare.
                     </p>
-<p style="margin: 0; font-size: 0.9rem;">
+                    <p style="margin: 0; font-size: 0.9rem;">
                         • Proiectul trebuie tratat transparent și responsabil.
                     </p>
-<p style="margin: 0; font-size: 0.9rem;">
+                    <p style="margin: 0; font-size: 0.9rem;">
                         • Consultați un specialist financiar înainte de orice investiție.
                     </p>
-</div>
-</div>
-</div>
-<!-- Butoane Acțiune -->
-<div style="text-align: center; margin: 3rem 0;">
-<button class="btn-refresh-modern" onclick="showSection('contact')" style="margin-right: 1rem;">
-<span class="refresh-icon">📨</span>
-<span class="refresh-text">Contactează Echipa</span>
-</button>
-<button class="btn-refresh-modern" onclick="window.open('https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833', '_blank')">
-<span class="refresh-icon">🔄</span>
-<span class="refresh-text">Cumpără SBYT pe Uniswap</span>
-</button>
-</div>
-</section>
-<!-- Contact Section - VERSIUNE PROFESIONALĂ CU EMAIL DIRECT -->
-<section class="page-section" id="contact">
-<div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
-<h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Butoane Acțiune -->
+        <div style="text-align: center; margin: 3rem 0;">
+            <button onclick="showSection('contact')" class="btn-refresh-modern" style="margin-right: 1rem;">
+                <span class="refresh-icon">📨</span>
+                <span class="refresh-text">Contactează Echipa</span>
+            </button>
+            <button onclick="window.open('https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833', '_blank')" class="btn-refresh-modern">
+                <span class="refresh-icon">🔄</span>
+                <span class="refresh-text">Cumpără SBYT pe Uniswap</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Contact Section - VERSIUNE PROFESIONALĂ CU EMAIL DIRECT -->
+    <section id="contact" class="page-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 Centru de Contact Tehnic
             </h1>
-<p style="opacity: 0.8;">Contact direct pentru colaborări tehnice, parteneriate și suport</p>
-</div>
-<div class="contact-grid">
-<!-- Formular Contact -->
-<div class="data-visualization neon-glow">
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
-<div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-<span style="font-size: 1.2rem;">📨</span>
-</div>
-<h3 style="margin: 0;">Formular Contact Rapid</h3>
-</div>
-<div class="form-group">
-<label>Nume complet <span class="required">*</span></label>
-<input id="contactName" placeholder="Introduceți numele complet..." required="" type="text"/>
-</div>
-<div class="form-group">
-<label>Adresă email profesională <span class="required">*</span></label>
-<input id="contactEmail" placeholder="ex: contact@companie.ro" required="" type="email"/>
-</div>
-<div class="form-group">
-<label>Tip solicitare <span class="required">*</span></label>
-<select id="contactType">
-<option value="technical">Suport Tehnic</option>
-<option value="partnership">Parteneriat de afaceri</option>
-<option value="investment">Oportunități de investiție</option>
-<option value="listing">Listing pe exchange</option>
-<option value="media">Interviu media</option>
-<option value="security">Securitate &amp; Compliance</option>
-<option value="other">Altceva</option>
-</select>
-</div>
-<div class="form-group">
-<label>Mesaj detaliat <span class="required">*</span></label>
-<textarea id="contactMessage" placeholder="Descrieți solicitarea în detaliu..." required="" rows="6"></textarea>
-</div>
-<div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
-<input id="contactPrivacy" style="transform: scale(1.2);" type="checkbox"/>
-<label for="contactPrivacy" style="font-size: 0.9rem; opacity: 0.8;">
+            <p style="opacity: 0.8;">Contact direct pentru colaborări tehnice, parteneriate și suport</p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Formular Contact -->
+            <div class="data-visualization neon-glow">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 1.2rem;">📨</span>
+                    </div>
+                    <h3 style="margin: 0;">Formular Contact Rapid</h3>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nume complet <span class="required">*</span></label>
+                    <input type="text" id="contactName" placeholder="Introduceți numele complet..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Adresă email profesională <span class="required">*</span></label>
+                    <input type="email" id="contactEmail" placeholder="ex: contact@companie.ro" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tip solicitare <span class="required">*</span></label>
+                    <select id="contactType">
+                        <option value="technical">Suport Tehnic</option>
+                        <option value="partnership">Parteneriat de afaceri</option>
+                        <option value="investment">Oportunități de investiție</option>
+                        <option value="listing">Listing pe exchange</option>
+                        <option value="media">Interviu media</option>
+                        <option value="security">Securitate & Compliance</option>
+                        <option value="other">Altceva</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Mesaj detaliat <span class="required">*</span></label>
+                    <textarea id="contactMessage" placeholder="Descrieți solicitarea în detaliu..." rows="6" required></textarea>
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+                    <input type="checkbox" id="contactPrivacy" style="transform: scale(1.2);">
+                    <label for="contactPrivacy" style="font-size: 0.9rem; opacity: 0.8;">
                         Sunt de acord cu prelucrarea datelor conform 
-                        <a href="https://stancubyt.com/privacy" style="color: var(--neon-cyan); text-decoration: none;" target="_blank">Politicii de confidențialitate</a>
-</label>
-</div>
-<button class="btn-refresh-modern" id="submitContactBtn" onclick="sendContactMessage()" style="width: 100%; margin-top: 1rem;">
-<span class="refresh-icon">🚀</span>
-<span class="refresh-text">Trimite solicitarea</span>
-</button>
-<div id="contactStatus" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
-</div>
-<!-- Informații Contact -->
-<div class="data-visualization neon-glow">
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
-<div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-<span style="font-size: 1.2rem;">📍</span>
-</div>
-<h3 style="margin: 0;">Canale de comunicare</h3>
-</div>
-<div style="margin-bottom: 2rem;">
-<h4 style="color: var(--green-growth); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
-<span style="font-size: 1.5rem;">👨‍💼</span> Contact Principal
+                        <a href="https://stancubyt.com/privacy" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Politicii de confidențialitate</a>
+                    </label>
+                </div>
+                
+                <button class="btn-refresh-modern" style="width: 100%; margin-top: 1rem;" onclick="sendContactMessage()" id="submitContactBtn">
+                    <span class="refresh-icon">🚀</span>
+                    <span class="refresh-text">Trimite solicitarea</span>
+                </button>
+                
+                <div id="contactStatus" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+            </div>
+
+            <!-- Informații Contact -->
+            <div class="data-visualization neon-glow">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 1.2rem;">📍</span>
+                    </div>
+                    <h3 style="margin: 0;">Canale de comunicare</h3>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--green-growth); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">👨‍💼</span> Contact Principal
                     </h4>
-<div class="contact-card business">
-<p style="margin: 0.5rem 0;"><strong>Stancu Marian</strong></p>
-<p style="margin: 0.5rem 0; opacity: 0.9;">Fondator &amp; CEO</p>
-<p style="margin: 0.5rem 0;">
-<a href="mailto:contact@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                    <div class="contact-card business">
+                        <p style="margin: 0.5rem 0;"><strong>Stancu Marian</strong></p>
+                        <p style="margin: 0.5rem 0; opacity: 0.9;">Fondator & CEO</p>
+                        <p style="margin: 0.5rem 0;">
+                            <a href="mailto:contact@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
                                 📧 contact@stancubyt.com
                             </a>
-</p>
-<p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+                        </p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
                             Pentru întrebări generale și suport
                         </p>
-</div>
-</div>
-<div style="margin-bottom: 2rem;">
-<h4 style="color: var(--blue-tech); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
-<span style="font-size: 1.5rem;">🤝</span> Pentru parteneriate
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--blue-tech); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">🤝</span> Pentru parteneriate
                     </h4>
-<div class="contact-card partnership">
-<p style="margin: 0.5rem 0;">
-<a href="mailto:partnerships@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                    <div class="contact-card partnership">
+                        <p style="margin: 0.5rem 0;">
+                            <a href="mailto:partnerships@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
                                 📧 partnerships@stancubyt.com
                             </a>
-</p>
-<p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+                        </p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
                             Colaborări, listing-uri, parteneriate
                         </p>
-</div>
-</div>
-<div style="margin-bottom: 2rem;">
-<h4 style="color: var(--purple-innov); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
-<span style="font-size: 1.5rem;">🛡️</span> Securitate &amp; Compliance
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--purple-innov); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">🛡️</span> Securitate & Compliance
                     </h4>
-<div class="contact-card security">
-<p style="margin: 0.5rem 0;">
-<a href="mailto:security@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                    <div class="contact-card security">
+                        <p style="margin: 0.5rem 0;">
+                            <a href="mailto:security@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
                                 🔒 security@stancubyt.com
                             </a>
-</p>
-<p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+                        </p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
                             Raportări de securitate și audite
                         </p>
-</div>
-</div>
-</div>
-</div>
-<!-- Social Links Grid -->
-<div class="data-visualization neon-glow" style="padding: 2rem; margin-bottom: 2rem;">
-<h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">🌐 Rețele Sociale Oficiale</h3>
-<div class="social-grid">
-<a class="social-card" href="https://twitter.com/StancuBYT" target="_blank">
-<div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Links Grid -->
+        <div class="data-visualization neon-glow" style="padding: 2rem; margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">🌐 Rețele Sociale Oficiale</h3>
+            
+            <div class="social-grid">
+                <a href="https://twitter.com/StancuBYT" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">
                         🐦
                     </div>
-<div>
-<strong style="display: block;">Twitter</strong>
-<small style="opacity: 0.7;">@StancuBYT</small>
-</div>
-</a>
-<a class="social-card" href="https://t.me/StancuBYT_Official" target="_blank">
-<div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">
+                    <div>
+                        <strong style="display: block;">Twitter</strong>
+                        <small style="opacity: 0.7;">@StancuBYT</small>
+                    </div>
+                </a>
+                
+                <a href="https://t.me/StancuBYT_Official" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">
                         📢
                     </div>
-<div>
-<strong style="display: block;">Telegram</strong>
-<small style="opacity: 0.7;">Official Channel</small>
-</div>
-</a>
-<a class="social-card" href="https://github.com/StancuBYT" target="_blank">
-<div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">
+                    <div>
+                        <strong style="display: block;">Telegram</strong>
+                        <small style="opacity: 0.7;">Official Channel</small>
+                    </div>
+                </a>
+                
+                <a href="https://github.com/StancuBYT" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">
                         💻
                     </div>
-<div>
-<strong style="display: block;">GitHub</strong>
-<small style="opacity: 0.7;">Cod sursă</small>
-</div>
-</a>
-<a class="social-card" href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank">
-<div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">
+                    <div>
+                        <strong style="display: block;">GitHub</strong>
+                        <small style="opacity: 0.7;">Cod sursă</small>
+                    </div>
+                </a>
+                
+                <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">
                         👔
                     </div>
-<div>
-<strong style="display: block;">LinkedIn</strong>
-<small style="opacity: 0.7;">Business Network</small>
-</div>
-</a>
-<a class="social-card" href="https://stancubyt.com" target="_blank">
-<div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">
+                    <div>
+                        <strong style="display: block;">LinkedIn</strong>
+                        <small style="opacity: 0.7;">Business Network</small>
+                    </div>
+                </a>
+                
+                <a href="https://stancubyt.com" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">
                         🌐
                     </div>
-<div>
-<strong style="display: block;">Website</strong>
-<small style="opacity: 0.7;">stancubyt.com</small>
-</div>
-</a>
-<a class="social-card" href="https://discord.gg/" target="_blank">
-<div class="social-icon" style="background: rgba(88, 101, 242, 0.2);">
+                    <div>
+                        <strong style="display: block;">Website</strong>
+                        <small style="opacity: 0.7;">stancubyt.com</small>
+                    </div>
+                </a>
+                
+                <a href="https://discord.gg/" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(88, 101, 242, 0.2);">
                         💬
                     </div>
-<div>
-<strong style="display: block;">Discord</strong>
-<small style="opacity: 0.7;">stancubyt</small>
-</div>
-</a>
-</div>
-</div>
-<!-- Program de lucru și Răspunsuri -->
-<div class="data-visualization neon-glow" style="padding: 2rem;">
-<h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">⏰ Timpi de răspuns</h3>
-<div class="time-grid">
-<div class="time-item">
-<div class="icon">📧</div>
-<h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Email Business</h4>
-<p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 24h lucrătoare</p>
-</div>
-<div class="time-item">
-<div class="icon">💬</div>
-<h4 style="color: var(--blue-tech); margin-bottom: 0.5rem;">Telegram</h4>
-<p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 2-4 ore</p>
-</div>
-<div class="time-item">
-<div class="icon">🐦</div>
-<h4 style="color: var(--purple-innov); margin-bottom: 0.5rem;">Twitter</h4>
-<p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 6-12 ore</p>
-</div>
-<div class="time-item">
-<div class="icon">🛡️</div>
-<h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Security</h4>
-<p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 12h max</p>
-</div>
-</div>
-<div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center;">
-<p style="font-size: 0.9rem; opacity: 0.8; margin: 0;">
+                    <div>
+                        <strong style="display: block;">Discord</strong>
+                        <small style="opacity: 0.7;">stancubyt</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Program de lucru și Răspunsuri -->
+        <div class="data-visualization neon-glow" style="padding: 2rem;">
+            <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">⏰ Timpi de răspuns</h3>
+            
+            <div class="time-grid">
+                <div class="time-item">
+                    <div class="icon">📧</div>
+                    <h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Email Business</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 24h lucrătoare</p>
+                </div>
+                
+                <div class="time-item">
+                    <div class="icon">💬</div>
+                    <h4 style="color: var(--blue-tech); margin-bottom: 0.5rem;">Telegram</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 2-4 ore</p>
+                </div>
+                
+                <div class="time-item">
+                    <div class="icon">🐦</div>
+                    <h4 style="color: var(--purple-innov); margin-bottom: 0.5rem;">Twitter</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 6-12 ore</p>
+                </div>
+                
+                <div class="time-item">
+                    <div class="icon">🛡️</div>
+                    <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Security</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 12h max</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center;">
+                <p style="font-size: 0.9rem; opacity: 0.8; margin: 0;">
                     ⚠️ <strong>Important:</strong> Nu trimitem mesaje directe pentru investiții sau OTC. 
                     Toate comunicările oficiale se fac prin canalele menționate mai sus.
                 </p>
-</div>
-</div>
-</section>
-<!-- Giveaway & Promoții Section -->
-<section class="page-section" id="giveaway">
-<div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
-<h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                Giveaway &amp; Promoții
+            </div>
+        </div>
+    </section>
+    <!-- Giveaway & Promoții Section -->
+    <section id="giveaway" class="page-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Giveaway & Promoții
             </h1>
-<p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
-<div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-<button class="news-btn" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
-<button class="news-btn trophy-btn" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img alt="SBYT" class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/></button>
-</div>
-</div>
-<div class="data-visualization neon-glow">
-<h3>📌 Promoții / Giveaway-uri</h3>
-<div id="promoList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
-<div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
-<h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
-<div class="form-row">
-<input id="promoTitle" maxlength="120" placeholder="Titlu (ex: Giveaway SBYT)" type="text"/>
-<input id="promoEnds" placeholder="Data si ora expirarii" type="datetime-local"/>
-</div>
-<div class="form-row">
-<input id="promoPrize" maxlength="160" placeholder="Premiu (ex: 5000 SBYT + bonusuri)" type="text"/>
-<input id="promoPoints" min="1" placeholder="Puncte / promovare" step="1" type="number" value="10"/>
-</div>
-<div class="form-row">
-<textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
-</div>
-<div class="form-row">
-<input accept="image/*,video/*" id="promoMedia" type="file"/>
-</div>
-<div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
-<button class="news-btn" onclick="savePromo()">💾 Salveaza</button>
-<button class="news-btn" onclick="cancelPromo()">❌ Anuleaza</button>
-</div>
-<small style="display:block; margin-top:0.8rem; opacity:0.75;">
+            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
+
+            <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                <button class="news-btn" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
+                <button class="news-btn trophy-btn" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                </div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📌 Promoții / Giveaway-uri</h3>
+            <div id="promoList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
+
+            <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+    <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
+
+    <div class="form-row">
+        <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT)" maxlength="120">
+        <input type="datetime-local" id="promoEnds" placeholder="Data si ora expirarii">
+    </div>
+
+    <div class="form-row">
+        <input type="text" id="promoPrize" placeholder="Premiu (ex: 5000 SBYT + bonusuri)" maxlength="160">
+        <input type="number" id="promoPoints" min="1" step="1" value="10" placeholder="Puncte / promovare">
+    </div>
+
+    <div class="form-row">
+        <textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
+    </div>
+
+    <div class="form-row">
+        <input type="file" id="promoMedia" accept="image/*,video/*">
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
+        <button class="news-btn" onclick="savePromo()">💾 Salveaza</button>
+        <button class="news-btn" onclick="cancelPromo()">❌ Anuleaza</button>
+    </div>
+
+    <small style="display:block; margin-top:0.8rem; opacity:0.75;">
         Media (foto/video) se incarca in Firebase Storage (doar admin). Participantii se inscriu public, cu ID automat.
     </small>
 </div>
-</div>
-<div class="data-visualization neon-glow">
-<h3>🏆 Clasament participanți</h3>
-<div id="leaderboard" style="margin-top:1rem;"></div>
-</div>
-</section>
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>🏆 Clasament participanți</h3>
+            
+            <div id="leaderboard" style="margin-top:1rem;"></div>
+        </div>
+    </section>
+
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
         // =============================================
         // CONFIGURARE
         // =============================================
         const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
-        const ETHERSCAN_PROXY = 'https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy';
+        const ETHERSCAN_PROXY = 'https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy';
 const ETHERSCAN_API_KEY = ''; // not used client-side (Cloud Function holds the key)
 
 async function etherscanProxyRequest(module, action, params = {}) {
@@ -3562,23 +2247,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
         // =============================================
         function $(id) { return document.getElementById(id); }
 
-        
-  // --- Emoji select -> input sync (News) ---
-  (function setupNewsEmojiSync() {
-    try {
-      const sel = $("newsEmojiSelect");
-      const input = $("newsEmojiInput");
-      if (sel && input) {
-        sel.addEventListener("change", () => {
-          input.value = sel.value || "";
-          // keep cursor at end
-          input.focus();
-          input.setSelectionRange(input.value.length, input.value.length);
-        });
-      }
-    } catch (e) { /* ignore */ }
-  })();
-function escapeHtml(str) {
+        function escapeHtml(str) {
             return String(str).replace(/[&<>"'`=\/]/g, s => ({
                 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
             }[s]));
@@ -4220,7 +2889,7 @@ function escapeHtml(str) {
                 try { await updateLivePriceAndStats(); } catch(e){ console.warn('Dex price failed', e); }
                 try { await updateChart(currentPeriod); } catch(e){ console.warn('Chart update failed', e); }
 
-setStatusHtml('');
+setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
 
                 if (refreshBtn) {
                     refreshBtn.classList.remove('loading');
@@ -4482,14 +3151,15 @@ async function updateLivePriceAndChart(period = 'live') {
 try {
   if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
     firebase.initializeApp({
-      apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-      authDomain: "stancubyt-fc2b9.firebaseapp.com",
-      projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
-      messagingSenderId: "263244200492",
-      appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-      measurementId: "G-272S9HSY3K"
-    });}
+      apiKey: "AIzaSyAjcRgrqwfXk-f2AqwUFtacSRWyUhsPTuY",
+      authDomain: "stancubyt-64c78.firebaseapp.com",
+      projectId: "stancubyt-64c78",
+      storageBucket: "stancubyt-64c78.firebasestorage.app",
+      messagingSenderId: "866498315210",
+      appId: "1:866498315210:web:abcf161e31aca695758533",
+      measurementId: "G-J5B0K35MR0"
+    });
+  }
 } catch (e) {}
 
 
@@ -4501,7 +3171,9 @@ try {
 
 window.__SBYT_ADMIN = false;
 
-const ADMIN_EMAILS = ["stancubyt@gmail.com"];
+const ADMIN_EMAILS = [
+  "stancubyt@gmail.com"
+];
 
 function maskEmail(email) {
   if (!email || typeof email !== 'string') return '';
@@ -4538,9 +3210,6 @@ function setAdminUI(isAdmin, user) {
   document.querySelectorAll('.admin-only').forEach(el => {
     el.style.display = isAdmin ? 'block' : 'none';
   });
-  try { ensureNewsAdminUI(); } catch(e) {}
-  try { loadNews(); } catch(e) {}
-
 }
 
 async function computeIsAdmin(user) {
@@ -4594,38 +3263,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.__SBYT_ADMIN = isAdmin;
         setAdminUI(isAdmin, user);
 
-        // Emoji dropdown -> scrie automat in campul "sau scrie..."
-        try {
-          const emojiSel = document.getElementById('newsEmojiSelect');
-          const emojiInp = document.getElementById('newsEmojiInput');
-          if (emojiSel && emojiInp && !emojiSel.__bound) {
-            emojiSel.__bound = true;
-            emojiSel.addEventListener('change', () => {
-              const v = (emojiSel.value || '').trim();
-              if (v) {
-                emojiInp.value = v;
-                emojiInp.dispatchEvent(new Event('input', { bubbles: true }));
-              }
-            });
-          }
-        } catch(e) {}
-
         // daca user e autentificat dar nu e admin -> optional delogare automata
         // if (user && !isAdmin) await firebase.auth().signOut();
       });
     }
   } catch (e) {}
-});
-
-// Emoji quick picker -> fills the emoji input
-document.addEventListener("DOMContentLoaded", () => {
-  const sel = document.getElementById("newsEmojiSelect");
-  const inp = document.getElementById("newsEmojiInput");
-  if (sel && inp) {
-    sel.addEventListener("change", () => {
-      if (sel.value) inp.value = sel.value;
-    });
-  }
 });
 
 
@@ -4734,13 +3376,15 @@ function loadNews() {
           const div = document.createElement('div');
           div.className = cardClass;
           div.innerHTML = `
-            ${item.bgUrl ? `<div class="news-bg" style="background-image:url('${_escapeAttr(item.bgUrl)}')"></div>` : ``}
             <div class="news-badge ${badge.cls}">${badge.txt}</div>
-            <h4 style="margin-bottom:0.5rem; color:white;">${_escapeHtml((item.emoji? item.emoji+' ' : '') + (item.title||''))}</h4>
+            <h4 style="margin-bottom:0.5rem; color:white;">${_escapeHtml(item.title||'')}</h4>
             <p style="opacity:0.9; line-height:1.5;">${_escapeHtml(item.content||'')}</p>
             <div class="news-date"><span>📅</span> ${dateStr}</div>
-            ${window.__SBYT_ADMIN ? `<button class="news-delete-btn" data-id="${item.id}">🗑️ Sterge</button>` : ``}
-    `;
+
+            <div style="margin-top:0.9rem; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="news-btn" onclick="deleteNews('${item._id}')">🗑️ Sterge</button>
+            </div>
+          `;
           newsContainer.appendChild(div);
         });
       });
@@ -5265,36 +3909,16 @@ window.addEventListener('load', () => {
 
       const date = item.date || item.createdAt;
       const d = date ? new Date(date) : new Date();
-      const emojiSpan = item.emoji ? `<span class="news-emoji">${_escape(item.emoji)}</span>` : '';
-      const delBtn = (window.isAdmin) ? `<button class="delete-news-btn" data-id="${item.id}">Șterge</button>` : '';
-
       card.innerHTML = `
         <div class="news-badge ${badge.cls}">${badge.txt}</div>
         <h4 style="margin-bottom:0.5rem; color:white;">${_escape(item.title||'')}</h4>
         <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
-        <div class="news-date">
-          <span>📅</span>
-          <span>${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
-          ${emojiSpan}
+        <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
+          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
         </div>
-        ${delBtn}
       `;
-
-
-      // fundal imagine (daca exista)
-      try {
-        if (item.bgUrl) {
-          card.classList.add('has-bg');
-          const safeUrl = String(item.bgUrl).replace(/["'()\\]/g, '');
-          card.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.70)), url(${safeUrl})`;
-          card.style.backgroundSize = 'cover';
-          card.style.backgroundPosition = 'center';
-        } else {
-          card.classList.remove('has-bg');
-          card.style.backgroundImage = '';
-        }
-      } catch(e) {}
-container.appendChild(card);
+      container.appendChild(card);
     });
   }
 
@@ -5738,6 +4362,7 @@ container.appendChild(card);
 })();
 
 </script>
+
 <script>
 /* ==========================================================
    SBYT PATCH (Admin auth + Giveaway/Promo + Team + Contact)
@@ -6282,6 +4907,8 @@ container.appendChild(card);
 
 })();
 </script>
+
+
 <script>
 /* ============================================================
    SBYT V4 PATCH (Firebase Auth + Firestore cross-device + Etherscan live)
@@ -6664,9 +5291,161 @@ try{
     }
   };
 
+  // ---------- Admin panel (hidden) ----------
+  function injectAdminPanel(){
+    // add at bottom of presentation if not exists
+    if (document.getElementById('adminPanel')) return;
+    const pres = document.querySelector('#presentation, section[data-page="presentation"], section#prezentare');
+    if (!pres) return;
+
+    const wrap = document.createElement('section');
+    wrap.id = 'adminPanel';
+    wrap.className = 'admin-login';
+    wrap.innerHTML = `
+      <h2>🔐 Administrator</h2>
+      <p class="admin-desc">Autentificare Firebase (Email/Parola) pentru administrare (membri, anunturi, noutati, giveaway, promotii).</p>
+
+      <div class="admin-login-box">
+        <input type="email" id="adminEmail" placeholder="Email (ex: stancubyt@gmail.com)" />
+        <input type="password" id="adminPass" placeholder="Parola" />
+        <button id="adminLoginBtn" type="button">Autentificare</button>
+        <button id="adminLogoutBtn" type="button" style="display:none;">Delogare</button>
+      </div>
+
+      <div style="margin-top:10px;">
+        <span id="adminBadge" style="font-weight:800;">Neautentificat</span>
+        <span id="adminUserLabel" style="margin-left:10px; opacity:0.85;"></span>
+      </div>
+      <p id="adminLoginMsg" class="admin-msg"></p>
+
+      <div class="admin-only" style="display:none; margin-top:18px;">
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button type="button" onclick="window.showTeamForm && window.showTeamForm()">👥 Adauga membru</button>
+          <button type="button" onclick="window.showAnnouncementForm && window.showAnnouncementForm()">📢 Adauga anunt</button>
+          <button type="button" onclick="window.showNewsForm && window.showNewsForm()">📰 Adauga noutate</button>
+          <button type="button" onclick="window.showPromoForm && window.showPromoForm('giveaway')">🏆 Adauga giveaway</button>
+          <button type="button" onclick="window.showPromoForm && window.showPromoForm('promo')">🎁 Adauga promotie</button>
+        </div>
+      </div>
+      <div style="opacity:0.8; margin-top:10px; font-size:0.9rem;">
+        Tip: pentru Etherscan live, seteaza cheia in browser: <code>localStorage.SBYT_ETHERSCAN_KEY = "CHEIA_TA"</code>
+      </div>
+    `;
+    pres.appendChild(wrap);
+
+    // hook buttons to existing auth functions if present
+    const loginBtn = document.getElementById('adminLoginBtn');
+    const logoutBtn = document.getElementById('adminLogoutBtn');
+    if (loginBtn){
+      loginBtn.addEventListener('click', async ()=>{
+        try{
+          if (!firebase?.auth) { alert('Firebase Auth nu este incarcat.'); return; }
+          const email = (document.getElementById('adminEmail')?.value || '').trim();
+          const pass = (document.getElementById('adminPass')?.value || '').trim();
+          await firebase.auth().signInWithEmailAndPassword(email, pass);
+        }catch(e){
+          alert('Eroare autentificare: ' + (e?.message || e));
+        }
+      });
+    }
+    if (logoutBtn){
+      logoutBtn.addEventListener('click', async ()=>{
+        try{ await firebase.auth().signOut(); }catch(e){}
+      });
+    }
+
+    // keep status updated
+    try{
+      firebase.auth().onAuthStateChanged(async (user)=>{
+        let isAdmin = false;
+        try{
+          if (user){
+            // whitelist fallback
+            isAdmin = (user.email || '').toLowerCase() === 'stancubyt@gmail.com';
+            // custom claim if exists
+            const t = await user.getIdTokenResult(true);
+            if (t?.claims?.admin === true) isAdmin = true;
+          }
+        }catch(e){}
+        window.__SBYT_ADMIN = !!isAdmin;
+
+        const badge = document.getElementById('adminBadge');
+        const label = document.getElementById('adminUserLabel');
+        const msg = document.getElementById('adminLoginMsg');
+        const lo = document.getElementById('adminLogoutBtn');
+
+        if (badge) badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
+        if (label) label.textContent = user ? `User: ${maskEmail(user.email||'')}` : '';
+        if (lo) lo.style.display = user ? 'inline-block' : 'none';
+        if (msg){
+          msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
+          msg.textContent = user ? (isAdmin ? 'Mod administrator activ.' : 'Autentificat, dar fara drepturi admin.') : 'Autentifica-te cu email + parola (Firebase).';
+        }
+
+        document.querySelectorAll('.admin-only').forEach(el=>{
+          el.style.display = isAdmin ? 'block' : 'none';
+        });
+      });
+    }catch(e){}
+  }
+
+  // ---------- Trophy icon replace ----------
+  function patchAddGiveawayButton(){
+    // Replace "adauga giveaway" text with trophy + SBYT logo if button exists
+    const btns = Array.from(document.querySelectorAll('button, a, .btn')).filter(b => /adauga\s+gi?veaway/i.test((b.textContent||'').trim()));
+    if (!btns.length) return;
+    const logoUrl = (window.SBYT_LOGO_URL || 'https://i.ibb.co/Zzb6ZTG0/logo.png');
+    btns.forEach(b=>{
+      b.innerHTML = `🏆 <img src="${logoUrl}" alt="SBYT" style="height:18px; width:18px; vertical-align:middle; margin:0 6px; border-radius:4px;">`;
+      b.setAttribute('title','Adauga Giveaway');
+    });
+  }
+
+  // ---------- Firestore rules help (comment in console) ----------
+  function printRulesHint(){
+    // Shows what you need to paste in Firestore Rules to fix "Rules" errors.
+    console.log(`
+SBYT Firestore Rules (exemplu) - seteaza admin doar pentru stancubyt@gmail.com:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == "stancubyt@gmail.com";
+      // SAU: request.auth.token.admin == true (custom claim)
+    }
+
+    match /promos/{promoId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+
+      match /participants/{pid} {
+        allow read: if true;
+        allow create: if true; // inscriere publica
+        allow delete, update: if isAdmin();
+      }
+    }
+
+    match /team/{id} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /announcements/{id} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /news/{id} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}
+    `);
+  }
+
   // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', ()=>{
-    
+    injectAdminPanel();
     patchQuickContact();
     patchAddGiveawayButton();
     printRulesHint();
@@ -6678,6 +5457,8 @@ try{
 
 })();
 </script>
+
+
 <script>
 /* ============================
    STBYT PATCH v1 (2025-12-25)
@@ -6687,7 +5468,7 @@ try{
 (function(){
   const ADMIN_EMAIL = "stancubyt@gmail.com";
   const TOKEN_ADDR = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-  const ETHERSCAN_PROXY = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy";
+  const ETHERSCAN_PROXY = "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy";
 
   // helpers
   const $ = (id)=>document.getElementById(id);
@@ -7136,7 +5917,7 @@ try{
     window.loadNews();
     window.loadTeam();
     listenPromos();
-    try { window.updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
+    window.updateVisitCounter();
 
     // token updates
     updateSupplyAndHolders();
@@ -7159,746 +5940,10 @@ try{
   }
 })();
 </script>
+
+</body>
+</html>
+
 <script>
 function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 </script>
-<script>
-/* =======================
-   STANCUBYT FIX OVERRIDES (fc2b9)
-   - price (CoinGecko)
-   - visits (hitCounter)
-   - news CRUD + emoji + image bg (Firestore+Storage)
-   ======================= */
-(function() {
-  const CONTRACT_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-  const FUNCTIONS_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net";
-  const ADMIN_EMAIL = "stancubyt@gmail.com";
-
-  function $(id){ return document.getElementById(id); }
-  function safeText(el, txt){ if (el) el.textContent = txt; }
-  function isAdminUser(user){
-    if(!user || !user.email) return false;
-    return String(user.email).toLowerCase() === String(ADMIN_EMAIL).toLowerCase();
-  }
-  function getDb(){ return (window.firebase && firebase.firestore) ? firebase.firestore() : null; }
-  function getAuth(){ return (window.firebase && firebase.auth) ? firebase.auth() : null; }
-  function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
-
-  // -------- VISITS (Cloud Function) --------
-  async function updateVisits() {
-    // 1) Increment via Cloud Function (ignore response shape)
-    try {
-      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", { cache: "no-store" });
-      // Some deployments may not return JSON; don't let UI break.
-      try {
-        const j = await r.clone().json();
-        const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
-        if (n != null) {
-          safeText($("visitCount"), String(n));
-          safeText($("visitCounter"), $("visitCounter")?.textContent ? $("visitCounter").textContent : "");
-        }
-      } catch (_) {}
-    } catch (e) {
-      console.warn("hitCounter failed:", e);
-    }
-
-    // 2) Always update UI from Firestore (source of truth)
-    try {
-      const db = getDb();
-      if (!db) return;
-      const ref = db.doc("stats/visits");
-      // attach once
-      if (!window.__SBYT_VISITS_LISTENING__) {
-        window.__SBYT_VISITS_LISTENING__ = true;
-        ref.onSnapshot((snap) => {
-          const data = snap && snap.data ? snap.data() : null;
-          const val = data ? (data.count ?? data.visits ?? data.value ?? data.total ?? null) : null;
-          if (val != null) safeText($("visitCount"), String(val));
-        }, (err) => {
-          console.warn("visits listener error:", err);
-        });
-      }
-      // one-time fetch in case snapshot delayed
-      const snap = await ref.get();
-      const data = snap && snap.data ? snap.data() : null;
-      const val = data ? (data.count ?? data.visits ?? data.value ?? data.total ?? null) : null;
-      if (val != null) safeText($("visitCount"), String(val));
-    } catch (e) {
-      console.warn("visits read failed:", e);
-    }
-  }
-
-  window.updateVisits = updateVisits;
-
-  
-  function updateVisitsOnce(){
-    if (window.__SBYT_VISIT_SENT) return;
-    window.__SBYT_VISIT_SENT = true;
-    return updateVisits();
-  }
-  window.updateVisitsOnce = updateVisitsOnce;
-// Disable legacy password prompt buttons (we use Firebase Auth)
-  window.requestPassword = function(){ alert("Autentifica-te ca administrator pentru a adauga/sterge anunturi."); };
-
-  
-  
-  // -------- PRICE (Real) --------
-  // Primary: CoinGecko by contract (works even when DexScreener/GeckoTerminal has no pairs)
-  const TOKEN_CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-
-  // Uniswap v4 position (provided by you). We try to read price from Uniswap interface gateway.
-  const UNISWAP_V4_POSITION_ID = "95049";
-
-  async function fetchPriceFromUniswapV4Position() {
-    // Uniswap interface gateway (CORS-friendly in most cases)
-    const url = "https://interface.gateway.uniswap.org/v1/positions/v4/ethereum/" + encodeURIComponent(UNISWAP_V4_POSITION_ID);
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("Uniswap position HTTP " + r.status);
-    const j = await r.json();
-
-    // We search for common fields used by the interface responses
-    // Examples: { position: { priceUSD: "0.00123" } } or nested: data.position...
-    const candidates = [
-      j && j.priceUSD,
-      j && j.position && j.position.priceUSD,
-      j && j.position && j.position.token0PriceUSD,
-      j && j.position && j.position.token1PriceUSD,
-      j && j.data && j.data.position && j.data.position.priceUSD,
-      j && j.data && j.data.position && j.data.position.token0PriceUSD,
-      j && j.data && j.data.position && j.data.position.token1PriceUSD,
-      j && j.position && j.position.currentPriceUSD,
-    ];
-    for (const v of candidates) {
-      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
-      if (Number.isFinite(num) && num > 0) return num;
-    }
-    throw new Error("Uniswap position price missing");
-  }
-
-  async function fetchPriceCoinGeckoByContract() {
-    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
-      + "?contract_addresses=" + encodeURIComponent(TOKEN_CONTRACT)
-      + "&vs_currencies=usd";
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
-    const j = await r.json();
-    const key = TOKEN_CONTRACT.toLowerCase();
-    const usd = j && j[key] && j[key].usd;
-    const num = typeof usd === "number" ? usd : Number(usd);
-    if (!Number.isFinite(num) || num <= 0) throw new Error("CoinGecko price missing");
-    return num;
-  }
-
-  // Fallback: GeckoTerminal pool (if available)
-  const GECKO_POOL = "0xabfa4bdb1b4485e0c590bba4adc93a3980f591e4"; // ETH pool address already linked in page
-
-  async function fetchPriceGeckoTerminal() {
-    const url = "https://api.geckoterminal.com/api/v2/networks/eth/pools/" + GECKO_POOL;
-    const r = await fetch(url, {cache:"no-store"});
-    if (!r.ok) throw new Error("GeckoTerminal HTTP " + r.status);
-    const j = await r.json();
-    const a = j && j.data && j.data.attributes ? j.data.attributes : null;
-    // Try multiple possible fields (API may differ)
-    const candidates = [
-      a && a.base_token_price_usd,
-      a && a.quote_token_price_usd,
-      a && a.price_in_usd,
-      a && a.pool_price_usd,
-      a && a.token_price_usd,
-    ];
-    for (const v of candidates) {
-      const num = typeof v === "string" ? Number(v) : (typeof v === "number" ? v : NaN);
-      if (Number.isFinite(num) && num > 0) return num;
-    }
-    throw new Error("GeckoTerminal price missing");
-  }
-
-  async function updateTokenPrice() {
-    const el = $("liveTokenPrice") || $("currentPrice") || $("tokenPrice");
-    const lastEl = $("lastUpdated");
-    try {
-      let usd = null;
-      try {
-        usd = await fetchPriceFromUniswapV4Position();
-      } catch (e0) {
-        try {
-          usd = await fetchPriceCoinGeckoByContract();
-        } catch (e1) {
-          // fallback to pool-based price if CoinGecko doesn't know the token yet
-          usd = await fetchPriceGeckoTerminal();
-        }
-      }
-      if (el) el.textContent = "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 10 });
-      if (lastEl) lastEl.textContent = "Ultima actualizare: " + new Date().toLocaleTimeString("ro-RO");
-    } catch (e) {
-      console.warn("price update failed:", e);
-      if (el) el.textContent = "-";
-      if (lastEl) lastEl.textContent = "Ultima actualizare: --:--:--";
-    }
-  }
-
-    function startPriceAutoUpdate() {
-    updateTokenPrice();
-    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
-    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
-  }
-  window.startPriceAutoUpdate = startPriceAutoUpdate;
-  window.updateTokenPrice = updateTokenPrice;
-// -------- TOTAL SUPPLY (etherscanProxy) --------
-  async function updateTotalSupplyReal() {
-    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
-    try {
-      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
-      const r = await fetch(url, {cache:"no-store"});
-      const j = await r.json();
-      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
-      if (!raw || raw === "0") return;
-      // raw is integer with 18 decimals
-      const supply = Number(raw) / 1e18;
-      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
-    } catch (e) {
-      console.warn("totalSupplyReal failed:", e);
-    }
-  }
-  window.updateTotalSupplyReal = updateTotalSupplyReal;
-
-  // -------- NEWS (Firestore + Storage) --------
-  function renderNewsList(items, isAdmin) {
-    const container = $("newsContainer");
-    if (!container) return;
-
-    // sort: pinned first, then newest
-    items.sort((a,b)=>{
-      const pa = a.pinned ? 1 : 0;
-      const pb = b.pinned ? 1 : 0;
-      if (pa !== pb) return pb - pa;
-      const ta = a.createdAtMs || 0;
-      const tb = b.createdAtMs || 0;
-      return tb - ta;
-    });
-
-    container.innerHTML = "";
-    items.forEach(item=>{
-      const card = document.createElement("div");
-      card.className = "news-card " + (item.type || "news");
-
-      // background image
-      if (item.bgUrl) {
-        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
-        card.style.backgroundSize = "cover";
-        card.style.backgroundPosition = "center";
-      }
-
-      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
-      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
-
-      card.innerHTML = `
-        <div class="news-card-head">
-          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
-          <div class="news-date">${(item.emoji ? item.emoji + " " : "")}${when}</div>
-        </div>
-        <div class="news-card-title">${(item.title || "")}</div>
-        <div class="news-card-text">${item.content || ""}</div>
-      `;
-
-      if (isAdmin) {
-        const del = document.createElement("button");
-        del.className = "news-del-btn";
-        del.textContent = "🗑️ Sterge";
-        del.onclick = async ()=>{
-          if (!confirm("Stergi acest anunt?")) return;
-          const db = getDb();
-          if (!db) return alert("Firestore indisponibil.");
-          try {
-            await db.collection("news").doc(item._id).delete();
-          } catch (e) {
-            console.error("delete news failed:", e);
-            alert("Eroare la stergere (rules/permisiuni).");
-          }
-        };
-        card.appendChild(del);
-      }
-
-      container.appendChild(card);
-    });
-  }
-
-  async function uploadNewsImage(file) {
-    if (!file) return null;
-    const storage = getStorage();
-    if (!storage) throw new Error("Storage SDK indisponibil");
-    const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
-    const path = "news/" + Date.now() + "_" + safeName;
-    const ref = storage.ref().child(path);
-
-    // NU blocam publicarea daca upload-ul se blocheaza / esueaza
-    try {
-      const task = ref.put(file);
-      await Promise.race([
-        task,
-        new Promise((_, rej) => setTimeout(() => rej(new Error("upload-timeout")), 8000))
-      ]);
-      return await ref.getDownloadURL();
-    } catch (e) {
-      console.warn("uploadNewsImage failed:", e);
-      return null;
-    }
-  }
-
-  async function adminCreateNews() {
-    const auth = getAuth();
-    const user = auth && auth.currentUser ? auth.currentUser : null;
-    if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
-
-    const addBtn = $("newsAddBtn");
-    if (addBtn) { addBtn.disabled = true; addBtn.style.opacity = "0.7"; }
-
-    const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
-    const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
-    const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
-    const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
-    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
-
-    if (!title || !content) return alert("Completeaza titlu si continut.");
-
-    const db = getDb();
-    if (!db) return alert("Firestore indisponibil.");
-
-    try {
-      let bgUrl = null;
-      if (file) {
-        try {
-          bgUrl = await uploadNewsImage(file);
-        } catch (upErr) {
-          console.warn("upload failed (continuing without image):", upErr);
-          bgUrl = null;
-        }
-      }
-
-      await db.collection("news").add({
-        title,
-        content,
-        emoji: emoji || "",
-        type,
-        pinned,
-        bgUrl: bgUrl || "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        createdAtMs: Date.now(),
-      });
-
-      // reset form
-      if ($("newsTitleInput")) $("newsTitleInput").value = "";
-      if ($("newsContentInput")) $("newsContentInput").value = "";
-      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
-      if ($("newsBgInput")) $("newsBgInput").value = "";
-      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
-    }
-    catch (e) {
-      console.error("create news failed:", e);
-      alert("Eroare la salvare stire (rules/permisiuni).");
-    } finally {
-      const addBtn2 = $("newsAddBtn");
-      if (addBtn2) { addBtn2.disabled = false; addBtn2.style.opacity = "1"; }
-    }
-  }
-  window.adminCreateNews = adminCreateNews;
-
-  function setNewsAdminVisible(isAdmin) {
-    const box = $("newsAdminBox");
-    if (box) box.style.display = isAdmin ? "block" : "none";
-    // hide any legacy admin section if exists
-    const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
-    if (legacyAdmin) legacyAdmin.style.display = "none";
-  }
-
-  function startNewsRealtime() {
-    const db = getDb();
-    const container = $("newsContainer");
-    if (!db || !container) return;
-    try {
-      db.collection("news")
-        .orderBy("createdAtMs", "desc")
-        .limit(50)
-        .onSnapshot((snap)=>{
-          const items=[];
-          snap.forEach(doc=> items.push({_id: doc.id, ...doc.data()}));
-          const auth = getAuth();
-          const isAdmin = isAdminUser(auth && auth.currentUser);
-          renderNewsList(items, isAdmin);
-        }, (err)=>{
-          console.error("news onSnapshot error:", err);
-          container.innerHTML = '<div style="color:#ffb3b3; padding:12px; border:1px solid rgba(255,255,255,.15); border-radius:12px; background:rgba(0,0,0,.35)">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca <b>match /news/{id} allow read: if true;</b></div>';
-        });
-    } catch (e) {
-      console.error("startNewsRealtime failed:", e);
-    }
-  }
-
-  function wireAuthUI() {
-    const auth = getAuth();
-    if (!auth) return;
-
-    // show admin box if admin
-    auth.onAuthStateChanged((user)=>{
-      const isAdmin = isAdminUser(user);
-      setNewsAdminVisible(isAdmin);
-
-      // also re-render delete buttons after login
-      // force refresh by re-reading current DOM content
-      // (snapshot callback will also run)
-    });
-
-    // attach login form if present
-    const loginBtn = $("adminLoginBtn");
-    const logoutBtn = $("adminLogoutBtn");
-
-    if (loginBtn) {
-      loginBtn.onclick = async ()=>{
-        const email = ($("adminEmail") && $("adminEmail").value || "").trim();
-        const pass  = ($("adminPassword") && $("adminPassword").value || "").trim();
-        try {
-          await auth.signInWithEmailAndPassword(email, pass);
-        } catch (e) {
-          console.error("login failed:", e);
-          alert("Eroare autentificare: " + (e && e.message ? e.message : e));
-        }
-      };
-    }
-    if (logoutBtn) {
-      logoutBtn.onclick = async ()=> { try { await auth.signOut(); } catch(_){} };
-    }
-  }
-
-  function init() {
-    // remove junk texts if still present
-    try {
-      document.body.innerHTML = document.body.innerHTML
-        .replace(/Particles Background Contor Vizite[^<]*Scientific Navigation/g, "")
-        .replace(/coinmarketcap LIVE/g, "");
-    } catch(_) {}
-
-    try { updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
-    startPriceAutoUpdate();
-    updateTotalSupplyReal();
-    wireAuthUI();
-    startNewsRealtime();
-
-    // if there is a visible price placeholder under hero text
-    const heroPrice = $("liveTokenPrice") || $("currentPrice");
-    if (heroPrice && heroPrice.textContent.trim() === "") heroPrice.textContent = "Loading...";
-  }
-
-  window.addEventListener("load", init);
-})();
-</script>
-
-</body>
-<script>
-/* =======================
-   STANCUBYT FIX OVERRIDES (fc2b9)
-   - price (CoinGecko)
-   - visits (hitCounter)
-   - news CRUD + emoji + image bg (Firestore+Storage)
-   ======================= */
-(function() {
-  const CONTRACT_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-  const FUNCTIONS_BASE = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net";
-  const ADMIN_EMAIL = "stancubyt@gmail.com";
-
-  function $(id){ return document.getElementById(id); }
-  function safeText(el, txt){ if (el) el.textContent = txt; }
-  function isAdminUser(user){
-    return !!(user && user.email && String(user.email).toLowerCase() === ADMIN_EMAIL);
-  }
-  function getDb(){ return (window.firebase && firebase.firestore) ? firebase.firestore() : null; }
-  function getAuth(){ return (window.firebase && firebase.auth) ? firebase.auth() : null; }
-  function getStorage(){ return (window.firebase && firebase.storage) ? firebase.storage() : null; }
-
-  // -------- VISITS (Cloud Function) --------
-  async function updateVisits() {
-    try {
-      const r = await fetch(FUNCTIONS_BASE + "/hitCounter", {cache:"no-store"});
-      const j = await r.json();
-      const n = (j && (j.count ?? j.visits ?? j.value)) ?? null;
-      if (n != null) safeText($("visitCount"), String(n));
-    } catch (e) {
-      console.warn("hitCounter failed:", e);
-    }
-  }
-  window.updateVisits = updateVisits;
-
-  // -------- PRICE (CoinGecko token_price) --------
-  async function fetchPriceCoinGecko() {
-    const url = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
-      + "?contract_addresses=" + encodeURIComponent(CONTRACT_ADDRESS)
-      + "&vs_currencies=usd";
-    const r = await fetch(url, {cache:"no-store"});
-    if (!r.ok) throw new Error("CoinGecko HTTP " + r.status);
-    const j = await r.json();
-    const key = CONTRACT_ADDRESS.toLowerCase();
-    const usd = j && j[key] && typeof j[key].usd === "number" ? j[key].usd : null;
-    if (usd == null) throw new Error("CoinGecko no price for contract");
-    return usd;
-  }
-
-  
-  function startPriceAutoUpdate() {
-    updateTokenPrice();
-    if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
-    window.__stancu_priceInterval = setInterval(updateTokenPrice, 60000);
-  }
-  window.startPriceAutoUpdate = startPriceAutoUpdate;
-  window.updateTokenPrice = updateTokenPrice;
-
-  // -------- TOTAL SUPPLY (etherscanProxy) --------
-  async function updateTotalSupplyReal() {
-    const el = $("totalSupplyReal") || $("totalSupply") || $("totalSupplyValue");
-    try {
-      const url = FUNCTIONS_BASE + "/etherscanProxy?module=stats&action=tokensupply&contractaddress=" + encodeURIComponent(CONTRACT_ADDRESS);
-      const r = await fetch(url, {cache:"no-store"});
-      const j = await r.json();
-      const raw = j && (j.result ?? j.Result ?? j.data) ? String(j.result ?? j.Result ?? j.data) : null;
-      if (!raw || raw === "0") return;
-      // raw is integer with 18 decimals
-      const supply = Number(raw) / 1e18;
-      if (Number.isFinite(supply)) safeText(el, supply.toLocaleString("en-US", {maximumFractionDigits: 0}));
-    } catch (e) {
-      console.warn("totalSupplyReal failed:", e);
-    }
-  }
-  window.updateTotalSupplyReal = updateTotalSupplyReal;
-
-  // -------- NEWS (Firestore + Storage) --------
-  function renderNewsList(items, isAdmin) {
-    const container = $("newsContainer");
-    if (!container) return;
-
-    // sort: pinned first, then newest
-    items.sort((a,b)=>{
-      const pa = a.pinned ? 1 : 0;
-      const pb = b.pinned ? 1 : 0;
-      if (pa !== pb) return pb - pa;
-      const ta = a.createdAtMs || 0;
-      const tb = b.createdAtMs || 0;
-      return tb - ta;
-    });
-
-    container.innerHTML = "";
-    items.forEach(item=>{
-      const card = document.createElement("div");
-      card.className = "news-card " + (item.type || "news");
-
-      // background image
-      if (item.bgUrl) {
-        card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)), url('${item.bgUrl}')`;
-        card.style.backgroundSize = "cover";
-        card.style.backgroundPosition = "center";
-      }
-
-      const typeLabel = item.type === "announcement" ? "Anunt" : (item.type === "update" ? "Noutate" : "Stire");
-      const when = item.createdAtMs ? new Date(item.createdAtMs).toLocaleString("ro-RO") : "";
-
-      card.innerHTML = `
-        <div class="news-card-head">
-          <div class="news-type ${item.type || "news"}">${typeLabel}${item.pinned ? " • PINNED" : ""}</div>
-          <div class="news-date">${(item.emoji ? item.emoji + " " : "")}${when}</div>
-        </div>
-        <div class="news-card-title">${(item.title || "")}</div>
-        <div class="news-card-text">${item.content || ""}</div>
-      `;
-
-      if (isAdmin) {
-        const del = document.createElement("button");
-        del.className = "news-del-btn";
-        del.textContent = "🗑️ Sterge";
-        del.onclick = async ()=>{
-          if (!confirm("Stergi acest anunt?")) return;
-          const db = getDb();
-          if (!db) return alert("Firestore indisponibil.");
-          try {
-            await db.collection("news").doc(item._id).delete();
-          } catch (e) {
-            console.error("delete news failed:", e);
-            alert("Eroare la stergere (rules/permisiuni).");
-          }
-        };
-        card.appendChild(del);
-      }
-
-      container.appendChild(card);
-    });
-  }
-
-  async function uploadNewsImage(file) {
-    if (!file) return null;
-    const storage = getStorage();
-    if (!storage) throw new Error("Storage SDK indisponibil");
-    const safeName = (file.name || "img").replace(/[^\w.\-]+/g, "_");
-    const path = "news/" + Date.now() + "_" + safeName;
-    const ref = storage.ref().child(path);
-    await ref.put(file);
-    return await ref.getDownloadURL();
-  }
-
-  async function adminCreateNews() {
-    const auth = getAuth();
-    const user = auth && auth.currentUser ? auth.currentUser : null;
-    if (!isAdminUser(user)) return alert("Doar admin poate adauga.");
-
-    const title = ($("newsTitleInput") && $("newsTitleInput").value || "").trim();
-    const content = ($("newsContentInput") && $("newsContentInput").value || "").trim();
-    const emoji = ($("newsEmojiInput") && $("newsEmojiInput").value || "").trim();
-    const type = ($("newsTypeInput") && $("newsTypeInput").value) || "news";
-    const pinned = !!($("newsPinnedInput") && $("newsPinnedInput").checked);
-    const file = $("newsBgInput") && $("newsBgInput").files && $("newsBgInput").files[0] ? $("newsBgInput").files[0] : null;
-
-    if (!title || !content) return alert("Completeaza titlu si continut.");
-
-    const db = getDb();
-    if (!db) return alert("Firestore indisponibil.");
-
-    try {
-      let bgUrl = null;
-      if (file) bgUrl = await uploadNewsImage(file);
-
-      await db.collection("news").add({
-        title,
-        content,
-        emoji: emoji || "",
-        type,
-        pinned,
-        bgUrl: bgUrl || "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        createdAtMs: Date.now(),
-      });
-
-      // reset form
-      if ($("newsTitleInput")) $("newsTitleInput").value = "";
-      if ($("newsContentInput")) $("newsContentInput").value = "";
-      if ($("newsEmojiInput")) $("newsEmojiInput").value = "";
-      if ($("newsBgInput")) $("newsBgInput").value = "";
-      if ($("newsPinnedInput")) $("newsPinnedInput").checked = false;
-    } catch (e) {
-      console.error("create news failed:", e);
-      alert("Eroare la salvare stire (rules/permisiuni).");
-    }
-  }
-  window.adminCreateNews = adminCreateNews;
-
-  function setNewsAdminVisible(isAdmin) {
-    const box = $("newsAdminBox");
-    if (box) box.style.display = isAdmin ? "block" : "none";
-    // hide any legacy admin section if exists
-    const legacyAdmin = document.querySelector(".admin-section, #adminPanel, #administratorSection");
-    if (legacyAdmin) legacyAdmin.style.display = "none";
-  }
-
-  function startNewsRealtime() {
-    const db = getDb();
-    const container = $("newsContainer");
-    if (!db || !container) return;
-    try {
-      db.collection("news")
-        .orderBy("createdAtMs", "desc")
-        .limit(50)
-        .onSnapshot((snap)=>{
-          const items=[];
-          snap.forEach(doc=> items.push({_id: doc.id, ...doc.data()}));
-          const auth = getAuth();
-          const isAdmin = isAdminUser(auth && auth.currentUser);
-          renderNewsList(items, isAdmin);
-        }, (err)=>{
-          console.error("news onSnapshot error:", err);
-          container.innerHTML = '<div style="color:#ffb3b3; padding:12px; border:1px solid rgba(255,255,255,.15); border-radius:12px; background:rgba(0,0,0,.35)">Eroare la încărcare știri (rules/permisiuni). Verifica in Firestore Rules ca <b>match /news/{id} allow read: if true;</b></div>';
-        });
-    } catch (e) {
-      console.error("startNewsRealtime failed:", e);
-    }
-  }
-
-  function wireAuthUI() {
-    const auth = getAuth();
-    if (!auth) return;
-
-    // show admin box if admin
-    auth.onAuthStateChanged((user)=>{
-      const isAdmin = isAdminUser(user);
-      setNewsAdminVisible(isAdmin);
-
-      // also re-render delete buttons after login
-      // force refresh by re-reading current DOM content
-      // (snapshot callback will also run)
-    });
-
-    // attach login form if present
-    const loginBtn = $("adminLoginBtn");
-    const logoutBtn = $("adminLogoutBtn");
-
-    if (loginBtn) {
-      loginBtn.onclick = async ()=>{
-        const email = ($("adminEmail") && $("adminEmail").value || "").trim();
-        const pass  = ($("adminPassword") && $("adminPassword").value || "").trim();
-        try {
-          await auth.signInWithEmailAndPassword(email, pass);
-        } catch (e) {
-          console.error("login failed:", e);
-          alert("Eroare autentificare: " + (e && e.message ? e.message : e));
-        }
-      };
-    }
-    if (logoutBtn) {
-      logoutBtn.onclick = async ()=> { try { await auth.signOut(); } catch(_){} };
-    }
-  }
-
-  function init() {
-    // remove junk texts if still present
-    try {
-      document.body.innerHTML = document.body.innerHTML
-        .replace(/Particles Background Contor Vizite[^<]*Scientific Navigation/g, "")
-        .replace(/coinmarketcap LIVE/g, "");
-    } catch(_) {}
-
-    try { updateVisitsOnce(); } catch(e) { try { updateVisits(); } catch(_) {} }
-    startPriceAutoUpdate();
-    updateTotalSupplyReal();
-    wireAuthUI();
-    startNewsRealtime();
-
-    // if there is a visible price placeholder under hero text
-    const heroPrice = $("liveTokenPrice") || $("currentPrice");
-    if (heroPrice && heroPrice.textContent.trim() === "") heroPrice.textContent = "Loading...";
-  }
-
-  window.addEventListener("load", init);
-})();
-
-</script>
-<script>
-const SBYT_PRICE_ENDPOINT =
-  "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-
-async function updateSBYTPrice() {
-  try {
-    const res = await fetch(SBYT_PRICE_ENDPOINT);
-    const data = await res.json();
-
-    if (data.ok && data.priceUsd) {
-      document.getElementById("sbyt-price").innerText =
-        "$" + Number(data.priceUsd).toFixed(8);
-    } else {
-      document.getElementById("sbyt-price").innerText = "—";
-    }
-  } catch (e) {
-    document.getElementById("sbyt-price").innerText = "—";
-  }
-}
-
-// prima rulare
-updateSBYTPrice();
-
-// auto-refresh la 30 secunde
-setInterval(updateSBYTPrice, 30000);
-</script>
-</body></html>
