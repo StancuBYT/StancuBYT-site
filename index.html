@@ -1178,7 +1178,188 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 <body>
-<section id="statistici" class="page-section">
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- Contor Vizite -->
+    <div class="visit-counter" id="visitCounter">
+        <span class="counter-icon">👁️</span>
+        <span id="visitCount">0</span> vizite
+    </div>
+
+    <!-- Scientific Navigation -->
+    <nav class="scientific-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-3d-container">
+                    <div class="logo-3d">
+                        <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'">
+                    </div>
+                    <div class="backnote-orbit">
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                    </div>
+                </div>
+                <div class="logo-text">StancuBYT</div>
+            </div>
+            <div class="nav-links">
+                <a href="#prezentare" onclick="showSection('prezentare')">Prezentare</a>
+                <a href="#statistici" onclick="showSection('statistici'); fetchAllData();">Statistici</a>
+                <a href="#whitepaper" onclick="showSection('whitepaper')">Whitepaper</a>
+                <a href="#contact" onclick="showSection('contact')">Contact</a>
+                <a href="#giveaway" onclick="showSection('giveaway')">Giveaway & Promoții</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Prezentare Section -->
+    <section id="prezentare" class="page-section active-section">
+        <!-- Logo Background 3D -->
+        <div class="hero-logo-bg">
+            <div class="logo-3d-bg">
+                <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo Background">
+            </div>
+        </div>
+
+        <div class="hero">
+            <h1>StancuBYT Token</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+                Revoluție Digitală în Blockchain - Viitorul Tehnologiei Decentralizate
+            </p>
+            
+            <!-- Live Price Display -->
+            <div id="livePriceDisplay" style="margin: 2rem 0;">
+                <div class="price-display" id="currentPrice">Se încarcă...</div>
+                <div id="priceChange" class="price-change"></div>
+                <small id="lastUpdated">Ultima actualizare: --:--:--</small>
+            </div>
+            
+            <!-- Buton Uniswap -->
+            <a href="https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+               target="_blank" class="uniswap-btn">
+                🔄 Tranzacționează pe Uniswap
+            </a>
+            <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="uniswap-btn" style="background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));">
+                🦎 Vizualizează și Tranzacționează pe GeckoTerminal
+            </a>
+
+            
+            <div class="token-info-grid">
+                <div class="info-card neon-glow">
+                    <h3>🔗 Contract Address</h3>
+                    <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                       target="_blank" 
+                       style="word-break: break-all; font-family: monospace; margin-top: 1rem; color: var(--neon-cyan); text-decoration: none; display: block;">
+                        0x44Cf220399be798baeaE45fd7C4fF44623713833
+                    </a>
+                    <small style="color: #888;">(Click pentru a vedea pe Etherscan)</small>
+                </div>
+                <div class="info-card neon-glow">
+                    <h3>💰 Total Supply REAL</h3>
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--green-growth);" id="mainTotalSupply">
+                        <span id="supplyValue">Se încarcă...</span> SBYT
+                    </p>
+                    <small style="color: #888;">Date live de pe Etherscan</small>
+                </div>
+                <div class="info-card neon-glow">
+                    <h3>🏆 Fondator</h3>
+                    <p style="font-size: 1.2rem; margin-top: 1rem;">
+                        Stancu Marian
+                    </p>
+                </div>
+            </div>
+
+            <!-- SECTIUNE NOUTATI -->
+            <div class="news-section">
+                <div class="news-header">
+                    <h2 class="news-title">
+                        <span>📢</span> Noutăți & Anunțuri
+                    </h2>
+                    <div class="news-controls">
+                        <button class="news-btn" onclick="requestPassword('add')">➕ Adaugă știre</button>
+                        <button class="news-btn" onclick="requestPassword('clear')">🗑️ Șterge toate</button>
+                    </div>
+                </div>
+                
+                <div class="news-grid" id="newsContainer">
+                    <!-- Noutățile vor fi adăugate aici dinamic -->
+                </div>
+                
+                <!-- Formular pentru adăugare știri -->
+                <div class="news-form" id="newsForm" style="display: none;">
+                    <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adaugă o știre nouă</h3>
+                    <div class="form-row">
+                        <input type="text" id="newsTitle" placeholder="Titlu știre" maxlength="100">
+                        <select id="newsType">
+                            <option value="update">Update</option>
+                            <option value="announcement">Anunț Important</option>
+                            <option value="event">Eveniment</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" id="newsContent" placeholder="Conținut știre" maxlength="500">
+                    </div>
+                    <div class="form-row">
+                        <label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
+                            <input type="checkbox" id="pinNews">
+                            Fixează această știre
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button class="news-btn" onclick="saveNews()">💾 Salvează</button>
+                        <button class="news-btn" onclick="cancelAddNews()">❌ Anulează</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="https://twitter.com/StancuBYT" class="social-btn" title="Twitter">🐦</a>
+                <a href="https://t.me/StancuBYT_Official" class="social-btn" title="Telegram">📢</a>
+            <a href="https://www.reddit.com/user/Upbeat_Fig_936/" target="_blank" class="social-btn" title="Reddit">👽</a>
+                <a href="https://github.com/StancuBYT" class="social-btn" title="GitHub">💻</a>
+                <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" class="social-btn" title="LinkedIn">👔</a>
+                <a href="https://stancubyt.com" class="social-btn" title="Website">🌐</a>
+            </div>
+
+            <!-- Status Server -->
+            <div style="margin-top: 2rem; text-align: center;">
+                <div id="serverStatus" class="status-online">
+                    ✅ Date încărcate de pe Etherscan
+                </div>
+            </div>
+        </div>
+    
+<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
+<section id="admin-login" class="admin-login">
+  <h2>🔐 Administrator Login</h2>
+  <p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
+
+  <div class="admin-login-box">
+    <input type="email" id="adminEmail" placeholder="Email administrator" autocomplete="username" />
+    <input type="password" id="adminPass" placeholder="Parola administrator" autocomplete="current-password" />
+    <button type="button" onclick="adminSignIn()">Autentificare</button>
+    <button type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Delogare</button>
+  </div>
+
+  <div class="admin-status-row">
+    <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
+    <span id="adminUserLabel" class="admin-user-label"></span>
+  </div>
+
+  <p id="adminLoginMsg" class="admin-msg"></p>
+
+  <p class="admin-hint">
+    Daca ai activat rol de admin prin <code>custom claims</code>, vei primi acces automat.
+    Alternativ, poti seta email-urile admin in const <code>ADMIN_EMAILS</code> din script.
+  </p>
+</section>
+
+</section>
+
+    <!-- Statistici Section -->
+    <section id="statistici" class="page-section">
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
             <p>Date live preluate de pe Etherscan</p>
@@ -1298,7 +1479,737 @@
             </div>
 </div>
     </section>
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <!-- Whitepaper Section - VERSIUNE PROFESIONALĂ -->
+    <section id="whitepaper" class="page-section">
+        <div class="whitepaper-header">
+            <div class="whitepaper-logo">
+                <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo">
+            </div>
+            <h1 style="font-size: 3rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                StancuBYT (SBYT) Whitepaper
+            </h1>
+            <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 0.5rem;">
+                Documentație Tehnologică Completă
+            </p>
+            <p style="color: var(--neon-cyan); font-family: monospace;">
+                Lansare token: Oct 26, 2025 — 11:23:11 PM +UTC
+            </p>
+            
+            <!-- Butoane Download -->
+            <div style="margin: 2rem 0; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="downloadWhitepaper('ro')" class="download-btn">
+                    <span>📥</span> Descarcă Whitepaper RO
+                </button>
+                <button onclick="downloadWhitepaper('en')" class="download-btn">
+                    <span>📥</span> Download Whitepaper EN
+                </button>
+                <button onclick="window.open('https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833', '_blank')" class="download-btn">
+                    <span>🔍</span> Vezi Contract pe Etherscan
+                </button>
+            </div>
+        </div>
+
+        <!-- Cuprins -->
+        <div class="toc neon-glow">
+            <h3>📚 Cuprins</h3>
+            <ul>
+                <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">1. Executive Summary</a></li>
+                <li><a href="#informatii-generale" onclick="scrollToSection('informatii-generale')">2. Informații generale</a></li>
+                <li><a href="#tokenomics" onclick="scrollToSection('tokenomics')">3. Tokenomics & Distribuție</a></li>
+                <li><a href="#utilitate" onclick="scrollToSection('utilitate')">4. Utilitate & Scop</a></li>
+                <li><a href="#roadmap" onclick="scrollToSection('roadmap')">5. Plan de lansare / Roadmap</a></li>
+                <li><a href="#taxe" onclick="scrollToSection('taxe')">6. Taxe & Tranzacții</a></li>
+                <li><a href="#echipa" onclick="scrollToSection('echipa')">7. Echipa</a></li>
+                <li><a href="#contact-wp" onclick="scrollToSection('contact-wp')">8. Contact & Linkuri</a></li>
+                <li><a href="#recomandari" onclick="scrollToSection('recomandari')">9. Note & Recomandări</a></li>
+                <li><a href="#disclaimer" onclick="scrollToSection('disclaimer')">10. Disclaimer & Riscuri</a></li>
+            </ul>
+        </div>
+
+        <!-- 1. Executive Summary -->
+        <div id="executive-summary" class="section-card neon-glow">
+            <h3>1. Executive Summary</h3>
+            <p>StancuBYT (SBYT) este un token ERC‑20 creat pentru a susține o comunitate digitală modernă, transparentă și orientată spre utilitate. Cu un supply total de 4.000.000 SBYT și un preț de lansare de 200 000 SBYT = 1 ETH, SBYT este conceput pentru a oferi utilitate reală — plăți interne, recompense, acces la servicii și participare comunitară. Lansarea oficială a avut loc pe 26 octombrie 2025.</p>
+        </div>
+
+        <!-- 2. Informații generale -->
+        <div id="informatii-generale" class="section-card neon-glow">
+            <h3>2. Informații generale</h3>
+            <div class="table-container">
+                <table class="whitepaper-table">
+                    <tr>
+                        <th>Parametru</th>
+                        <th>Valoare</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Token</strong></td>
+                        <td>StancuBYT (SBYT)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Standard</strong></td>
+                        <td>ERC‑20</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Smart‑contract address</strong></td>
+                        <td>
+                            <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                               target="_blank" 
+                               style="color: var(--neon-cyan); text-decoration: none; font-family: monospace;">
+                                0x44Cf220399be798baeaE45fd7C4fF44623713833
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Website oficial</strong></td>
+                        <td>
+                            <a href="https://stancubyt.com/" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                                https://stancubyt.com/
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h4 style="color: var(--blue-tech); margin-bottom: 1rem;">Social Media / Comunicare</h4>
+                <div class="social-grid">
+                    <a href="https://twitter.com/StancuBYT" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">
+                            🐦
+                        </div>
+                        <div>
+                            <strong>Twitter</strong>
+                            <small>@StancuBYT</small>
+                        </div>
+                    </a>
+                    <a href="https://t.me/StancuBYT_Official" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">
+                            📢
+                        </div>
+                        <div>
+                            <strong>Telegram</strong>
+                            <small>Official Channel</small>
+                        </div>
+                    </a>
+                    <a href="https://github.com/StancuBYT" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">
+                            💻
+                        </div>
+                        <div>
+                            <strong>GitHub</strong>
+                            <small>Cod sursă</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Tokenomics & Distribuție -->
+        <div id="tokenomics" class="section-card neon-glow">
+            <h3>3. Tokenomics & Distribuție</h3>
+            
+            <div class="table-container">
+                <table class="whitepaper-table">
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Valoare</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Total supply</strong></td>
+                        <td>4.000.000 SBYT (18 decimale)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Preț inițial</strong></td>
+                        <td>200.000 SBYT = 1 ETH</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin: 2rem 0;">
+                <h4 style="color: var(--green-growth); margin-bottom: 1rem;">Distribuție Token</h4>
+                <div class="table-container">
+                    <table class="whitepaper-table">
+                        <tr>
+                            <th>Categorie</th>
+                            <th>Procentaj</th>
+                            <th>Cantitate SBYT</th>
+                        </tr>
+                        <tr>
+                            <td>Fondator / Echipa</td>
+                            <td>15%</td>
+                            <td>600.000 SBYT</td>
+                        </tr>
+                        <tr>
+                            <td>Rezervă proiect / Dezvoltare</td>
+                            <td>40%</td>
+                            <td>1.600.000 SBYT</td>
+                        </tr>
+                        <tr>
+                            <td>Marketing & Comunitate</td>
+                            <td>15%</td>
+                            <td>600.000 SBYT</td>
+                        </tr>
+                        <tr>
+                            <td>Presale / Investitori</td>
+                            <td>30%</td>
+                            <td>1.200.000 SBYT</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div style="background: rgba(0, 255, 136, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--green-growth); margin-top: 1.5rem;">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    <strong>📝 Notă:</strong> Se recomandă lock‑up pentru partea echipei (ex: 12 luni cu eliberare treptată) pentru a asigura stabilitate și încredere.
+                </p>
+            </div>
+        </div>
+
+        <!-- 4. Utilitate & Scop -->
+        <div id="utilitate" class="section-card neon-glow">
+            <h3>4. Utilitate & Scop</h3>
+            <p>SBYT este conceput să fie coloana vertebrală a ecosistemului digital al comunității StancuBYT. Utilități anticipate:</p>
+            
+            <div style="margin: 1.5rem 0;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1rem; background: rgba(0, 102, 255, 0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
+                        <strong>Tranzacții interne</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Rapide și sigure pe blockchain</p>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(0, 255, 136, 0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏆</div>
+                        <strong>Recompense comunitate</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Beneficii pentru membri activi</p>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(138, 43, 226, 0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔒</div>
+                        <strong>Acces exclusiv</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Servicii și conținut premium</p>
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
+                Prin tokenomics clar și supply limitat, SBYT urmărește să devină un instrument util — nu doar un obiect de speculație.
+            </p>
+        </div>
+
+        <!-- 5. Plan de lansare / Roadmap -->
+        <div id="roadmap" class="section-card neon-glow">
+            <h3>5. Plan de lansare / Roadmap</h3>
+            
+            <div class="roadmap-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 1: Lansare</div>
+                    <p>Publicare smart‑contract, verificare pe Etherscan, vânzare către investitori early adopters.</p>
+                    <span class="badge badge-success">Completat</span>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 2: Listare</div>
+                    <p>Creare pool lichiditate pe Uniswap, listare pe DEX, campanii marketing, construire comunitate.</p>
+                    <span class="badge badge-warning">În Curs</span>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 3: Dezvoltare</div>
+                    <p>Integrare token în platforme, servicii, funcții extra, gestionare rezervă, update‑uri periodice.</p>
+                    <span class="badge badge-info">Planificat</span>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Faza 4: Extindere</div>
+                    <p>Integrare token în platforme/servicii, funcționalități suplimentare, audit smart-contract.</p>
+                    <span class="badge badge-info">Planificat</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Taxe & Tranzacții -->
+        <div id="taxe" class="section-card neon-glow">
+            <h3>6. Taxe & Tranzacții</h3>
+            
+            <div class="table-container">
+                <table class="whitepaper-table">
+                    <tr>
+                        <th>Tip Taxă</th>
+                        <th>Procent</th>
+                        <th>Destinație</th>
+                    </tr>
+                    <tr>
+                        <td>Comision DEX (Uniswap)</td>
+                        <td>≈ 0.30%</td>
+                        <td>Lichiditate & Furnizori</td>
+                    </tr>
+                    <tr>
+                        <td>Gas Fee (Ethereum)</td>
+                        <td>Variabil</td>
+                        <td>Rețea Ethereum</td>
+                    </tr>
+                    <tr>
+                        <td>Taxă suplimentară*</td>
+                        <td>Configurabilă</td>
+                        <td>Marketing / Burn / Recompense</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="background: rgba(255, 204, 0, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid #ffcc00; margin-top: 1.5rem;">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    <strong>⚠️ Notă:</strong> Dacă implementezi *taxă suplimentară pe transfer*, aceasta trebuie definită clar în smart‑contract și poate merge spre lichiditate, marketing, burn sau recompense comunitate.
+                </p>
+            </div>
+        </div>
+
+        <!-- 7. Echipa -->
+        <div id="echipa" class="section-card neon-glow">
+            <h3>7. Echipa</h3>
+            
+            <div style="display: flex; align-items: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
+                <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
+                    👨‍💼
+                </div>
+                <div>
+                    <h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Stancu Marian</h4>
+                    <p><strong>Fondator & CEO</strong></p>
+                    <p style="opacity: 0.8; margin-top: 0.5rem;">Inițiator și coordonator proiect StancuBYT</p>
+                </div>
+            </div>
+            <!-- Management echipa (salvare permanenta - Firebase) -->
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.12);">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <h4 style="margin:0; color: var(--neon-cyan);">Membri echipa (Live)</h4>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="news-btn" onclick="requestPassword('teamAdd')">➕ Adaugă membru</button>
+                        <button class="news-btn" onclick="requestPassword('teamClear')">🗑️ Șterge toți</button>
+                    </div>
+                </div>
+
+                <div id="teamList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; margin-top:1rem;"></div>
+
+                <div id="teamForm" style="display:none; margin-top:1rem; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:1rem;">
+                    <div class="form-row">
+                        <input type="text" id="teamName" placeholder="Nume membru" maxlength="80">
+                        <input type="text" id="teamRole" placeholder="Funcția / rol" maxlength="80">
+                    </div>
+                    <div class="form-row">
+                        <input type="date" id="teamJoinDate" placeholder="Data înscrierii">
+                        <input type="url" id="teamAvatar" placeholder="Link foto / avatar (opțional)" maxlength="240">
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:10px;">
+                        <button class="news-btn" onclick="saveTeamMember()">💾 Salvează</button>
+                        <button class="news-btn" onclick="cancelTeamMember()">✖ Anulează</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="background: rgba(0, 204, 255, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    <strong>💼 Echipa în formare:</strong> Vor fi incluși dezvoltatori blockchain, marketeri, manager comunitate. Informațiile vor fi actualizate pe măsură ce echipa se extinde.
+                </p>
+            </div>
+        </div>
+
+        <!-- 8. Contact & Linkuri -->
+        <div id="contact-wp" class="section-card neon-glow">
+            <h3>8. Contact & Linkuri</h3>
+            
+            <div style="margin: 1.5rem 0;">
+                <div class="social-grid">
+                    <a href="https://stancubyt.com/" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">
+                            🌐
+                        </div>
+                        <div>
+                            <strong>Website</strong>
+                            <small>stancubyt.com</small>
+                        </div>
+                    </a>
+                    <a href="mailto:contact@stancubyt.com" class="social-card">
+                        <div class="social-icon" style="background: rgba(255, 68, 68, 0.2);">
+                            📧
+                        </div>
+                        <div>
+                            <strong>Email</strong>
+                            <small>contact@stancubyt.com</small>
+                        </div>
+                    </a>
+                    <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank" class="social-card">
+                        <div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">
+                            👔
+                        </div>
+                        <div>
+                            <strong>LinkedIn</strong>
+                            <small>Business Network</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. Note & Recomandări -->
+        <div id="recomandari" class="section-card neon-glow">
+            <h3>9. Note & Recomandări</h3>
+            
+            <div style="margin: 1.5rem 0;">
+                <div style="display: grid; gap: 1rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(0, 102, 255, 0.05); border-radius: 10px;">
+                        <span style="font-size: 1.5rem;">🔍</span>
+                        <div>
+                            <strong>Audit Smart‑Contract</strong>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Recomandat pentru credibilitate și securitate suplimentară înainte de listare.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(0, 255, 136, 0.05); border-radius: 10px;">
+                        <span style="font-size: 1.5rem;">📊</span>
+                        <div>
+                            <strong>Transparență Distribuție</strong>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(138, 43, 226, 0.05); border-radius: 10px;">
+                        <span style="font-size: 1.5rem;">💬</span>
+                        <div>
+                            <strong>Comunicare Comunitate</strong>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Menține comunicare constantă: actualizări, roadmap, planuri, echipă.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. Disclaimer & Riscuri -->
+        <div id="disclaimer" class="section-card neon-glow">
+            <h3>10. Disclaimer & Riscuri</h3>
+            
+            <div style="background: rgba(255, 68, 68, 0.05); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255, 68, 68, 0.2); margin-top: 1rem;">
+                <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
+                    <span style="font-size: 1.5rem; color: #ff4444;">⚠️</span>
+                    <div>
+                        <h4 style="color: #ff4444; margin-bottom: 0.5rem;">Avertisment important</h4>
+                        <p>Tokenul SBYT este un <strong>token de utilitate</strong>. Nu este garantat un instrument financiar, nici un venit garantat.</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; gap: 0.8rem;">
+                    <p style="margin: 0; font-size: 0.9rem;">
+                        • Investițiile implică riscuri — prețul este volatil, depinde de adopție și acceptare.
+                    </p>
+                    <p style="margin: 0; font-size: 0.9rem;">
+                        • Smart‑contractele pot avea vulnerabilități — recomandăm audit extern înainte de utilizare.
+                    </p>
+                    <p style="margin: 0; font-size: 0.9rem;">
+                        • Proiectul trebuie tratat transparent și responsabil.
+                    </p>
+                    <p style="margin: 0; font-size: 0.9rem;">
+                        • Consultați un specialist financiar înainte de orice investiție.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Butoane Acțiune -->
+        <div style="text-align: center; margin: 3rem 0;">
+            <button onclick="showSection('contact')" class="btn-refresh-modern" style="margin-right: 1rem;">
+                <span class="refresh-icon">📨</span>
+                <span class="refresh-text">Contactează Echipa</span>
+            </button>
+            <button onclick="window.open('https://app.uniswap.org/swap?outputCurrency=0x44Cf220399be798baeaE45fd7C4fF44623713833', '_blank')" class="btn-refresh-modern">
+                <span class="refresh-icon">🔄</span>
+                <span class="refresh-text">Cumpără SBYT pe Uniswap</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Contact Section - VERSIUNE PROFESIONALĂ CU EMAIL DIRECT -->
+    <section id="contact" class="page-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Centru de Contact Tehnic
+            </h1>
+            <p style="opacity: 0.8;">Contact direct pentru colaborări tehnice, parteneriate și suport</p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Formular Contact -->
+            <div class="data-visualization neon-glow">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 1.2rem;">📨</span>
+                    </div>
+                    <h3 style="margin: 0;">Formular Contact Rapid</h3>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nume complet <span class="required">*</span></label>
+                    <input type="text" id="contactName" placeholder="Introduceți numele complet..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Adresă email profesională <span class="required">*</span></label>
+                    <input type="email" id="contactEmail" placeholder="ex: contact@companie.ro" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tip solicitare <span class="required">*</span></label>
+                    <select id="contactType">
+                        <option value="technical">Suport Tehnic</option>
+                        <option value="partnership">Parteneriat de afaceri</option>
+                        <option value="investment">Oportunități de investiție</option>
+                        <option value="listing">Listing pe exchange</option>
+                        <option value="media">Interviu media</option>
+                        <option value="security">Securitate & Compliance</option>
+                        <option value="other">Altceva</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Mesaj detaliat <span class="required">*</span></label>
+                    <textarea id="contactMessage" placeholder="Descrieți solicitarea în detaliu..." rows="6" required></textarea>
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+                    <input type="checkbox" id="contactPrivacy" style="transform: scale(1.2);">
+                    <label for="contactPrivacy" style="font-size: 0.9rem; opacity: 0.8;">
+                        Sunt de acord cu prelucrarea datelor conform 
+                        <a href="https://stancubyt.com/privacy" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Politicii de confidențialitate</a>
+                    </label>
+                </div>
+                
+                <button class="btn-refresh-modern" style="width: 100%; margin-top: 1rem;" onclick="sendContactMessage()" id="submitContactBtn">
+                    <span class="refresh-icon">🚀</span>
+                    <span class="refresh-text">Trimite solicitarea</span>
+                </button>
+                
+                <div id="contactStatus" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+            </div>
+
+            <!-- Informații Contact -->
+            <div class="data-visualization neon-glow">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 1.2rem;">📍</span>
+                    </div>
+                    <h3 style="margin: 0;">Canale de comunicare</h3>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--green-growth); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">👨‍💼</span> Contact Principal
+                    </h4>
+                    <div class="contact-card business">
+                        <p style="margin: 0.5rem 0;"><strong>Stancu Marian</strong></p>
+                        <p style="margin: 0.5rem 0; opacity: 0.9;">Fondator & CEO</p>
+                        <p style="margin: 0.5rem 0;">
+                            <a href="mailto:contact@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                                📧 contact@stancubyt.com
+                            </a>
+                        </p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+                            Pentru întrebări generale și suport
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--blue-tech); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">🤝</span> Pentru parteneriate
+                    </h4>
+                    <div class="contact-card partnership">
+                        <p style="margin: 0.5rem 0;">
+                            <a href="mailto:partnerships@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                                📧 partnerships@stancubyt.com
+                            </a>
+                        </p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+                            Colaborări, listing-uri, parteneriate
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--purple-innov); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">🛡️</span> Securitate & Compliance
+                    </h4>
+                    <div class="contact-card security">
+                        <p style="margin: 0.5rem 0;">
+                            <a href="mailto:security@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                                🔒 security@stancubyt.com
+                            </a>
+                        </p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+                            Raportări de securitate și audite
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Links Grid -->
+        <div class="data-visualization neon-glow" style="padding: 2rem; margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">🌐 Rețele Sociale Oficiale</h3>
+            
+            <div class="social-grid">
+                <a href="https://twitter.com/StancuBYT" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">
+                        🐦
+                    </div>
+                    <div>
+                        <strong style="display: block;">Twitter</strong>
+                        <small style="opacity: 0.7;">@StancuBYT</small>
+                    </div>
+                </a>
+                
+                <a href="https://t.me/StancuBYT_Official" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">
+                        📢
+                    </div>
+                    <div>
+                        <strong style="display: block;">Telegram</strong>
+                        <small style="opacity: 0.7;">Official Channel</small>
+                    </div>
+                </a>
+                
+                <a href="https://github.com/StancuBYT" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">
+                        💻
+                    </div>
+                    <div>
+                        <strong style="display: block;">GitHub</strong>
+                        <small style="opacity: 0.7;">Cod sursă</small>
+                    </div>
+                </a>
+                
+                <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">
+                        👔
+                    </div>
+                    <div>
+                        <strong style="display: block;">LinkedIn</strong>
+                        <small style="opacity: 0.7;">Business Network</small>
+                    </div>
+                </a>
+                
+                <a href="https://stancubyt.com" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">
+                        🌐
+                    </div>
+                    <div>
+                        <strong style="display: block;">Website</strong>
+                        <small style="opacity: 0.7;">stancubyt.com</small>
+                    </div>
+                </a>
+                
+                <a href="https://discord.gg/" target="_blank" class="social-card">
+                    <div class="social-icon" style="background: rgba(88, 101, 242, 0.2);">
+                        💬
+                    </div>
+                    <div>
+                        <strong style="display: block;">Discord</strong>
+                        <small style="opacity: 0.7;">stancubyt</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Program de lucru și Răspunsuri -->
+        <div class="data-visualization neon-glow" style="padding: 2rem;">
+            <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">⏰ Timpi de răspuns</h3>
+            
+            <div class="time-grid">
+                <div class="time-item">
+                    <div class="icon">📧</div>
+                    <h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Email Business</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 24h lucrătoare</p>
+                </div>
+                
+                <div class="time-item">
+                    <div class="icon">💬</div>
+                    <h4 style="color: var(--blue-tech); margin-bottom: 0.5rem;">Telegram</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 2-4 ore</p>
+                </div>
+                
+                <div class="time-item">
+                    <div class="icon">🐦</div>
+                    <h4 style="color: var(--purple-innov); margin-bottom: 0.5rem;">Twitter</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 6-12 ore</p>
+                </div>
+                
+                <div class="time-item">
+                    <div class="icon">🛡️</div>
+                    <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Security</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 12h max</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center;">
+                <p style="font-size: 0.9rem; opacity: 0.8; margin: 0;">
+                    ⚠️ <strong>Important:</strong> Nu trimitem mesaje directe pentru investiții sau OTC. 
+                    Toate comunicările oficiale se fac prin canalele menționate mai sus.
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- Giveaway & Promoții Section -->
+    <section id="giveaway" class="page-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Giveaway & Promoții
+            </h1>
+            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
+
+            <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                <button class="news-btn" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
+                <button class="news-btn trophy-btn" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                </div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📌 Promoții / Giveaway-uri</h3>
+            <div id="promoList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
+
+            <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+    <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
+
+    <div class="form-row">
+        <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT)" maxlength="120">
+        <input type="datetime-local" id="promoEnds" placeholder="Data si ora expirarii">
+    </div>
+
+    <div class="form-row">
+        <input type="text" id="promoPrize" placeholder="Premiu (ex: 5000 SBYT + bonusuri)" maxlength="160">
+        <input type="number" id="promoPoints" min="1" step="1" value="10" placeholder="Puncte / promovare">
+    </div>
+
+    <div class="form-row">
+        <textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
+    </div>
+
+    <div class="form-row">
+        <input type="file" id="promoMedia" accept="image/*,video/*">
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
+        <button class="news-btn" onclick="savePromo()">💾 Salveaza</button>
+        <button class="news-btn" onclick="cancelPromo()">❌ Anuleaza</button>
+    </div>
+
+    <small style="display:block; margin-top:0.8rem; opacity:0.75;">
+        Media (foto/video) se incarca in Firebase Storage (doar admin). Participantii se inscriu public, cu ID automat.
+    </small>
+</div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>🏆 Clasament participanți</h3>
+            
+            <div id="leaderboard" style="margin-top:1rem;"></div>
+        </div>
+    </section>
+
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         // =============================================
         // CONFIGURARE
