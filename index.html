@@ -98,13 +98,22 @@ h1,h3{margin:0}
   </div>
 
   <!-- PRET + CHART -->
-  <div class="neon">
-    <h3>📈 Preț în timp real</h3>
-    <div class="chart-box">
-      <canvas id="priceChart"></canvas>
-    </div>
-    <div id="priceStatus">Se încarcă datele...</div>
+<div class="neon">
+  <h3>📈 Preț în timp real</h3>
+
+  <div class="chart-box">
+    <canvas id="priceChart"></canvas>
   </div>
+
+  <!-- BOX-ul tău (exact cum ai cerut) -->
+  <div id="sbyt-price-box" style="margin-top:20px;">
+    <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
+    <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:#00ff88;">
+      Se încarcă...
+    </div>
+  </div>
+</div>
+
 
   <!-- METRICI -->
   <div class="neon">
@@ -152,51 +161,118 @@ h1,h3{margin:0}
 </div>
 
 <script>
+const SBYT_PRICE_ENDPOINT =
+  "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+
 const chartCtx = document.getElementById("priceChart");
 let priceChart;
 
-function initChart(){
-  priceChart = new Chart(chartCtx,{
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"SBYT / USD",
-        data:[],
-        borderColor:"#00ff88",
-        backgroundColor:"rgba(0,255,136,.15)",
-        tension:.3
+// istoricul pe grafic (limitează la ultimele N puncte)
+const MAX_POINTS = 60;      // ex: 60 puncte
+const REFRESH_MS = 15000;   // ex: la 15 secunde
+
+function initChart() {
+  priceChart = new Chart(chartCtx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: "SBYT / USD",
+        data: [],
+        borderColor: "#00ff88",
+        backgroundColor: "rgba(0,255,136,.15)",
+        tension: .3
       }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0, autoSkip: true } },
+        y: {
+          beginAtZero: false,
+          ticks: {
+            callback: (v) => {
+              // afișare compactă
+              const n = Number(v);
+              if (!Number.isFinite(n)) return v;
+              if (n === 0) return "0";
+              if (n < 0.0001) return n.toExponential(2);
+              return n.toFixed(6);
+            }
+          }
+        }
+      }
     }
   });
 }
 
-async function fetchAllData(){
-  document.getElementById("priceStatus").innerText="Actualizare...";
-  try{
-    // aici vei conecta endpointul tau Firebase / Uniswap
-    // momentan demo
-    const price = (Math.random()*0.01).toFixed(6);
-    document.getElementById("priceStatus").innerText="Preț curent: $"+price;
+function pushPoint(label, priceUsd) {
+  const labels = priceChart.data.labels;
+  const data = priceChart.data.datasets[0].data;
 
-    priceChart.data.labels.push(new Date().toLocaleTimeString());
-    priceChart.data.datasets[0].data.push(price);
-    priceChart.update();
+  labels.push(label);
+  data.push(priceUsd);
 
-    document.getElementById("holders").innerText="—";
-    document.getElementById("supply").innerText="4,000,000";
-    document.getElementById("txs").innerText="—";
-    document.getElementById("marketcap").innerText="—";
-    document.getElementById("volume").innerText="—";
+  // păstrăm ultimele MAX_POINTS
+  while (labels.length > MAX_POINTS) {
+    labels.shift();
+    data.shift();
+  }
 
-  }catch(e){
-    document.getElementById("priceStatus").innerText="Eroare la încărcare";
+  priceChart.update();
+}
+
+async function updateSBYTPrice() {
+  try {
+    const res = await fetch(SBYT_PRICE_ENDPOINT, { cache: "no-store" });
+    const data = await res.json();
+
+    if (data.ok && data.priceUsd) {
+      const price = Number(data.priceUsd);
+      if (Number.isFinite(price) && price > 0) {
+        // update text
+        document.getElementById("sbyt-price").innerText =
+          "$" + price.toFixed(8);
+
+        // update chart
+        const label = new Date().toLocaleTimeString();
+        pushPoint(label, price);
+        return;
+      }
+    }
+
+    document.getElementById("sbyt-price").innerText = "—";
+  } catch (e) {
+    document.getElementById("sbyt-price").innerText = "—";
   }
 }
 
+// butonul tău de refresh
+async function fetchAllData() {
+  await updateSBYTPrice();
+
+  // restul metricilor tale (le poți completa ulterior)
+  document.getElementById("holders").innerText = "—";
+  document.getElementById("supply").innerText = "4,000,000";
+  document.getElementById("txs").innerText = "—";
+  document.getElementById("marketcap").innerText = "—";
+  document.getElementById("volume").innerText = "—";
+}
+
 initChart();
+
+// prima încărcare
 fetchAllData();
+
+// auto-update preț + grafic
+setInterval(updateSBYTPrice, REFRESH_MS);
 </script>
+
 
 </body>
 </html>
