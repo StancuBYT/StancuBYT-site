@@ -98,36 +98,17 @@ h1,h3{margin:0}
   </div>
 
   <!-- PRET + CHART -->
-<div class="neon">
-  <h3>📈 Preț în timp real</h3>
-
-  <div class="chart-box">
-    <canvas id="priceChart"></canvas>
-  </div>
-
-  <!-- BOX-ul tău (exact cum ai cerut) -->
-  <div id="sbyt-price-box" style="margin-top:20px;">
-    <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
-    <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:#00ff88;">
-      Se încarcă...
+  <div class="neon">
+    <h3>📈 Preț în timp real</h3>
+    <div class="chart-box">
+      <canvas id="priceChart"></canvas>
     </div>
+    <div id="priceStatus">Se încarcă datele...</div>
   </div>
-</div>
-
 
   <!-- METRICI -->
   <div class="neon">
     <h3>📊 Metrici Contract</h3>
-  <div>Total Supply</div>
-  <div id="metric-supply">—</div>
-</div>
-<div>
-  <div>Holders</div>
-  <div id="metric-holders">—</div>
-</div>
-<div style="opacity:.7;font-size:12px;margin-top:8px;">
-  Updated: <span id="metric-updated">—</span>
-
     <div class="stats-grid">
       <div class="stat">
         Holders
@@ -171,205 +152,51 @@ h1,h3{margin:0}
 </div>
 
 <script>
-const SBYT_PRICE_ENDPOINT =
-  "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-
 const chartCtx = document.getElementById("priceChart");
 let priceChart;
 
-// istoricul pe grafic (limitează la ultimele N puncte)
-const MAX_POINTS = 60;      // ex: 60 puncte
-const REFRESH_MS = 15000;   // ex: la 15 secunde
-
-function initChart() {
-  priceChart = new Chart(chartCtx, {
-    type: "line",
-    data: {
-      labels: [],
-      datasets: [{
-        label: "SBYT / USD",
-        data: [],
-        borderColor: "#00ff88",
-        backgroundColor: "rgba(0,255,136,.15)",
-        tension: .3
+function initChart(){
+  priceChart = new Chart(chartCtx,{
+    type:"line",
+    data:{
+      labels:[],
+      datasets:[{
+        label:"SBYT / USD",
+        data:[],
+        borderColor:"#00ff88",
+        backgroundColor:"rgba(0,255,136,.15)",
+        tension:.3
       }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      plugins: {
-        legend: { display: true }
-      },
-      scales: {
-        x: { ticks: { maxRotation: 0, autoSkip: true } },
-        y: {
-          beginAtZero: false,
-          ticks: {
-            callback: (v) => {
-              // afișare compactă
-              const n = Number(v);
-              if (!Number.isFinite(n)) return v;
-              if (n === 0) return "0";
-              if (n < 0.0001) return n.toExponential(2);
-              return n.toFixed(6);
-            }
-          }
-        }
-      }
     }
   });
 }
 
-function pushPoint(label, priceUsd) {
-  const labels = priceChart.data.labels;
-  const data = priceChart.data.datasets[0].data;
+async function fetchAllData(){
+  document.getElementById("priceStatus").innerText="Actualizare...";
+  try{
+    // aici vei conecta endpointul tau Firebase / Uniswap
+    // momentan demo
+    const price = (Math.random()*0.01).toFixed(6);
+    document.getElementById("priceStatus").innerText="Preț curent: $"+price;
 
-  labels.push(label);
-  data.push(priceUsd);
+    priceChart.data.labels.push(new Date().toLocaleTimeString());
+    priceChart.data.datasets[0].data.push(price);
+    priceChart.update();
 
-  // păstrăm ultimele MAX_POINTS
-  while (labels.length > MAX_POINTS) {
-    labels.shift();
-    data.shift();
+    document.getElementById("holders").innerText="—";
+    document.getElementById("supply").innerText="4,000,000";
+    document.getElementById("txs").innerText="—";
+    document.getElementById("marketcap").innerText="—";
+    document.getElementById("volume").innerText="—";
+
+  }catch(e){
+    document.getElementById("priceStatus").innerText="Eroare la încărcare";
   }
-
-  priceChart.update();
-}
-
-async function updateSBYTPrice() {
-  try {
-    const res = await fetch(SBYT_PRICE_ENDPOINT, { cache: "no-store" });
-    const data = await res.json();
-
-    if (data.ok && data.priceUsd) {
-      const price = Number(data.priceUsd);
-      if (Number.isFinite(price) && price > 0) {
-        // update text
-        document.getElementById("sbyt-price").innerText =
-          "$" + price.toFixed(8);
-
-        // update chart
-        const label = new Date().toLocaleTimeString();
-        pushPoint(label, price);
-        return;
-      }
-    }
-
-    document.getElementById("sbyt-price").innerText = "—";
-  } catch (e) {
-    document.getElementById("sbyt-price").innerText = "—";
-  }
-}
-
-// butonul tău de refresh
-async function fetchAllData() {
-  await updateSBYTPrice();
-
-  // restul metricilor tale (le poți completa ulterior)
-  document.getElementById("holders").innerText = "—";
-  document.getElementById("supply").innerText = "4,000,000";
-  document.getElementById("txs").innerText = "—";
-  document.getElementById("marketcap").innerText = "—";
-  document.getElementById("volume").innerText = "—";
 }
 
 initChart();
-
-// prima încărcare
 fetchAllData();
-
-// auto-update preț + grafic
-setInterval(updateSBYTPrice, REFRESH_MS);
-
-  const ETHERSCAN_PROXY = "https://etherscanproxy-jfka2frgwa-ew.a.run.app";
-  const TOKEN = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-
-  async function fetchProxy(params) {
-    const qs = new URLSearchParams(params);
-    const url = `${ETHERSCAN_PROXY}?${qs.toString()}`;
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
-  }
-
-  function fmtInt(n) {
-    try { return Number(n).toLocaleString("en-US"); } catch { return String(n); }
-  }
-
-  // SBYT are 18 decimals (din contract). Supply din Etherscan vine în “wei-like”.
-  function fmtTokenAmount(raw, decimals = 18) {
-    const s = String(raw || "0");
-    if (decimals === 0) return fmtInt(s);
-    // format simplu: mută virgula la stânga cu 18 (fără librării)
-    const pad = decimals + 1;
-    const x = s.padStart(pad, "0");
-    const head = x.slice(0, -decimals);
-    const tail = x.slice(-decimals).replace(/0+$/, "");
-    return tail ? `${fmtInt(head)}.${tail}` : fmtInt(head);
-  }
-
-  async function updateContractMetrics() {
-    const elSupply = document.getElementById("metric-supply");
-    const elHolders = document.getElementById("metric-holders");
-    const elUpdated = document.getElementById("metric-updated");
-
-    // fallback UI
-    if (elSupply) elSupply.textContent = "Se încarcă...";
-    if (elHolders) elHolders.textContent = "Se încarcă...";
-
-    try {
-      // 1) Total supply
-      const supplyRes = await fetchProxy({
-        module: "stats",
-        action: "tokensupply",
-        contractaddress: TOKEN
-      });
-
-      // Etherscan tipic: { status:"1", message:"OK", result:"..." }
-      const rawSupply = supplyRes?.result;
-      if (elSupply) {
-        if (rawSupply && rawSupply !== "0") elSupply.textContent = fmtTokenAmount(rawSupply, 18) + " SBYT";
-        else elSupply.textContent = "—";
-      }
-
-      // 2) Holders count (încearcă endpoint; dacă nu e disponibil, nu crăpa)
-      let holdersVal = null;
-
-      // Variante comune (una dintre ele poate funcționa pe contul tău)
-      const holderTries = [
-        { module: "stats", action: "tokenholdercount", contractaddress: TOKEN },
-        { module: "token", action: "tokenholdercount", contractaddress: TOKEN },
-      ];
-
-      for (const t of holderTries) {
-        try {
-          const hRes = await fetchProxy(t);
-          const r = hRes?.result;
-          if (r && r !== "0" && !String(r).includes("NOTOK")) {
-            holdersVal = r;
-            break;
-          }
-        } catch (_) {}
-      }
-
-      if (elHolders) elHolders.textContent = holdersVal ? fmtInt(holdersVal) : "—";
-
-      if (elUpdated) elUpdated.textContent = new Date().toLocaleString();
-    } catch (e) {
-      if (elSupply) elSupply.textContent = "—";
-      if (elHolders) elHolders.textContent = "—";
-      if (elUpdated) elUpdated.textContent = "Eroare update";
-      console.error("Metrici Contract error:", e);
-    }
-  }
-
-  // Rulează imediat + refresh periodic
-  updateContractMetrics();
-  setInterval(updateContractMetrics, 30_000); // la 30s
 </script>
-
-
 
 </body>
 </html>
