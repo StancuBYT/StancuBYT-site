@@ -1189,7 +1189,12 @@
         <div class="data-visualization neon-glow">
             <h3>📈 Preț în Timp Real</h3>
             
-            <!-- Chart Controls -->
+            
+            <div id="sbyt-price-box" style="margin-top:14px; margin-bottom:10px;">
+              <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
+              <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:var(--green-growth);">Se încarcă...</div>
+            </div>
+<!-- Chart Controls -->
             <div class="chart-controls">
                 <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
                 <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
@@ -1446,40 +1451,13 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
         }
 
         
+        
         function initializeChart() {
-            const canvas = document.getElementById('priceChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
+            // Create initial chart instance (line by default) and render from cached samples
+            try { ensureChartInstance('line'); } catch(e) {}
+            try { renderPriceChart(); } catch(e) {}
+        }
 
-            // dacă există deja, nu recrea
-            if (window.__stancu_priceChart) return;
-
-            const data = {
-                labels: [],
-                datasets: [{
-                    label: 'Preț (USD)',
-                    data: [],
-                    borderWidth: 2,
-                    tension: 0.25,
-                    pointRadius: 0
-                }]
-            };
-
-            window.__stancu_priceChart = new Chart(ctx, {
-                type: 'line',
-                data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { display: false } },
-                        y: {
-                            ticks: { callback: (v) => v },
-                            beginAtZero: false
-                        }
                     }
                 }
             });
@@ -1524,47 +1502,233 @@ setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
                 console.warn('chart update failed', e);
             }
         }
-async function fetchDexScreenerBestPair() {
-            const url = `https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`;
-            const r = await fetch(url);
-            if (!r.ok) throw new Error('DexScreener fetch failed');
-            const data = await r.json();
-            const pairs = data?.pairs || [];
-            if (!pairs.length) throw new Error('No pairs for token');
-            // alege perechea cu cea mai mare lichiditate USD
-            pairs.sort((a, b) => (Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)));
-            return pairs[0];
-        }
+        // ===== SBYT PRICE (Cloud Function) + LOCAL HISTORY =====
+        const SBYT_PRICE_ENDPOINT =
+          "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
 
-        
-        function startPriceAutoUpdate() {
-            // rulează imediat și apoi la fiecare 10s
-            updateLivePriceAndChart('live');
-            if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
-            window.__stancu_priceInterval = setInterval(() => updateLivePriceAndChart('live'), 10000);
-        }
+        const __PRICE_STORAGE_KEY = "sbyt_price_samples_v1";
+        let priceSamples = []; // [{t:number(ms), p:number}]
+        let currentPeriod = '1h';
+        let currentChartType = 'line'; // 'line' | 'candlestick'
+        let priceChart = null;
 
-async function updateLivePriceAndChart(period = 'live') {
+        function loadPriceSamples() {
             try {
-                const pair = await fetchDexScreenerBestPair();
-                const priceUsd = Number(pair.priceUsd);
-                // actualizează graficul live (fallback sigur)
-                updatePriceChartLive(priceUsd);
-                if (!Number.isFinite(priceUsd)) throw new Error('priceUsd missing');
+                const raw = localStorage.getItem(__PRICE_STORAGE_KEY);
+                if (!raw) return;
+                const arr = JSON.parse(raw);
+                if (Array.isArray(arr)) {
+                    // sanitize
+                    priceSamples = arr
+                        .filter(x => x && typeof x.t === 'number' && typeof x.p === 'number' && isFinite(x.p))
+                        .slice(-8000);
+                }
+            } catch (e) {
+                // ignore
+            }
+        }
 
-                // UI: preț + schimbare
-                const priceEl = document.getElementById('currentPrice');
-                if (priceEl) priceEl.textContent = '$' + priceUsd.toLocaleString('en-US', { maximumFractionDigits: 10 });
+        function savePriceSamples() {
+            try {
+                // keep last ~8000 points (~2.7 zile la 30s)
+                const keep = priceSamples.slice(-8000);
+                localStorage.setItem(__PRICE_STORAGE_KEY, JSON.stringify(keep));
+            } catch (e) {
+                // ignore
+            }
+        }
 
-                const changeEl = document.getElementById('priceChange');
-                const ch24 = pair?.priceChange?.h24;
-                if (changeEl) {
-                    if (typeof ch24 === 'number') {
-                        const sign = ch24 >= 0 ? '+' : '';
-                        changeEl.textContent = `${sign}${ch24.toFixed(2)}% (24h)`;
-                    } else {
-                        changeEl.textContent = '';
+        function pushPriceSample(priceUsd) {
+            if (!Number.isFinite(priceUsd)) return;
+            const now = Date.now();
+            priceSamples.push({ t: now, p: priceUsd });
+            // hard cap in memory
+            if (priceSamples.length > 9000) priceSamples = priceSamples.slice(-8000);
+            savePriceSamples();
+        }
+
+        function periodToMs(period) {
+            switch (period) {
+                case '1h': return 60 * 60 * 1000;
+                case '24h': return 24 * 60 * 60 * 1000;
+                case '7d': return 7 * 24 * 60 * 60 * 1000;
+                case '1m': return 30 * 24 * 60 * 60 * 1000;
+                default: return 60 * 60 * 1000;
+            }
+        }
+
+        function bucketMsForPeriod(period) {
+            // downsample for longer ranges (we only have session/local samples)
+            switch (period) {
+                case '1h': return 30 * 1000;         // show raw (30s refresh)
+                case '24h': return 5 * 60 * 1000;     // 5 min
+                case '7d': return 60 * 60 * 1000;     // 1 hour
+                case '1m': return 4 * 60 * 60 * 1000; // 4 hours
+                default: return 30 * 1000;
+            }
+        }
+
+        function sliceSamples(period) {
+            const cutoff = Date.now() - periodToMs(period);
+            return priceSamples.filter(pt => pt.t >= cutoff);
+        }
+
+        function aggregateOHLC(samples, bucketMs) {
+            if (!samples.length) return [];
+            const out = [];
+            let bucketStart = Math.floor(samples[0].t / bucketMs) * bucketMs;
+            let o = samples[0].p, h = samples[0].p, l = samples[0].p, c = samples[0].p;
+
+            for (const s of samples) {
+                const b = Math.floor(s.t / bucketMs) * bucketMs;
+                if (b !== bucketStart) {
+                    out.push({ x: bucketStart, o, h, l, c });
+                    bucketStart = b;
+                    o = s.p; h = s.p; l = s.p; c = s.p;
+                } else {
+                    h = Math.max(h, s.p);
+                    l = Math.min(l, s.p);
+                    c = s.p;
+                }
+            }
+            out.push({ x: bucketStart, o, h, l, c });
+            return out;
+        }
+
+        function aggregateLine(samples, bucketMs) {
+            if (!samples.length) return { labels: [], data: [] };
+            if (bucketMs <= 30 * 1000) {
+                return {
+                    labels: samples.map(s => new Date(s.t).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })),
+                    data: samples.map(s => s.p)
+                };
+            }
+            const map = new Map();
+            for (const s of samples) {
+                const b = Math.floor(s.t / bucketMs) * bucketMs;
+                const arr = map.get(b) || [];
+                arr.push(s.p);
+                map.set(b, arr);
+            }
+            const buckets = Array.from(map.keys()).sort((a,b)=>a-b);
+            const labels = buckets.map(b => new Date(b).toLocaleString('ro-RO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }));
+            const data = buckets.map(b => {
+                const arr = map.get(b);
+                const avg = arr.reduce((x,y)=>x+y,0)/arr.length;
+                return avg;
+            });
+            return { labels, data };
+        }
+
+        function ensureChartInstance(type) {
+            const canvas = document.getElementById('priceChart');
+            if (!canvas) return null;
+            const ctx = canvas.getContext('2d');
+            if (priceChart) {
+                // if same type, keep
+                if (priceChart.config.type === type) return priceChart;
+                priceChart.destroy();
+                priceChart = null;
+            }
+
+            if (type === 'candlestick') {
+                priceChart = new Chart(ctx, {
+                    type: 'candlestick',
+                    data: { datasets: [{ label: 'SBYT', data: [] }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { display: true } },
+                            y: { beginAtZero: false }
+                        }
                     }
+                });
+            } else {
+                priceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [{ label: 'SBYT', data: [], pointRadius: 0, tension: 0.25 }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { display: true } },
+                            y: { beginAtZero: false }
+                        }
+                    }
+                });
+            }
+            window.__stancu_priceChart = priceChart;
+            return priceChart;
+        }
+
+        function renderPriceChart() {
+            const samples = sliceSamples(currentPeriod);
+            const bucketMs = bucketMsForPeriod(currentPeriod);
+
+            if (currentChartType === 'candlestick') {
+                const ch = ensureChartInstance('candlestick');
+                if (!ch) return;
+                // need samples sorted by time
+                const sorted = samples.slice().sort((a,b)=>a.t-b.t);
+                const ohlc = aggregateOHLC(sorted, bucketMs);
+                ch.data.datasets[0].data = ohlc;
+                ch.update('none');
+                return;
+            }
+
+            const ch = ensureChartInstance('line');
+            if (!ch) return;
+            const sorted = samples.slice().sort((a,b)=>a.t-b.t);
+            const agg = aggregateLine(sorted, bucketMs);
+            ch.data.labels = agg.labels;
+            ch.data.datasets[0].data = agg.data;
+            ch.update('none');
+        }
+
+        async function updateSBYTPrice() {
+          try {
+            const res = await fetch(SBYT_PRICE_ENDPOINT, { cache: "no-store" });
+            const data = await res.json();
+
+            if (data.ok && data.priceUsd) {
+              const price = Number(data.priceUsd);
+              if (Number.isFinite(price)) {
+                // main box
+                const boxEl = document.getElementById("sbyt-price");
+                if (boxEl) boxEl.innerText = "$" + price.toFixed(8);
+
+                // backward-compat with existing UI ids
+                const priceEl = document.getElementById('currentPrice');
+                if (priceEl) priceEl.textContent = '$' + price.toLocaleString('en-US', { maximumFractionDigits: 10 });
+
+                pushPriceSample(price);
+                renderPriceChart();
+                return;
+              }
+            }
+            const boxEl = document.getElementById("sbyt-price");
+            if (boxEl) boxEl.innerText = "—";
+          } catch (e) {
+            const boxEl = document.getElementById("sbyt-price");
+            if (boxEl) boxEl.innerText = "—";
+          }
+        }
+
+        // initialize from localStorage so 24h/7d/1m can show *something* if you visited before
+        loadPriceSamples();
+
+        function startPriceAutoUpdate() {
+            // first run
+            updateSBYTPrice();
+            // auto-refresh every 30s (as requested)
+            if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
+            window.__stancu_priceInterval = setInterval(updateSBYTPrice, 30000);
+        }
                 }
 
                 const lastEl = document.getElementById('lastUpdated');
@@ -1590,39 +1754,65 @@ async function updateLivePriceAndChart(period = 'live') {
         }
 
         // Butoane perioadă (dacă există în UI)
+        
         async function changeChartPeriod(period) {
-            currentPeriod = period || 'live';
-            // resetează seria pentru o experiență “curată”
-            liveSeries = [];
-            _renderLiveChart(period);
-            // forțează update imediat
-            await updateLivePriceAndChart(period);
+            currentPeriod = period || '1h';
+            // update active button UI
+            document.querySelectorAll('.chart-controls .period-btn').forEach(btn => {
+                const t = (btn.textContent || '').trim().toLowerCase();
+                btn.classList.remove('active');
+                if ((currentPeriod === '1h' && t === '1h') ||
+                    (currentPeriod === '24h' && t === '24h') ||
+                    (currentPeriod === '7d' && t.includes('7')) ||
+                    (currentPeriod === '1m' && t.includes('lun'))) {
+                    btn.classList.add('active');
+                }
+            });
+            renderPriceChart();
         }
+
 
 
         // Butoane tip grafic (lumânări/linie). În varianta B folosim linie (live).
         // Dacă se apasă "Lumânări", nu crăpăm site-ul: rămânem pe linie.
+        
         function changeChartType(type) {
-            // compatibilitate cu UI existent
             if (!type) return;
-            // În această implementare simplă rămânem pe line chart (Chart.js standard)
-            // pentru a evita probleme de CORS / OHLC. Doar re-render.
-            _renderLiveChart(currentPeriod || 'live');
+            currentChartType = (type === 'candlestick') ? 'candlestick' : 'line';
+
+            // highlight buttons
+            const buttons = document.querySelectorAll('.chart-controls .period-btn');
+            buttons.forEach(btn => {
+                const txt = (btn.textContent || '').toLowerCase();
+                if (txt.includes('lum')) btn.classList.toggle('active', currentChartType === 'candlestick');
+                if (txt.includes('lini')) btn.classList.toggle('active', currentChartType === 'line');
+            });
+
+            renderPriceChart();
         }
 
 
-        // compatibilitate: unele versiuni apelau updateChart()
-        async function updateChart(period) {
-            await updateLivePriceAndCh
 
-  
+        // compatibilitate: unele versiuni apelau updateLivePriceAndStats() / updateChart()
+        async function updateLivePriceAndStats() {
+            await updateSBYTPrice();
+        }
+
+        async function updateChart(period) {
+            if (period) currentPeriod = period;
+            renderPriceChart();
+        }
+
 window.addEventListener('load', () => {
   try { initializeChart(); } catch(e){}
   try { fetchAllData(); } catch(e){}
+  // refresh metrici (supply/holders/tx etc.)
   setInterval(() => { try{ fetchAllData(); }catch(e){} }, 60000);
-  setInterval(() => { try{ updateLivePriceAndStats(); }catch(e){} }, 10000);
+  // price + chart refresh (30s)
+  try { startPriceAutoUpdate(); } catch(e){}
+  // render once from cache
+  try { renderPriceChart(); } catch(e){}
 });
-
-  </script>
+</script>
 </body>
 </html>
