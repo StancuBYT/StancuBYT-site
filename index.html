@@ -1428,8 +1428,10 @@ function renderPriceChart(samples) {
   const ctx = canvas.getContext("2d");
   destroyChart();
 
+  const statusEl = document.getElementById("priceData");
   if (currentMode === "candles") {
     const { labels, ohlc } = buildCandlesSeries(samples, currentPeriod);
+    if (statusEl) statusEl.innerText = `Mod: Lumânări • Perioadă: ${currentPeriod.toUpperCase()} • Lumânări: ${ohlc.length}`;
     priceChart = new Chart(ctx, {
       type: "candlestick",
       data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
@@ -1445,6 +1447,7 @@ function renderPriceChart(samples) {
     });
   } else {
     const { labels, values } = buildLineSeries(samples, currentPeriod);
+    if (statusEl) statusEl.innerText = `Mod: Linie • Perioadă: ${currentPeriod.toUpperCase()} • Puncte: ${values.length}`;
     priceChart = new Chart(ctx, {
       type: "line",
       data: { labels, datasets: [{ label: "SBYT", data: values, tension: 0.25, pointRadius: 0 }] },
@@ -1485,21 +1488,22 @@ async function updateSBYTPrice() {
 }
 
 function syncActiveButtons(){
-  // period buttons
-  document.querySelectorAll(".period-btn").forEach(btn => {
-    const onclick = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
-    const isActive = onclick.includes(`'${currentPeriod}'`) || onclick.includes(`"${currentPeriod}"`);
-    btn.classList.toggle("active", isActive);
-  });
-  // type buttons
-  document.querySelectorAll(".type-btn").forEach(btn => {
-    const onclick = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
-    const isActive = onclick.includes(`'${currentMode}'`) || onclick.includes(`"${currentMode}"`);
-    btn.classList.toggle("active", isActive);
+  const btns = Array.from(document.querySelectorAll(".period-btn, .type-btn"));
+  btns.forEach(btn => {
+    const onclick = (btn.getAttribute("onclick") || "");
+    if (onclick.includes("changeChartPeriod")) {
+      const isActive = onclick.includes(`'${currentPeriod}'`) || onclick.includes(`\"${currentPeriod}\"`);
+      btn.classList.toggle("active", isActive);
+    } else if (onclick.includes("changeChartType")) {
+      // buttons may use 'candlestick' even though internal mode is 'candles'
+      const isCandleBtn = onclick.toLowerCase().includes("candle") || onclick.toLowerCase().includes("luman");
+      const isActive = (currentMode === "candles") ? isCandleBtn : !isCandleBtn;
+      btn.classList.toggle("active", isActive);
+    }
   });
 }
 
-// Backward-compatible functions (your existing HTML buttons call these)
+ // Backward-compatible functions (your existing HTML buttons call these)
 window.changeChartPeriod = function(period){
   currentPeriod = period;
   syncActiveButtons();
@@ -1507,7 +1511,9 @@ window.changeChartPeriod = function(period){
 };
 
 window.changeChartType = function(mode){
-  currentMode = (mode === "candles") ? "candles" : "line";
+  const m = String(mode || "").toLowerCase();
+  // accept: 'candlestick', 'candles', 'candle', 'lumanari', etc.
+  currentMode = (m.includes("candle") || m.includes("luman")) ? "candles" : "line";
   syncActiveButtons();
   renderPriceChart(loadSamples());
 };
