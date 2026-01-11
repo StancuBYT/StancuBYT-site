@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StancuBYT | Token Digital Avansat</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
-    <style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StancuBYT | Statistici</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+  <style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
             --blue-tech: #0066ff;
@@ -1171,15 +1171,9 @@
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
 </style>
-<!-- Firebase (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
-
 <body>
-  <section id="statistici" class="page-section">
+  <section id="statistici" class="page-section active-section">
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
             <p>Date live preluate de pe Etherscan</p>
@@ -1300,171 +1294,335 @@
 </div>
     </section>
 
-<script>
-(() => {
-  const CONTRACT = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-  const ETHERSCAN_PROXY = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy";
-  const PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+  <script>
+  // ======= Helpers =======
+  function $(id) { return document.getElementById(id); }
+  
+function setText(id, txt){
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
 
-  const $ = (id) => document.getElementById(id);
-  const setText = (id, v) => { const el=$(id); if(el) el.textContent = v; };
-  const setHtml = (id, v) => { const el=$(id); if(el) el.innerHTML = v; };
 
-  function fmtNum(n) {
-    const x = Number(n);
-    if (!Number.isFinite(x)) return "—";
-    return x.toLocaleString("en-US");
-  }
+  // ======= Config + Etherscan proxy =======
+  const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
+  const ETHERSCAN_PROXY = 'https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy';
 
-  function fmtPriceUsd(p) {
-    const x = Number(p);
-    if (!Number.isFinite(x) || x <= 0) return "—";
-    // adaptive decimals
-    const d = x >= 1 ? 6 : 10;
-    return "$" + x.toFixed(d);
-  }
-
-  async function es(params) {
-    const usp = new URLSearchParams(params);
-    const url = ETHERSCAN_PROXY + "?" + usp.toString();
-    const r = await fetch(url);
-    // etherscanProxy returns text/json string
-    const t = await r.text();
-    try { return JSON.parse(t); } catch { return null; }
-  }
-
-  async function updateContractMetrics() {
-    // Static known fields (avoid flaky APIs)
-    setText("tokenSymbol", "SBYT");
-    setText("tokenDecimals", "18");
-    setText("tokenName", "StancuBYT");
-
-    // Total supply from Etherscan (works on free tier)
-    try {
-      const j = await es({ module:"stats", action:"tokensupply", contractaddress: CONTRACT });
-      const raw = j && (j.result ?? j.Result);
-      if (raw) {
-        // decimals 18
-        const supply = Number(raw) / 1e18;
-        setText("totalSupply", fmtNum(supply));
-      }
-    } catch (e) {}
-
-    // Holders: try a few endpoints (some require Pro; show — if unavailable)
-    try {
-      let holders = null;
-
-      // (1) tokenholdercount (if available on your key)
-      let j = await es({ module:"token", action:"tokenholdercount", contractaddress: CONTRACT });
-      if (j && j.status === "1" && j.result) holders = j.result;
-
-      // (2) tokenholderlist (often Pro; try and derive count if returned)
-      if (!holders) {
-        j = await es({ module:"stats", action:"tokenholderlist", contractaddress: CONTRACT, page:"1", offset:"1" });
-        // Some responses include "result" array plus "total" on some plans; we accept anything numeric we can find.
-        if (j) {
-          if (typeof j.total === "string" || typeof j.total === "number") holders = j.total;
-          if (!holders && Array.isArray(j.result) && j.result[0] && j.result[0].TotalHolders) holders = j.result[0].TotalHolders;
-        }
-      }
-
-      setText("totalHolders", holders ? fmtNum(holders) : "—");
-    } catch (e) {
-      setText("totalHolders", "—");
+  async function etherscanProxyRequest(module, action, params = {}) {
+    const u = new URL(ETHERSCAN_PROXY);
+    u.searchParams.set('module', module);
+    u.searchParams.set('action', action);
+    for (const [k,v] of Object.entries(params)) {
+      if (v === undefined || v === null || v === '') continue;
+      u.searchParams.set(k, String(v));
     }
-
-    // Transfers: not reliably available without indexing; leave placeholder
-    if ($("totalTransfers") && !$("totalTransfers").textContent.trim()) {
-      setText("totalTransfers", "—");
+    const r = await fetch(u.toString());
+    const j = await r.json().catch(() => null);
+    if (!j) throw new Error('Etherscan proxy: invalid JSON');
+    if (j.status && j.status !== '1') {
+      throw new Error((j.result && typeof j.result === 'string' ? j.result : j.message) || 'Etherscan proxy failed');
     }
-
-    // Contract creation date: you already have it; keep display if element exists
-    // Optional: show "Last update"
-    setText("lastUpdateTime", new Date().toLocaleString());
+    return j;
   }
 
-  // Price + chart
-  let chart = null;
-  let points = [];
-  const MAX_POINTS = 120; // ~1h if 30s interval
+  // ======= Statistici (extras din fișierul original) =======
+  async function fetchAllData() {
+            const refreshBtn = $('refreshButton');
+            const original = refreshBtn ? refreshBtn.innerHTML : null;
 
-  function initChart() {
-    const canvas = $("priceChart");
-    if (!canvas || !window.Chart) return;
-    const ctx = canvas.getContext("2d");
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: [],
-        datasets: [{
-          label: "SBYT / USD",
-          data: [],
-          tension: 0.25,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: { intersect: false, mode: "index" }
-        },
-        scales: {
-          x: { display: false },
-          y: {
-            ticks: {
-              callback: (v) => "$" + v
+            try {
+                if (refreshBtn) {
+                    refreshBtn.classList.add('loading');
+                    refreshBtn.innerHTML = '<span class="refresh-icon">⏳</span><span class="refresh-text">Se actualizează...</span>';
+                }
+
+                // Supply (API)
+                let supplyTokens = null;
+                try {
+                    const supply = await fetchTokenSupplyAPI();
+                    supplyTokens = supply.tokens;
+                    const formatted = supplyTokens.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+                    setText('totalSupply', formatted);
+                    setText('supplyValue', formatted);
+                } catch (e) {
+                    console.warn('Supply API failed:', e);
+                }
+
+                // Holders/Transfers + (opțional supply fallback) din pagină Etherscan
+                try {
+                    const txt = await fetchEtherscanTokenPageText();
+                    const parsed = await parseFromEtherscanText(txt);
+
+                    if (parsed.holders != null) { setText('holdersCount', parsed.holders.toLocaleString('ro-RO')); } else { try { const info = await fetchEthplorerTokenInfo(); const hc = info && info.holdersCount; if (hc != null) setText('holdersCount', Number(hc).toLocaleString('ro-RO')); } catch(e){} }
+                    if (parsed.transfers != null) setText('transactionsCount', parsed.transfers.toLocaleString('ro-RO'));
+
+                    if (supplyTokens == null && parsed.supplyTokens != null) {
+                        const formatted = parsed.supplyTokens.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+                        setText('totalSupply', formatted);
+                        setText('supplyValue', formatted);
+                    }
+                } catch (e) {
+                    console.warn('Etherscan scrape failed:', e);
+                }
+
+
+                // Tranzacții (API) - dacă scrape nu a dat nimic
+                try {
+                    const txc = await fetchTransactionsCountAPI();
+                    if (txc != null) setText('transactionsCount', txc.toLocaleString('ro-RO'));
+                } catch (e) {
+                    console.warn('transactionsCount API failed', e);
+                // Fallback: Ethplorer transfersCount
+                try {
+                    const info = await fetchEthplorerTokenInfo();
+                    const tc = info && (info.transfersCount ?? info.transfersCount === 0 ? info.transfersCount : null);
+                    if (tc != null) setText('transactionsCount', Number(tc).toLocaleString('ro-RO'));
+                } catch(e2) {
+                    console.warn('Ethplorer transfersCount failed', e2);
+                }
+
+                }
+
+                // Contract creator + data aproximativă (din tx)
+                try {
+                    const cc = await fetchContractCreation();
+                    if (cc.contractCreator) setText('contractCreator', cc.contractCreator);
+                    if (cc.txHash) setText('creationTx', cc.txHash);
+
+                    try {
+                        const d = await fetchTxTimestamp(cc.txHash);
+                        setText('launchDate', d.toLocaleString('ro-RO'));
+                    } catch (_) {
+                        // dacă nu putem lua timestamp, nu inventăm
+                        setText('launchDate', '-');
+                    }
+                } catch (e) {
+                    console.warn('Contract creation failed:', e);
+                    setText('launchDate', '-');
+                }
+
+                
+                // Preț live + chart (DEX)
+                try { await updateLivePriceAndStats(); } catch(e){ console.warn('Dex price failed', e); }
+                try { await updateChart(currentPeriod); } catch(e){ console.warn('Chart update failed', e); }
+
+setStatusHtml('<span class="status-online">✅ Date live (Etherscan)</span>');
+
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('loading');
+                    refreshBtn.classList.add('success');
+                    refreshBtn.innerHTML = '<span class="refresh-icon">✅</span><span class="refresh-text">Actualizat</span>';
+                    setTimeout(() => {
+                        refreshBtn.classList.remove('success');
+                        refreshBtn.innerHTML = original;
+                    }, 1800);
+                }
+            } catch (e) {
+                console.error('fetchAllData fatal:', e);
+                setStatusHtml('<span class="status-offline">⚠️ Eroare la încărcarea datelor (verifică API / CORS)</span>');
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('loading');
+                    refreshBtn.innerHTML = '<span class="refresh-icon">❌</span><span class="refresh-text">Eroare</span>';
+                    setTimeout(() => refreshBtn.innerHTML = original, 2200);
+                }
             }
-          }
         }
-      }
-    });
-  }
 
-  function pushPoint(priceUsd) {
-    const ts = new Date();
-    points.push({ t: ts, p: Number(priceUsd) });
-    if (points.length > MAX_POINTS) points.shift();
+        // =============================================
+        // PREȚ LIVE + GRAFIC (VARIANTA B, fără CORS headache)
+        // =============================================
+        let priceChart = null;
+        let liveSeries = []; // [{t: Date, p: number}]
+        let lastPrice = null;
+        let currentPeriod = 'live';
 
-    if (chart) {
-      chart.data.labels = points.map(x => x.t.toLocaleTimeString());
-      chart.data.datasets[0].data = points.map(x => x.p);
-      chart.update();
-    }
-  }
+        function _maxPointsForPeriod(period) {
+            // doar pentru cât păstrăm în memorie (grafic live)
+            if (period === '1h') return 60;
+            if (period === '24h') return 144;
+            if (period === '7d') return 200;
+            if (period === '1m') return 250;
+            return 120; // 'live' sau default
+        }
 
-  async function updatePrice() {
-    try {
-      const r = await fetch(PRICE_ENDPOINT);
-      const j = await r.json();
-      if (j && j.ok && j.priceUsd) {
-        const p = Number(j.priceUsd);
-        setText("sbyt-price", fmtPriceUsd(p));
-        pushPoint(p);
-      } else {
-        setText("sbyt-price", "—");
-      }
-    } catch (e) {
-      setText("sbyt-price", "—");
-    }
-  }
+        
+        function initializeChart() {
+            const canvas = document.getElementById('priceChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
 
-  async function boot() {
-    initChart();
-    await updateContractMetrics();
-    await updatePrice();
-    setInterval(updateContractMetrics, 60_000);
-    setInterval(updatePrice, 30_000);
-  }
+            // dacă există deja, nu recrea
+            if (window.__stancu_priceChart) return;
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
-})();
-</script>
+            const data = {
+                labels: [],
+                datasets: [{
+                    label: 'Preț (USD)',
+                    data: [],
+                    borderWidth: 2,
+                    tension: 0.25,
+                    pointRadius: 0
+                }]
+            };
 
+            window.__stancu_priceChart = new Chart(ctx, {
+                type: 'line',
+                data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { display: false } },
+                        y: {
+                            ticks: { callback: (v) => v },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+            // păstrează referința globală
+            priceChart = window.__stancu_priceChart;
+
+
+        function _renderLiveChart(period = 'live') {
+            if (!priceChart) return;
+            const maxPts = _maxPointsForPeriod(period);
+            const slice = liveSeries.slice(-maxPts);
+            const labels = slice.map(pt => {
+                const d = new Date(pt.t);
+                return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            });
+            const data = slice.map(pt => pt.p);
+
+            priceChart.data.labels = labels;
+            priceChart.data.datasets[0].data = data;
+            priceChart.update('none');
+        }
+
+        
+        function updatePriceChartLive(priceUsd) {
+            try {
+                const ch = window.__stancu_priceChart;
+                if (!ch) return;
+                const ts = new Date();
+                const lbl = ts.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                ch.data.labels.push(lbl);
+                ch.data.datasets[0].data.push(Number(priceUsd));
+                // păstrează ultimele 120 puncte (~20 minute la 10s)
+                const max = 120;
+                if (ch.data.labels.length > max) {
+                    ch.data.labels.shift();
+                    ch.data.datasets[0].data.shift();
+                }
+                ch.update();
+            } catch (e) {
+                console.warn('chart update failed', e);
+            }
+        }
+async function fetchDexScreenerBestPair() {
+            const url = `https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDRESS}`;
+            const r = await fetch(url);
+            if (!r.ok) throw new Error('DexScreener fetch failed');
+            const data = await r.json();
+            const pairs = data?.pairs || [];
+            if (!pairs.length) throw new Error('No pairs for token');
+            // alege perechea cu cea mai mare lichiditate USD
+            pairs.sort((a, b) => (Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)));
+            return pairs[0];
+        }
+
+        
+        function startPriceAutoUpdate() {
+            // rulează imediat și apoi la fiecare 10s
+            updateLivePriceAndChart('live');
+            if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
+            window.__stancu_priceInterval = setInterval(() => updateLivePriceAndChart('live'), 10000);
+        }
+
+async function updateLivePriceAndChart(period = 'live') {
+            try {
+                const pair = await fetchDexScreenerBestPair();
+                const priceUsd = Number(pair.priceUsd);
+                // actualizează graficul live (fallback sigur)
+                updatePriceChartLive(priceUsd);
+                if (!Number.isFinite(priceUsd)) throw new Error('priceUsd missing');
+
+                // UI: preț + schimbare
+                const priceEl = document.getElementById('currentPrice');
+                if (priceEl) priceEl.textContent = '$' + priceUsd.toLocaleString('en-US', { maximumFractionDigits: 10 });
+
+                const changeEl = document.getElementById('priceChange');
+                const ch24 = pair?.priceChange?.h24;
+                if (changeEl) {
+                    if (typeof ch24 === 'number') {
+                        const sign = ch24 >= 0 ? '+' : '';
+                        changeEl.textContent = `${sign}${ch24.toFixed(2)}% (24h)`;
+                    } else {
+                        changeEl.textContent = '';
+                    }
+                }
+
+                const lastEl = document.getElementById('lastUpdated');
+                if (lastEl) lastEl.textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                // MarketCap (DexScreener fdv) - dacă există element
+                const mcEl = document.getElementById('marketCap');
+                const fdv = Number(pair.fdv);
+                if (mcEl) mcEl.textContent = Number.isFinite(fdv) ? ('$' + fdv.toLocaleString('en-US', { maximumFractionDigits: 0 })) : mcEl.textContent;
+
+                // adaugă punct în serie
+                const now = new Date();
+                liveSeries.push({ t: now, p: priceUsd });
+                // nu păstra prea mult
+                if (liveSeries.length > 300) liveSeries = liveSeries.slice(-300);
+
+                _renderLiveChart(period);
+
+                lastPrice = priceUsd;
+            } catch (e) {
+                console.error('Live price update error:', e);
+            }
+        }
+
+        // Butoane perioadă (dacă există în UI)
+        async function changeChartPeriod(period) {
+            currentPeriod = period || 'live';
+            // resetează seria pentru o experiență “curată”
+            liveSeries = [];
+            _renderLiveChart(period);
+            // forțează update imediat
+            await updateLivePriceAndChart(period);
+        }
+
+
+        // Butoane tip grafic (lumânări/linie). În varianta B folosim linie (live).
+        // Dacă se apasă "Lumânări", nu crăpăm site-ul: rămânem pe linie.
+        function changeChartType(type) {
+            // compatibilitate cu UI existent
+            if (!type) return;
+            // În această implementare simplă rămânem pe line chart (Chart.js standard)
+            // pentru a evita probleme de CORS / OHLC. Doar re-render.
+            _renderLiveChart(currentPeriod || 'live');
+        }
+
+
+        // compatibilitate: unele versiuni apelau updateChart()
+        async function updateChart(period) {
+            await updateLivePriceAndCh
+
+  
+window.addEventListener('load', () => {
+  try { initializeChart(); } catch(e){}
+  try { fetchAllData(); } catch(e){}
+  setInterval(() => { try{ fetchAllData(); }catch(e){} }, 60000);
+  setInterval(() => { try{ updateLivePriceAndStats(); }catch(e){} }, 10000);
+});
+
+  </script>
 </body>
 </html>
