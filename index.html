@@ -118,6 +118,16 @@ h1,h3{margin:0}
   <!-- METRICI -->
   <div class="neon">
     <h3>📊 Metrici Contract</h3>
+  <div>Total Supply</div>
+  <div id="metric-supply">—</div>
+</div>
+<div>
+  <div>Holders</div>
+  <div id="metric-holders">—</div>
+</div>
+<div style="opacity:.7;font-size:12px;margin-top:8px;">
+  Updated: <span id="metric-updated">—</span>
+
     <div class="stats-grid">
       <div class="stat">
         Holders
@@ -271,7 +281,94 @@ fetchAllData();
 
 // auto-update preț + grafic
 setInterval(updateSBYTPrice, REFRESH_MS);
+
+  const ETHERSCAN_PROXY = "https://etherscanproxy-jfka2frgwa-ew.a.run.app";
+  const TOKEN = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+
+  async function fetchProxy(params) {
+    const qs = new URLSearchParams(params);
+    const url = `${ETHERSCAN_PROXY}?${qs.toString()}`;
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  }
+
+  function fmtInt(n) {
+    try { return Number(n).toLocaleString("en-US"); } catch { return String(n); }
+  }
+
+  // SBYT are 18 decimals (din contract). Supply din Etherscan vine în “wei-like”.
+  function fmtTokenAmount(raw, decimals = 18) {
+    const s = String(raw || "0");
+    if (decimals === 0) return fmtInt(s);
+    // format simplu: mută virgula la stânga cu 18 (fără librării)
+    const pad = decimals + 1;
+    const x = s.padStart(pad, "0");
+    const head = x.slice(0, -decimals);
+    const tail = x.slice(-decimals).replace(/0+$/, "");
+    return tail ? `${fmtInt(head)}.${tail}` : fmtInt(head);
+  }
+
+  async function updateContractMetrics() {
+    const elSupply = document.getElementById("metric-supply");
+    const elHolders = document.getElementById("metric-holders");
+    const elUpdated = document.getElementById("metric-updated");
+
+    // fallback UI
+    if (elSupply) elSupply.textContent = "Se încarcă...";
+    if (elHolders) elHolders.textContent = "Se încarcă...";
+
+    try {
+      // 1) Total supply
+      const supplyRes = await fetchProxy({
+        module: "stats",
+        action: "tokensupply",
+        contractaddress: TOKEN
+      });
+
+      // Etherscan tipic: { status:"1", message:"OK", result:"..." }
+      const rawSupply = supplyRes?.result;
+      if (elSupply) {
+        if (rawSupply && rawSupply !== "0") elSupply.textContent = fmtTokenAmount(rawSupply, 18) + " SBYT";
+        else elSupply.textContent = "—";
+      }
+
+      // 2) Holders count (încearcă endpoint; dacă nu e disponibil, nu crăpa)
+      let holdersVal = null;
+
+      // Variante comune (una dintre ele poate funcționa pe contul tău)
+      const holderTries = [
+        { module: "stats", action: "tokenholdercount", contractaddress: TOKEN },
+        { module: "token", action: "tokenholdercount", contractaddress: TOKEN },
+      ];
+
+      for (const t of holderTries) {
+        try {
+          const hRes = await fetchProxy(t);
+          const r = hRes?.result;
+          if (r && r !== "0" && !String(r).includes("NOTOK")) {
+            holdersVal = r;
+            break;
+          }
+        } catch (_) {}
+      }
+
+      if (elHolders) elHolders.textContent = holdersVal ? fmtInt(holdersVal) : "—";
+
+      if (elUpdated) elUpdated.textContent = new Date().toLocaleString();
+    } catch (e) {
+      if (elSupply) elSupply.textContent = "—";
+      if (elHolders) elHolders.textContent = "—";
+      if (elUpdated) elUpdated.textContent = "Eroare update";
+      console.error("Metrici Contract error:", e);
+    }
+  }
+
+  // Rulează imediat + refresh periodic
+  updateContractMetrics();
+  setInterval(updateContractMetrics, 30_000); // la 30s
 </script>
+
 
 
 </body>
