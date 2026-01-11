@@ -1,203 +1,1539 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StancuBYT | Statistici Live</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StancuBYT | Token Digital Avansat</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+    <style>
+        /* Variabile culori conform psihologiei marketingului */
+        :root {
+            --blue-tech: #0066ff;
+            --green-growth: #00ff88;
+            --purple-innov: #8a2be2;
+            --neon-cyan: #00ffff;
+            --dark-bg: #0a0a1f;
+            --darker-bg: #050510;
+            --orange-alert: #ff9500;
+        }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
 
-<style>
-:root{
-  --blue:#0066ff;
-  --green:#00ff88;
-  --purple:#8a2be2;
-  --cyan:#00ffff;
-  --bg:#0a0a1f;
+        body {
+            background: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
+        }
+
+        /* Particle Animation Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Logo Background pentru Hero Section */
+        .hero-logo-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .logo-3d-bg {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: float3d 20s infinite ease-in-out;
+        }
+
+        .logo-3d-bg img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            filter: blur(1px) brightness(1.2);
+        }
+
+        @keyframes float3d {
+            0%, 100% { 
+                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
+            }
+            25% { 
+                transform: translateY(-20px) rotateX(5deg) rotateY(5deg); 
+            }
+            50% { 
+                transform: translateY(0px) rotateX(0deg) rotateY(10deg); 
+            }
+            75% { 
+                transform: translateY(20px) rotateX(-5deg) rotateY(5deg); 
+            }
+        }
+
+        /* 3D Logo Animation */
+        .logo-3d-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            perspective: 1000px;
+        }
+
+        .logo-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate3d 8s infinite linear;
+        }
+
+        .logo-3d img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            backface-visibility: hidden;
+        }
+
+        .backnote-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translate(-50%, -50%);
+            animation: orbit 6s infinite linear;
+        }
+
+        .backnote {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.7;
+        }
+
+        .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+        .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+        .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+
+        @keyframes rotate3d {
+            0% { transform: rotateY(0deg) rotateX(5deg); }
+            100% { transform: rotateY(360deg) rotateX(5deg); }
+        }
+
+        @keyframes orbit {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Buton Modern Reîmprospătează Datele */
+        .btn-refresh-modern {
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-refresh-modern:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
+        }
+
+        .btn-refresh-modern:active {
+            transform: translateY(0) scale(1);
+        }
+
+        .refresh-icon {
+            font-size: 1.3rem;
+            transition: transform 0.5s ease;
+        }
+
+        .btn-refresh-modern:hover .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .refresh-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50px;
+            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+            opacity: 0;
+            z-index: -1;
+            animation: pulseEffect 2s infinite;
+        }
+
+        @keyframes rotate360 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseEffect {
+            0% { 
+                transform: scale(1); 
+                opacity: 0.7; 
+            }
+            100% { 
+                transform: scale(1.2); 
+                opacity: 0; 
+            }
+        }
+
+        /* Loading animation pentru buton */
+        .btn-refresh-modern.loading {
+            background: linear-gradient(45deg, #666, #888);
+            cursor: wait;
+        }
+
+        .btn-refresh-modern.loading .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .btn-refresh-modern.loading .refresh-text {
+            opacity: 0.7;
+        }
+
+        /* Animatie pentru actualizare succes */
+        @keyframes successFlash {
+            0%, 100% { 
+                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
+            }
+            50% { 
+                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
+            }
+        }
+
+        .btn-refresh-modern.success {
+            animation: successFlash 0.5s ease 2;
+        }
+
+        /* Navigation - Scientific Style */
+        .scientific-nav {
+            background: rgba(10, 10, 31, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--blue-tech);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        /* Main Content Sections */
+        .page-section {
+            min-height: 100vh;
+            padding: 120px 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .active-section {
+            display: block;
+        }
+
+        /* Hero Section - Prezentare */
+        .hero {
+            text-align: center;
+            padding-top: 150px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(45deg); }
+        }
+
+        /* Sectiune Noutati */
+        .news-section {
+            margin: 3rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--green-growth);
+        }
+
+        .news-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .news-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .news-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .news-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--green-growth);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
+        }
+
+        .news-card.pinned {
+            border: 2px solid var(--orange-alert);
+            background: rgba(255, 149, 0, 0.05);
+        }
+
+        .news-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .badge-update {
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--blue-tech);
+            border: 1px solid var(--blue-tech);
+        }
+
+        .badge-announcement {
+            background: rgba(255, 149, 0, 0.2);
+            color: var(--orange-alert);
+            border: 1px solid var(--orange-alert);
+        }
+
+        .badge-event {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-growth);
+            border: 1px solid var(--green-growth);
+        }
+
+        .news-date {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-form {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            outline: none;
+        }
+
+        /* Contor Vizite */
+        .visit-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 10, 31, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--blue-tech);
+            border-radius: 15px;
+            padding: 0.8rem 1.2rem;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .visit-counter:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+
+        .counter-icon {
+            animation: pulse 2s infinite;
+        }
+
+        .token-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--green-growth);
+        }
+
+        /* Social Links in Hero */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .social-btn:hover {
+            background: rgba(0, 102, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
+        }
+
+        /* Buton Uniswap */
+        .uniswap-btn {
+            background: linear-gradient(45deg, #ff007a, #8a2be2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+
+        .uniswap-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.4);
+        }
+
+        /* Scientific Data Visualization */
+        .data-visualization {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .period-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn.active {
+            background: var(--blue-tech);
+            border-color: var(--blue-tech);
+        }
+
+        .period-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            margin: 0.5rem 0;
+        }
+
+        .neon-glow {
+            box-shadow: 
+                0 0 20px rgba(0, 102, 255, 0.3),
+                0 0 40px rgba(0, 255, 136, 0.2),
+                inset 0 0 20px rgba(138, 43, 226, 0.1);
+        }
+
+        /* Status Indicators */
+        .status-online {
+            color: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        .status-offline {
+            color: #ff4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Token Price Display */
+        .price-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .price-change {
+            font-size: 1.2rem;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
+        .positive { color: #00ff88; background: rgba(0, 255, 136, 0.1); }
+        .negative { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
+
+        /* Whitepaper Specific Styles */
+        .whitepaper-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 20px;
+        }
+
+        .whitepaper-logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            padding: 15px;
+            box-shadow: 0 0 40px rgba(0, 102, 255, 0.4);
+        }
+
+        .whitepaper-logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .toc {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--green-growth);
+        }
+
+        .toc h3 {
+            margin-bottom: 1rem;
+            color: var(--neon-cyan);
+        }
+
+        .toc ul {
+            columns: 2;
+            column-gap: 3rem;
+        }
+
+        .toc li {
+            margin-bottom: 0.8rem;
+            break-inside: avoid;
+        }
+
+        .toc a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--neon-cyan);
+            text-decoration: underline;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+        }
+
+        .section-card h3 {
+            color: var(--green-growth);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .whitepaper-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .whitepaper-table th {
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .whitepaper-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .whitepaper-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .whitepaper-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.2rem;
+        }
+
+        .badge-success {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-growth);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(0, 204, 255, 0.2);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 204, 255, 0.3);
+        }
+
+        .roadmap-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 2rem 0;
+        }
+
+        .roadmap-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--blue-tech), var(--purple-innov));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .timeline-date {
+            font-weight: bold;
+            color: var(--green-growth);
+            margin-bottom: 0.5rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .social-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .social-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
+            border-color: var(--blue-tech);
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .required {
+            color: #ff4444;
+        }
+
+        .contact-card {
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 3px solid;
+            margin-bottom: 1rem;
+        }
+
+        .contact-card.business {
+            border-color: var(--green-growth);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .contact-card.partnership {
+            border-color: var(--blue-tech);
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .contact-card.security {
+            border-color: var(--purple-innov);
+            background: rgba(138, 43, 226, 0.05);
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .time-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .time-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-logo-bg {
+                width: 400px;
+                height: 400px;
+            }
+
+            .token-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-display {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .btn-refresh-modern {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .social-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc ul {
+                columns: 1;
+            }
+
+            .whitepaper-table {
+                font-size: 0.9rem;
+            }
+
+            .whitepaper-table th,
+            .whitepaper-table td {
+                padding: 0.5rem;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .visit-counter {
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .nav-links a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .whitepaper-logo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    
+        .form-group select option {
+            background: var(--darker-bg);
+            color: #ffffff;
+        }
+
+    
+/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
+.admin-login{
+  margin-top: 80px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  border-top: 2px solid rgba(122,92,255,.8);
+  text-align: center;
+  border-radius: 16px;
 }
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:#fff;
+.admin-login h2{ color:#fff; margin:0 0 10px; }
+.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
+.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+.admin-login-box input{
+  padding:12px 14px; width:280px; max-width:92vw;
+  border-radius:10px; border:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25); color:#fff; outline:none;
 }
-h1,h3{margin:0}
-.page{
-  max-width:1200px;
-  margin:auto;
-  padding:100px 20px 40px;
+.admin-login-box button{
+  padding:12px 16px; border-radius:10px; border:none;
+  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
 }
-.neon{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(0,255,136,.25);
-  border-radius:18px;
-  padding:30px;
-  margin-bottom:30px;
-  box-shadow:0 0 30px rgba(0,255,136,.1);
+.admin-login-box button:hover{ filter: brightness(1.08); }
+.admin-msg{ margin-top:12px; font-weight:700; }
+.admin-pill{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px; font-size:.9rem;
+  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
 }
-.btn-refresh{
-  background:linear-gradient(45deg,var(--blue),var(--purple));
-  border:none;
-  color:#fff;
-  padding:14px 26px;
-  border-radius:30px;
-  cursor:pointer;
-  font-size:1.05rem;
-  font-weight:bold;
-  margin-top:10px;
+.admin-pill.off{
+  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
 }
-.btn-refresh:hover{filter:brightness(1.15)}
-.chart-box{height:380px;margin-top:20px}
-.stats-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:15px;
+.admin-only{ display:none !important; }
+
+/* ====== TROPHY BUTTON (Giveaway add) ====== */
+.trophy-btn{
+  padding: 10px 14px !important;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  min-width: 54px;
 }
-.stat{
-  background:rgba(255,255,255,.05);
-  padding:18px;
-  border-radius:14px;
-  text-align:center;
+.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
+.trophy-btn .trophy-logo{
+  width: 22px; height: 22px; border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0,255,136,.25);
 }
-.stat strong{
-  display:block;
-  font-size:1.4rem;
-  color:var(--cyan);
-}
-.links{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-}
-.links a{
-  display:block;
-  padding:20px;
-  border-radius:14px;
-  background:rgba(255,255,255,.05);
-  color:var(--cyan);
-  text-decoration:none;
-  text-align:center;
-  border:1px solid rgba(0,102,255,.25);
-}
-.links a:hover{
-  background:rgba(0,102,255,.25);
-}
+.table-responsive{ overflow-x:auto; width:100%; }
+.lb-table{ width:100%; border-collapse: collapse; }
+.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
+.lb-top1{ background: rgba(255,215,0,.12); }
+.lb-top2{ background: rgba(192,192,192,.12); }
+.lb-top3{ background: rgba(205,127,50,.12); }
+.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
+
 </style>
+<!-- Firebase (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
-
 <body>
+<section id="statistici" class="page-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
+            <p>Date live preluate de pe Etherscan</p>
+            
+            <!-- Buton Modern Reîmprospătează Datele -->
+            <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
+                <span class="refresh-icon">🔄</span>
+                <span class="refresh-text">Reîmprospătează Datele</span>
+                <span class="refresh-pulse"></span>
+            </button>
+        </div>
 
-<div class="page">
+        <div class="data-visualization neon-glow">
+            <h3>📈 Preț în Timp Real</h3>
+            
+            <!-- Chart Controls -->
+            <div class="chart-controls">
+                <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
+                <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
+                <button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
+                <button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
+                <button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
+                <button class="period-btn" onclick="changeChartType('line')">Linie</button>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+            <div id="priceData" class="loading">Se încarcă datele live...</div>
+        </div>
 
-  <!-- HEADER -->
-  <div style="text-align:center;margin-bottom:40px">
-    <h1>📊 Statistici StancuBYT</h1>
-    <p>Date live preluate din blockchain</p>
-    <button class="btn-refresh" onclick="fetchAllData()">🔄 Reîmprospătează Datele</button>
-  </div>
+        <div class="data-visualization neon-glow">
+            <h3>📊 Metrici Contract - coinmarketcap LIVE</h3>
+            <div class="stats-grid" id="etherscanStats">
+                <div class="stat-item">
+                    <div>Holders</div>
+                    <div class="stat-value" id="holdersCount">-</div>
+                    <div>Deținători</div>
+                </div>
+                <div class="stat-item">
+                    <div>Total Supply REAL</div>
+                    <div class="stat-value" id="totalSupply">-</div>
+                    <div>SBYT</div>
+                </div>
+                <div class="stat-item">
+                    <div>Tranzacții</div>
+                    <div class="stat-value" id="transactionsCount">-</div>
+                    <div>Total TX</div>
+                </div>
+                <div class="stat-item">
+                    <div>Market Cap</div>
+                    <div class="stat-value" id="marketCap">-</div>
+                    <div>USD</div>
+                </div>
+                <div class="stat-item">
+                    <div>Volum 24h</div>
+                    <div class="stat-value" id="volume24h">-</div>
+                    <div>USD</div>
+                </div>
+            </div>
+        </div>
 
-  <!-- PRET + CHART -->
-  <div class="neon">
-    <h3>📈 Preț în timp real</h3>
-    <div class="chart-box">
-      <canvas id="priceChart"></canvas>
-    </div>
-    <div id="priceStatus">Se încarcă datele...</div>
-  </div>
+        <div class="data-visualization neon-glow">
+            <h3>📋 Detalii Contract</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
+                    <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
+                    <p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
+                    <p><strong>Creation Date:</strong> <span id="creationDate">-</span></p>
+                </div>
+                <div>
+                    <p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
+                    <p><strong>Contract Age:</strong> <span id="contractAge">-</span> zile</p>
+                    <p><strong>Last Update:</strong> <span id="lastUpdateTime">-</span></p>
+                    <p><strong>Contract verificat pe Etherscan</strong></p>
+                </div>
+            </div>
+        </div>
 
-  <!-- METRICI -->
-  <div class="neon">
-    <h3>📊 Metrici Contract</h3>
-    <div class="stats-grid">
-      <div class="stat">
-        Holders
-        <strong id="holders">-</strong>
-      </div>
-      <div class="stat">
-        Total Supply
-        <strong id="supply">-</strong>
-      </div>
-      <div class="stat">
-        Tranzacții
-        <strong id="txs">-</strong>
-      </div>
-      <div class="stat">
-        Market Cap
-        <strong id="marketcap">-</strong>
-      </div>
-      <div class="stat">
-        Volum 24h
-        <strong id="volume">-</strong>
-      </div>
-    </div>
-  </div>
-
-  <!-- LINKURI -->
-  <div class="neon">
-    <h3>🔗 Linkuri externe</h3>
-    <div class="links">
-      <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank">
-        🔍 Etherscan
-      </a>
-      <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07" target="_blank">
-        🦎 GeckoTerminal
-      </a>
-      <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" target="_blank">
-        📌 CoinMarketCap DEX
-      </a>
-    </div>
-  </div>
-
+        <div class="token-info-grid">
+            <div class="info-card">
+                <h3>🔍 Vezi pe Etherscan</h3>
+                <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Analiză detaliată Etherscan ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>📈 Vezi pe DexTools</h3>
+                <a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Chart live DexTools ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>🦍 Vezi pe Apespace</h3>
+                <a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Analiză Apespace ›
+                </a>
+            </div>
+        
+            <div class="info-card">
+                <h3>🦎 Vezi pe GeckoTerminal</h3>
+                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Pool & tranzacționare GeckoTerminal ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>📌 Vezi pe CoinMarketCap DEX</h3>
+                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    coinmarketcap DEX ›
+                </a>
+            </div>
 </div>
-
+    </section>
 <script>
-const chartCtx = document.getElementById("priceChart");
-let priceChart;
+(() => {
+  const TOKEN = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+  const ETHERSCAN_PROXY = "https://etherscanproxy-jfka2frgwa-ew.a.run.app";
+  const PRICE_ENDPOINT  = "https://sbytprice-jfka2frgwa-ew.a.run.app";
+  const HITCOUNTER      = "https://hitcounter-jfka2frgwa-ew.a.run.app";
 
-function initChart(){
-  priceChart = new Chart(chartCtx,{
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"SBYT / USD",
-        data:[],
-        borderColor:"#00ff88",
-        backgroundColor:"rgba(0,255,136,.15)",
-        tension:.3
-      }]
+  const els = {
+    tokenName: document.getElementById("tokenName"),
+    tokenSymbol: document.getElementById("tokenSymbol"),
+    tokenDecimals: document.getElementById("tokenDecimals"),
+    totalSupply: document.getElementById("totalSupply"),
+    holdersCount: document.getElementById("holdersCount"),
+    transactionsCount: document.getElementById("transactionsCount"),
+    contractCreator: document.getElementById("contractCreator"),
+    creationDate: document.getElementById("creationDate"),
+    contractAge: document.getElementById("contractAge"),
+    priceData: document.getElementById("priceData"),
+    marketCap: document.getElementById("marketCap"),
+    volume24h: document.getElementById("volume24h"),
+    lastUpdateTime: document.getElementById("lastUpdateTime"),
+    refreshButton: document.getElementById("refreshButton"),
+  };
+
+  function fmtNum(n) {
+    try {
+      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(n);
+    } catch {
+      return String(n);
     }
-  });
-}
-
-async function fetchAllData(){
-  document.getElementById("priceStatus").innerText="Actualizare...";
-  try{
-    // aici vei conecta endpointul tau Firebase / Uniswap
-    // momentan demo
-    const price = (Math.random()*0.01).toFixed(6);
-    document.getElementById("priceStatus").innerText="Preț curent: $"+price;
-
-    priceChart.data.labels.push(new Date().toLocaleTimeString());
-    priceChart.data.datasets[0].data.push(price);
-    priceChart.update();
-
-    document.getElementById("holders").innerText="—";
-    document.getElementById("supply").innerText="4,000,000";
-    document.getElementById("txs").innerText="—";
-    document.getElementById("marketcap").innerText="—";
-    document.getElementById("volume").innerText="—";
-
-  }catch(e){
-    document.getElementById("priceStatus").innerText="Eroare la încărcare";
   }
-}
 
-initChart();
-fetchAllData();
+  function fmtUsd(n) {
+    if (!Number.isFinite(n)) return "—";
+    const dp = n < 0.01 ? 8 : (n < 1 ? 6 : 4);
+    return "$" + n.toFixed(dp);
+  }
+
+  function setText(el, v) {
+    if (!el) return;
+    el.textContent = (v === undefined || v === null || v === "") ? "—" : String(v);
+  }
+
+  async function es(params) {
+    const qs = new URLSearchParams(params);
+    const url = `${ETHERSCAN_PROXY}?${qs.toString()}`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error("EtherscanProxy HTTP " + r.status);
+    return await r.json();
+  }
+
+  // --- CONTRACT METRICS (Etherscan) ---
+  async function loadContractMeta() {
+    // name/symbol/decimals -> from Etherscan "getsourcecode" (often has ContractName),
+    // while decimals isn't there. We'll fill name from ContractName and keep decimals=18 (known for your token).
+    const sc = await es({ module: "contract", action: "getsourcecode", address: TOKEN });
+    const row = (sc && sc.result && sc.result[0]) ? sc.result[0] : null;
+
+    if (row) {
+      setText(els.tokenName, row.ContractName || "StancuBYT");
+      setText(els.contractCreator, row.ContractCreator || "—");
+
+      // Try to resolve creation date from CreationTxHash -> tx -> block -> timestamp
+      if (row.CreationTxHash) {
+        try {
+          const tx = await es({ module: "proxy", action: "eth_getTransactionByHash", txhash: row.CreationTxHash });
+          const blockHex = tx?.result?.blockNumber;
+          if (blockHex) {
+            const block = await es({ module: "proxy", action: "eth_getBlockByNumber", tag: blockHex, boolean: "true" });
+            const tsHex = block?.result?.timestamp;
+            if (tsHex) {
+              const ts = parseInt(tsHex, 16) * 1000;
+              const d = new Date(ts);
+              setText(els.creationDate, d.toISOString().replace("T"," ").replace("Z"," UTC"));
+              const ageMs = Date.now() - ts;
+              const days = Math.floor(ageMs / 86400000);
+              setText(els.contractAge, days + " zile");
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    } else {
+      setText(els.tokenName, "StancuBYT");
+      setText(els.contractCreator, "—");
+    }
+
+    setText(els.tokenSymbol, "SBYT");
+    setText(els.tokenDecimals, "18");
+  }
+
+  async function loadSupplyAndHolders() {
+    // total supply
+    const supply = await es({ module: "stats", action: "tokensupply", contractaddress: TOKEN });
+    const raw = supply?.result ? Number(supply.result) : NaN;
+    const total = Number.isFinite(raw) ? raw / 1e18 : NaN;
+    setText(els.totalSupply, Number.isFinite(total) ? fmtNum(total) + " SBYT" : "—");
+
+    // holders
+    try {
+      const holders = await es({ module: "token", action: "tokenholdercount", contractaddress: TOKEN });
+      const hc = holders?.result ? Number(holders.result) : NaN;
+      setText(els.holdersCount, Number.isFinite(hc) ? fmtNum(hc) : "—");
+    } catch {
+      setText(els.holdersCount, "—");
+    }
+
+    return { totalSupply: total };
+  }
+
+  // --- PRICE (Cloud Function) + CHART ---
+  let chart;
+  const points = []; // {t, p}
+
+  function ensureChart() {
+    const canvas = document.getElementById("priceChart");
+    if (!canvas || !window.Chart) return;
+    if (chart) return;
+
+    chart = new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "SBYT / USD",
+          data: [],
+          tension: 0.25,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => " " + fmtUsd(ctx.parsed.y)
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { maxTicksLimit: 6 },
+            grid: { display: false }
+          },
+          y: {
+            ticks: {
+              callback: (v) => {
+                const n = Number(v);
+                return Number.isFinite(n) ? fmtUsd(n) : v;
+              }
+            },
+            grid: { }
+          }
+        }
+      }
+    });
+  }
+
+  function pushPoint(priceUsd) {
+    const now = new Date();
+    points.push({ t: now, p: priceUsd });
+    // keep last 60 points (~30 min at 30s interval)
+    while (points.length > 60) points.shift();
+
+    if (!chart) return;
+    chart.data.labels = points.map(x => x.t.toLocaleTimeString());
+    chart.data.datasets[0].data = points.map(x => x.p);
+    chart.update();
+  }
+
+  async function loadPrice() {
+    const r = await fetch(PRICE_ENDPOINT);
+    if (!r.ok) throw new Error("Price HTTP " + r.status);
+    const j = await r.json();
+    const price = (j && j.ok && j.priceUsd) ? Number(j.priceUsd) : NaN;
+
+    if (Number.isFinite(price) && price > 0) {
+      setText(els.priceData, fmtUsd(price));
+      pushPoint(price);
+      return price;
+    } else {
+      setText(els.priceData, "—");
+      return NaN;
+    }
+  }
+
+  async function loadVisits() {
+    try {
+      // hits increments, but we don't show it on this page unless element exists
+      await fetch(HITCOUNTER, { method: "POST" });
+    } catch {}
+  }
+
+  async function refreshAll() {
+    try {
+      setText(els.lastUpdateTime, "se actualizeaza...");
+      await loadVisits();
+      await loadContractMeta();
+      const { totalSupply } = await loadSupplyAndHolders();
+      const price = await loadPrice();
+
+      // market cap
+      if (Number.isFinite(totalSupply) && Number.isFinite(price)) {
+        setText(els.marketCap, fmtUsd(totalSupply * price));
+      } else {
+        setText(els.marketCap, "—");
+      }
+
+      // placeholders
+      setText(els.volume24h, "—");
+      setText(els.transactionsCount, "—");
+
+      setText(els.lastUpdateTime, new Date().toLocaleString());
+    } catch (e) {
+      console.error(e);
+      setText(els.lastUpdateTime, "eroare");
+    }
+  }
+
+  // init
+  ensureChart();
+  refreshAll();
+
+  // auto refresh
+  setInterval(() => {
+    ensureChart();
+    refreshAll();
+  }, 30000);
+
+  if (els.refreshButton) {
+    els.refreshButton.addEventListener("click", () => refreshAll());
+  }
+})();
 </script>
-
 </body>
 </html>
-
