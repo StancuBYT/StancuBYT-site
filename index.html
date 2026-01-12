@@ -1616,6 +1616,85 @@ window.changeChartType = function(mode){
   renderPriceChart(loadSamples());
 };
 
+
+// ====== CONTRACT METRICS (DEX Screener - proxy for CoinMarketCap DEX live data) ======
+const TOKEN_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
+const DEXSCREENER_ENDPOINT = "https://api.dexscreener.com/token-pairs/v1/ethereum/" + TOKEN_ADDRESS;
+
+function fmtNum(n, digits=2){
+  if (!Number.isFinite(n)) return "—";
+  return n.toLocaleString("en-US", { maximumFractionDigits: digits });
+}
+function fmtUSD(n, digits=2){
+  if (!Number.isFinite(n)) return "—";
+  return "$" + n.toLocaleString("en-US", { maximumFractionDigits: digits });
+}
+
+async function updateContractMetrics() {
+  try {
+    const res = await fetch(DEXSCREENER_ENDPOINT, { cache: "no-store" });
+    const pairs = await res.json();
+    if (!Array.isArray(pairs) || pairs.length === 0) throw new Error("no pairs");
+
+    // pick the most liquid pair
+    const best = pairs
+      .filter(p => p && p.liquidity && Number.isFinite(Number(p.liquidity.usd)))
+      .sort((a,b)=>Number(b.liquidity.usd)-Number(a.liquidity.usd))[0] || pairs[0];
+
+    const priceUsd = Number(best?.priceUsd);
+    const volume24 = Number(best?.volume?.h24);
+    const fdv = Number(best?.fdv); // DexScreener field often used as FDV/market cap proxy
+    const txns24 = Number(best?.txns?.h24?.buys || 0) + Number(best?.txns?.h24?.sells || 0);
+
+    // Update UI
+    const volumeEl = document.getElementById("volume24h");
+    const mcapEl   = document.getElementById("marketCap");
+    const txEl     = document.getElementById("transactionsCount");
+
+    if (volumeEl) volumeEl.innerText = fmtUSD(volume24, 0);
+    if (mcapEl) {
+      // Prefer FDV when available; otherwise compute from price * total supply (4,000,000)
+      let m = Number.isFinite(fdv) ? fdv : (Number.isFinite(priceUsd) ? priceUsd * 4000000 : NaN);
+      mcapEl.innerText = fmtUSD(m, 0);
+    }
+    if (txEl) txEl.innerText = Number.isFinite(txns24) ? fmtNum(txns24, 0) : "—";
+
+    // holdersCount + totalSupply: requires on-chain indexer / Etherscan key; keep as-is if already filled elsewhere
+    return true;
+  } catch (e) {
+    const volumeEl = document.getElementById("volume24h");
+    const mcapEl   = document.getElementById("marketCap");
+    const txEl     = document.getElementById("transactionsCount");
+    if (volumeEl) volumeEl.innerText = "—";
+    if (mcapEl)   mcapEl.innerText = "—";
+    if (txEl)     txEl.innerText = "—";
+    return false;
+  }
+}
+
+function setLastUpdateNow() {
+  const el = document.getElementById("lastUpdateTime");
+  if (!el) return;
+  el.innerText = new Date().toLocaleString("ro-RO");
+}
+
+window.fetchAllData = async function fetchAllData() {
+  const btn = document.getElementById("refreshButton");
+  try {
+    btn?.classList.add("loading");
+    await Promise.all([
+      updateSBYTPrice(),
+      updateContractMetrics()
+    ]);
+    setLastUpdateNow();
+    btn?.classList.remove("loading");
+    btn?.classList.add("success");
+    setTimeout(()=>btn?.classList.remove("success"), 1200);
+  } catch {
+    btn?.classList.remove("loading");
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   // initial UI sync + render from cached history
   syncActiveButtons();
@@ -1624,6 +1703,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // start live price updates
   updateSBYTPrice();
   setInterval(updateSBYTPrice, 30000);
+
+  // start live contract metrics (DEX Screener)
+  updateContractMetrics();
+  setInterval(updateContractMetrics, 60000);
+  setLastUpdateNow();
 });
 </script>
 </body>
