@@ -1396,45 +1396,105 @@ function fmtRange(period){
 
 
 function buildLineSeries(samples, period) {
-  const start = nowMs() - periodWindowMs(period);
-  const inRange = samples.filter(s => s.t >= start);
-  if (!inRange.length) return { labels: [], values: [] };
+  const now = nowMs();
+  const windowMs = periodWindowMs(period);
+  const start = now - windowMs;
+  const stepMs = bucketSizeMs(period);
 
-  const maxPoints = 300;
-  const step = Math.max(1, Math.floor(inRange.length / maxPoints));
+  if (!samples.length) return { labels: [], values: [] };
+
+  // consider only samples that can affect the window (keep a little earlier for forward-fill)
+  const relevant = samples.filter(s => s.t >= start - stepMs*2 && s.t <= now);
+  if (!relevant.length) return { labels: [], values: [] };
+
+  // Align to bucket boundaries so the x-axis clearly changes with period
+  let t0 = Math.floor(start / stepMs) * stepMs;
+  let t1 = Math.floor(now / stepMs) * stepMs;
+
+  // Forward-fill from the last known price (use first in-range price as baseline)
+  let i = 0;
+  let last = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
+
+  // Move i to first relevant point
+  while (i < relevant.length && relevant[i].t < t0) {
+    last = relevant[i].p;
+    i++;
+  }
+
   const labels = [];
   const values = [];
-  for (let i=0; i<inRange.length; i+=step){
-    labels.push(fmtLabel(inRange[i].t));
-    values.push(inRange[i].p);
+
+  for (let t = t0; t <= t1; t += stepMs) {
+    // consume all samples up to current bucket end
+    while (i < relevant.length && relevant[i].t <= t) {
+      last = relevant[i].p;
+      i++;
+    }
+    labels.push(fmtLabel(t));
+    values.push(Number.isFinite(last) ? last : null);
   }
-  const last = inRange[inRange.length-1];
-  if (labels[labels.length-1] !== fmtLabel(last.t)) {
-    labels.push(fmtLabel(last.t));
-    values.push(last.p);
-  }
+
   return { labels, values };
 }
 
 function buildCandlesSeries(samples, period) {
-  const start = nowMs() - periodWindowMs(period);
+  const now = nowMs();
+  const windowMs = periodWindowMs(period);
+  const start = now - windowMs;
   const bms = bucketSizeMs(period);
-  const inRange = samples.filter(s => s.t >= start);
-  if (!inRange.length) return { labels: [], ohlc: [] };
 
-  const buckets = new Map();
-  for (const s of inRange){
-    const b = Math.floor(s.t / bms) * bms;
-    const cur = buckets.get(b);
-    if (!cur) buckets.set(b, { o: s.p, h: s.p, l: s.p, c: s.p });
-    else { cur.h = Math.max(cur.h, s.p); cur.l = Math.min(cur.l, s.p); cur.c = s.p; }
+  if (!samples.length) return { labels: [], ohlc: [] };
+
+  // keep a little earlier for baseline
+  const relevant = samples
+    .filter(s => s.t >= start - bms*2 && s.t <= now)
+    .sort((a,b) => a.t - b.t);
+
+  if (!relevant.length) return { labels: [], ohlc: [] };
+
+  let t0 = Math.floor(start / bms) * bms;
+  let t1 = Math.floor(now / bms) * bms;
+
+  // baseline price for empty buckets (so the x-axis expands even if you have sparse data)
+  let i = 0;
+  let lastClose = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
+
+  // advance i to t0
+  while (i < relevant.length && relevant[i].t < t0) {
+    lastClose = relevant[i].p;
+    i++;
   }
 
-  const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
-  return {
-    labels: keys.map(k => fmtLabel(k)),
-    ohlc: keys.map(k => buckets.get(k))
-  };
+  const labels = [];
+  const ohlc = [];
+
+  for (let t = t0; t <= t1; t += bms) {
+    let o = null, h = null, l = null, c = null;
+
+    // gather samples inside this bucket (<= bucket end t)
+    let gotAny = false;
+    while (i < relevant.length && relevant[i].t <= t) {
+      const p = relevant[i].p;
+      if (!gotAny) { o = h = l = c = p; gotAny = true; }
+      else { h = Math.max(h, p); l = Math.min(l, p); c = p; }
+      lastClose = p;
+      i++;
+    }
+
+    if (!gotAny) {
+      // flat candle from last close
+      if (Number.isFinite(lastClose)) {
+        o = h = l = c = lastClose;
+      } else {
+        continue;
+      }
+    }
+
+    labels.push(fmtLabel(t));
+    ohlc.push({ o, h, l, c });
+  }
+
+  return { labels, ohlc };
 }
 
 function destroyChart() {
