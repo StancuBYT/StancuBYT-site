@@ -6,6 +6,21 @@
   <title>StancuBYT | Statistici</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.0/dist/chartjs-chart-financial.min.js"></script>
+
+<script>
+(function(){
+  try{
+    if (window.Chart && typeof window.Chart.register === "function") {
+      const regs = [];
+      ["CandlestickController","CandlestickElement","OhlcController","OhlcElement"].forEach(n=>{
+        if (window[n]) regs.push(window[n]);
+      });
+      if (regs.length) window.Chart.register(...regs);
+    }
+  }catch(e){}
+})();
+</script>
+
 <script>
   // Guard: ensure financial chart types are registered (UMD should auto-register, but we double-check)
   (function(){
@@ -1511,7 +1526,7 @@ function buildCandlesSeries(samples, period) {
     }
 
     labels.push(fmtLabel(t));
-    ohlc.push({ o, h, l, c });
+    ohlc.push({ x: fmtLabel(t), o, h, l, c });
   }
 
   return { labels, ohlc };
