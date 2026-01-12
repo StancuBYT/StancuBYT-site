@@ -1425,6 +1425,14 @@ function renderPriceChart(samples) {
   const canvas = document.getElementById("priceChart");
   if (!canvas) return;
 
+  // IMPORTANT: Chart.js nu permite re-folosirea aceluiași canvas fără destroy()
+  try {
+    const existing = (window.Chart && Chart.getChart) ? Chart.getChart(canvas) : null;
+    if (existing) existing.destroy();
+  } catch (e) {}
+  try { if (priceChart) priceChart.destroy(); } catch (e) {}
+  priceChart = null;
+
   const ctx = canvas.getContext("2d");
   destroyChart();
 
