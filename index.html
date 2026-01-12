@@ -4,34 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StancuBYT | Statistici</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.0/dist/chartjs-chart-financial.min.js"></script>
-
-<script>
-(function(){
-  try{
-    if (window.Chart && typeof window.Chart.register === "function") {
-      const regs = [];
-      ["CandlestickController","CandlestickElement","OhlcController","OhlcElement"].forEach(n=>{
-        if (window[n]) regs.push(window[n]);
-      });
-      if (regs.length) window.Chart.register(...regs);
-    }
-  }catch(e){}
-})();
-</script>
-
-<script>
-  // Guard: ensure financial chart types are registered (UMD should auto-register, but we double-check)
-  (function(){
-    try {
-      if (window.Chart && Chart.registry && Chart.registry.controllers) {
-        // no-op: registry exists in Chart.js v3
-      }
-    } catch(e){}
-  })();
-</script>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
   <style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
@@ -1526,7 +1500,7 @@ function buildCandlesSeries(samples, period) {
     }
 
     labels.push(fmtLabel(t));
-    ohlc.push({ x: fmtLabel(t), o, h, l, c });
+    ohlc.push({ o, h, l, c });
   }
 
   return { labels, ohlc };
@@ -1556,40 +1530,19 @@ function renderPriceChart(samples) {
   if (currentMode === "candles") {
     const { labels, ohlc } = buildCandlesSeries(samples, currentPeriod);
     if (statusEl) statusEl.innerText = `Mod: Lumânări • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Lumânări: ${ohlc.length}`;
-    try {
-      priceChart = new Chart(ctx, {
-        type: "candlestick",
-        data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { maxRotation: 0, autoSkip: true } },
-            y: { beginAtZero: false }
-          }
+    priceChart = new Chart(ctx, {
+      type: "candlestick",
+      data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 0, autoSkip: true } },
+          y: { beginAtZero: false }
         }
-      });
-    } catch (e) {
-      console.error("Candlestick chart failed, fallback to line:", e);
-      currentMode = "line";
-      const { labels: l2, values: v2 } = buildLineSeries(samples, currentPeriod);
-      if (statusEl) statusEl.innerText = `Mod: Linie (fallback) • Perioadă: ${labelPeriod(currentPeriod)} • Interval: ${fmtRange(currentPeriod)} • Puncte: ${v2.length}`;
-      priceChart = new Chart(ctx, {
-        type: "line",
-        data: { labels: l2, datasets: [{ label: "SBYT", data: v2, tension: 0.25, pointRadius: 0 }] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { maxRotation: 0, autoSkip: true } },
-            y: { beginAtZero: false }
-          }
-        }
-      });
-      syncActiveButtons();
-    };
+      }
+    });
   } else {
     const { labels, values } = buildLineSeries(samples, currentPeriod);
     if (statusEl) statusEl.innerText = `Mod: Linie • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Puncte: ${values.length}`;
