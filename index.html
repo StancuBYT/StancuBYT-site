@@ -1617,61 +1617,273 @@ window.changeChartType = function(mode){
 };
 
 
-// ====== CONTRACT METRICS (DEX Screener - proxy for CoinMarketCap DEX live data) ======
+// ====== CONTRACT METRICS (CoinMarketCap LIVE via DEX data + optional on-chain/Etherscan) ======
 const TOKEN_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-const DEXSCREENER_ENDPOINT = "https://api.dexscreener.com/token-pairs/v1/ethereum/" + TOKEN_ADDRESS;
 
-function fmtNum(n, digits=2){
+// 1) DEX data (works in browser, no API key)
+const DEXSCREENER_TOKENS = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_ADDRESS;
+const DEXSCREENER_PAIRS  = "https://api.dexscreener.com/token-pairs/v1/ethereum/" + TOKEN_ADDRESS;
+
+// 2) Optional: your proxy endpoints (work if you deploy on Vercel / Cloud Functions)
+// - If these exist, they will fill Holders / Total Supply / Total TX
+const OPTIONAL_ENDPOINTS = {
+  holders: [
+    "/api/token-holders?address=" + TOKEN_ADDRESS,
+    "/api/token-holders.js?address=" + TOKEN_ADDRESS,
+    // If you host the proxy elsewhere, add full URL here (kept as fallback slots)
+  ],
+  supply: [
+    "/api/token-supply?address=" + TOKEN_ADDRESS,
+    "/api/token-supply.js?address=" + TOKEN_ADDRESS,
+  ],
+  txTotal: [
+    "/api/token-tx?address=" + TOKEN_ADDRESS,
+    "/api/token-tx.js?address=" + TOKEN_ADDRESS,
+  ],
+  // Known proxy used earlier in your project (only if it is enabled + allows CORS)
+  etherscanProxy: [
+    "https://us-central1-stancubyt-64c78.cloudfunctions.net/etherscanProxy"
+  ]
+};
+
+function fmtNum(n, digits = 0) {
   if (!Number.isFinite(n)) return "—";
   return n.toLocaleString("en-US", { maximumFractionDigits: digits });
 }
-function fmtUSD(n, digits=2){
+function fmtUSD(n, digits = 0) {
   if (!Number.isFinite(n)) return "—";
   return "$" + n.toLocaleString("en-US", { maximumFractionDigits: digits });
 }
 
-async function updateContractMetrics() {
-  try {
-    const res = await fetch(DEXSCREENER_ENDPOINT, { cache: "no-store" });
-    const pairs = await res.json();
-    if (!Array.isArray(pairs) || pairs.length === 0) throw new Error("no pairs");
-
-    // pick the most liquid pair
-    const best = pairs
-      .filter(p => p && p.liquidity && Number.isFinite(Number(p.liquidity.usd)))
-      .sort((a,b)=>Number(b.liquidity.usd)-Number(a.liquidity.usd))[0] || pairs[0];
-
-    const priceUsd = Number(best?.priceUsd);
-    const volume24 = Number(best?.volume?.h24);
-    const fdv = Number(best?.fdv); // DexScreener field often used as FDV/market cap proxy
-    const txns24 = Number(best?.txns?.h24?.buys || 0) + Number(best?.txns?.h24?.sells || 0);
-
-    // Update UI
-    const volumeEl = document.getElementById("volume24h");
-    const mcapEl   = document.getElementById("marketCap");
-    const txEl     = document.getElementById("transactionsCount");
-
-    if (volumeEl) volumeEl.innerText = fmtUSD(volume24, 0);
-    if (mcapEl) {
-      // Prefer FDV when available; otherwise compute from price * total supply (4,000,000)
-      let m = Number.isFinite(fdv) ? fdv : (Number.isFinite(priceUsd) ? priceUsd * 4000000 : NaN);
-      mcapEl.innerText = fmtUSD(m, 0);
+async function fetchJsonTry(urls, { timeoutMs = 8000 } = {}) {
+  for (const url of urls) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), timeoutMs);
+      const res = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+      clearTimeout(t);
+      if (!res.ok) continue;
+      const data = await res.json();
+      return { ok: true, url, data };
+    } catch (e) {
+      // try next
     }
-    if (txEl) txEl.innerText = Number.isFinite(txns24) ? fmtNum(txns24, 0) : "—";
+  }
+  return { ok: false, url: null, data: null };
+}
 
-    // holdersCount + totalSupply: requires on-chain indexer / Etherscan key; keep as-is if already filled elsewhere
+// Minimal ERC-20 calls (no extra libs) for Total Supply + Decimals
+const ETH_RPC = "https://cloudflare-eth.com/";
+async function ethRpc(method, params) {
+  const res = await fetch(ETH_RPC, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
+  });
+  if (!res.ok) throw new Error("rpc_http_" + res.status);
+  const j = await res.json();
+  if (j.error) throw new Error(j.error.message || "rpc_error");
+  return j.result;
+}
+function hexToBigInt(hex) {
+  if (!hex || hex === "0x") return 0n;
+  return BigInt(hex);
+}
+async function erc20Decimals(addr) {
+  // decimals() => 0x313ce567
+  const data = "0x313ce567";
+  const r = await ethRpc("eth_call", [{ to: addr, data }, "latest"]);
+  return Number(hexToBigInt(r));
+}
+async function erc20TotalSupply(addr) {
+  // totalSupply() => 0x18160ddd
+  const data = "0x18160ddd";
+  const r = await ethRpc("eth_call", [{ to: addr, data }, "latest"]);
+  return hexToBigInt(r);
+}
+
+function pickBestPair(pairs) {
+  if (!Array.isArray(pairs) || pairs.length === 0) return null;
+  // pick the most liquid pair
+  const liquid = pairs
+    .filter(p => p && p.liquidity && Number.isFinite(Number(p.liquidity.usd)))
+    .sort((a, b) => Number(b.liquidity.usd) - Number(a.liquidity.usd));
+  return liquid[0] || pairs[0];
+}
+
+async function getDexData() {
+  // Prefer /latest/dex/tokens/{address} (returns {pairs:[...]})
+  const a = await fetchJsonTry([DEXSCREENER_TOKENS]);
+  if (a.ok && a.data && Array.isArray(a.data.pairs)) {
+    const best = pickBestPair(a.data.pairs);
+    return best ? { ok: true, best } : { ok: false };
+  }
+  // Fallback to token-pairs/v1 (returns array)
+  const b = await fetchJsonTry([DEXSCREENER_PAIRS]);
+  if (b.ok && Array.isArray(b.data)) {
+    const best = pickBestPair(b.data);
+    return best ? { ok: true, best } : { ok: false };
+  }
+  return { ok: false };
+}
+
+function tryParseEtherscanNumber(payload) {
+  // Etherscan style: {status:"1", message:"OK", result:"123"}
+  if (!payload) return NaN;
+  const r = payload.result ?? payload;
+  if (typeof r === "string" && r.trim() && !isNaN(Number(r))) return Number(r);
+  if (typeof r === "number") return r;
+  return NaN;
+}
+
+async function getHoldersCount() {
+  // 1) Try optional local/Vercel endpoints first
+  const a = await fetchJsonTry(OPTIONAL_ENDPOINTS.holders);
+  if (a.ok) {
+    const n = tryParseEtherscanNumber(a.data?.holders ?? a.data?.result ?? a.data);
+    if (Number.isFinite(n)) return n;
+  }
+
+  // 2) Try etherscanProxy if it exists + supports this action
+  for (const base of OPTIONAL_ENDPOINTS.etherscanProxy) {
+    const urls = [
+      `${base}?module=stats&action=tokenholdercount&contractaddress=${TOKEN_ADDRESS}`,
+      `${base}?module=stats&action=tokenholderlist&contractaddress=${TOKEN_ADDRESS}&page=1&offset=1`
+    ];
+    const b = await fetchJsonTry(urls);
+    if (b.ok) {
+      // tokenholdercount: result is number
+      let n = tryParseEtherscanNumber(b.data);
+      if (Number.isFinite(n)) return n;
+
+      // tokenholderlist: sometimes result has total holders fields (custom proxies)
+      const r = b.data?.result;
+      if (Array.isArray(r) && r.length && (r[0].TokenHolderQuantity || r[0].tokenHolderQuantity)) {
+        n = Number(r[0].TokenHolderQuantity || r[0].tokenHolderQuantity);
+        if (Number.isFinite(n)) return n;
+      }
+    }
+  }
+
+  return NaN;
+}
+
+async function getTotalSupplyHuman() {
+  // 1) Try optional endpoints (server-side is best)
+  const a = await fetchJsonTry(OPTIONAL_ENDPOINTS.supply);
+  if (a.ok) {
+    const n = tryParseEtherscanNumber(a.data?.totalSupply ?? a.data?.result ?? a.data);
+    if (Number.isFinite(n)) return { value: n, unit: "SBYT", ok: true };
+  }
+
+  // 2) On-chain fallback (works from browser, no key) -> totalSupply() / decimals()
+  try {
+    const [dec, raw] = await Promise.all([erc20Decimals(TOKEN_ADDRESS), erc20TotalSupply(TOKEN_ADDRESS)]);
+    const denom = 10n ** BigInt(dec || 18);
+    const whole = Number(raw) / Number(denom); // ok for 4,000,000 (fits safely)
+    if (Number.isFinite(whole)) return { value: whole, unit: "SBYT", ok: true };
+  } catch (e) {}
+
+  return { value: NaN, unit: "SBYT", ok: false };
+}
+
+async function getTxTotal() {
+  // 1) Optional endpoint first
+  const a = await fetchJsonTry(OPTIONAL_ENDPOINTS.txTotal);
+  if (a.ok) {
+    const n = tryParseEtherscanNumber(a.data?.txTotal ?? a.data?.result ?? a.data);
+    if (Number.isFinite(n)) return { value: n, ok: true, kind: "total" };
+  }
+
+  // 2) Try etherscan proxy common action (may require API key or be disabled)
+  for (const base of OPTIONAL_ENDPOINTS.etherscanProxy) {
+    const urls = [
+      `${base}?module=stats&action=tokentxcount&contractaddress=${TOKEN_ADDRESS}`,  // if implemented
+    ];
+    const b = await fetchJsonTry(urls);
+    if (b.ok) {
+      const n = tryParseEtherscanNumber(b.data);
+      if (Number.isFinite(n)) return { value: n, ok: true, kind: "total" };
+    }
+  }
+
+  return { value: NaN, ok: false, kind: "unknown" };
+}
+
+async function updateContractMetrics() {
+  const holdersEl = document.getElementById("holdersCount");
+  const supplyEl  = document.getElementById("totalSupply");
+  const txEl      = document.getElementById("transactionsCount");
+  const mcapEl    = document.getElementById("marketCap");
+  const volumeEl  = document.getElementById("volume24h");
+
+  // set temporary loading state
+  if (holdersEl) holdersEl.innerText = holdersEl.innerText === "-" ? "…" : holdersEl.innerText;
+  if (supplyEl)  supplyEl.innerText  = supplyEl.innerText  === "-" ? "…" : supplyEl.innerText;
+  if (txEl)      txEl.innerText      = txEl.innerText      === "-" ? "…" : txEl.innerText;
+  if (mcapEl)    mcapEl.innerText    = mcapEl.innerText    === "-" ? "…" : mcapEl.innerText;
+  if (volumeEl)  volumeEl.innerText  = volumeEl.innerText  === "-" ? "…" : volumeEl.innerText;
+
+  try {
+    // Fetch in parallel
+    const [dex, holders, supply, txTotal] = await Promise.all([
+      getDexData(),
+      getHoldersCount(),
+      getTotalSupplyHuman(),
+      getTxTotal()
+    ]);
+
+    // DEX -> MarketCap/FDV, Volume 24h, Txns 24h (fallback if no total)
+    if (dex.ok) {
+      const best = dex.best;
+
+      const priceUsd = Number(best?.priceUsd);
+      const volume24 = Number(best?.volume?.h24);
+      const fdv      = Number(best?.fdv); // FDV / marketcap proxy
+      const txns24   = Number(best?.txns?.h24?.buys || 0) + Number(best?.txns?.h24?.sells || 0);
+
+      if (volumeEl) volumeEl.innerText = fmtUSD(volume24, 0);
+
+      if (mcapEl) {
+        // Prefer FDV when available; else compute from price * supply
+        let supplyForMcap = Number.isFinite(supply?.value) ? Number(supply.value) : 4000000;
+        let m = Number.isFinite(fdv) ? fdv : (Number.isFinite(priceUsd) ? priceUsd * supplyForMcap : NaN);
+        mcapEl.innerText = fmtUSD(m, 0);
+      }
+
+      // Transactions box: prefer total if available, else show 24h
+      if (txEl) {
+        if (Number.isFinite(txTotal?.value)) {
+          txEl.innerText = fmtNum(Number(txTotal.value), 0);
+        } else if (Number.isFinite(txns24)) {
+          txEl.innerText = fmtNum(txns24, 0);
+        } else {
+          txEl.innerText = "—";
+        }
+      }
+    } else {
+      if (mcapEl) mcapEl.innerText = "—";
+      if (volumeEl) volumeEl.innerText = "—";
+    }
+
+    // Holders
+    if (holdersEl) holdersEl.innerText = Number.isFinite(holders) ? fmtNum(holders, 0) : "—";
+
+    // Total Supply
+    if (supplyEl) supplyEl.innerText = (supply && Number.isFinite(supply.value))
+      ? fmtNum(supply.value, 0)
+      : "—";
+
     return true;
   } catch (e) {
-    const volumeEl = document.getElementById("volume24h");
-    const mcapEl   = document.getElementById("marketCap");
-    const txEl     = document.getElementById("transactionsCount");
-    if (volumeEl) volumeEl.innerText = "—";
-    if (mcapEl)   mcapEl.innerText = "—";
-    if (txEl)     txEl.innerText = "—";
+    if (holdersEl) holdersEl.innerText = "—";
+    if (supplyEl)  supplyEl.innerText  = "—";
+    if (txEl)      txEl.innerText      = "—";
+    if (mcapEl)    mcapEl.innerText    = "—";
+    if (volumeEl)  volumeEl.innerText  = "—";
     return false;
   }
 }
-
 function setLastUpdateNow() {
   const el = document.getElementById("lastUpdateTime");
   if (!el) return;
