@@ -1358,8 +1358,8 @@ function bucketSizeMs(period) {
   switch(period){
     case "1h":  return 60*1000;          // 1 min
     case "24h": return 15*60*1000;       // 15 min
-    case "7d":  return 60*60*1000;       // 1 hour
-    case "1m":  return 4*60*60*1000;     // 4 hours
+    case "7d":  return 24*60*60*1000;    // 1 zi -> 7 puncte
+    case "1m":  return 24*60*60*1000;    // 1 zi -> ~30 puncte (1 luna)
     default:    return 15*60*1000;
   }
 }
@@ -1368,20 +1368,29 @@ function fmtLabel(t){
   const d = new Date(t);
   const period = currentPeriod;
 
-  // 1H: show only time (fine granularity)
+  // 1H: doar ora (granularitate mare)
   if (period === "1h") {
     return d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
   }
 
-  // 24H: include day/month so you can actually SEE the day boundary (otherwise it looks like "a few hours")
+  // 24H: zi/luna + ora (sa se vada clar trecerea peste miezul noptii)
   if (period === "24h") {
     return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }) + " " +
            d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
   }
 
-  // 7D / 1M: date + time (coarser)
-  return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }) + " " +
-         d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
+  // 7 zile: afiseaza zilele saptamanii (Lun, Mar, ...)
+  if (period === "7d") {
+    // in ro-RO apare de obicei cu punct (ex: "lun."), il eliminam
+    return d.toLocaleDateString("ro-RO", { weekday: "short" }).replace(".", "");
+  }
+
+  // 1 luna: afiseaza data (zi.luna)
+  if (period === "1m") {
+    return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }).replace("/", "."); 
+  }
+
+  return d.toLocaleDateString("ro-RO");
 }
 
 function fmtRange(period){
