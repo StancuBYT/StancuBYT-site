@@ -1301,22 +1301,8 @@
 
   <script>
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-const TOKEN_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-const DEXSCREENER_ENDPOINT = `https://api.dexscreener.com/token-pairs/v1/ethereum/${TOKEN_ADDRESS}`;
-const METRICS_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytMetricsFree";
-const HOLDERS_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytHoldersFree";
 const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
 const MAX_KEEP_DAYS = 31;
-
-
-function fmtNum(n, dec=0) {
-  if (!Number.isFinite(n)) return "—";
-  return n.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
-}
-function fmtUSD(n, dec=0) {
-  if (!Number.isFinite(n)) return "—";
-  return "$" + n.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
-}
 
 // UI state (compat with existing buttons)
 let currentPeriod = "24h";   // "1h" | "24h" | "7d" | "1m"
@@ -1372,8 +1358,8 @@ function bucketSizeMs(period) {
   switch(period){
     case "1h":  return 60*1000;          // 1 min
     case "24h": return 15*60*1000;       // 15 min
-    case "7d":  return 24*60*60*1000;    // 1 zi -> 7 puncte
-    case "1m":  return 24*60*60*1000;    // 1 zi -> ~30 puncte (1 luna)
+    case "7d":  return 60*60*1000;       // 1 hour
+    case "1m":  return 4*60*60*1000;     // 4 hours
     default:    return 15*60*1000;
   }
 }
@@ -1381,143 +1367,53 @@ function bucketSizeMs(period) {
 function fmtLabel(t){
   const d = new Date(t);
   const period = currentPeriod;
-
-  // 1H: doar ora (granularitate mare)
-  if (period === "1h") {
+  if (period === "1h" || period === "24h") {
     return d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
   }
-
-  // 24H: zi/luna + ora (sa se vada clar trecerea peste miezul noptii)
-  if (period === "24h") {
-    return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }) + " " +
-           d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
-  }
-
-  // 7 zile: afiseaza zilele saptamanii (Lun, Mar, ...)
-  if (period === "7d") {
-    // in ro-RO apare de obicei cu punct (ex: "lun."), il eliminam
-    return d.toLocaleDateString("ro-RO", { weekday: "short" }).replace(".", "");
-  }
-
-  // 1 luna: afiseaza data (zi.luna)
-  if (period === "1m") {
-    return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }).replace("/", "."); 
-  }
-
-  return d.toLocaleDateString("ro-RO");
+  return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }) + " " +
+         d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
 }
-
-function fmtRange(period){
-  const endT = nowMs();
-  const startT = endT - periodWindowMs(period);
-  const a = new Date(startT);
-  const b = new Date(endT);
-  const fa = a.toLocaleDateString("ro-RO", { day:"2-digit", month:"2-digit" }) + " " + a.toLocaleTimeString("ro-RO", { hour:"2-digit", minute:"2-digit" });
-  const fb = b.toLocaleDateString("ro-RO", { day:"2-digit", month:"2-digit" }) + " " + b.toLocaleTimeString("ro-RO", { hour:"2-digit", minute:"2-digit" });
-  return `${fa} → ${fb}`;
-}
-
 
 function buildLineSeries(samples, period) {
-  const now = nowMs();
-  const windowMs = periodWindowMs(period);
-  const start = now - windowMs;
-  const stepMs = bucketSizeMs(period);
+  const start = nowMs() - periodWindowMs(period);
+  const inRange = samples.filter(s => s.t >= start);
+  if (!inRange.length) return { labels: [], values: [] };
 
-  if (!samples.length) return { labels: [], values: [] };
-
-  // consider only samples that can affect the window (keep a little earlier for forward-fill)
-  const relevant = samples.filter(s => s.t >= start - stepMs*2 && s.t <= now);
-  if (!relevant.length) return { labels: [], values: [] };
-
-  // Align to bucket boundaries so the x-axis clearly changes with period
-  let t0 = Math.floor(start / stepMs) * stepMs;
-  let t1 = Math.floor(now / stepMs) * stepMs;
-
-  // Forward-fill from the last known price (use first in-range price as baseline)
-  let i = 0;
-  let last = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
-
-  // Move i to first relevant point
-  while (i < relevant.length && relevant[i].t < t0) {
-    last = relevant[i].p;
-    i++;
-  }
-
+  const maxPoints = 300;
+  const step = Math.max(1, Math.floor(inRange.length / maxPoints));
   const labels = [];
   const values = [];
-
-  for (let t = t0; t <= t1; t += stepMs) {
-    // consume all samples up to current bucket end
-    while (i < relevant.length && relevant[i].t <= t) {
-      last = relevant[i].p;
-      i++;
-    }
-    labels.push(fmtLabel(t));
-    values.push(Number.isFinite(last) ? last : null);
+  for (let i=0; i<inRange.length; i+=step){
+    labels.push(fmtLabel(inRange[i].t));
+    values.push(inRange[i].p);
   }
-
+  const last = inRange[inRange.length-1];
+  if (labels[labels.length-1] !== fmtLabel(last.t)) {
+    labels.push(fmtLabel(last.t));
+    values.push(last.p);
+  }
   return { labels, values };
 }
 
 function buildCandlesSeries(samples, period) {
-  const now = nowMs();
-  const windowMs = periodWindowMs(period);
-  const start = now - windowMs;
+  const start = nowMs() - periodWindowMs(period);
   const bms = bucketSizeMs(period);
+  const inRange = samples.filter(s => s.t >= start);
+  if (!inRange.length) return { labels: [], ohlc: [] };
 
-  if (!samples.length) return { labels: [], ohlc: [] };
-
-  // keep a little earlier for baseline
-  const relevant = samples
-    .filter(s => s.t >= start - bms*2 && s.t <= now)
-    .sort((a,b) => a.t - b.t);
-
-  if (!relevant.length) return { labels: [], ohlc: [] };
-
-  let t0 = Math.floor(start / bms) * bms;
-  let t1 = Math.floor(now / bms) * bms;
-
-  // baseline price for empty buckets (so the x-axis expands even if you have sparse data)
-  let i = 0;
-  let lastClose = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
-
-  // advance i to t0
-  while (i < relevant.length && relevant[i].t < t0) {
-    lastClose = relevant[i].p;
-    i++;
+  const buckets = new Map();
+  for (const s of inRange){
+    const b = Math.floor(s.t / bms) * bms;
+    const cur = buckets.get(b);
+    if (!cur) buckets.set(b, { o: s.p, h: s.p, l: s.p, c: s.p });
+    else { cur.h = Math.max(cur.h, s.p); cur.l = Math.min(cur.l, s.p); cur.c = s.p; }
   }
 
-  const labels = [];
-  const ohlc = [];
-
-  for (let t = t0; t <= t1; t += bms) {
-    let o = null, h = null, l = null, c = null;
-
-    // gather samples inside this bucket (<= bucket end t)
-    let gotAny = false;
-    while (i < relevant.length && relevant[i].t <= t) {
-      const p = relevant[i].p;
-      if (!gotAny) { o = h = l = c = p; gotAny = true; }
-      else { h = Math.max(h, p); l = Math.min(l, p); c = p; }
-      lastClose = p;
-      i++;
-    }
-
-    if (!gotAny) {
-      // flat candle from last close
-      if (Number.isFinite(lastClose)) {
-        o = h = l = c = lastClose;
-      } else {
-        continue;
-      }
-    }
-
-    labels.push(fmtLabel(t));
-    ohlc.push({ o, h, l, c });
-  }
-
-  return { labels, ohlc };
+  const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
+  return {
+    labels: keys.map(k => fmtLabel(k)),
+    ohlc: keys.map(k => buckets.get(k))
+  };
 }
 
 function destroyChart() {
@@ -1529,21 +1425,11 @@ function renderPriceChart(samples) {
   const canvas = document.getElementById("priceChart");
   if (!canvas) return;
 
-  // IMPORTANT: Chart.js nu permite re-folosirea aceluiași canvas fără destroy()
-  try {
-    const existing = (window.Chart && Chart.getChart) ? Chart.getChart(canvas) : null;
-    if (existing) existing.destroy();
-  } catch (e) {}
-  try { if (priceChart) priceChart.destroy(); } catch (e) {}
-  priceChart = null;
-
   const ctx = canvas.getContext("2d");
   destroyChart();
 
-  const statusEl = document.getElementById("priceData");
   if (currentMode === "candles") {
     const { labels, ohlc } = buildCandlesSeries(samples, currentPeriod);
-    if (statusEl) statusEl.innerText = `Mod: Lumânări • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Lumânări: ${ohlc.length}`;
     priceChart = new Chart(ctx, {
       type: "candlestick",
       data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
@@ -1559,7 +1445,6 @@ function renderPriceChart(samples) {
     });
   } else {
     const { labels, values } = buildLineSeries(samples, currentPeriod);
-    if (statusEl) statusEl.innerText = `Mod: Linie • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Puncte: ${values.length}`;
     priceChart = new Chart(ctx, {
       type: "line",
       data: { labels, datasets: [{ label: "SBYT", data: values, tension: 0.25, pointRadius: 0 }] },
@@ -1600,22 +1485,21 @@ async function updateSBYTPrice() {
 }
 
 function syncActiveButtons(){
-  const btns = Array.from(document.querySelectorAll(".period-btn, .type-btn"));
-  btns.forEach(btn => {
-    const onclick = (btn.getAttribute("onclick") || "");
-    if (onclick.includes("changeChartPeriod")) {
-      const isActive = onclick.includes(`'${currentPeriod}'`) || onclick.includes(`\"${currentPeriod}\"`);
-      btn.classList.toggle("active", isActive);
-    } else if (onclick.includes("changeChartType")) {
-      // buttons may use 'candlestick' even though internal mode is 'candles'
-      const isCandleBtn = onclick.toLowerCase().includes("candle") || onclick.toLowerCase().includes("luman");
-      const isActive = (currentMode === "candles") ? isCandleBtn : !isCandleBtn;
-      btn.classList.toggle("active", isActive);
-    }
+  // period buttons
+  document.querySelectorAll(".period-btn").forEach(btn => {
+    const onclick = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
+    const isActive = onclick.includes(`'${currentPeriod}'`) || onclick.includes(`"${currentPeriod}"`);
+    btn.classList.toggle("active", isActive);
+  });
+  // type buttons
+  document.querySelectorAll(".type-btn").forEach(btn => {
+    const onclick = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
+    const isActive = onclick.includes(`'${currentMode}'`) || onclick.includes(`"${currentMode}"`);
+    btn.classList.toggle("active", isActive);
   });
 }
 
- // Backward-compatible functions (your existing HTML buttons call these)
+// Backward-compatible functions (your existing HTML buttons call these)
 window.changeChartPeriod = function(period){
   currentPeriod = period;
   syncActiveButtons();
@@ -1623,18 +1507,13 @@ window.changeChartPeriod = function(period){
 };
 
 window.changeChartType = function(mode){
-  const m = String(mode || "").toLowerCase();
-  // accept: 'candlestick', 'candles', 'candle', 'lumanari', etc.
-  currentMode = (m.includes("candle") || m.includes("luman")) ? "candles" : "line";
+  currentMode = (mode === "candles") ? "candles" : "line";
   syncActiveButtons();
   renderPriceChart(loadSamples());
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  
-  updateContractMetrics();
-  setInterval(updateContractMetrics, 60000);
-// initial UI sync + render from cached history
+  // initial UI sync + render from cached history
   syncActiveButtons();
   renderPriceChart(loadSamples());
 
