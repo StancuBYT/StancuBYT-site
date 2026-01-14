@@ -1299,15 +1299,24 @@
 </div>
     </section>
 
-  \1
+  <script>
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
 const TOKEN_ADDRESS = "0x44Cf220399be798baeaE45fd7C4fF44623713833";
-// DexScreener: pools for token (returns array of pairs)
 const DEXSCREENER_ENDPOINT = `https://api.dexscreener.com/token-pairs/v1/ethereum/${TOKEN_ADDRESS}`;
 const METRICS_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytMetricsFree";
 const HOLDERS_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytHoldersFree";
 const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
 const MAX_KEEP_DAYS = 31;
+
+
+function fmtNum(n, dec=0) {
+  if (!Number.isFinite(n)) return "—";
+  return n.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+function fmtUSD(n, dec=0) {
+  if (!Number.isFinite(n)) return "—";
+  return "$" + n.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
 
 // UI state (compat with existing buttons)
 let currentPeriod = "24h";   // "1h" | "24h" | "7d" | "1m"
@@ -1623,10 +1632,8 @@ window.changeChartType = function(mode){
 
 document.addEventListener("DOMContentLoaded", () => {
   
-  // initial metrics refresh
   updateContractMetrics();
   setInterval(updateContractMetrics, 60000);
-  setLastUpdateNow();
 // initial UI sync + render from cached history
   syncActiveButtons();
   renderPriceChart(loadSamples());
@@ -1635,86 +1642,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateSBYTPrice();
   setInterval(updateSBYTPrice, 30000);
 });
-
-function fmtNum(n, dec=0) {
-  if (!Number.isFinite(n)) return "—";
-  return n.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
-}
-
-function fmtUSD(n, dec=0) {
-  if (!Number.isFinite(n)) return "—";
-  return "$" + n.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
-}
-
-function setLastUpdateNow() {
-  const el = document.getElementById("lastUpdateTime");
-  if (el) el.textContent = new Date().toLocaleTimeString();
-}
-
-async function updateContractMetrics() {
-  // FREE + Firebase: fetch metrics from your Cloud Function (no paid APIs)
-  const volumeEl = document.getElementById("volume24h");
-  const mcapEl   = document.getElementById("marketCap");
-  const txEl     = document.getElementById("transactionsCount");
-  const supplyEl = document.getElementById("totalSupply");
-  const holdersEl= document.getElementById("holdersCount");
-
-  const setDash = () => {
-    if (volumeEl) volumeEl.textContent = "—";
-    if (mcapEl)   mcapEl.textContent = "—";
-    if (txEl)     txEl.textContent = "—";
-  };
-
-  try {
-    const r = await fetch(METRICS_ENDPOINT, { cache: "no-store" });
-    if (!r.ok) throw new Error("metrics HTTP " + r.status);
-    const d = await r.json();
-
-    if (d && d.ok) {
-      if (volumeEl) volumeEl.textContent = (d.volume24hUsd != null) ? fmtUSD(Number(d.volume24hUsd), 0) : "—";
-      if (mcapEl)   mcapEl.textContent   = (d.marketCapUsd != null) ? fmtUSD(Number(d.marketCapUsd), 0) : "—";
-      if (txEl)     txEl.textContent     = (d.tx24h != null) ? fmtNum(Number(d.tx24h), 0) : "—";
-      if (supplyEl) supplyEl.textContent = (d.totalSupply != null) ? fmtNum(Number(d.totalSupply), 0) : fmtNum(4000000, 0);
-      return true;
-    }
-    setDash();
-    if (supplyEl) supplyEl.textContent = fmtNum(4000000, 0);
-    return false;
-  } catch (e) {
-    console.warn("updateContractMetrics failed:", e);
-    setDash();
-    if (supplyEl) supplyEl.textContent = fmtNum(4000000, 0);
-    return false;
-  } finally {
-    // Optional holders (FREE approximate) via separate endpoint if you deploy it
-    if (holdersEl && HOLDERS_ENDPOINT && !String(HOLDERS_ENDPOINT).includes("<")) {
-      try {
-        const hr = await fetch(HOLDERS_ENDPOINT, { cache: "no-store" });
-        const hd = await hr.json();
-        holdersEl.textContent = (hd && hd.ok && hd.holders != null) ? fmtNum(Number(hd.holders), 0) : "—";
-      } catch {
-        holdersEl.textContent = "—";
-      }
-    }
-  }
-}
-
-
-async function fetchAllData() {
-  const btn = document.getElementById("refreshButton");
-  try {
-    btn?.classList.add("loading");
-    await Promise.all([updateSBYTPrice(), updateContractMetrics()]);
-    setLastUpdateNow();
-    btn?.classList.remove("loading");
-    btn?.classList.add("success");
-    setTimeout(()=>btn?.classList.remove("success"), 1200);
-  } catch (e) {
-    console.warn("fetchAllData failed:", e);
-    btn?.classList.remove("loading");
-  }
-}
-
-\3
+</script>
 </body>
 </html>
