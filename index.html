@@ -1535,6 +1535,9 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPriceChart(loadSamples());
 
   // start live price updates
+  updateHolders();
+setInterval(updateHolders, 300000);
+
   updateSBYTPrice();
   setInterval(updateSBYTPrice, 30000);
 });
