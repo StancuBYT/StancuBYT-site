@@ -1301,7 +1301,7 @@
 
   <script>
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-const HOLDERS_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytHoldersFree";
+const HOLDERS_ENDPOINT = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
 const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
 const MAX_KEEP_DAYS = 31;
 
@@ -1535,9 +1535,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPriceChart(loadSamples());
 
   // start live price updates
-  updateHolders();
-setInterval(updateHolders, 300000);
-
   updateSBYTPrice();
   setInterval(updateSBYTPrice, 30000);
 });
