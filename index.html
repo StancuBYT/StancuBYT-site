@@ -1489,18 +1489,25 @@ async function updateSBYTPrice() {
 async function updateHolders() {
   const el = document.getElementById("holdersCount");
   if (!el) return;
+
+  // show loading so it doesn't stay "-"
+  el.textContent = "…";
+
   try {
-    const r = await fetch(HOLDERS_ENDPOINT, { cache: "no-store" });
+    const url = HOLDERS_ENDPOINT + "?t=" + Date.now(); // cache-buster
+    const r = await fetch(url, { cache: "no-store" });
     const d = await r.json();
-    if (d && d.ok && d.holders != null) {
+
+    if (d && d.ok && d.holders !== undefined && d.holders !== null) {
       el.textContent = Number(d.holders).toLocaleString("ro-RO");
     } else {
-      el.textContent = "—";
+      el.textContent = "0";
     }
-  } catch {
-    el.textContent = "—";
+  } catch (e) {
+    el.textContent = "0";
   }
 }
+
 function syncActiveButtons(){
   // period buttons
   document.querySelectorAll(".period-btn").forEach(btn => {
@@ -1534,7 +1541,12 @@ document.addEventListener("DOMContentLoaded", () => {
   syncActiveButtons();
   renderPriceChart(loadSamples());
 
-  // start live price updates
+  
+
+  // holders live
+  updateHolders();
+  setInterval(updateHolders, 300000);
+// start live price updates
   updateSBYTPrice();
   setInterval(updateSBYTPrice, 30000);
 });
