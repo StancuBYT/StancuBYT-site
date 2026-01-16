@@ -1514,7 +1514,9 @@ async function updateTotalSupply() {
 
   try {
     const url = TOTALSUPPLY_ENDPOINT + "?t=" + Date.now();
-    const r = await fetch(url, { cache: "no-store" });
+    const r = await fetch(url, { cache: "no-store" }
+window.updateTotalSupply = updateTotalSupply;
+);
     const d = await r.json();
 
     if (d && d.ok && d.supply != null) {
