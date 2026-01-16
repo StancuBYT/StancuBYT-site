@@ -1300,17 +1300,19 @@
     </section>
 
   <script>
-const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-const HOLDERS_ENDPOINT = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
-const TOTALSUPPLY_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTotalSupplyFree";
+/* ====== ENDPOINTS ====== */
+const SBYT_PRICE_ENDPOINT   = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+const HOLDERS_ENDPOINT      = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
+const TOTALSUPPLY_ENDPOINT  = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTotalSupplyFree";
+
+/* ====== PRICE HISTORY STORAGE ====== */
 const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
 const MAX_KEEP_DAYS = 31;
 
-// UI state (compat with existing buttons)
-let currentPeriod = "24h";   // "1h" | "24h" | "7d" | "1m"
-let currentMode   = "line";  // "line" | "candles"
-
-let priceChart = null;
+/* ====== UI STATE ====== */
+let currentPeriod = "24h";       // "1h" | "24h" | "7d" | "1m"
+let currentMode   = "line";      // "line" | "candlestick"
+let priceChart    = null;
 
 function nowMs(){ return Date.now(); }
 
@@ -1356,24 +1358,32 @@ function periodWindowMs(period) {
   }
 }
 
+// Candle bucket size (helps align axis)
 function bucketSizeMs(period) {
   switch(period){
     case "1h":  return 60*1000;          // 1 min
     case "24h": return 15*60*1000;       // 15 min
-    case "7d":  return 60*60*1000;       // 1 hour
-    case "1m":  return 4*60*60*1000;     // 4 hours
+    case "7d":  return 24*60*60*1000;    // 1 day (7 points-ish)
+    case "1m":  return 24*60*60*1000;    // 1 day (date;month)
     default:    return 15*60*1000;
   }
 }
 
-function fmtLabel(t){
-  const d = new Date(t);
-  const period = currentPeriod;
-  if (period === "1h" || period === "24h") {
+function fmtLabel(ts){
+  const d = new Date(ts);
+  if (currentPeriod === "1h" || currentPeriod === "24h") {
     return d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
   }
-  return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }) + " " +
-         d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
+  if (currentPeriod === "7d") {
+    return d.toLocaleDateString("ro-RO", { weekday: "short" }); // lun, mar...
+  }
+  // 1m
+  return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" });
+}
+
+function destroyChart() {
+  try { if (priceChart) priceChart.destroy(); } catch {}
+  priceChart = null;
 }
 
 function buildLineSeries(samples, period) {
@@ -1381,6 +1391,19 @@ function buildLineSeries(samples, period) {
   const inRange = samples.filter(s => s.t >= start);
   if (!inRange.length) return { labels: [], values: [] };
 
+  // For 7d / 1m -> show daily points
+  if (period === "7d" || period === "1m") {
+    const bms = bucketSizeMs(period);
+    const buckets = new Map();
+    for (const s of inRange){
+      const b = Math.floor(s.t / bms) * bms;
+      buckets.set(b, s.p); // last price of day
+    }
+    const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
+    return { labels: keys.map(fmtLabel), values: keys.map(k => buckets.get(k)) };
+  }
+
+  // 1h / 24h -> decimate
   const maxPoints = 300;
   const step = Math.max(1, Math.floor(inRange.length / maxPoints));
   const labels = [];
@@ -1410,17 +1433,13 @@ function buildCandlesSeries(samples, period) {
     if (!cur) buckets.set(b, { o: s.p, h: s.p, l: s.p, c: s.p });
     else { cur.h = Math.max(cur.h, s.p); cur.l = Math.min(cur.l, s.p); cur.c = s.p; }
   }
-
   const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
-  return {
-    labels: keys.map(k => fmtLabel(k)),
-    ohlc: keys.map(k => buckets.get(k))
-  };
-}
 
-function destroyChart() {
-  try { if (priceChart) priceChart.destroy(); } catch {}
-  priceChart = null;
+  // chartjs-chart-financial likes {o,h,l,c} (and optional x)
+  return {
+    labels: keys.map(fmtLabel),
+    ohlc: keys.map((k) => ({ ...buckets.get(k) }))
+  };
 }
 
 function renderPriceChart(samples) {
@@ -1430,7 +1449,7 @@ function renderPriceChart(samples) {
   const ctx = canvas.getContext("2d");
   destroyChart();
 
-  if (currentMode === "candles") {
+  if (currentMode === "candlestick") {
     const { labels, ohlc } = buildCandlesSeries(samples, currentPeriod);
     priceChart = new Chart(ctx, {
       type: "candlestick",
@@ -1463,12 +1482,19 @@ function renderPriceChart(samples) {
   }
 }
 
+function setLastUpdate() {
+  const el = document.getElementById("lastUpdateTime");
+  if (!el) return;
+  el.textContent = new Date().toLocaleString("ro-RO");
+}
+
+/* ====== LIVE UPDATERS ====== */
 async function updateSBYTPrice() {
   const priceEl = document.getElementById("sbyt-price");
   if (!priceEl) return;
 
   try {
-    const res = await fetch(SBYT_PRICE_ENDPOINT, { cache: "no-store" });
+    const res = await fetch(SBYT_PRICE_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const data = await res.json();
 
     if (data && data.ok && data.priceUsd !== undefined) {
@@ -1477,78 +1503,64 @@ async function updateSBYTPrice() {
         priceEl.innerText = "$" + p.toFixed(8);
         const samples = addSample(p);
         renderPriceChart(samples);
+        setLastUpdate();
         return;
       }
     }
     priceEl.innerText = "—";
-  } catch (e) {
+  } catch {
     priceEl.innerText = "—";
   }
 }
-
 
 async function updateHolders() {
   const el = document.getElementById("holdersCount");
   if (!el) return;
 
-  // show loading so it doesn't stay "-"
   el.textContent = "…";
-
   try {
-    const url = HOLDERS_ENDPOINT + "?t=" + Date.now(); // cache-buster
-    const r = await fetch(url, { cache: "no-store" });
+    const r = await fetch(HOLDERS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
-
-    if (d && d.ok && d.holders !== undefined && d.holders !== null) {
-      el.textContent = Number(d.holders).toLocaleString("ro-RO");
-    } else {
-      el.textContent = "0";
-    }
-
+    if (d && d.ok && d.holders != null) el.textContent = Number(d.holders).toLocaleString("ro-RO");
+    else el.textContent = "0";
+    setLastUpdate();
+  } catch {
+    el.textContent = "0";
+  }
+}
 
 async function updateTotalSupply() {
   const el = document.getElementById("totalSupply");
   if (!el) return;
 
   el.textContent = "…";
-
   try {
-    const url = TOTALSUPPLY_ENDPOINT + "?t=" + Date.now();
-    const r = await fetch(url, { cache: "no-store" }
-window.updateTotalSupply = updateTotalSupply;
-);
+    const r = await fetch(TOTALSUPPLY_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
-
-    if (d && d.ok && d.supply != null) {
-      el.textContent = Number(d.supply).toLocaleString("ro-RO");
-    } else {
-      el.textContent = "—";
-    }
-  } catch (e) {
+    if (d && d.ok && d.supply != null) el.textContent = Number(d.supply).toLocaleString("ro-RO");
+    else el.textContent = "—";
+    setLastUpdate();
+  } catch {
     el.textContent = "—";
   }
 }
-  } catch (e) {
-    el.textContent = "0";
-  }
-}
 
+/* ====== BUTTON HANDLERS ====== */
 function syncActiveButtons(){
-  // period buttons
   document.querySelectorAll(".period-btn").forEach(btn => {
-    const onclick = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
-    const isActive = onclick.includes(`'${currentPeriod}'`) || onclick.includes(`"${currentPeriod}"`);
-    btn.classList.toggle("active", isActive);
-  });
-  // type buttons
-  document.querySelectorAll(".type-btn").forEach(btn => {
-    const onclick = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
-    const isActive = onclick.includes(`'${currentMode}'`) || onclick.includes(`"${currentMode}"`);
-    btn.classList.toggle("active", isActive);
+    const oc = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
+    const isPeriod = oc.includes("changeChartPeriod");
+    const isType   = oc.includes("changeChartType");
+    let active = false;
+
+    if (isPeriod) active = oc.includes(`'${currentPeriod}'`) || oc.includes(`"${currentPeriod}"`);
+    if (isType)   active = oc.includes(`'${currentMode}'`)   || oc.includes(`"${currentMode}"`);
+
+    btn.classList.toggle("active", active);
   });
 }
 
-// Backward-compatible functions (your existing HTML buttons call these)
+// called by inline HTML
 window.changeChartPeriod = function(period){
   currentPeriod = period;
   syncActiveButtons();
@@ -1556,29 +1568,40 @@ window.changeChartPeriod = function(period){
 };
 
 window.changeChartType = function(mode){
-  currentMode = (mode === "candles") ? "candles" : "line";
+  // buttons send 'candlestick' or 'line'
+  currentMode = (mode === "candlestick") ? "candlestick" : "line";
   syncActiveButtons();
   renderPriceChart(loadSamples());
 };
 
+// Refresh button (optional)
+window.fetchAllData = async function(){
+  const btn = document.getElementById("refreshButton");
+  if (btn) btn.classList.add("loading");
+  try{
+    await Promise.allSettled([updateSBYTPrice(), updateHolders(), updateTotalSupply()]);
+    if (btn) {
+      btn.classList.remove("loading");
+      btn.classList.add("success");
+      setTimeout(()=>btn.classList.remove("success"), 1200);
+    }
+  } catch {
+    if (btn) btn.classList.remove("loading");
+  }
+};
+
+/* ====== BOOT ====== */
 document.addEventListener("DOMContentLoaded", () => {
-  // initial UI sync + render from cached history
   syncActiveButtons();
   renderPriceChart(loadSamples());
 
-  
-
-  // holders live
-  updateHolders();
-  setInterval(updateHolders, 300000);
-
-
-  // total supply live
-  updateTotalSupply();
-  setInterval(updateTotalSupply, 300000);
-// start live price updates
   updateSBYTPrice();
+  updateHolders();
+  updateTotalSupply();
+
   setInterval(updateSBYTPrice, 30000);
+  setInterval(updateHolders, 300000);
+  setInterval(updateTotalSupply, 300000);
 });
 </script>
 </body>
