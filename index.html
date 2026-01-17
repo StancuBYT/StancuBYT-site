@@ -4,8 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StancuBYT | Statistici</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+// Fallback: call once shortly after load
+setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1">
+// Fallback: call once shortly after load
+setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
+</script>
   <style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
@@ -1225,7 +1231,7 @@
                 </div>
                 <div class="stat-item">
                     <div>Tranzacții</div>
-                    <div class="stat-value" id="transactionsCount">-</div>
+                    <div class="stat-value" id="transactionsCount">0</div>
                     <div>Total TX</div>
                 </div>
                 <div class="stat-item">
@@ -1299,19 +1305,14 @@
 </div>
     </section>
 
-  <script>
+  
+<script>
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
 const HOLDERS_ENDPOINT = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
-const TOTALSUPPLY_ENDPOINT = "https://sbyttotalsupplyfree-jfka2frgwa-uc.a.run.app";
-const TX_ENDPOINT = "https://sbyttxcountfree-jfka2frgwa-uc.a.run.app";
-const CONTRACT_INFO_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytContractInfoFree";
+const TOTALSUPPLY_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTotalSupplyFree";
+const TX_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTxCountFree";
 
-
-const STORAGE_KEY = "sbyt_price_samples_v1"; 
-
-let CURRENT_PRICE_USD = null;
-let CURRENT_SUPPLY = null;
-// [{t: ms, p: number}]
+const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
 const MAX_KEEP_DAYS = 31;
 
 // UI state (compat with existing buttons)
@@ -1319,6 +1320,10 @@ let currentPeriod = "24h";   // "1h" | "24h" | "7d" | "1m"
 let currentMode   = "line";  // "line" | "candles"
 
 let priceChart = null;
+
+// For Market Cap
+let CURRENT_PRICE_USD = null;
+let CURRENT_SUPPLY = null;
 
 function nowMs(){ return Date.now(); }
 
@@ -1368,8 +1373,8 @@ function bucketSizeMs(period) {
   switch(period){
     case "1h":  return 60*1000;          // 1 min
     case "24h": return 15*60*1000;       // 15 min
-    case "7d":  return 24*60*60*1000;    // 1 zi -> 7 puncte
-    case "1m":  return 24*60*60*1000;    // 1 zi -> ~30 puncte (1 luna)
+    case "7d":  return 24*60*60*1000;    // 1 day (7 points)
+    case "1m":  return 24*60*60*1000;    // 1 day (date labels)
     default:    return 15*60*1000;
   }
 }
@@ -1378,142 +1383,75 @@ function fmtLabel(t){
   const d = new Date(t);
   const period = currentPeriod;
 
-  // 1H: doar ora (granularitate mare)
-  if (period === "1h") {
+  if (period === "1h" || period === "24h") {
     return d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
   }
-
-  // 24H: zi/luna + ora (sa se vada clar trecerea peste miezul noptii)
-  if (period === "24h") {
-    return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }) + " " +
-           d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
-  }
-
-  // 7 zile: afiseaza zilele saptamanii (Lun, Mar, ...)
   if (period === "7d") {
-    // in ro-RO apare de obicei cu punct (ex: "lun."), il eliminam
-    return d.toLocaleDateString("ro-RO", { weekday: "short" }).replace(".", "");
+    return d.toLocaleDateString("ro-RO", { weekday: "short" });
   }
-
-  // 1 luna: afiseaza data (zi.luna)
-  if (period === "1m") {
-    return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }).replace("/", "."); 
-  }
-
-  return d.toLocaleDateString("ro-RO");
+  // 1 month: day.month
+  return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" });
 }
-
-function fmtRange(period){
-  const endT = nowMs();
-  const startT = endT - periodWindowMs(period);
-  const a = new Date(startT);
-  const b = new Date(endT);
-  const fa = a.toLocaleDateString("ro-RO", { day:"2-digit", month:"2-digit" }) + " " + a.toLocaleTimeString("ro-RO", { hour:"2-digit", minute:"2-digit" });
-  const fb = b.toLocaleDateString("ro-RO", { day:"2-digit", month:"2-digit" }) + " " + b.toLocaleTimeString("ro-RO", { hour:"2-digit", minute:"2-digit" });
-  return `${fa} → ${fb}`;
-}
-
 
 function buildLineSeries(samples, period) {
-  const now = nowMs();
-  const windowMs = periodWindowMs(period);
-  const start = now - windowMs;
-  const stepMs = bucketSizeMs(period);
+  const start = nowMs() - periodWindowMs(period);
+  const inRange = samples.filter(s => s.t >= start);
+  if (!inRange.length) return { labels: [], values: [] };
 
-  if (!samples.length) return { labels: [], values: [] };
-
-  // consider only samples that can affect the window (keep a little earlier for forward-fill)
-  const relevant = samples.filter(s => s.t >= start - stepMs*2 && s.t <= now);
-  if (!relevant.length) return { labels: [], values: [] };
-
-  // Align to bucket boundaries so the x-axis clearly changes with period
-  let t0 = Math.floor(start / stepMs) * stepMs;
-  let t1 = Math.floor(now / stepMs) * stepMs;
-
-  // Forward-fill from the last known price (use first in-range price as baseline)
-  let i = 0;
-  let last = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
-
-  // Move i to first relevant point
-  while (i < relevant.length && relevant[i].t < t0) {
-    last = relevant[i].p;
-    i++;
+  // For 7d and 1m, bucket by day
+  if (period === "7d" || period === "1m") {
+    const bms = bucketSizeMs(period);
+    const buckets = new Map();
+    for (const s of inRange) {
+      const b = Math.floor(s.t / bms) * bms;
+      const cur = buckets.get(b);
+      if (!cur) buckets.set(b, { last: s.p, t: b });
+      else cur.last = s.p;
+    }
+    const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
+    return {
+      labels: keys.map(k => fmtLabel(k)),
+      values: keys.map(k => buckets.get(k).last)
+    };
   }
 
+  // For 1h/24h, downsample to max ~300 points
+  const maxPoints = 300;
+  const step = Math.max(1, Math.floor(inRange.length / maxPoints));
   const labels = [];
   const values = [];
-
-  for (let t = t0; t <= t1; t += stepMs) {
-    // consume all samples up to current bucket end
-    while (i < relevant.length && relevant[i].t <= t) {
-      last = relevant[i].p;
-      i++;
-    }
-    labels.push(fmtLabel(t));
-    values.push(Number.isFinite(last) ? last : null);
+  for (let i=0; i<inRange.length; i+=step){
+    labels.push(fmtLabel(inRange[i].t));
+    values.push(inRange[i].p);
   }
-
+  const last = inRange[inRange.length-1];
+  const lastLabel = fmtLabel(last.t);
+  if (labels[labels.length-1] !== lastLabel) {
+    labels.push(lastLabel);
+    values.push(last.p);
+  }
   return { labels, values };
 }
 
 function buildCandlesSeries(samples, period) {
-  const now = nowMs();
-  const windowMs = periodWindowMs(period);
-  const start = now - windowMs;
+  const start = nowMs() - periodWindowMs(period);
   const bms = bucketSizeMs(period);
+  const inRange = samples.filter(s => s.t >= start);
+  if (!inRange.length) return { labels: [], ohlc: [] };
 
-  if (!samples.length) return { labels: [], ohlc: [] };
-
-  // keep a little earlier for baseline
-  const relevant = samples
-    .filter(s => s.t >= start - bms*2 && s.t <= now)
-    .sort((a,b) => a.t - b.t);
-
-  if (!relevant.length) return { labels: [], ohlc: [] };
-
-  let t0 = Math.floor(start / bms) * bms;
-  let t1 = Math.floor(now / bms) * bms;
-
-  // baseline price for empty buckets (so the x-axis expands even if you have sparse data)
-  let i = 0;
-  let lastClose = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
-
-  // advance i to t0
-  while (i < relevant.length && relevant[i].t < t0) {
-    lastClose = relevant[i].p;
-    i++;
+  const buckets = new Map();
+  for (const s of inRange){
+    const b = Math.floor(s.t / bms) * bms;
+    const cur = buckets.get(b);
+    if (!cur) buckets.set(b, { o: s.p, h: s.p, l: s.p, c: s.p });
+    else { cur.h = Math.max(cur.h, s.p); cur.l = Math.min(cur.l, s.p); cur.c = s.p; }
   }
 
-  const labels = [];
-  const ohlc = [];
-
-  for (let t = t0; t <= t1; t += bms) {
-    let o = null, h = null, l = null, c = null;
-
-    // gather samples inside this bucket (<= bucket end t)
-    let gotAny = false;
-    while (i < relevant.length && relevant[i].t <= t) {
-      const p = relevant[i].p;
-      if (!gotAny) { o = h = l = c = p; gotAny = true; }
-      else { h = Math.max(h, p); l = Math.min(l, p); c = p; }
-      lastClose = p;
-      i++;
-    }
-
-    if (!gotAny) {
-      // flat candle from last close
-      if (Number.isFinite(lastClose)) {
-        o = h = l = c = lastClose;
-      } else {
-        continue;
-      }
-    }
-
-    labels.push(fmtLabel(t));
-    ohlc.push({ o, h, l, c });
-  }
-
-  return { labels, ohlc };
+  const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
+  return {
+    labels: keys.map(k => fmtLabel(k)),
+    ohlc: keys.map(k => buckets.get(k))
+  };
 }
 
 function destroyChart() {
@@ -1525,21 +1463,11 @@ function renderPriceChart(samples) {
   const canvas = document.getElementById("priceChart");
   if (!canvas) return;
 
-  // IMPORTANT: Chart.js nu permite re-folosirea aceluiași canvas fără destroy()
-  try {
-    const existing = (window.Chart && Chart.getChart) ? Chart.getChart(canvas) : null;
-    if (existing) existing.destroy();
-  } catch (e) {}
-  try { if (priceChart) priceChart.destroy(); } catch (e) {}
-  priceChart = null;
-
   const ctx = canvas.getContext("2d");
   destroyChart();
 
-  const statusEl = document.getElementById("priceData");
   if (currentMode === "candles") {
     const { labels, ohlc } = buildCandlesSeries(samples, currentPeriod);
-    if (statusEl) statusEl.innerText = `Mod: Lumânări • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Lumânări: ${ohlc.length}`;
     priceChart = new Chart(ctx, {
       type: "candlestick",
       data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
@@ -1555,7 +1483,6 @@ function renderPriceChart(samples) {
     });
   } else {
     const { labels, values } = buildLineSeries(samples, currentPeriod);
-    if (statusEl) statusEl.innerText = `Mod: Linie • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Puncte: ${values.length}`;
     priceChart = new Chart(ctx, {
       type: "line",
       data: { labels, datasets: [{ label: "SBYT", data: values, tension: 0.25, pointRadius: 0 }] },
@@ -1572,7 +1499,6 @@ function renderPriceChart(samples) {
   }
 }
 
-
 function updateMarketCap() {
   const el = document.getElementById("marketCap");
   if (!el) return;
@@ -1583,15 +1509,7 @@ function updateMarketCap() {
   }
 
   const mc = CURRENT_PRICE_USD * CURRENT_SUPPLY;
-
-  // format smart: show decimals only for very small caps
-  let text;
-  if (mc >= 1e9) text = "$" + (mc/1e9).toLocaleString("ro-RO", { maximumFractionDigits: 2 }) + "B";
-  else if (mc >= 1e6) text = "$" + (mc/1e6).toLocaleString("ro-RO", { maximumFractionDigits: 2 }) + "M";
-  else if (mc >= 1e3) text = "$" + (mc/1e3).toLocaleString("ro-RO", { maximumFractionDigits: 2 }) + "K";
-  else text = "$" + mc.toLocaleString("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 8 });
-
-  el.textContent = text;
+  el.textContent = mc.toLocaleString("ro-RO", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
 async function updateSBYTPrice() {
@@ -1599,13 +1517,17 @@ async function updateSBYTPrice() {
   if (!priceEl) return;
 
   try {
-    const res = await fetch(SBYT_PRICE_ENDPOINT, { cache: "no-store" });
+    const res = await fetch(SBYT_PRICE_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const data = await res.json();
 
     if (data && data.ok && data.priceUsd !== undefined) {
       const p = Number(data.priceUsd);
       if (Number.isFinite(p)) {
         priceEl.innerText = "$" + p.toFixed(8);
+
+        CURRENT_PRICE_USD = p;
+        updateMarketCap();
+
         const samples = addSample(p);
         renderPriceChart(samples);
         return;
@@ -1617,23 +1539,88 @@ async function updateSBYTPrice() {
   }
 }
 
+async function updateHolders() {
+  const el = document.getElementById("holdersCount");
+  if (!el) return;
+
+  try {
+    const r = await fetch(HOLDERS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
+    const d = await r.json();
+    if (d && d.ok && d.holders != null) {
+      el.textContent = Number(d.holders).toLocaleString("ro-RO");
+    } else {
+      el.textContent = "0";
+    }
+  } catch {
+    el.textContent = "0";
+  }
+}
+
+async function updateTotalSupply() {
+  const el = document.getElementById("totalSupply");
+  if (!el) return;
+
+  try {
+    const r = await fetch(TOTALSUPPLY_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
+    const d = await r.json();
+    if (d && d.ok && d.supply != null) {
+      const supplyNum = Number(d.supply);
+      el.textContent = supplyNum.toLocaleString("ro-RO");
+
+      CURRENT_SUPPLY = supplyNum;
+      updateMarketCap();
+    } else {
+      el.textContent = "—";
+      CURRENT_SUPPLY = null;
+      updateMarketCap();
+    }
+  } catch {
+    el.textContent = "—";
+    CURRENT_SUPPLY = null;
+    updateMarketCap();
+  }
+}
+
+async function updateTransactions() {
+  const el = document.getElementById("transactionsCount");
+  if (!el) return;
+
+  try {
+    const r = await fetch(TX_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
+    const d = await r.json();
+
+    if (d && d.ok && d.txCount != null) {
+      el.textContent = Number(d.txCount).toLocaleString("ro-RO");
+    } else {
+      el.textContent = "0";
+    }
+  } catch {
+    el.textContent = "0";
+  }
+}
+
 function syncActiveButtons(){
-  const btns = Array.from(document.querySelectorAll(".period-btn, .type-btn"));
-  btns.forEach(btn => {
-    const onclick = (btn.getAttribute("onclick") || "");
-    if (onclick.includes("changeChartPeriod")) {
+  // period buttons
+  document.querySelectorAll(".period-btn").forEach(btn => {
+    const onclick = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
+    const isPeriod = onclick.includes("changeChartPeriod");
+    const isType = onclick.includes("changeChartType");
+
+    if (isPeriod) {
       const isActive = onclick.includes(`'${currentPeriod}'`) || onclick.includes(`\"${currentPeriod}\"`);
       btn.classList.toggle("active", isActive);
-    } else if (onclick.includes("changeChartType")) {
-      // buttons may use 'candlestick' even though internal mode is 'candles'
-      const isCandleBtn = onclick.toLowerCase().includes("candle") || onclick.toLowerCase().includes("luman");
-      const isActive = (currentMode === "candles") ? isCandleBtn : !isCandleBtn;
-      btn.classList.toggle("active", isActive);
+    }
+    if (isType) {
+      const mode = (currentMode === "candles") ? "candlestick" : "line";
+      const isActive = (mode === "candlestick" && onclick.includes("candlestick")) || (mode === "line" && onclick.includes("line"));
+      // keep original active logic simple: highlight clicked by re-render
+      if (onclick.includes("candlestick")) btn.classList.toggle("active", currentMode === "candles");
+      if (onclick.includes("line")) btn.classList.toggle("active", currentMode === "line");
     }
   });
 }
 
- // Backward-compatible functions (your existing HTML buttons call these)
+// Backward-compatible functions (your existing HTML buttons call these)
 window.changeChartPeriod = function(period){
   currentPeriod = period;
   syncActiveButtons();
@@ -1641,48 +1628,33 @@ window.changeChartPeriod = function(period){
 };
 
 window.changeChartType = function(mode){
-  const m = String(mode || "").toLowerCase();
-  // accept: 'candlestick', 'candles', 'candle', 'lumanari', etc.
-  currentMode = (m.includes("candle") || m.includes("luman")) ? "candles" : "line";
+  currentMode = (mode === "candlestick" || mode === "candles" || mode === "candlestick") ? "candles" : "line";
   syncActiveButtons();
   renderPriceChart(loadSamples());
 };
 
+window.fetchAllData = function(){
+  updateSBYTPrice();
+  updateHolders();
+  updateTotalSupply();
+  updateTransactions();
+};
 
-async function updateContractInfo() {
-  const creationEl = document.getElementById("creationDate");
-  const ageEl = document.getElementById("contractAge");
-  if (!creationEl && !ageEl) return;
-
-  try {
-    const r = await fetch(CONTRACT_INFO_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
-    const d = await r.json();
-
-    if (d && d.ok && d.createdAt) {
-      const date = new Date(d.createdAt);
-      if (creationEl) creationEl.textContent = date.toLocaleDateString("ro-RO");
-      if (ageEl && typeof d.ageDays === "number") ageEl.textContent = d.ageDays.toLocaleString("ro-RO");
-      return;
-    }
-  } catch (e) {
-    // ignore
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {updateContractInfo();
-updateTransactions();
-updateTotalSupply();
-updateHolders();
-
-  // initial UI sync + render from cached history
+document.addEventListener("DOMContentLoaded", () => {
   syncActiveButtons();
   renderPriceChart(loadSamples());
 
-  // start live price updates
   updateSBYTPrice();
-  setInterval(updateSBYTPrice, 30000);
+  updateHolders();
+  updateTotalSupply();
+  updateTransactions();
 
-  setInterval(updateContractInfo, 3600000);
-});</script>
+  setInterval(updateSBYTPrice, 30000);
+  setInterval(updateHolders, 300000);
+  setInterval(updateTotalSupply, 300000);
+  setInterval(updateTransactions, 300000);
+});
+</script>
+
 </body>
 </html>
