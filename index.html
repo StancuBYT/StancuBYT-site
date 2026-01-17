@@ -240,74 +240,6 @@
             animation: successFlash 0.5s ease 2;
         }
 
-        /* Navigation - Scientific Style */
-        .scientific-nav {
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--blue-tech);
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-links a:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .nav-links a::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::before {
-            width: 100%;
-        }
-
         /* Main Content Sections */
         .page-section {
             min-height: 100vh;
@@ -321,271 +253,6 @@
 
         .active-section {
             display: block;
-        }
-
-        /* Hero Section - Prezentare */
-        .hero {
-            text-align: center;
-            padding-top: 150px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 4.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease infinite;
-            text-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(45deg); }
-        }
-
-        /* Sectiune Noutati */
-        .news-section {
-            margin: 3rem 0;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .news-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--green-growth);
-        }
-
-        .news-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.8rem;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .news-controls {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .news-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .news-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .news-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 1.5rem;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--green-growth);
-            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
-        }
-
-        .news-card.pinned {
-            border: 2px solid var(--orange-alert);
-            background: rgba(255, 149, 0, 0.05);
-        }
-
-        .news-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .badge-update {
-            background: rgba(0, 102, 255, 0.2);
-            color: var(--blue-tech);
-            border: 1px solid var(--blue-tech);
-        }
-
-        .badge-announcement {
-            background: rgba(255, 149, 0, 0.2);
-            color: var(--orange-alert);
-            border: 1px solid var(--orange-alert);
-        }
-
-        .badge-event {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid var(--green-growth);
-        }
-
-        .news-date {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .news-form {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-row input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-row input:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        /* Contor Vizite */
-        .visit-counter {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(10, 10, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--blue-tech);
-            border-radius: 15px;
-            padding: 0.8rem 1.2rem;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .visit-counter:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
-        }
-
-        .counter-icon {
-            animation: pulse 2s infinite;
-        }
-
-        .token-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .info-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--green-growth);
-        }
-
-        /* Social Links in Hero */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .social-btn {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 102, 255, 0.3);
-        }
-
-        .social-btn:hover {
-            background: rgba(0, 102, 255, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
-        }
-
-        /* Buton Uniswap */
-        .uniswap-btn {
-            background: linear-gradient(45deg, #ff007a, #8a2be2);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin: 1rem 0;
-            font-weight: bold;
-        }
-
-        .uniswap-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.4);
         }
 
         /* Scientific Data Visualization */
@@ -657,520 +324,35 @@
                 inset 0 0 20px rgba(138, 43, 226, 0.1);
         }
 
-        /* Status Indicators */
-        .status-online {
-            color: #00ff88;
-            animation: pulse 2s infinite;
-        }
-
-        .status-offline {
-            color: #ff4444;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Token Price Display */
-        .price-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 1rem 0;
-        }
-
-        .price-change {
-            font-size: 1.2rem;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 0.5rem 0;
-        }
-
-        .positive { color: #00ff88; background: rgba(0, 255, 136, 0.1); }
-        .negative { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
-
-        /* Whitepaper Specific Styles */
-        .whitepaper-header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding-top: 20px;
-        }
-
-        .whitepaper-logo {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 1.5rem;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(0, 102, 255, 0.4);
-        }
-
-        .whitepaper-logo img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .toc {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid var(--green-growth);
-        }
-
-        .toc h3 {
-            margin-bottom: 1rem;
-            color: var(--neon-cyan);
-        }
-
-        .toc ul {
-            columns: 2;
-            column-gap: 3rem;
-        }
-
-        .toc li {
-            margin-bottom: 0.8rem;
-            break-inside: avoid;
-        }
-
-        .toc a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .toc a:hover {
-            color: var(--neon-cyan);
-            text-decoration: underline;
-        }
-
-        .section-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .section-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-cyan);
-        }
-
-        .section-card h3 {
-            color: var(--green-growth);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 1.5rem 0;
-        }
-
-        .whitepaper-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .whitepaper-table th {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .whitepaper-table td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .whitepaper-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .whitepaper-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin: 0.2rem;
-        }
-
-        .badge-success {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-growth);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .badge-warning {
-            background: rgba(255, 204, 0, 0.2);
-            color: #ffcc00;
-            border: 1px solid rgba(255, 204, 0, 0.3);
-        }
-
-        .badge-info {
-            background: rgba(0, 204, 255, 0.2);
-            color: var(--neon-cyan);
-            border: 1px solid rgba(0, 204, 255, 0.3);
-        }
-
-        .roadmap-timeline {
-            position: relative;
-            padding-left: 30px;
-            margin: 2rem 0;
-        }
-
-        .roadmap-timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, var(--blue-tech), var(--purple-innov));
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding-left: 30px;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -33px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .timeline-date {
-            font-weight: bold;
-            color: var(--green-growth);
-            margin-bottom: 0.5rem;
-        }
-
-        .download-btn {
-            background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--neon-cyan);
-            font-size: 0.9rem;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            outline: none;
-        }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .social-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 1rem;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .social-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
-            border-color: var(--blue-tech);
-        }
-
-        .social-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .required {
-            color: #ff4444;
-        }
-
-        .contact-card {
-            background: rgba(255,255,255,0.03);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 3px solid;
-            margin-bottom: 1rem;
-        }
-
-        .contact-card.business {
-            border-color: var(--green-growth);
-            background: rgba(0, 255, 136, 0.05);
-        }
-
-        .contact-card.partnership {
-            border-color: var(--blue-tech);
-            background: rgba(0, 102, 255, 0.05);
-        }
-
-        .contact-card.security {
-            border-color: var(--purple-innov);
-            background: rgba(138, 43, 226, 0.05);
-        }
-
-        .time-grid {
+        .token-info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
+            gap: 2rem;
+            margin: 3rem 0;
         }
 
-        .time-item {
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
             text-align: center;
-            padding: 1rem;
+            transition: transform 0.3s ease;
         }
 
-        .time-item .icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+        .info-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--green-growth);
         }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-
-            .hero-logo-bg {
-                width: 400px;
-                height: 400px;
-            }
-
-            .token-info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .price-display {
-                font-size: 2rem;
-            }
-
-            .chart-container {
-                height: 300px;
-            }
-
-            .btn-refresh-modern {
-                padding: 0.8rem 1.5rem;
-                font-size: 1rem;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .social-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .toc ul {
-                columns: 1;
-            }
-
-            .whitepaper-table {
-                font-size: 0.9rem;
-            }
-
-            .whitepaper-table th,
-            .whitepaper-table td {
-                padding: 0.5rem;
-            }
-
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                flex-direction: column;
-            }
-
-            .visit-counter {
-                bottom: 10px;
-                right: 10px;
-                font-size: 0.8rem;
-                padding: 0.6rem 1rem;
-            }
+            .chart-container { height: 300px; }
+            .btn-refresh-modern { padding: 0.8rem 1.5rem; font-size: 1rem; }
+            .token-info-grid { grid-template-columns: 1fr; }
         }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .nav-links a {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.9rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .social-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .whitepaper-logo {
-                width: 100px;
-                height: 100px;
-            }
-        }
-    
-        .form-group select option {
-            background: var(--darker-bg);
-            color: #ffffff;
-        }
-
-    
-/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
-.admin-login{
-  margin-top: 80px;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
-  border-top: 2px solid rgba(122,92,255,.8);
-  text-align: center;
-  border-radius: 16px;
-}
-.admin-login h2{ color:#fff; margin:0 0 10px; }
-.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
-.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-.admin-login-box input{
-  padding:12px 14px; width:280px; max-width:92vw;
-  border-radius:10px; border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.25); color:#fff; outline:none;
-}
-.admin-login-box button{
-  padding:12px 16px; border-radius:10px; border:none;
-  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
-}
-.admin-login-box button:hover{ filter: brightness(1.08); }
-.admin-msg{ margin-top:12px; font-weight:700; }
-.admin-pill{
-  display:inline-flex; align-items:center; gap:8px;
-  padding:6px 10px; border-radius:999px; font-size:.9rem;
-  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
-}
-.admin-pill.off{
-  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
-}
-.admin-only{ display:none !important; }
-
-/* ====== TROPHY BUTTON (Giveaway add) ====== */
-.trophy-btn{
-  padding: 10px 14px !important;
-  display:inline-flex; align-items:center; justify-content:center; gap:10px;
-  min-width: 54px;
-}
-.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
-.trophy-btn .trophy-logo{
-  width: 22px; height: 22px; border-radius: 6px;
-  box-shadow: 0 0 12px rgba(0,255,136,.25);
-}
-.table-responsive{ overflow-x:auto; width:100%; }
-.lb-table{ width:100%; border-collapse: collapse; }
-.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
-.lb-top1{ background: rgba(255,215,0,.12); }
-.lb-top2{ background: rgba(192,192,192,.12); }
-.lb-top3{ background: rgba(205,127,50,.12); }
-.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
-
-</style>
+  </style>
 </head>
 <body>
   <section id="statistici" class="page-section active-section">
@@ -1178,7 +360,6 @@
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
             <p>Date live preluate de pe Etherscan</p>
             
-            <!-- Buton Modern Reîmprospătează Datele -->
             <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
                 <span class="refresh-icon">🔄</span>
                 <span class="refresh-text">Reîmprospătează Datele</span>
@@ -1188,13 +369,11 @@
 
         <div class="data-visualization neon-glow">
             <h3>📈 Preț în Timp Real</h3>
-            
-            
             <div id="sbyt-price-box" style="margin-top:14px; margin-bottom:10px;">
               <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
               <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:var(--green-growth);">Se încarcă...</div>
             </div>
-<!-- Chart Controls -->
+
             <div class="chart-controls">
                 <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
                 <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
@@ -1248,7 +427,7 @@
                     <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
                     <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
                     <p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
-                    <p><strong>Creation Date:</strong> <span id="creationDate">-</span></p>
+                    <p><strong>Creation Date:</strong> <span id="creationDate">26.10.2025</span></p>
                 </div>
                 <div>
                     <p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
@@ -1296,38 +475,51 @@
                     coinmarketcap DEX ›
                 </a>
             </div>
-</div>
-    </section>
+        </div>
+  </section>
 
   <script>
-
 /* ===================== ENDPOINTS ===================== */
-// Pret (GeckoTerminal) – functioneaza deja
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-
-// 2nd gen (Cloud Run) URLs – din `firebase functions:list`
 const HOLDERS_ENDPOINT       = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
 const TOTALSUPPLY_ENDPOINT   = "https://sbyttotalsupplyfree-jfka2frgwa-uc.a.run.app";
 const TX_ENDPOINT            = "https://sbyttxcountfree-jfka2frgwa-uc.a.run.app";
 const CONTRACT_INFO_ENDPOINT = "https://sbytcontractinfofree-jfka2frgwa-uc.a.run.app";
+const POOL_STATS_ENDPOINT    = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPoolStats";
 
-// Pentru Volum 24h – o sa-l adaugam ca function (pasii mai jos)
-// Dupa deploy, inlocuiesti cu URL-ul real afisat la deploy.
-const POOL_STATS_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPoolStats";
+/* ===================== CONTRACT CREATION (FIXED + AUTO AGE) ===================== */
+/* Fix: afiseaza mereu 26 Octombrie 2025 (launch time) si calculeaza automat age */
+const CONTRACT_CREATION_ISO_UTC = "2025-10-26T23:23:11Z"; // 26 Oct 2025 11:23:11 PM UTC
+function contractCreationMsFallback() {
+  const ms = Date.parse(CONTRACT_CREATION_ISO_UTC);
+  return Number.isFinite(ms) ? ms : Date.UTC(2025, 9, 26, 23, 23, 11); // safety
+}
+function calcAgeDaysFromMs(ms){
+  if (!Number.isFinite(ms)) return null;
+  const diff = Date.now() - ms;
+  if (!Number.isFinite(diff)) return null;
+  return Math.max(0, Math.floor(diff / 86400000));
+}
+function renderContractDates(ms){
+  const creationEl = document.getElementById("creationDate");
+  const ageEl      = document.getElementById("contractAge");
+  if (creationEl) creationEl.textContent = new Date(ms).toLocaleDateString("ro-RO");
+  const ageDays = calcAgeDaysFromMs(ms);
+  if (ageEl) ageEl.textContent = (ageDays == null) ? "—" : ageDays.toLocaleString("ro-RO");
+}
 
 /* ===================== PRICE HISTORY STORAGE ===================== */
-const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
+const STORAGE_KEY = "sbyt_price_samples_v1";
 const MAX_KEEP_DAYS = 31;
 
 /* ===================== UI STATE ===================== */
-let currentPeriod = "24h";       // 1h | 24h | 7d | 1m
-let currentMode   = "line";      // line | candlestick
+let currentPeriod = "24h";
+let currentMode   = "line";
 let priceChart    = null;
 
-// pentru marketcap
-let CURRENT_PRICE_USD  = null;   // number
-let CURRENT_SUPPLY     = null;   // number
-let CURRENT_VOLUME_24H = null;   // number
+let CURRENT_PRICE_USD  = null;
+let CURRENT_SUPPLY     = null;
+let CURRENT_VOLUME_24H = null;
 
 function nowMs(){ return Date.now(); }
 
@@ -1451,11 +643,7 @@ function buildCandlesSeries(samples, period) {
 function renderPriceChart(samples) {
   const canvas = document.getElementById("priceChart");
   if (!canvas) return;
-
-  if (typeof Chart === "undefined") {
-    console.warn("Chart.js not loaded yet");
-    return;
-  }
+  if (typeof Chart === "undefined") return;
 
   const ctx = canvas.getContext("2d");
   destroyChart();
@@ -1509,24 +697,16 @@ function updateMarketCapUI() {
   }
 
   const mc = CURRENT_PRICE_USD * CURRENT_SUPPLY;
-  if (!Number.isFinite(mc)) {
-    el.textContent = "—";
-    return;
-  }
-
-  el.textContent = mc.toLocaleString("ro-RO", { maximumFractionDigits: 0 });
+  el.textContent = Number.isFinite(mc) ? mc.toLocaleString("ro-RO", { maximumFractionDigits: 0 }) : "—";
 }
 
 function updateVolumeUI() {
   const el = document.getElementById("volume24h");
   if (!el) return;
 
-  if (!Number.isFinite(CURRENT_VOLUME_24H)) {
-    el.textContent = "—";
-    return;
-  }
-
-  el.textContent = CURRENT_VOLUME_24H.toLocaleString("ro-RO", { maximumFractionDigits: 0 });
+  el.textContent = Number.isFinite(CURRENT_VOLUME_24H)
+    ? CURRENT_VOLUME_24H.toLocaleString("ro-RO", { maximumFractionDigits: 0 })
+    : "—";
 }
 
 /* ===================== LIVE UPDATERS ===================== */
@@ -1551,7 +731,7 @@ async function updateSBYTPrice() {
     }
 
     priceEl.innerText = "—";
-  } catch (e) {
+  } catch {
     priceEl.innerText = "—";
   }
 }
@@ -1565,8 +745,7 @@ async function updateHolders() {
     const r = await fetch(HOLDERS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
     const v = Number(d?.holders);
-    if (d?.ok && Number.isFinite(v)) el.textContent = v.toLocaleString("ro-RO");
-    else el.textContent = "0";
+    el.textContent = (d?.ok && Number.isFinite(v)) ? v.toLocaleString("ro-RO") : "0";
     setLastUpdate();
   } catch {
     el.textContent = "0";
@@ -1609,47 +788,46 @@ async function updateTransactions() {
     const r = await fetch(TX_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
     const v = Number(d?.txCount);
-    if (d?.ok && Number.isFinite(v)) el.textContent = v.toLocaleString("ro-RO");
-    else el.textContent = "0";
+    el.textContent = (d?.ok && Number.isFinite(v)) ? v.toLocaleString("ro-RO") : "0";
     setLastUpdate();
   } catch {
     el.textContent = "0";
   }
 }
 
+/* FIX IMPORTANT:
+   - Creation Date trebuie sa fie 26 Oct 2025
+   - Contract Age calculat automat (client-side), chiar daca function-ul da eroare / rate limit
+*/
 async function updateContractInfo() {
-  const creationEl = document.getElementById("creationDate");
-  const ageEl      = document.getElementById("contractAge");
+  let ms = null;
 
   try {
     const r = await fetch(CONTRACT_INFO_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
 
-    if (!d?.ok) return;
+    if (d?.ok && d.createdAt != null) {
+      const raw = d.createdAt;
 
-    // accept: ISO string OR unix ms OR unix seconds
-    const raw = d.createdAt;
-    let ms = null;
-
-    if (typeof raw === "string") {
-      const t = Date.parse(raw);
-      if (Number.isFinite(t)) ms = t;
-      else {
-        const n = Number(raw);
-        if (Number.isFinite(n)) ms = (n > 1e12) ? n : n * 1000;
+      if (typeof raw === "string") {
+        const t = Date.parse(raw);
+        if (Number.isFinite(t)) ms = t;
+        else {
+          const n = Number(raw);
+          if (Number.isFinite(n)) ms = (n > 1e12) ? n : n * 1000;
+        }
+      } else if (typeof raw === "number") {
+        ms = (raw > 1e12) ? raw : raw * 1000;
       }
-    } else if (typeof raw === "number") {
-      ms = (raw > 1e12) ? raw : raw * 1000;
-    }
-
-    if (ms != null) {
-      if (creationEl) creationEl.textContent = new Date(ms).toLocaleDateString("ro-RO");
-      if (ageEl && typeof d.ageDays === "number") ageEl.textContent = d.ageDays.toLocaleString("ro-RO");
-      setLastUpdate();
     }
   } catch {
-    // ignore
+    // ignore, fallback below
   }
+
+  if (!Number.isFinite(ms)) ms = contractCreationMsFallback();
+
+  renderContractDates(ms);
+  setLastUpdate();
 }
 
 async function updatePoolStats() {
@@ -1661,11 +839,7 @@ async function updatePoolStats() {
     const d = await r.json();
 
     const v = Number(d?.volumeUsd24h);
-    if (d?.ok && Number.isFinite(v)) {
-      CURRENT_VOLUME_24H = v;
-    } else {
-      CURRENT_VOLUME_24H = null;
-    }
+    CURRENT_VOLUME_24H = (d?.ok && Number.isFinite(v)) ? v : null;
 
     updateVolumeUI();
     setLastUpdate();
@@ -1728,10 +902,12 @@ window.fetchAllData = async function(){
 
 /* ===================== BOOT ===================== */
 document.addEventListener("DOMContentLoaded", () => {
+  // Setare imediata corecta (fara sa astepti API)
+  renderContractDates(contractCreationMsFallback());
+
   syncActiveButtons();
   renderPriceChart(loadSamples());
 
-  // initial
   updateSBYTPrice();
   updateHolders();
   updateTotalSupply();
@@ -1739,15 +915,17 @@ document.addEventListener("DOMContentLoaded", () => {
   updateContractInfo();
   updatePoolStats();
 
-  // intervals
   setInterval(updateSBYTPrice, 30000);
   setInterval(updateHolders, 300000);
   setInterval(updateTotalSupply, 300000);
   setInterval(updateTransactions, 300000);
   setInterval(updateContractInfo, 3600000);
   setInterval(updatePoolStats, 300000);
-});
 
-</script>
+  // OPTIONAL: ca sa se actualizeze "Contract Age" zilnic chiar daca pagina ramane deschisa
+  setInterval(() => renderContractDates(contractCreationMsFallback()), 6 * 60 * 60 * 1000);
+});
+  </script>
 </body>
 </html>
+
