@@ -133,11 +133,10 @@
 
         .chart-container {
             position: relative;
-            height: 240px; /* <-- mai mic (era 400) */
+            height: 240px; /* mai mic */
             margin: 10px 0 6px;
         }
 
-        /* controale mai compacte */
         .chart-controls {
             display: flex;
             gap: 8px;
@@ -164,7 +163,6 @@
         }
         .period-btn:hover { background: rgba(0, 102, 255, 0.2); transform: translateY(-1px); }
 
-        /* toggle modern (Line / Candles) */
         .toggle {
             display: inline-flex;
             background: rgba(255,255,255,0.06);
@@ -188,7 +186,6 @@
             color: #fff;
         }
 
-        /* mini info row */
         .chart-meta {
             display:flex;
             align-items:center;
@@ -210,7 +207,6 @@
             border: 1px solid rgba(0,255,136,0.18);
         }
 
-        /* grid stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -436,7 +432,6 @@ function renderContractDatesFixed() {
   const ms = contractCreationMsLocalMidnight();
   const creationEl = document.getElementById("creationDate");
   const ageEl      = document.getElementById("contractAge");
-
   if (creationEl) creationEl.textContent = "26.10.2025"; // FIX, fara shift
   const ageDays = calcAgeDaysFromLocalMidnight(ms);
   if (ageEl) ageEl.textContent = (ageDays == null) ? "—" : ageDays.toLocaleString("ro-RO");
@@ -509,14 +504,13 @@ function bucketSizeMs(period) {
   }
 }
 
+/* FIX IMPORTANT: etichete unice/clare pentru 7d/1m ca sa nu "dispara" graficul */
 function fmtLabel(ts){
   const d = new Date(ts);
   if (currentPeriod === "1h" || currentPeriod === "24h") {
     return d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
   }
-  if (currentPeriod === "7d") {
-    return d.toLocaleDateString("ro-RO", { weekday: "short" });
-  }
+  // 7d & 1m: zi.luna (evita weekday short care se repeta / se vede ciudat)
   return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" });
 }
 
@@ -541,7 +535,7 @@ function buildLineSeries(samples, period) {
     return { labels: keys.map(fmtLabel), values: keys.map(k => buckets.get(k)) };
   }
 
-  const maxPoints = 220; // mai compact
+  const maxPoints = 220;
   const step = Math.max(1, Math.floor(inRange.length / maxPoints));
   const labels = [];
   const values = [];
@@ -557,11 +551,12 @@ function buildLineSeries(samples, period) {
   return { labels, values };
 }
 
+/* FIX IMPORTANT: candlestick trebuie sa primeasca x (altfel deseori nu afiseaza nimic) */
 function buildCandlesSeries(samples, period) {
   const start = nowMs() - periodWindowMs(period);
   const bms = bucketSizeMs(period);
   const inRange = samples.filter(s => s.t >= start);
-  if (!inRange.length) return { labels: [], ohlc: [] };
+  if (!inRange.length) return { labels: [], candles: [] };
 
   const buckets = new Map();
   for (const s of inRange){
@@ -570,8 +565,15 @@ function buildCandlesSeries(samples, period) {
     if (!cur) buckets.set(b, { o: s.p, h: s.p, l: s.p, c: s.p });
     else { cur.h = Math.max(cur.h, s.p); cur.l = Math.min(cur.l, s.p); cur.c = s.p; }
   }
+
   const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
-  return { labels: keys.map(fmtLabel), ohlc: keys.map(k => ({ ...buckets.get(k) })) };
+  const labels = keys.map(k => fmtLabel(k));
+  const candles = keys.map((k, i) => {
+    const c = buckets.get(k);
+    return { x: labels[i], o: c.o, h: c.h, l: c.l, c: c.c };
+  });
+
+  return { labels, candles };
 }
 
 function updateChartMeta(pointsCount){
@@ -581,99 +583,137 @@ function updateChartMeta(pointsCount){
   if (p) p.textContent = String(pointsCount ?? 0);
 }
 
-/* ---- CHART STYLING HELPERS (fara culori hardcode in dataset) ---- */
-function applyChartOptionsCommon(options){
-  // grid/ticks mai soft + fara margini prea mari
-  options.layout = options.layout || {};
-  options.layout.padding = { left: 6, right: 10, top: 8, bottom: 4 };
-
-  options.plugins = options.plugins || {};
-  options.plugins.legend = { display: false };
-  options.plugins.tooltip = {
-    enabled: true,
-    mode: "index",
-    intersect: false,
-    displayColors: false,
-    callbacks: {
-      label: (ctx) => {
-        const v = ctx.parsed?.y;
-        if (!Number.isFinite(v)) return "—";
-        return "SBYT: $" + Number(v).toFixed(8);
-      }
+/* ---- CHART STYLING HELPERS ---- */
+function commonScales(){
+  return {
+    x: {
+      ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+      grid: { display: false }
+    },
+    y: {
+      beginAtZero: false,
+      ticks: {
+        callback: (v) => {
+          const n = Number(v);
+          if (!Number.isFinite(n)) return "";
+          return (n >= 1) ? "$" + n.toFixed(2) : "$" + n.toFixed(6);
+        }
+      },
+      grid: { color: "rgba(255,255,255,0.06)" }
     }
   };
-
-  options.scales = options.scales || {};
-  options.scales.x = {
-    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
-    grid: { display: false }
-  };
-  options.scales.y = {
-    beginAtZero: false,
-    ticks: {
-      callback: (v) => (Number(v) >= 1 ? "$" + Number(v).toFixed(2) : "$" + Number(v).toFixed(6))
-    },
-    grid: { color: "rgba(255,255,255,0.06)" }
-  };
-
-  return options;
 }
 
 function renderPriceChart(samples) {
   const canvas = document.getElementById("priceChart");
-  if (!canvas) return;
-  if (typeof Chart === "undefined") return;
+  const priceDataEl = document.getElementById("priceData");
+  if (!canvas || typeof Chart === "undefined") return;
 
   const ctx = canvas.getContext("2d");
   destroyChart();
 
+  const safeSamples = Array.isArray(samples) ? samples : [];
+
+  // mesaj util daca alegi 7d/1m si nu ai istoric suficient
+  if (priceDataEl && (currentPeriod === "7d" || currentPeriod === "1m")) {
+    if (safeSamples.length < 5) {
+      priceDataEl.textContent = "Nu ai încă istoric suficient pentru 7 zile / 1 lună. Lasă pagina deschisă sau revino zilnic ca să se umple.";
+    }
+  }
+
   if (currentMode === "candlestick") {
-    const { labels, ohlc } = buildCandlesSeries(samples, currentPeriod);
+    const { labels, candles } = buildCandlesSeries(safeSamples, currentPeriod);
+
     priceChart = new Chart(ctx, {
       type: "candlestick",
-      data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
-      options: applyChartOptionsCommon({
-        responsive: true,
-        maintainAspectRatio: false,
-        parsing: false
-      })
-    });
-    updateChartMeta(ohlc.length);
-  } else {
-    const { labels, values } = buildLineSeries(samples, currentPeriod);
-
-    // gradient fill (din canvas) - vizual mai “premium”
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 240);
-    gradient.addColorStop(0, "rgba(0, 255, 136, 0.22)");
-    gradient.addColorStop(1, "rgba(0, 255, 136, 0.00)");
-
-    priceChart = new Chart(ctx, {
-      type: "line",
       data: {
         labels,
         datasets: [{
           label: "SBYT",
-          data: values,
-          tension: 0.35,
-          pointRadius: 0,
-          borderWidth: 2,
-          borderColor: "rgba(0,255,136,0.85)",
-          backgroundColor: gradient,
-          fill: true
+          data: candles
         }]
       },
-      options: applyChartOptionsCommon({
+      options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
-        elements: { line: { capBezierPoints: true } }
-      })
+        parsing: false, // important pentru candlestick
+        layout: { padding: { left: 6, right: 10, top: 8, bottom: 4 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            displayColors: false,
+            callbacks: {
+              label: (t) => {
+                const v = t?.raw;
+                if (!v) return "—";
+                const o = Number(v.o), h = Number(v.h), l = Number(v.l), c = Number(v.c);
+                if (![o,h,l,c].every(Number.isFinite)) return "—";
+                return `O:$${o.toFixed(8)}  H:$${h.toFixed(8)}  L:$${l.toFixed(8)}  C:$${c.toFixed(8)}`;
+              }
+            }
+          }
+        },
+        scales: commonScales()
+      }
     });
 
-    updateChartMeta(values.length);
+    updateChartMeta(candles.length);
+    if (priceDataEl && candles.length === 0) priceDataEl.textContent = "Nu există suficiente mostre pentru lumânări încă.";
+    return;
   }
+
+  // LINE mode
+  const { labels, values } = buildLineSeries(safeSamples, currentPeriod);
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 240);
+  gradient.addColorStop(0, "rgba(0, 255, 136, 0.22)");
+  gradient.addColorStop(1, "rgba(0, 255, 136, 0.00)");
+
+  priceChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "SBYT",
+        data: values,
+        tension: 0.35,
+        pointRadius: 0,
+        borderWidth: 2,
+        borderColor: "rgba(0,255,136,0.85)",
+        backgroundColor: gradient,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      layout: { padding: { left: 6, right: 10, top: 8, bottom: 4 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          mode: "index",
+          intersect: false,
+          displayColors: false,
+          callbacks: {
+            label: (ctx) => {
+              const v = ctx.parsed?.y;
+              if (!Number.isFinite(v)) return "—";
+              return "SBYT: $" + Number(v).toFixed(8);
+            }
+          }
+        }
+      },
+      scales: commonScales()
+    }
+  });
+
+  updateChartMeta(values.length);
 }
 
+/* ===================== UI HELPERS ===================== */
 function setLastUpdate() {
   const el = document.getElementById("lastUpdateTime");
   if (!el) return;
@@ -806,7 +846,6 @@ async function updatePoolStats() {
 
 /* ===================== BUTTON HANDLERS ===================== */
 function syncActiveButtons(){
-  // period buttons
   document.querySelectorAll(".period-btn").forEach(btn => {
     const oc = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
     const isPeriod = oc.includes("changeChartPeriod");
@@ -815,7 +854,6 @@ function syncActiveButtons(){
     btn.classList.toggle("active", active);
   });
 
-  // toggle buttons
   const btnLine = document.getElementById("btnLine");
   const btnCandle = document.getElementById("btnCandle");
   if (btnLine) btnLine.classList.toggle("active", currentMode === "line");
@@ -879,7 +917,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateContractInfo, 3600000);
   setInterval(updatePoolStats, 300000);
 
-  // age corect daca pagina ramane deschisa peste miezul noptii
   setInterval(renderContractDatesFixed, 60 * 60 * 1000);
 });
   </script>
