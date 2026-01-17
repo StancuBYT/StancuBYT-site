@@ -4,8 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StancuBYT | Statistici</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+// Fallback: call once shortly after load
+setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1">
+// Fallback: call once shortly after load
+setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
+</script>
   <style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
@@ -1225,7 +1231,7 @@
                 </div>
                 <div class="stat-item">
                     <div>Tranzacții</div>
-                    <div class="stat-value" id="transactionsCount">-</div>
+                    <div class="stat-value" id="transactionsCount">0</div>
                     <div>Total TX</div>
                 </div>
                 <div class="stat-item">
@@ -1562,6 +1568,7 @@ async function updateTransactions() {
     } else {
       el.textContent = "0";
     }
+window.updateTransactions = updateTransactions;
   } catch (e) {
     el.textContent = "0";
   }
@@ -1614,6 +1621,13 @@ window.fetchAllData = async function(){
 };
 
 /* ====== BOOT ====== */
+
+function fetchAllData(){
+  try { updateSBYTPrice(); } catch(e){}
+  try { updateHolders(); } catch(e){}
+  try { updateTotalSupply(); } catch(e){}
+  try { updateTransactions(); } catch(e){}
+}
 document.addEventListener("DOMContentLoaded", () => {
   syncActiveButtons();
   renderPriceChart(loadSamples());
@@ -1631,6 +1645,9 @@ document.addEventListener("DOMContentLoaded", () => {
   updateTransactions();
   setInterval(updateTransactions, 300000);
 });
+
+// Fallback: call once shortly after load
+setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
 </script>
 </body>
 </html>
