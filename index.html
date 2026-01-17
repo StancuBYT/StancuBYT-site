@@ -1,12 +1,1545 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StancuBYT | Statistici</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+  <style>
+        /* Variabile culori conform psihologiei marketingului */
+        :root {
+            --blue-tech: #0066ff;
+            --green-growth: #00ff88;
+            --purple-innov: #8a2be2;
+            --neon-cyan: #00ffff;
+            --dark-bg: #0a0a1f;
+            --darker-bg: #050510;
+            --orange-alert: #ff9500;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
+        }
+
+        /* Particle Animation Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Logo Background pentru Hero Section */
+        .hero-logo-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .logo-3d-bg {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: float3d 20s infinite ease-in-out;
+        }
+
+        .logo-3d-bg img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            filter: blur(1px) brightness(1.2);
+        }
+
+        @keyframes float3d {
+            0%, 100% { 
+                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
+            }
+            25% { 
+                transform: translateY(-20px) rotateX(5deg) rotateY(5deg); 
+            }
+            50% { 
+                transform: translateY(0px) rotateX(0deg) rotateY(10deg); 
+            }
+            75% { 
+                transform: translateY(20px) rotateX(-5deg) rotateY(5deg); 
+            }
+        }
+
+        /* 3D Logo Animation */
+        .logo-3d-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            perspective: 1000px;
+        }
+
+        .logo-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate3d 8s infinite linear;
+        }
+
+        .logo-3d img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            backface-visibility: hidden;
+        }
+
+        .backnote-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translate(-50%, -50%);
+            animation: orbit 6s infinite linear;
+        }
+
+        .backnote {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.7;
+        }
+
+        .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+        .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+        .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+
+        @keyframes rotate3d {
+            0% { transform: rotateY(0deg) rotateX(5deg); }
+            100% { transform: rotateY(360deg) rotateX(5deg); }
+        }
+
+        @keyframes orbit {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Buton Modern Reîmprospătează Datele */
+        .btn-refresh-modern {
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-refresh-modern:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
+        }
+
+        .btn-refresh-modern:active {
+            transform: translateY(0) scale(1);
+        }
+
+        .refresh-icon {
+            font-size: 1.3rem;
+            transition: transform 0.5s ease;
+        }
+
+        .btn-refresh-modern:hover .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .refresh-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50px;
+            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+            opacity: 0;
+            z-index: -1;
+            animation: pulseEffect 2s infinite;
+        }
+
+        @keyframes rotate360 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseEffect {
+            0% { 
+                transform: scale(1); 
+                opacity: 0.7; 
+            }
+            100% { 
+                transform: scale(1.2); 
+                opacity: 0; 
+            }
+        }
+
+        /* Loading animation pentru buton */
+        .btn-refresh-modern.loading {
+            background: linear-gradient(45deg, #666, #888);
+            cursor: wait;
+        }
+
+        .btn-refresh-modern.loading .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .btn-refresh-modern.loading .refresh-text {
+            opacity: 0.7;
+        }
+
+        /* Animatie pentru actualizare succes */
+        @keyframes successFlash {
+            0%, 100% { 
+                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
+            }
+            50% { 
+                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
+            }
+        }
+
+        .btn-refresh-modern.success {
+            animation: successFlash 0.5s ease 2;
+        }
+
+        /* Navigation - Scientific Style */
+        .scientific-nav {
+            background: rgba(10, 10, 31, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--blue-tech);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        /* Main Content Sections */
+        .page-section {
+            min-height: 100vh;
+            padding: 120px 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .active-section {
+            display: block;
+        }
+
+        /* Hero Section - Prezentare */
+        .hero {
+            text-align: center;
+            padding-top: 150px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(45deg); }
+        }
+
+        /* Sectiune Noutati */
+        .news-section {
+            margin: 3rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--green-growth);
+        }
+
+        .news-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .news-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .news-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .news-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--green-growth);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
+        }
+
+        .news-card.pinned {
+            border: 2px solid var(--orange-alert);
+            background: rgba(255, 149, 0, 0.05);
+        }
+
+        .news-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .badge-update {
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--blue-tech);
+            border: 1px solid var(--blue-tech);
+        }
+
+        .badge-announcement {
+            background: rgba(255, 149, 0, 0.2);
+            color: var(--orange-alert);
+            border: 1px solid var(--orange-alert);
+        }
+
+        .badge-event {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-growth);
+            border: 1px solid var(--green-growth);
+        }
+
+        .news-date {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-form {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            outline: none;
+        }
+
+        /* Contor Vizite */
+        .visit-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 10, 31, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--blue-tech);
+            border-radius: 15px;
+            padding: 0.8rem 1.2rem;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .visit-counter:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+
+        .counter-icon {
+            animation: pulse 2s infinite;
+        }
+
+        .token-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--green-growth);
+        }
+
+        /* Social Links in Hero */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .social-btn:hover {
+            background: rgba(0, 102, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
+        }
+
+        /* Buton Uniswap */
+        .uniswap-btn {
+            background: linear-gradient(45deg, #ff007a, #8a2be2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+
+        .uniswap-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.4);
+        }
+
+        /* Scientific Data Visualization */
+        .data-visualization {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .period-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn.active {
+            background: var(--blue-tech);
+            border-color: var(--blue-tech);
+        }
+
+        .period-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            margin: 0.5rem 0;
+        }
+
+        .neon-glow {
+            box-shadow: 
+                0 0 20px rgba(0, 102, 255, 0.3),
+                0 0 40px rgba(0, 255, 136, 0.2),
+                inset 0 0 20px rgba(138, 43, 226, 0.1);
+        }
+
+        /* Status Indicators */
+        .status-online {
+            color: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        .status-offline {
+            color: #ff4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Token Price Display */
+        .price-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .price-change {
+            font-size: 1.2rem;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
+        .positive { color: #00ff88; background: rgba(0, 255, 136, 0.1); }
+        .negative { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
+
+        /* Whitepaper Specific Styles */
+        .whitepaper-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 20px;
+        }
+
+        .whitepaper-logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            padding: 15px;
+            box-shadow: 0 0 40px rgba(0, 102, 255, 0.4);
+        }
+
+        .whitepaper-logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .toc {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--green-growth);
+        }
+
+        .toc h3 {
+            margin-bottom: 1rem;
+            color: var(--neon-cyan);
+        }
+
+        .toc ul {
+            columns: 2;
+            column-gap: 3rem;
+        }
+
+        .toc li {
+            margin-bottom: 0.8rem;
+            break-inside: avoid;
+        }
+
+        .toc a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--neon-cyan);
+            text-decoration: underline;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+        }
+
+        .section-card h3 {
+            color: var(--green-growth);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .whitepaper-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .whitepaper-table th {
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .whitepaper-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .whitepaper-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .whitepaper-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.2rem;
+        }
+
+        .badge-success {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-growth);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(0, 204, 255, 0.2);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 204, 255, 0.3);
+        }
+
+        .roadmap-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 2rem 0;
+        }
+
+        .roadmap-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--blue-tech), var(--purple-innov));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .timeline-date {
+            font-weight: bold;
+            color: var(--green-growth);
+            margin-bottom: 0.5rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .social-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .social-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
+            border-color: var(--blue-tech);
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .required {
+            color: #ff4444;
+        }
+
+        .contact-card {
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 3px solid;
+            margin-bottom: 1rem;
+        }
+
+        .contact-card.business {
+            border-color: var(--green-growth);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .contact-card.partnership {
+            border-color: var(--blue-tech);
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .contact-card.security {
+            border-color: var(--purple-innov);
+            background: rgba(138, 43, 226, 0.05);
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .time-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .time-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-logo-bg {
+                width: 400px;
+                height: 400px;
+            }
+
+            .token-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-display {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .btn-refresh-modern {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .social-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc ul {
+                columns: 1;
+            }
+
+            .whitepaper-table {
+                font-size: 0.9rem;
+            }
+
+            .whitepaper-table th,
+            .whitepaper-table td {
+                padding: 0.5rem;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .visit-counter {
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .nav-links a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .whitepaper-logo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    
+        .form-group select option {
+            background: var(--darker-bg);
+            color: #ffffff;
+        }
+
+    
+/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
+.admin-login{
+  margin-top: 80px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  border-top: 2px solid rgba(122,92,255,.8);
+  text-align: center;
+  border-radius: 16px;
+}
+.admin-login h2{ color:#fff; margin:0 0 10px; }
+.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
+.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+.admin-login-box input{
+  padding:12px 14px; width:280px; max-width:92vw;
+  border-radius:10px; border:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25); color:#fff; outline:none;
+}
+.admin-login-box button{
+  padding:12px 16px; border-radius:10px; border:none;
+  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
+}
+.admin-login-box button:hover{ filter: brightness(1.08); }
+.admin-msg{ margin-top:12px; font-weight:700; }
+.admin-pill{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px; font-size:.9rem;
+  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
+}
+.admin-pill.off{
+  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
+}
+.admin-only{ display:none !important; }
+
+/* ====== TROPHY BUTTON (Giveaway add) ====== */
+.trophy-btn{
+  padding: 10px 14px !important;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  min-width: 54px;
+}
+.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
+.trophy-btn .trophy-logo{
+  width: 22px; height: 22px; border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0,255,136,.25);
+}
+.table-responsive{ overflow-x:auto; width:100%; }
+.lb-table{ width:100%; border-collapse: collapse; }
+.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
+.lb-top1{ background: rgba(255,215,0,.12); }
+.lb-top2{ background: rgba(192,192,192,.12); }
+.lb-top3{ background: rgba(205,127,50,.12); }
+.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
+
+</style>
+</head>
+<body>
+  <section id="statistici" class="page-section active-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
+            <p>Date live preluate de pe Etherscan</p>
+            
+            <!-- Buton Modern Reîmprospătează Datele -->
+            <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
+                <span class="refresh-icon">🔄</span>
+                <span class="refresh-text">Reîmprospătează Datele</span>
+                <span class="refresh-pulse"></span>
+            </button>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📈 Preț în Timp Real</h3>
+            
+            
+            <div id="sbyt-price-box" style="margin-top:14px; margin-bottom:10px;">
+              <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
+              <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:var(--green-growth);">Se încarcă...</div>
+            </div>
+<!-- Chart Controls -->
+            <div class="chart-controls">
+                <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
+                <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
+                <button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
+                <button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
+                <button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
+                <button class="period-btn" onclick="changeChartType('line')">Linie</button>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+            <div id="priceData" class="loading">Se încarcă datele live...</div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📊 Metrici Contract - coinmarketcap LIVE</h3>
+            <div class="stats-grid" id="etherscanStats">
+                <div class="stat-item">
+                    <div>Holders</div>
+                    <div class="stat-value" id="holdersCount">-</div>
+                    <div>Deținători</div>
+                </div>
+                <div class="stat-item">
+                    <div>Total Supply REAL</div>
+                    <div class="stat-value" id="totalSupply">-</div>
+                    <div>SBYT</div>
+                </div>
+                <div class="stat-item">
+                    <div>Tranzacții</div>
+                    <div class="stat-value" id="transactionsCount">-</div>
+                    <div>Total TX</div>
+                </div>
+                <div class="stat-item">
+                    <div>Market Cap</div>
+                    <div class="stat-value" id="marketCap">-</div>
+                    <div>USD</div>
+                </div>
+                <div class="stat-item">
+                    <div>Volum 24h</div>
+                    <div class="stat-value" id="volume24h">-</div>
+                    <div>USD</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📋 Detalii Contract</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
+                    <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
+                    <p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
+                    <p><strong>Creation Date:</strong> <span id="creationDate">-</span></p>
+                </div>
+                <div>
+                    <p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
+                    <p><strong>Contract Age:</strong> <span id="contractAge">-</span> zile</p>
+                    <p><strong>Last Update:</strong> <span id="lastUpdateTime">-</span></p>
+                    <p><strong>Contract verificat pe Etherscan</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="token-info-grid">
+            <div class="info-card">
+                <h3>🔍 Vezi pe Etherscan</h3>
+                <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Analiză detaliată Etherscan ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>📈 Vezi pe DexTools</h3>
+                <a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Chart live DexTools ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>🦍 Vezi pe Apespace</h3>
+                <a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Analiză Apespace ›
+                </a>
+            </div>
+        
+            <div class="info-card">
+                <h3>🦎 Vezi pe GeckoTerminal</h3>
+                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    Pool & tranzacționare GeckoTerminal ›
+                </a>
+            </div>
+            <div class="info-card">
+                <h3>📌 Vezi pe CoinMarketCap DEX</h3>
+                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" 
+                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                    coinmarketcap DEX ›
+                </a>
+            </div>
+</div>
+    </section>
+
+  <script>
+const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+const HOLDERS_ENDPOINT = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
+const TOTALSUPPLY_ENDPOINT = "https://sbyttotalsupplyfree-jfka2frgwa-uc.a.run.app";
+const TX_ENDPOINT = "https://sbyttxcountfree-jfka2frgwa-uc.a.run.app";
+const CONTRACT_INFO_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytContractInfoFree";
+
+
+const STORAGE_KEY = "sbyt_price_samples_v1"; 
+
+let CURRENT_PRICE_USD = null;
+let CURRENT_SUPPLY = null;
+// [{t: ms, p: number}]
+const MAX_KEEP_DAYS = 31;
+
+// UI state (compat with existing buttons)
+let currentPeriod = "24h";   // "1h" | "24h" | "7d" | "1m"
+let currentMode   = "line";  // "line" | "candles"
+
+let priceChart = null;
+
+function nowMs(){ return Date.now(); }
+
+function loadSamples() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const arr = JSON.parse(raw || "[]");
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .map(s => ({ t: Number(s.t), p: Number(s.p) }))
+      .filter(s => Number.isFinite(s.t) && Number.isFinite(s.p))
+      .sort((a,b) => a.t - b.t);
+  } catch {
+    return [];
+  }
+}
+
+function saveSamples(arr) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch {}
+}
+
+function trimSamples(arr) {
+  const cutoff = nowMs() - MAX_KEEP_DAYS * 24*60*60*1000;
+  return arr.filter(s => s.t >= cutoff);
+}
+
+function addSample(price) {
+  let arr = loadSamples();
+  arr.push({ t: nowMs(), p: price });
+  arr = trimSamples(arr).sort((a,b)=>a.t-b.t);
+  if (arr.length > 20000) arr = arr.slice(arr.length - 20000);
+  saveSamples(arr);
+  return arr;
+}
+
+function periodWindowMs(period) {
+  switch(period){
+    case "1h":  return 1*60*60*1000;
+    case "24h": return 24*60*60*1000;
+    case "7d":  return 7*24*60*60*1000;
+    case "1m":  return 30*24*60*60*1000;
+    default:    return 24*60*60*1000;
+  }
+}
+
+function bucketSizeMs(period) {
+  switch(period){
+    case "1h":  return 60*1000;          // 1 min
+    case "24h": return 15*60*1000;       // 15 min
+    case "7d":  return 24*60*60*1000;    // 1 zi -> 7 puncte
+    case "1m":  return 24*60*60*1000;    // 1 zi -> ~30 puncte (1 luna)
+    default:    return 15*60*1000;
+  }
+}
+
+function fmtLabel(t){
+  const d = new Date(t);
+  const period = currentPeriod;
+
+  // 1H: doar ora (granularitate mare)
+  if (period === "1h") {
+    return d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  // 24H: zi/luna + ora (sa se vada clar trecerea peste miezul noptii)
+  if (period === "24h") {
+    return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }) + " " +
+           d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  // 7 zile: afiseaza zilele saptamanii (Lun, Mar, ...)
+  if (period === "7d") {
+    // in ro-RO apare de obicei cu punct (ex: "lun."), il eliminam
+    return d.toLocaleDateString("ro-RO", { weekday: "short" }).replace(".", "");
+  }
+
+  // 1 luna: afiseaza data (zi.luna)
+  if (period === "1m") {
+    return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" }).replace("/", "."); 
+  }
+
+  return d.toLocaleDateString("ro-RO");
+}
+
+function fmtRange(period){
+  const endT = nowMs();
+  const startT = endT - periodWindowMs(period);
+  const a = new Date(startT);
+  const b = new Date(endT);
+  const fa = a.toLocaleDateString("ro-RO", { day:"2-digit", month:"2-digit" }) + " " + a.toLocaleTimeString("ro-RO", { hour:"2-digit", minute:"2-digit" });
+  const fb = b.toLocaleDateString("ro-RO", { day:"2-digit", month:"2-digit" }) + " " + b.toLocaleTimeString("ro-RO", { hour:"2-digit", minute:"2-digit" });
+  return `${fa} → ${fb}`;
+}
+
+
+function buildLineSeries(samples, period) {
+  const now = nowMs();
+  const windowMs = periodWindowMs(period);
+  const start = now - windowMs;
+  const stepMs = bucketSizeMs(period);
+
+  if (!samples.length) return { labels: [], values: [] };
+
+  // consider only samples that can affect the window (keep a little earlier for forward-fill)
+  const relevant = samples.filter(s => s.t >= start - stepMs*2 && s.t <= now);
+  if (!relevant.length) return { labels: [], values: [] };
+
+  // Align to bucket boundaries so the x-axis clearly changes with period
+  let t0 = Math.floor(start / stepMs) * stepMs;
+  let t1 = Math.floor(now / stepMs) * stepMs;
+
+  // Forward-fill from the last known price (use first in-range price as baseline)
+  let i = 0;
+  let last = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
+
+  // Move i to first relevant point
+  while (i < relevant.length && relevant[i].t < t0) {
+    last = relevant[i].p;
+    i++;
+  }
+
+  const labels = [];
+  const values = [];
+
+  for (let t = t0; t <= t1; t += stepMs) {
+    // consume all samples up to current bucket end
+    while (i < relevant.length && relevant[i].t <= t) {
+      last = relevant[i].p;
+      i++;
+    }
+    labels.push(fmtLabel(t));
+    values.push(Number.isFinite(last) ? last : null);
+  }
+
+  return { labels, values };
+}
+
+function buildCandlesSeries(samples, period) {
+  const now = nowMs();
+  const windowMs = periodWindowMs(period);
+  const start = now - windowMs;
+  const bms = bucketSizeMs(period);
+
+  if (!samples.length) return { labels: [], ohlc: [] };
+
+  // keep a little earlier for baseline
+  const relevant = samples
+    .filter(s => s.t >= start - bms*2 && s.t <= now)
+    .sort((a,b) => a.t - b.t);
+
+  if (!relevant.length) return { labels: [], ohlc: [] };
+
+  let t0 = Math.floor(start / bms) * bms;
+  let t1 = Math.floor(now / bms) * bms;
+
+  // baseline price for empty buckets (so the x-axis expands even if you have sparse data)
+  let i = 0;
+  let lastClose = Number.isFinite(relevant[0].p) ? relevant[0].p : null;
+
+  // advance i to t0
+  while (i < relevant.length && relevant[i].t < t0) {
+    lastClose = relevant[i].p;
+    i++;
+  }
+
+  const labels = [];
+  const ohlc = [];
+
+  for (let t = t0; t <= t1; t += bms) {
+    let o = null, h = null, l = null, c = null;
+
+    // gather samples inside this bucket (<= bucket end t)
+    let gotAny = false;
+    while (i < relevant.length && relevant[i].t <= t) {
+      const p = relevant[i].p;
+      if (!gotAny) { o = h = l = c = p; gotAny = true; }
+      else { h = Math.max(h, p); l = Math.min(l, p); c = p; }
+      lastClose = p;
+      i++;
+    }
+
+    if (!gotAny) {
+      // flat candle from last close
+      if (Number.isFinite(lastClose)) {
+        o = h = l = c = lastClose;
+      } else {
+        continue;
+      }
+    }
+
+    labels.push(fmtLabel(t));
+    ohlc.push({ o, h, l, c });
+  }
+
+  return { labels, ohlc };
+}
+
+function destroyChart() {
+  try { if (priceChart) priceChart.destroy(); } catch {}
+  priceChart = null;
+}
+
 function renderPriceChart(samples) {
   const canvas = document.getElementById("priceChart");
   if (!canvas) return;
-  if (typeof Chart === "undefined") { console.warn("Chart.js not loaded yet"); return; }
-  const ctx = canvas.getContext("2d");
+
+  // IMPORTANT: Chart.js nu permite re-folosirea aceluiași canvas fără destroy()
   try {
-  try { destroyChart(); } catch(e){ console.warn("destroyChart failed", e); }
-if (currentMode === "candles") {
+    const existing = (window.Chart && Chart.getChart) ? Chart.getChart(canvas) : null;
+    if (existing) existing.destroy();
+  } catch (e) {}
+  try { if (priceChart) priceChart.destroy(); } catch (e) {}
+  priceChart = null;
+
+  const ctx = canvas.getContext("2d");
+  destroyChart();
+
+  const statusEl = document.getElementById("priceData");
+  if (currentMode === "candles") {
     const { labels, ohlc } = buildCandlesSeries(samples, currentPeriod);
+    if (statusEl) statusEl.innerText = `Mod: Lumânări • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Lumânări: ${ohlc.length}`;
     priceChart = new Chart(ctx, {
       type: "candlestick",
       data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
@@ -22,6 +1555,7 @@ if (currentMode === "candles") {
     });
   } else {
     const { labels, values } = buildLineSeries(samples, currentPeriod);
+    if (statusEl) statusEl.innerText = `Mod: Linie • Perioadă: ${currentPeriod.toUpperCase()} • Interval: ${fmtRange(currentPeriod)} • Puncte: ${values.length}`;
     priceChart = new Chart(ctx, {
       type: "line",
       data: { labels, datasets: [{ label: "SBYT", data: values, tension: 0.25, pointRadius: 0 }] },
@@ -36,8 +1570,9 @@ if (currentMode === "candles") {
       }
     });
   }
-  } catch (e) { console.error("renderPriceChart failed", e); }
 }
+
+
 function updateMarketCap() {
   const el = document.getElementById("marketCap");
   if (!el) return;
@@ -48,7 +1583,15 @@ function updateMarketCap() {
   }
 
   const mc = CURRENT_PRICE_USD * CURRENT_SUPPLY;
-  el.textContent = mc.toLocaleString("ro-RO", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+  // format smart: show decimals only for very small caps
+  let text;
+  if (mc >= 1e9) text = "$" + (mc/1e9).toLocaleString("ro-RO", { maximumFractionDigits: 2 }) + "B";
+  else if (mc >= 1e6) text = "$" + (mc/1e6).toLocaleString("ro-RO", { maximumFractionDigits: 2 }) + "M";
+  else if (mc >= 1e3) text = "$" + (mc/1e3).toLocaleString("ro-RO", { maximumFractionDigits: 2 }) + "K";
+  else text = "$" + mc.toLocaleString("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+
+  el.textContent = text;
 }
 
 async function updateSBYTPrice() {
@@ -56,148 +1599,90 @@ async function updateSBYTPrice() {
   if (!priceEl) return;
 
   try {
-    const res = await fetch(SBYT_PRICE_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
+    const res = await fetch(SBYT_PRICE_ENDPOINT, { cache: "no-store" });
     const data = await res.json();
 
     if (data && data.ok && data.priceUsd !== undefined) {
       const p = Number(data.priceUsd);
       if (Number.isFinite(p)) {
         priceEl.innerText = "$" + p.toFixed(8);
-
-        CURRENT_PRICE_USD = p;
-        updateMarketCap();
-
         const samples = addSample(p);
         renderPriceChart(samples);
         return;
       }
     }
     priceEl.innerText = "—";
-  } catch {
+  } catch (e) {
     priceEl.innerText = "—";
   }
 }
 
-async function updateHolders() {
-  const el = document.getElementById("holdersCount");
-  if (!el) return;
-  try {
-    const r = await fetch(HOLDERS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
-    const d = await r.json();
-    if (d && d.ok && d.holders != null) el.textContent = Number(d.holders).toLocaleString("ro-RO");
-    else el.textContent = "0";
-  } catch {
-    el.textContent = "0";
-  }
-}
-
-async function updateTotalSupply() {
-  const el = document.getElementById("totalSupply");
-  if (!el) return;
-  try {
-    const r = await fetch(TOTALSUPPLY_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
-    const d = await r.json();
-    if (d && d.ok && d.supply != null) {
-      const supplyNum = Number(d.supply);
-      el.textContent = supplyNum.toLocaleString("ro-RO");
-
-      CURRENT_SUPPLY = supplyNum;
-      updateMarketCap();
-    } else {
-      el.textContent = "—";
-      CURRENT_SUPPLY = null;
-      updateMarketCap();
+function syncActiveButtons(){
+  const btns = Array.from(document.querySelectorAll(".period-btn, .type-btn"));
+  btns.forEach(btn => {
+    const onclick = (btn.getAttribute("onclick") || "");
+    if (onclick.includes("changeChartPeriod")) {
+      const isActive = onclick.includes(`'${currentPeriod}'`) || onclick.includes(`\"${currentPeriod}\"`);
+      btn.classList.toggle("active", isActive);
+    } else if (onclick.includes("changeChartType")) {
+      // buttons may use 'candlestick' even though internal mode is 'candles'
+      const isCandleBtn = onclick.toLowerCase().includes("candle") || onclick.toLowerCase().includes("luman");
+      const isActive = (currentMode === "candles") ? isCandleBtn : !isCandleBtn;
+      btn.classList.toggle("active", isActive);
     }
-  } catch {
-    el.textContent = "—";
-    CURRENT_SUPPLY = null;
-    updateMarketCap();
-  }
+  });
 }
 
-async function updateTransactions() {
-  const el = document.getElementById("transactionsCount");
-  if (!el) return;
-  try {
-    const r = await fetch(TX_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
-    const d = await r.json();
-    if (d && d.ok && d.txCount != null) el.textContent = Number(d.txCount).toLocaleString("ro-RO");
-    else el.textContent = "0";
-  } catch {
-    el.textContent = "0";
-  }
-}
+ // Backward-compatible functions (your existing HTML buttons call these)
+window.changeChartPeriod = function(period){
+  currentPeriod = period;
+  syncActiveButtons();
+  renderPriceChart(loadSamples());
+};
+
+window.changeChartType = function(mode){
+  const m = String(mode || "").toLowerCase();
+  // accept: 'candlestick', 'candles', 'candle', 'lumanari', etc.
+  currentMode = (m.includes("candle") || m.includes("luman")) ? "candles" : "line";
+  syncActiveButtons();
+  renderPriceChart(loadSamples());
+};
+
 
 async function updateContractInfo() {
   const creationEl = document.getElementById("creationDate");
   const ageEl = document.getElementById("contractAge");
+  if (!creationEl && !ageEl) return;
+
   try {
     const r = await fetch(CONTRACT_INFO_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
+
     if (d && d.ok && d.createdAt) {
       const date = new Date(d.createdAt);
       if (creationEl) creationEl.textContent = date.toLocaleDateString("ro-RO");
       if (ageEl && typeof d.ageDays === "number") ageEl.textContent = d.ageDays.toLocaleString("ro-RO");
       return;
     }
-  } catch {}
-  // fallback: don't overwrite if already set
+  } catch (e) {
+    // ignore
+  }
 }
 
-function syncActiveButtons() {
-  document.querySelectorAll(".period-btn").forEach(btn => {
-    const oc = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
-    if (oc.includes("changeChartPeriod")) {
-      const isActive = oc.includes(`'${currentPeriod}'`) || oc.includes(`\"${currentPeriod}\"`);
-      btn.classList.toggle("active", isActive);
-    }
-    if (oc.includes("changeChartType")) {
-      if (oc.includes("candlestick") || oc.includes("candles")) btn.classList.toggle("active", currentMode === "candles");
-      if (oc.includes("line")) btn.classList.toggle("active", currentMode === "line");
-    }
-  });
-}
+document.addEventListener("DOMContentLoaded", () => {updateContractInfo();
+updateTransactions();
+updateTotalSupply();
+updateHolders();
 
-window.changeChartPeriod = function(period) {
-  currentPeriod = period;
+  // initial UI sync + render from cached history
   syncActiveButtons();
   renderPriceChart(loadSamples());
-};
 
-window.changeChartType = function(mode) {
-  currentMode = (mode === "candlestick" || mode === "candles") ? "candles" : "line";
-  syncActiveButtons();
-  renderPriceChart(loadSamples());
-};
-
-window.fetchAllData = function() {
+  // start live price updates
   updateSBYTPrice();
-  updateHolders();
-  updateTotalSupply();
-  updateTransactions();
-  updateContractInfo();
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Load non-chart metrics first (so a chart error can't block them)
-  updateHolders();
-  updateTotalSupply();
-  updateTransactions();
-  updateContractInfo();
-  updateSBYTPrice();
-
-  // Chart init from cached samples (guarded)
-  try { syncActiveButtons(); } catch(e) { console.warn("syncActiveButtons failed", e); }
-  try { renderPriceChart(loadSamples()); } catch(e) { console.warn("initial chart render failed", e); }
-
   setInterval(updateSBYTPrice, 30000);
-  setInterval(updateHolders, 300000);
-  setInterval(updateTotalSupply, 300000);
-  setInterval(updateTransactions, 300000);
+
   setInterval(updateContractInfo, 3600000);
-});
-</script>
-
-
+});</script>
 </body>
 </html>
