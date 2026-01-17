@@ -1304,6 +1304,7 @@
 const SBYT_PRICE_ENDPOINT   = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
 const HOLDERS_ENDPOINT      = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
 const TOTALSUPPLY_ENDPOINT  = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTotalSupplyFree";
+const TX_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTxCountFree";
 
 /* ====== PRICE HISTORY STORAGE ====== */
 const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
@@ -1543,6 +1544,28 @@ async function updateTotalSupply() {
   } catch {
     el.textContent = "—";
   }
+
+
+async function updateTransactions() {
+  const el = document.getElementById("transactionsCount");
+  if (!el) return;
+
+  el.textContent = "…";
+
+  try {
+    const url = TX_ENDPOINT + "?t=" + Date.now();
+    const r = await fetch(url, { cache: "no-store" });
+    const d = await r.json();
+
+    if (d && d.ok && d.txCount != null) {
+      el.textContent = Number(d.txCount).toLocaleString("ro-RO");
+    } else {
+      el.textContent = "0";
+    }
+  } catch (e) {
+    el.textContent = "0";
+  }
+}
 }
 
 /* ====== BUTTON HANDLERS ====== */
@@ -1602,6 +1625,11 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateSBYTPrice, 30000);
   setInterval(updateHolders, 300000);
   setInterval(updateTotalSupply, 300000);
+
+
+  // transactions live
+  updateTransactions();
+  setInterval(updateTransactions, 300000);
 });
 </script>
 </body>
