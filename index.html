@@ -6,8 +6,8 @@
   <title>StancuBYT | Statistici</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+
   <style>
-        /* Variabile culori conform psihologiei marketingului */
         :root {
             --blue-tech: #0066ff;
             --green-growth: #00ff88;
@@ -35,116 +35,8 @@
                 radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
         }
 
-        /* Particle Animation Background */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
+        #particles-js { position: fixed; width: 100%; height: 100%; z-index: -1; }
 
-        /* Logo Background pentru Hero Section */
-        .hero-logo-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            opacity: 0.05;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .logo-3d-bg {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            animation: float3d 20s infinite ease-in-out;
-        }
-
-        .logo-3d-bg img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            filter: blur(1px) brightness(1.2);
-        }
-
-        @keyframes float3d {
-            0%, 100% {
-                transform: translateY(0px) rotateX(0deg) rotateY(0deg);
-            }
-            25% {
-                transform: translateY(-20px) rotateX(5deg) rotateY(5deg);
-            }
-            50% {
-                transform: translateY(0px) rotateX(0deg) rotateY(10deg);
-            }
-            75% {
-                transform: translateY(20px) rotateX(-5deg) rotateY(5deg);
-            }
-        }
-
-        /* 3D Logo Animation */
-        .logo-3d-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            perspective: 1000px;
-        }
-
-        .logo-3d {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: rotate3d 8s infinite linear;
-        }
-
-        .logo-3d img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: absolute;
-            backface-visibility: hidden;
-        }
-
-        .backnote-orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120px;
-            height: 120px;
-            transform: translate(-50%, -50%);
-            animation: orbit 6s infinite linear;
-        }
-
-        .backnote {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            filter: blur(2px);
-            opacity: 0.7;
-        }
-
-        .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
-        .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
-
-        @keyframes rotate3d {
-            0% { transform: rotateY(0deg) rotateX(5deg); }
-            100% { transform: rotateY(360deg) rotateX(5deg); }
-        }
-
-        @keyframes orbit {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        /* Buton Modern Reîmprospătează Datele */
         .btn-refresh-modern {
             background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
             color: white;
@@ -155,7 +47,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 10px;
@@ -165,23 +56,11 @@
             box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
         }
 
-        .btn-refresh-modern:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
-        }
+        .btn-refresh-modern:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5); }
+        .btn-refresh-modern:active { transform: translateY(0) scale(1); }
 
-        .btn-refresh-modern:active {
-            transform: translateY(0) scale(1);
-        }
-
-        .refresh-icon {
-            font-size: 1.3rem;
-            transition: transform 0.5s ease;
-        }
-
-        .btn-refresh-modern:hover .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
+        .refresh-icon { font-size: 1.3rem; transition: transform 0.5s ease; }
+        .btn-refresh-modern:hover .refresh-icon { animation: rotate360 1s linear infinite; }
 
         .refresh-pulse {
             position: absolute;
@@ -196,51 +75,22 @@
             animation: pulseEffect 2s infinite;
         }
 
-        @keyframes rotate360 {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
+        @keyframes rotate360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulseEffect {
-            0% {
-                transform: scale(1);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(1.2);
-                opacity: 0;
-            }
+            0% { transform: scale(1); opacity: 0.7; }
+            100% { transform: scale(1.2); opacity: 0; }
         }
 
-        /* Loading animation pentru buton */
-        .btn-refresh-modern.loading {
-            background: linear-gradient(45deg, #666, #888);
-            cursor: wait;
-        }
+        .btn-refresh-modern.loading { background: linear-gradient(45deg, #666, #888); cursor: wait; }
+        .btn-refresh-modern.loading .refresh-icon { animation: rotate360 1s linear infinite; }
+        .btn-refresh-modern.loading .refresh-text { opacity: 0.7; }
 
-        .btn-refresh-modern.loading .refresh-icon {
-            animation: rotate360 1s linear infinite;
-        }
-
-        .btn-refresh-modern.loading .refresh-text {
-            opacity: 0.7;
-        }
-
-        /* Animatie pentru actualizare succes */
         @keyframes successFlash {
-            0%, 100% {
-                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            }
-            50% {
-                background: linear-gradient(45deg, var(--green-growth), #00cc66);
-            }
+            0%, 100% { background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); }
+            50% { background: linear-gradient(45deg, var(--green-growth), #00cc66); }
         }
+        .btn-refresh-modern.success { animation: successFlash 0.5s ease 2; }
 
-        .btn-refresh-modern.success {
-            animation: successFlash 0.5s ease 2;
-        }
-
-        /* Main Content Sections */
         .page-section {
             min-height: 100vh;
             padding: 120px 2rem 2rem;
@@ -250,12 +100,8 @@
             position: relative;
             overflow: hidden;
         }
+        .active-section { display: block; }
 
-        .active-section {
-            display: block;
-        }
-
-        /* Scientific Data Visualization */
         .data-visualization {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 20px;
@@ -264,38 +110,107 @@
             border: 1px solid rgba(0, 255, 136, 0.2);
         }
 
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 2rem 0;
+        /* === CHART CARD (mai mic + mai frumos) === */
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(0,255,136,0.18);
+            border-radius: 16px;
+            padding: 14px 14px 10px;
+            margin-top: 10px;
+            box-shadow:
+              0 0 20px rgba(0, 102, 255, 0.16),
+              0 0 40px rgba(0, 255, 136, 0.10);
         }
 
+        .chart-toprow {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 240px; /* <-- mai mic (era 400) */
+            margin: 10px 0 6px;
+        }
+
+        /* controale mai compacte */
         .chart-controls {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 8px;
             flex-wrap: wrap;
+            margin-bottom: 0;
         }
 
         .period-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 102, 255, 0.3);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.42rem 0.7rem;
+            border-radius: 999px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            user-select: none;
         }
 
         .period-btn.active {
-            background: var(--blue-tech);
-            border-color: var(--blue-tech);
+            background: rgba(0, 102, 255, 0.35);
+            border-color: rgba(0, 255, 136, 0.55);
+            box-shadow: 0 0 10px rgba(0,255,136,0.15);
+        }
+        .period-btn:hover { background: rgba(0, 102, 255, 0.2); transform: translateY(-1px); }
+
+        /* toggle modern (Line / Candles) */
+        .toggle {
+            display: inline-flex;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(0, 102, 255, 0.25);
+            border-radius: 999px;
+            padding: 3px;
+            gap: 3px;
+        }
+        .toggle button {
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.85);
+            padding: 0.42rem 0.8rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .toggle button.active {
+            background: linear-gradient(45deg, rgba(0,102,255,0.55), rgba(0,255,136,0.25));
+            color: #fff;
         }
 
-        .period-btn:hover {
-            background: rgba(0, 102, 255, 0.2);
+        /* mini info row */
+        .chart-meta {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.88rem;
+            opacity: 0.85;
+            padding: 6px 2px 2px;
         }
 
+        .pill {
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0,255,136,0.10);
+            border: 1px solid rgba(0,255,136,0.18);
+        }
+
+        /* grid stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -341,19 +256,18 @@
             transition: transform 0.3s ease;
         }
 
-        .info-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--green-growth);
-        }
+        .info-card:hover { transform: translateY(-10px); border-color: var(--green-growth); }
 
-        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .chart-container { height: 300px; }
+            .chart-container { height: 210px; }
             .btn-refresh-modern { padding: 0.8rem 1.5rem; font-size: 1rem; }
             .token-info-grid { grid-template-columns: 1fr; }
+            .period-btn { font-size: 0.85rem; padding: 0.4rem 0.65rem; }
+            .toggle button { font-size: 0.85rem; padding: 0.4rem 0.7rem; }
         }
   </style>
 </head>
+
 <body>
   <section id="statistici" class="page-section active-section">
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
@@ -369,24 +283,39 @@
 
         <div class="data-visualization neon-glow">
             <h3>📈 Preț în Timp Real</h3>
+
             <div id="sbyt-price-box" style="margin-top:14px; margin-bottom:10px;">
               <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
               <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:var(--green-growth);">Se încarcă...</div>
             </div>
 
-            <div class="chart-controls">
-                <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
-                <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
-                <button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
-                <button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
-                <button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
-                <button class="period-btn" onclick="changeChartType('line')">Linie</button>
-            </div>
+            <!-- CHART (mai mic + mai modern) -->
+            <div class="chart-card">
+              <div class="chart-toprow">
+                <div class="chart-controls" aria-label="Perioada grafic">
+                    <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
+                    <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
+                    <button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
+                    <button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
+                </div>
 
-            <div class="chart-container">
-                <canvas id="priceChart"></canvas>
+                <div class="toggle" aria-label="Tip grafic">
+                  <button id="btnLine" class="active" onclick="changeChartType('line')">Linie</button>
+                  <button id="btnCandle" onclick="changeChartType('candlestick')">Lumânări</button>
+                </div>
+              </div>
+
+              <div class="chart-container">
+                  <canvas id="priceChart"></canvas>
+              </div>
+
+              <div class="chart-meta">
+                <div class="pill">🕒 <span id="chartUpdatedAt">—</span></div>
+                <div class="pill">📌 <span id="chartPoints">0</span> puncte</div>
+              </div>
+
+              <div id="priceData" class="loading" style="margin-top:6px; opacity:.85;">Se încarcă datele live...</div>
             </div>
-            <div id="priceData" class="loading">Se încarcă datele live...</div>
         </div>
 
         <div class="data-visualization neon-glow">
@@ -488,12 +417,7 @@ const CONTRACT_INFO_ENDPOINT = "https://sbytcontractinfofree-jfka2frgwa-uc.a.run
 const POOL_STATS_ENDPOINT    = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPoolStats";
 
 /* ===================== CONTRACT CREATION (FIXED + AUTO AGE) ===================== */
-/*
-  IMPORTANT:
-  - Vrei sa apara MEREU 26.10.2025 (fara shift de timezone)
-  - Contract Age corect pe zile, raportat la 26.10.2025 00:00 local
-*/
-const CONTRACT_CREATION_LOCAL = { y: 2025, m: 9, d: 26 }; // m=9 => Octombrie (0=Ian)
+const CONTRACT_CREATION_LOCAL = { y: 2025, m: 9, d: 26 }; // Oct (0=Ian)
 
 function contractCreationMsLocalMidnight() {
   return new Date(CONTRACT_CREATION_LOCAL.y, CONTRACT_CREATION_LOCAL.m, CONTRACT_CREATION_LOCAL.d, 0, 0, 0).getTime();
@@ -501,13 +425,10 @@ function contractCreationMsLocalMidnight() {
 
 function calcAgeDaysFromLocalMidnight(msLocalMidnight) {
   if (!Number.isFinite(msLocalMidnight)) return null;
-
   const now = new Date();
   const todayLocalMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
-
   const diff = todayLocalMidnight - msLocalMidnight;
   if (!Number.isFinite(diff)) return null;
-
   return Math.max(0, Math.floor(diff / 86400000));
 }
 
@@ -516,8 +437,7 @@ function renderContractDatesFixed() {
   const creationEl = document.getElementById("creationDate");
   const ageEl      = document.getElementById("contractAge");
 
-  if (creationEl) creationEl.textContent = new Date(ms).toLocaleDateString("ro-RO");
-
+  if (creationEl) creationEl.textContent = "26.10.2025"; // FIX, fara shift
   const ageDays = calcAgeDaysFromLocalMidnight(ms);
   if (ageEl) ageEl.textContent = (ageDays == null) ? "—" : ageDays.toLocaleString("ro-RO");
 }
@@ -583,7 +503,7 @@ function bucketSizeMs(period) {
   switch(period){
     case "1h":  return 60*1000;
     case "24h": return 15*60*1000;
-    case "7d":  return 24*60*60*1000;
+    case "7d":  return 12*60*60*1000;  // mai smooth
     case "1m":  return 24*60*60*1000;
     default:    return 15*60*1000;
   }
@@ -621,7 +541,7 @@ function buildLineSeries(samples, period) {
     return { labels: keys.map(fmtLabel), values: keys.map(k => buckets.get(k)) };
   }
 
-  const maxPoints = 300;
+  const maxPoints = 220; // mai compact
   const step = Math.max(1, Math.floor(inRange.length / maxPoints));
   const labels = [];
   const values = [];
@@ -630,7 +550,7 @@ function buildLineSeries(samples, period) {
     values.push(inRange[i].p);
   }
   const last = inRange[inRange.length-1];
-  if (labels[labels.length-1] !== fmtLabel(last.t)) {
+  if (labels.length && labels[labels.length-1] !== fmtLabel(last.t)) {
     labels.push(fmtLabel(last.t));
     values.push(last.p);
   }
@@ -654,6 +574,51 @@ function buildCandlesSeries(samples, period) {
   return { labels: keys.map(fmtLabel), ohlc: keys.map(k => ({ ...buckets.get(k) })) };
 }
 
+function updateChartMeta(pointsCount){
+  const u = document.getElementById("chartUpdatedAt");
+  const p = document.getElementById("chartPoints");
+  if (u) u.textContent = new Date().toLocaleTimeString("ro-RO", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+  if (p) p.textContent = String(pointsCount ?? 0);
+}
+
+/* ---- CHART STYLING HELPERS (fara culori hardcode in dataset) ---- */
+function applyChartOptionsCommon(options){
+  // grid/ticks mai soft + fara margini prea mari
+  options.layout = options.layout || {};
+  options.layout.padding = { left: 6, right: 10, top: 8, bottom: 4 };
+
+  options.plugins = options.plugins || {};
+  options.plugins.legend = { display: false };
+  options.plugins.tooltip = {
+    enabled: true,
+    mode: "index",
+    intersect: false,
+    displayColors: false,
+    callbacks: {
+      label: (ctx) => {
+        const v = ctx.parsed?.y;
+        if (!Number.isFinite(v)) return "—";
+        return "SBYT: $" + Number(v).toFixed(8);
+      }
+    }
+  };
+
+  options.scales = options.scales || {};
+  options.scales.x = {
+    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+    grid: { display: false }
+  };
+  options.scales.y = {
+    beginAtZero: false,
+    ticks: {
+      callback: (v) => (Number(v) >= 1 ? "$" + Number(v).toFixed(2) : "$" + Number(v).toFixed(6))
+    },
+    grid: { color: "rgba(255,255,255,0.06)" }
+  };
+
+  return options;
+}
+
 function renderPriceChart(samples) {
   const canvas = document.getElementById("priceChart");
   if (!canvas) return;
@@ -667,31 +632,45 @@ function renderPriceChart(samples) {
     priceChart = new Chart(ctx, {
       type: "candlestick",
       data: { labels, datasets: [{ label: "SBYT", data: ohlc }] },
-      options: {
+      options: applyChartOptionsCommon({
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { maxRotation: 0, autoSkip: true } },
-          y: { beginAtZero: false }
-        }
-      }
+        parsing: false
+      })
     });
+    updateChartMeta(ohlc.length);
   } else {
     const { labels, values } = buildLineSeries(samples, currentPeriod);
+
+    // gradient fill (din canvas) - vizual mai “premium”
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 240);
+    gradient.addColorStop(0, "rgba(0, 255, 136, 0.22)");
+    gradient.addColorStop(1, "rgba(0, 255, 136, 0.00)");
+
     priceChart = new Chart(ctx, {
       type: "line",
-      data: { labels, datasets: [{ label: "SBYT", data: values, tension: 0.25, pointRadius: 0 }] },
-      options: {
+      data: {
+        labels,
+        datasets: [{
+          label: "SBYT",
+          data: values,
+          tension: 0.35,
+          pointRadius: 0,
+          borderWidth: 2,
+          borderColor: "rgba(0,255,136,0.85)",
+          backgroundColor: gradient,
+          fill: true
+        }]
+      },
+      options: applyChartOptionsCommon({
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { maxRotation: 0, autoSkip: true } },
-          y: { beginAtZero: false }
-        }
-      }
+        interaction: { mode: "index", intersect: false },
+        elements: { line: { capBezierPoints: true } }
+      })
     });
+
+    updateChartMeta(values.length);
   }
 }
 
@@ -704,12 +683,7 @@ function setLastUpdate() {
 function updateMarketCapUI() {
   const el = document.getElementById("marketCap");
   if (!el) return;
-
-  if (!Number.isFinite(CURRENT_PRICE_USD) || !Number.isFinite(CURRENT_SUPPLY)) {
-    el.textContent = "—";
-    return;
-  }
-
+  if (!Number.isFinite(CURRENT_PRICE_USD) || !Number.isFinite(CURRENT_SUPPLY)) { el.textContent = "—"; return; }
   const mc = CURRENT_PRICE_USD * CURRENT_SUPPLY;
   el.textContent = Number.isFinite(mc) ? mc.toLocaleString("ro-RO", { maximumFractionDigits: 0 }) : "—";
 }
@@ -717,7 +691,6 @@ function updateMarketCapUI() {
 function updateVolumeUI() {
   const el = document.getElementById("volume24h");
   if (!el) return;
-
   el.textContent = Number.isFinite(CURRENT_VOLUME_24H)
     ? CURRENT_VOLUME_24H.toLocaleString("ro-RO", { maximumFractionDigits: 0 })
     : "—";
@@ -726,6 +699,7 @@ function updateVolumeUI() {
 /* ===================== LIVE UPDATERS ===================== */
 async function updateSBYTPrice() {
   const priceEl = document.getElementById("sbyt-price");
+  const priceDataEl = document.getElementById("priceData");
   if (!priceEl) return;
 
   try {
@@ -740,20 +714,23 @@ async function updateSBYTPrice() {
 
       const samples = addSample(p);
       renderPriceChart(samples);
+
+      if (priceDataEl) priceDataEl.textContent = "Ultima citire: $" + p.toFixed(8);
       setLastUpdate();
       return;
     }
 
     priceEl.innerText = "—";
+    if (priceDataEl) priceDataEl.textContent = "Nu am primit preț valid.";
   } catch {
     priceEl.innerText = "—";
+    if (priceDataEl) priceDataEl.textContent = "Eroare la încărcarea prețului.";
   }
 }
 
 async function updateHolders() {
   const el = document.getElementById("holdersCount");
   if (!el) return;
-
   el.textContent = "…";
   try {
     const r = await fetch(HOLDERS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
@@ -769,13 +746,11 @@ async function updateHolders() {
 async function updateTotalSupply() {
   const el = document.getElementById("totalSupply");
   if (!el) return;
-
   el.textContent = "…";
   try {
     const r = await fetch(TOTALSUPPLY_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
     const supplyNum = parseFloat(String(d?.supply ?? ""));
-
     if (d?.ok && Number.isFinite(supplyNum)) {
       el.textContent = supplyNum.toLocaleString("ro-RO", { maximumFractionDigits: 0 });
       CURRENT_SUPPLY = supplyNum;
@@ -796,7 +771,6 @@ async function updateTotalSupply() {
 async function updateTransactions() {
   const el = document.getElementById("transactionsCount");
   if (!el) return;
-
   el.textContent = "…";
   try {
     const r = await fetch(TX_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
@@ -809,7 +783,6 @@ async function updateTransactions() {
   }
 }
 
-/* Contract info: FIXAT pe 26.10.2025 + age corect (nu depinde de API/timezone) */
 async function updateContractInfo() {
   renderContractDatesFixed();
   setLastUpdate();
@@ -818,14 +791,11 @@ async function updateContractInfo() {
 async function updatePoolStats() {
   const el = document.getElementById("volume24h");
   if (el) el.textContent = "…";
-
   try {
     const r = await fetch(POOL_STATS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
-
     const v = Number(d?.volumeUsd24h);
     CURRENT_VOLUME_24H = (d?.ok && Number.isFinite(v)) ? v : null;
-
     updateVolumeUI();
     setLastUpdate();
   } catch {
@@ -836,17 +806,20 @@ async function updatePoolStats() {
 
 /* ===================== BUTTON HANDLERS ===================== */
 function syncActiveButtons(){
+  // period buttons
   document.querySelectorAll(".period-btn").forEach(btn => {
     const oc = (btn.getAttribute("onclick") || "").replace(/\s+/g, "");
     const isPeriod = oc.includes("changeChartPeriod");
-    const isType   = oc.includes("changeChartType");
     let active = false;
-
     if (isPeriod) active = oc.includes(`'${currentPeriod}'`) || oc.includes(`"${currentPeriod}"`);
-    if (isType)   active = oc.includes(`'${currentMode}'`)   || oc.includes(`"${currentMode}"`);
-
     btn.classList.toggle("active", active);
   });
+
+  // toggle buttons
+  const btnLine = document.getElementById("btnLine");
+  const btnCandle = document.getElementById("btnCandle");
+  if (btnLine) btnLine.classList.toggle("active", currentMode === "line");
+  if (btnCandle) btnCandle.classList.toggle("active", currentMode === "candlestick");
 }
 
 window.changeChartPeriod = function(period){
@@ -887,7 +860,6 @@ window.fetchAllData = async function(){
 
 /* ===================== BOOT ===================== */
 document.addEventListener("DOMContentLoaded", () => {
-  // imediat corect (26.10.2025) + age corect
   renderContractDatesFixed();
 
   syncActiveButtons();
@@ -907,7 +879,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateContractInfo, 3600000);
   setInterval(updatePoolStats, 300000);
 
-  // ca sa se actualizeze "Contract Age" corect daca pagina ramane deschisa peste miezul noptii
+  // age corect daca pagina ramane deschisa peste miezul noptii
   setInterval(renderContractDatesFixed, 60 * 60 * 1000);
 });
   </script>
