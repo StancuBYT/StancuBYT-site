@@ -29,7 +29,7 @@
             background: var(--dark-bg);
             color: white;
             overflow-x: hidden;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
@@ -71,17 +71,17 @@
         }
 
         @keyframes float3d {
-            0%, 100% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
+            0%, 100% {
+                transform: translateY(0px) rotateX(0deg) rotateY(0deg);
             }
-            25% { 
-                transform: translateY(-20px) rotateX(5deg) rotateY(5deg); 
+            25% {
+                transform: translateY(-20px) rotateX(5deg) rotateY(5deg);
             }
-            50% { 
-                transform: translateY(0px) rotateX(0deg) rotateY(10deg); 
+            50% {
+                transform: translateY(0px) rotateX(0deg) rotateY(10deg);
             }
-            75% { 
-                transform: translateY(20px) rotateX(-5deg) rotateY(5deg); 
+            75% {
+                transform: translateY(20px) rotateX(-5deg) rotateY(5deg);
             }
         }
 
@@ -202,13 +202,13 @@
         }
 
         @keyframes pulseEffect {
-            0% { 
-                transform: scale(1); 
-                opacity: 0.7; 
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
             }
-            100% { 
-                transform: scale(1.2); 
-                opacity: 0; 
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
             }
         }
 
@@ -228,11 +228,11 @@
 
         /* Animatie pentru actualizare succes */
         @keyframes successFlash {
-            0%, 100% { 
-                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
+            0%, 100% {
+                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
             }
-            50% { 
-                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
+            50% {
+                background: linear-gradient(45deg, var(--green-growth), #00cc66);
             }
         }
 
@@ -318,7 +318,7 @@
         }
 
         .neon-glow {
-            box-shadow: 
+            box-shadow:
                 0 0 20px rgba(0, 102, 255, 0.3),
                 0 0 40px rgba(0, 255, 136, 0.2),
                 inset 0 0 20px rgba(138, 43, 226, 0.1);
@@ -359,7 +359,7 @@
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
             <p>Date live preluate de pe Etherscan</p>
-            
+
             <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
                 <span class="refresh-icon">🔄</span>
                 <span class="refresh-text">Reîmprospătează Datele</span>
@@ -382,7 +382,7 @@
                 <button class="period-btn" onclick="changeChartType('candlestick')">Lumânări</button>
                 <button class="period-btn" onclick="changeChartType('line')">Linie</button>
             </div>
-            
+
             <div class="chart-container">
                 <canvas id="priceChart"></canvas>
             </div>
@@ -427,7 +427,7 @@
                     <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
                     <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
                     <p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
-                    <p><strong>Creation Date:</strong> <span id="creationDate">25.10.2025</span></p>
+                    <p><strong>Creation Date:</strong> <span id="creationDate">26.10.2025</span></p>
                 </div>
                 <div>
                     <p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
@@ -441,36 +441,36 @@
         <div class="token-info-grid">
             <div class="info-card">
                 <h3>🔍 Vezi pe Etherscan</h3>
-                <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" 
+                <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833"
                    target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     Analiză detaliată Etherscan ›
                 </a>
             </div>
             <div class="info-card">
                 <h3>📈 Vezi pe DexTools</h3>
-                <a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462" 
+                <a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462"
                    target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     Chart live DexTools ›
                 </a>
             </div>
             <div class="info-card">
                 <h3>🦍 Vezi pe Apespace</h3>
-                <a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368" 
+                <a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368"
                    target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     Analiză Apespace ›
                 </a>
             </div>
-        
+
             <div class="info-card">
                 <h3>🦎 Vezi pe GeckoTerminal</h3>
-                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" 
+                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults"
                    target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     Pool & tranzacționare GeckoTerminal ›
                 </a>
             </div>
             <div class="info-card">
                 <h3>📌 Vezi pe CoinMarketCap DEX</h3>
-                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/" 
+                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/"
                    target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
                     coinmarketcap DEX ›
                 </a>
@@ -488,23 +488,37 @@ const CONTRACT_INFO_ENDPOINT = "https://sbytcontractinfofree-jfka2frgwa-uc.a.run
 const POOL_STATS_ENDPOINT    = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPoolStats";
 
 /* ===================== CONTRACT CREATION (FIXED + AUTO AGE) ===================== */
-/* Fix: afiseaza mereu 26 Octombrie 2025 (launch time) si calculeaza automat age */
-const CONTRACT_CREATION_ISO_UTC = "2025-10-26T23:23:11Z"; // 26 Oct 2025 11:23:11 PM UTC
-function contractCreationMsFallback() {
-  const ms = Date.parse(CONTRACT_CREATION_ISO_UTC);
-  return Number.isFinite(ms) ? ms : Date.UTC(2025, 9, 26, 23, 23, 11); // safety
+/*
+  IMPORTANT:
+  - Vrei sa apara MEREU 26.10.2025 (fara shift de timezone)
+  - Contract Age corect pe zile, raportat la 26.10.2025 00:00 local
+*/
+const CONTRACT_CREATION_LOCAL = { y: 2025, m: 9, d: 26 }; // m=9 => Octombrie (0=Ian)
+
+function contractCreationMsLocalMidnight() {
+  return new Date(CONTRACT_CREATION_LOCAL.y, CONTRACT_CREATION_LOCAL.m, CONTRACT_CREATION_LOCAL.d, 0, 0, 0).getTime();
 }
-function calcAgeDaysFromMs(ms){
-  if (!Number.isFinite(ms)) return null;
-  const diff = Date.now() - ms;
+
+function calcAgeDaysFromLocalMidnight(msLocalMidnight) {
+  if (!Number.isFinite(msLocalMidnight)) return null;
+
+  const now = new Date();
+  const todayLocalMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
+
+  const diff = todayLocalMidnight - msLocalMidnight;
   if (!Number.isFinite(diff)) return null;
+
   return Math.max(0, Math.floor(diff / 86400000));
 }
-function renderContractDates(ms){
+
+function renderContractDatesFixed() {
+  const ms = contractCreationMsLocalMidnight();
   const creationEl = document.getElementById("creationDate");
   const ageEl      = document.getElementById("contractAge");
+
   if (creationEl) creationEl.textContent = new Date(ms).toLocaleDateString("ro-RO");
-  const ageDays = calcAgeDaysFromMs(ms);
+
+  const ageDays = calcAgeDaysFromLocalMidnight(ms);
   if (ageEl) ageEl.textContent = (ageDays == null) ? "—" : ageDays.toLocaleString("ro-RO");
 }
 
@@ -795,38 +809,9 @@ async function updateTransactions() {
   }
 }
 
-/* FIX IMPORTANT:
-   - Creation Date trebuie sa fie 26 Oct 2025
-   - Contract Age calculat automat (client-side), chiar daca function-ul da eroare / rate limit
-*/
+/* Contract info: FIXAT pe 26.10.2025 + age corect (nu depinde de API/timezone) */
 async function updateContractInfo() {
-  let ms = null;
-
-  try {
-    const r = await fetch(CONTRACT_INFO_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
-    const d = await r.json();
-
-    if (d?.ok && d.createdAt != null) {
-      const raw = d.createdAt;
-
-      if (typeof raw === "string") {
-        const t = Date.parse(raw);
-        if (Number.isFinite(t)) ms = t;
-        else {
-          const n = Number(raw);
-          if (Number.isFinite(n)) ms = (n > 1e12) ? n : n * 1000;
-        }
-      } else if (typeof raw === "number") {
-        ms = (raw > 1e12) ? raw : raw * 1000;
-      }
-    }
-  } catch {
-    // ignore, fallback below
-  }
-
-  if (!Number.isFinite(ms)) ms = contractCreationMsFallback();
-
-  renderContractDates(ms);
+  renderContractDatesFixed();
   setLastUpdate();
 }
 
@@ -902,8 +887,8 @@ window.fetchAllData = async function(){
 
 /* ===================== BOOT ===================== */
 document.addEventListener("DOMContentLoaded", () => {
-  // Setare imediata corecta (fara sa astepti API)
-  renderContractDates(contractCreationMsFallback());
+  // imediat corect (26.10.2025) + age corect
+  renderContractDatesFixed();
 
   syncActiveButtons();
   renderPriceChart(loadSamples());
@@ -922,8 +907,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateContractInfo, 3600000);
   setInterval(updatePoolStats, 300000);
 
-  // OPTIONAL: ca sa se actualizeze "Contract Age" zilnic chiar daca pagina ramane deschisa
-  setInterval(() => renderContractDates(contractCreationMsFallback()), 6 * 60 * 60 * 1000);
+  // ca sa se actualizeze "Contract Age" corect daca pagina ramane deschisa peste miezul noptii
+  setInterval(renderContractDatesFixed, 60 * 60 * 1000);
 });
   </script>
 </body>
