@@ -4,8 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StancuBYT | Statistici</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+// Fallback: call once shortly after load
+setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1">
+// Fallback: call once shortly after load
+setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
+</script>
   <style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
@@ -1303,9 +1309,8 @@
 <script>
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
 const HOLDERS_ENDPOINT = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
-const TOTALSUPPLY_ENDPOINT = "https://sbyttotalsupplyfree-jfka2frgwa-uc.a.run.app";
-const TX_ENDPOINT = "https://sbyttxcountfree-jfka2frgwa-uc.a.run.app";
-const CONTRACTINFO_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytContractInfoFree";
+const TOTALSUPPLY_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTotalSupplyFree";
+const TX_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTxCountFree";
 
 const STORAGE_KEY = "sbyt_price_samples_v1"; // [{t: ms, p: number}]
 const MAX_KEEP_DAYS = 31;
@@ -1594,48 +1599,6 @@ async function updateTransactions() {
   }
 }
 
-
-async function updateContractInfo() {
-  const nameEl = document.getElementById("tokenName");
-  const symEl = document.getElementById("tokenSymbol");
-  const decEl = document.getElementById("tokenDecimals");
-  const creationEl = document.getElementById("creationDate");
-  const addrEl = document.getElementById("contractCreator");
-  const ageEl = document.getElementById("contractAge");
-  const lastEl = document.getElementById("lastUpdateTime");
-
-  // keep address static if present in HTML
-  try {
-    const r = await fetch(CONTRACTINFO_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
-    const d = await r.json();
-
-    if (d && d.ok) {
-      if (nameEl && d.name) nameEl.textContent = String(d.name);
-      if (symEl && d.symbol) symEl.textContent = String(d.symbol);
-      if (decEl && (d.decimals !== undefined)) decEl.textContent = String(d.decimals);
-
-      if (addrEl && (d.address || d.contractAddress)) {
-        addrEl.textContent = String(d.address || d.contractAddress);
-      }
-
-      // Try multiple possible timestamp fields
-      const tsSec = Number(d.creationTimestamp ?? d.createdAtTimestamp ?? d.timestamp ?? d.createdAt ?? d.deployedAt);
-      if (creationEl && Number.isFinite(tsSec) && tsSec > 0) {
-        const dt = new Date(tsSec * 1000);
-        creationEl.textContent = dt.toLocaleString("ro-RO");
-        if (ageEl) {
-          const days = Math.max(0, Math.floor((Date.now() - dt.getTime()) / (24*60*60*1000)));
-          ageEl.textContent = String(days);
-        }
-      }
-    }
-
-    if (lastEl) lastEl.textContent = new Date().toLocaleTimeString("ro-RO");
-  } catch (e) {
-    if (lastEl) lastEl.textContent = "—";
-  }
-}
-
 function syncActiveButtons(){
   // period buttons
   document.querySelectorAll(".period-btn").forEach(btn => {
@@ -1675,8 +1638,6 @@ window.fetchAllData = function(){
   updateHolders();
   updateTotalSupply();
   updateTransactions();
-  updateContractInfo();
-  updateContractInfo();
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1687,13 +1648,11 @@ document.addEventListener("DOMContentLoaded", () => {
   updateHolders();
   updateTotalSupply();
   updateTransactions();
-  updateContractInfo();
 
   setInterval(updateSBYTPrice, 30000);
   setInterval(updateHolders, 300000);
   setInterval(updateTotalSupply, 300000);
   setInterval(updateTransactions, 300000);
-  setInterval(updateContractInfo, 300000);
 });
 </script>
 
