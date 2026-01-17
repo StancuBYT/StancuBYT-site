@@ -1236,7 +1236,7 @@ setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
                 </div>
                 <div class="stat-item">
                     <div>Market Cap</div>
-                    <div class="stat-value" id="marketCap">-</div>
+                    <div class="stat-value" id="marketCap">—</div>
                     <div>USD</div>
                 </div>
                 <div class="stat-item">
@@ -1308,6 +1308,9 @@ setTimeout(() => { try { updateTransactions(); } catch(e) {} }, 1000);
   <script>
 /* ====== ENDPOINTS ====== */
 const SBYT_PRICE_ENDPOINT   = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
+
+let CURRENT_PRICE_USD = null;
+let CURRENT_SUPPLY = null;
 const HOLDERS_ENDPOINT      = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
 const TOTALSUPPLY_ENDPOINT  = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTotalSupplyFree";
 const TX_ENDPOINT = "https://us-central1-stancubyt-fc2b9.cloudfunctions.net/sbytTxCountFree";
@@ -1496,6 +1499,23 @@ function setLastUpdate() {
 }
 
 /* ====== LIVE UPDATERS ====== */
+function updateMarketCap() {
+  const el = document.getElementById("marketCap");
+  if (!el) return;
+
+  if (CURRENT_PRICE_USD == null || CURRENT_SUPPLY == null || !Number.isFinite(CURRENT_PRICE_USD) || !Number.isFinite(CURRENT_SUPPLY)) {
+    el.textContent = "—";
+    return;
+  }
+
+  const mc = CURRENT_PRICE_USD * CURRENT_SUPPLY;
+
+  el.textContent = mc.toLocaleString("ro-RO", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
+}
+
 async function updateSBYTPrice() {
   const priceEl = document.getElementById("sbyt-price");
   if (!priceEl) return;
@@ -1508,7 +1528,10 @@ async function updateSBYTPrice() {
       const p = Number(data.priceUsd);
       if (Number.isFinite(p)) {
         priceEl.innerText = "$" + p.toFixed(8);
-        const samples = addSample(p);
+        
+        CURRENT_PRICE_USD = p;
+        updateMarketCap();
+const samples = addSample(p);
         renderPriceChart(samples);
         setLastUpdate();
         return;
