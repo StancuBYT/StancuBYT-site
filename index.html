@@ -1149,7 +1149,7 @@
 .admin-pill.off{
   background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
 }
-.admin-only{ display:none !important; }
+.admin-only{ display:none; }
 
 /* ====== TROPHY BUTTON (Giveaway add) ====== */
 .trophy-btn{
@@ -1176,6 +1176,26 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+  // Firebase init (must run before any firebase.auth()/firestore/storage usage)
+  window.firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+    messagingSenderId: "263244200492",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+    measurementId: "G-272S9HSY3K"
+  };
+  try {
+    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  } catch (e) {
+    console.warn("Firebase init warning:", e);
+  }
+</script>
+
 </head>
 <body>
 
@@ -1658,21 +1678,6 @@ window.addEventListener('load', ()=>{
    ============================================================ */
 
 (function(){
-  // ---------- Firebase init (identic cu index prezentare ok.html) ----------
-  try {
-    if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
-      firebase.initializeApp({
-        apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-        authDomain: "stancubyt-fc2b9.firebaseapp.com",
-        projectId: "stancubyt-fc2b9",
-        storageBucket: "stancubyt-fc2b9.firebasestorage.app",
-        messagingSenderId: "263244200492",
-        appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-        measurementId: "G-272S9HSY3K"
-      });
-    }
-  } catch (e) {}
-
   // ---------- Helpers ----------
   const $ = (sel)=>document.querySelector(sel);
   const escapeHtml = (s)=>String(s ?? '').replace(/[&<>"'`=\/]/g, ch => ({
@@ -1681,8 +1686,6 @@ window.addEventListener('load', ()=>{
 
   const ADMIN_EMAILS = ["stancubyt@gmail.com"];
   const ROADMAP_COLLECTION = 'roadmap';
-  const ROADMAP_COLLECTION = 'roadmap';
-
 
   function hasFB(){
     try{ return typeof firebase !== 'undefined' && firebase.auth && firebase.firestore; }catch(e){ return false; }
@@ -1929,24 +1932,22 @@ if (!hasFB()) return;
 })();
 </script>
 
-<!-- ADMIN LOGIN (pentru editare Roadmap) -->
-<section id="admin-login" class="section" style="padding-top:10px;">
-  <h2 style="text-align:center; margin-bottom:14px;">Administrare</h2>
+<!-- ADMIN LOGIN (Prezentare - josul paginii) -->
+<section class="admin-login" id="admin-login">
+<h2>🔐 Administrator Login</h2>
+<p class="admin-desc">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
+<div class="admin-login-box">
+<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
+<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
+<button onclick="adminSignIn()" type="button">Autentificare</button>
+<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
+</div>
+<div class="admin-status-row">
+<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
+<span class="admin-user-label" id="adminUserLabel"></span>
+</div>
+<p class="admin-msg" id="adminLoginMsg"></p>
 
-  <div class="admin-login-box">
-    <input id="adminEmail" type="email" placeholder="Email administrator" autocomplete="username">
-    <input id="adminPass" type="password" placeholder="Parola administrator" autocomplete="current-password">
-    <button type="button" onclick="adminSignIn()">Autentificare</button>
-    <button type="button" id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;">Delogare</button>
-  </div>
-
-  <div class="admin-status-row">
-    <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
-    <span id="adminUserLabel" class="admin-user-label"></span>
-  </div>
-
-  <p id="adminLoginMsg" class="admin-msg"></p>
 </section>
-
 </body>
 </html>
