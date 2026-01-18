@@ -1779,9 +1779,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================================================
-   ROADMAP CRUD (pe fazele existente) + sincronizare Firestore
-   - Nu modifica structura initiala: foloseste .timeline-item existente
+   ROADMAP CRUD + PERSISTENTA (1:1 ca principiu cu anunturile)
+   - Salvare in Firestore: stats/roadmap (doc)
+   - Citire live pentru oricine: onSnapshot
+   - NU schimba structura paginii: foloseste .timeline-item existente
    ============================================================ */
+
+const ROADMAP_STATS_DOC = { col: 'stats', doc: 'roadmap' };
+let __roadmapUnsub = null;
+let __roadmapHydrating = false; // evita bucle (snapshot -> render -> save)
 
 function getRoadmapEls(){
   const wrap = document.querySelector('#roadmap .roadmap-timeline');
@@ -1890,13 +1896,77 @@ function writeRoadmapItem(item, data){
   descEl.textContent = data.description || '';
   badgeEl.textContent = data.status || 'Planificat';
 
-  // actualizeaza clase
   badgeEl.classList.remove('badge-success','badge-warning','badge-info');
   badgeEl.classList.add(statusToBadgeClass(data.status));
 }
 
+function collectRoadmapFromDOM(){
+  const items = Array.from(document.querySelectorAll('#roadmap .roadmap-timeline .timeline-item'));
+  return items.map((it, idx)=>{
+    const d = readRoadmapItem(it);
+    return { order: idx, title: d.title, description: d.description, status: d.status };
+  });
+}
+
+function renderRoadmapFromArray(arr){
+  const wrap = document.querySelector('#roadmap .roadmap-timeline');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  (arr||[]).sort((a,b)=>(Number(a.order)-Number(b.order))).forEach((d)=>{
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+    item.innerHTML = `
+      <div class="timeline-date"></div>
+      <p></p>
+      <span class="badge badge-info"></span>
+    `;
+    wrap.appendChild(item);
+    writeRoadmapItem(item, {
+      title: d.title || '',
+      description: d.description || '',
+      status: d.status || 'Planificat'
+    });
+  });
+}
+
+async function saveRoadmapToFirestore(){
+  if (!db || !auth?.currentUser) return;
+  try{
+    const isAdmin = await computeIsAdmin(auth.currentUser);
+    if (!isAdmin) return;
+
+    const items = collectRoadmapFromDOM();
+        // salvam intr-un singur doc, ca in "stats" (usor de permis in Rules)
+    await db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc).set({
+      items,
+      updatedAt: Date.now(),
+      updatedBy: auth.currentUser.email || null
+    }, { merge: true });
+  }catch(e){
+    console.warn('Roadmap save (stats/roadmap) error:', e);
+    alert('Eroare la salvare roadmap in Firestore (verifica Rules pentru stats/roadmap).');
+  }
+}
+
+async function seedRoadmapIfMissing(){
+  // Daca doc-ul nu exista, il cream din fazele HTML existente, ca sa nu dispara la refresh
+  if (!db) return;
+  try{
+    const ref = db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc);
+    const snap = await ref.get();
+    if (snap.exists) return;
+    const items = collectRoadmapFromDOM();
+    if (!items.length) return;
+    await ref.set({ items, createdAt: Date.now() }, { merge: true });
+  }catch(e){
+    console.warn('Roadmap seed error:', e);
+  }
+}
+
 async function editRoadmapItem(item){
   if (!window.__SBYT_ADMIN) return;
+  await seedRoadmapIfMissing();
+
   const cur = readRoadmapItem(item);
   const title = prompt('Titlu faza:', cur.title);
   if (title === null) return;
@@ -1907,23 +1977,22 @@ async function editRoadmapItem(item){
 
   writeRoadmapItem(item, {title, description, status});
   ensureAdminButtonsOnItem(item);
-  await upsertRoadmapItemToFirestore(item);
+  await saveRoadmapToFirestore();
 }
 
 async function deleteRoadmapItem(item){
   if (!window.__SBYT_ADMIN) return;
+  await seedRoadmapIfMissing();
+
   if (!confirm('Sigur vrei sa stergi aceasta faza?')) return;
-  const docId = item.dataset.docId;
   item.remove();
-  if (db && docId){
-    try { await db.collection('roadmap').doc(docId).delete(); } catch(e) { console.warn(e); }
-  }
-  // reindex orders
-  await saveRoadmapOrderToFirestore();
+  await saveRoadmapToFirestore();
 }
 
 async function addRoadmapItem(){
   if (!window.__SBYT_ADMIN) return;
+  await seedRoadmapIfMissing();
+
   const title = prompt('Titlu faza (ex: Faza 5: ...):', 'Faza noua');
   if (title === null) return;
   const description = prompt('Descriere:', '');
@@ -1945,102 +2014,42 @@ async function addRoadmapItem(){
 
   writeRoadmapItem(item, {title, description, status});
   ensureAdminButtonsOnItem(item);
-  await upsertRoadmapItemToFirestore(item);
-  await saveRoadmapOrderToFirestore();
+  await saveRoadmapToFirestore();
 }
 
-function computeOrderForItem(item){
-  const items = Array.from(document.querySelectorAll('#roadmap .roadmap-timeline .timeline-item'));
-  return items.indexOf(item);
-}
-
-async function upsertRoadmapItemToFirestore(item){
-  if (!db || !auth?.currentUser) return;
-  try {
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) return;
-
-    let docId = item.dataset.docId;
-    if (!docId){
-      // doc id determinist (ca sa nu dubleze la refresh)
-      docId = 'phase_' + (computeOrderForItem(item) + 1) + '_' + Date.now();
-      item.dataset.docId = docId;
-    }
-
-    const data = readRoadmapItem(item);
-    await db.collection('roadmap').doc(docId).set({
-      title: data.title,
-      description: data.description,
-      status: data.status,
-      order: computeOrderForItem(item),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    }, {merge:true});
-  } catch(e){
-    console.warn('Roadmap save error:', e);
-  }
-}
-
-async function saveRoadmapOrderToFirestore(){
-  if (!db || !auth?.currentUser) return;
-  try {
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) return;
-
-    const items = Array.from(document.querySelectorAll('#roadmap .roadmap-timeline .timeline-item'));
-    const batch = db.batch();
-    items.forEach((it, idx) => {
-      const docId = it.dataset.docId;
-      if (!docId) return;
-      batch.set(db.collection('roadmap').doc(docId), {
-        order: idx,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      }, {merge:true});
-    });
-    await batch.commit();
-  } catch(e){
-    console.warn('Roadmap order save error:', e);
-  }
-}
-
-async function initRoadmapLive(){
+function listenRoadmapLive(){
   if (!db) return;
-  try {
-    const snap = await db.collection('roadmap').orderBy('order','asc').get();
-    if (!snap.empty){
-      const wrap = document.querySelector('#roadmap .roadmap-timeline');
-      if (!wrap) return;
-      wrap.innerHTML = '';
-      snap.forEach(doc => {
-        const d = doc.data() || {};
-        const item = document.createElement('div');
-        item.className = 'timeline-item';
-        item.dataset.docId = doc.id;
-        item.innerHTML = `
-          <div class="timeline-date"></div>
-          <p></p>
-          <span class="badge badge-info"></span>
-        `;
-        wrap.appendChild(item);
-        writeRoadmapItem(item, {
-          title: d.title || '',
-          description: d.description || '',
-          status: d.status || 'Planificat'
-        });
-      });
-      // dupa render, aplica admin mode daca e cazul
-      setRoadmapAdminMode(!!window.__SBYT_ADMIN);
-    } else {
-      // nu exista roadmap in firestore -> pastreaza fazele existente din HTML
+  // evitam dublu subscribe
+  if (__roadmapUnsub) { try{__roadmapUnsub();}catch(e){} __roadmapUnsub=null; }
+
+  const ref = db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc);
+  __roadmapUnsub = ref.onSnapshot((snap)=>{
+    try{
+      if (snap.exists){
+        const data = snap.data() || {};
+        const items = Array.isArray(data.items) ? data.items : [];
+        __roadmapHydrating = true;
+        renderRoadmapFromArray(items);
+        __roadmapHydrating = false;
+        setRoadmapAdminMode(!!window.__SBYT_ADMIN);
+      } else {
+        // daca nu exista doc -> lasam fazele HTML
+        setRoadmapAdminMode(!!window.__SBYT_ADMIN);
+      }
+    }catch(e){
+      __roadmapHydrating = false;
       setRoadmapAdminMode(!!window.__SBYT_ADMIN);
     }
-  } catch(e){
-    // fara permisiuni / offline -> pastreaza fazele din HTML
+  }, (err)=>{
+    console.warn('Roadmap listen error:', err);
     setRoadmapAdminMode(!!window.__SBYT_ADMIN);
-  }
+  });
 }
 
-
-
+// init: live listen (public read). daca nu exista doc, va ramane HTML-ul.
+function initRoadmapLive(){
+  listenRoadmapLive();
+}
 
 
 </script>
