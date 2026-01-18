@@ -1716,7 +1716,7 @@ window.addEventListener('load', ()=>{
 
   function ensureAdminOrWarn(){
     if (window.__SBYT_ADMIN) return true;
-    alert('Actiune permisa doar administratorului. Autentifica-te in pagina de prezentare (Firebase) si revino aici.');
+    alert('Actiune permisa doar administratorului. Autentifica-te mai jos (Firebase) si apoi vei vedea butoanele de editare/sterge + Adauga faza noua.');
     return false;
   }
 
@@ -1949,13 +1949,86 @@ window.addEventListener('load', ()=>{
   }
 
   // ---------- Init ----------
-  document.addEventListener('DOMContentLoaded', ()=>{
+  
+  // ===== Admin Login UI (Firebase Auth) =====
+  function setAuthUi(user, isAdmin){
+    const badge = document.getElementById('adminStatusBadge');
+    const label = document.getElementById('adminUserLabel');
+    const msg   = document.getElementById('adminLoginMsg');
+    const outBtn= document.getElementById('adminLogoutBtn');
+
+    if (msg){ msg.textContent = ''; }
+
+    if (user){
+      if (label){ label.textContent = user.email || ''; }
+      if (badge){
+        badge.classList.remove('admin-badge-off');
+        badge.classList.add('admin-badge-on');
+        badge.textContent = isAdmin ? 'Admin autentificat' : 'Autentificat (fara drepturi admin)';
+      }
+      if (outBtn){ outBtn.style.display = 'inline-block'; }
+    } else {
+      if (label){ label.textContent = ''; }
+      if (badge){
+        badge.classList.add('admin-badge-off');
+        badge.classList.remove('admin-badge-on');
+        badge.textContent = 'Neautentificat';
+      }
+      if (outBtn){ outBtn.style.display = 'none'; }
+    }
+
+    // Roadmap controls: arata/ascunde butoanele si "Adauga faza noua"
+    document.querySelectorAll('#roadmap .admin-only').forEach(el=>{
+      const isRow = (el.tagName||'').toLowerCase()==='div' && (el.style.justifyContent || '').includes('flex-end');
+      el.style.display = (isAdmin ? (isRow ? 'flex' : 'block') : 'none');
+    });
+  }
+
+  window.adminSignIn = async function(){
+    try{
+      if (!hasFB()){
+        alert('Firebase nu este incarcat.');
+        return;
+      }
+      const email = (document.getElementById('adminEmail')?.value || '').trim();
+      const pass  = (document.getElementById('adminPass')?.value  || '');
+      const msg   = document.getElementById('adminLoginMsg');
+
+      if (!email || !pass){
+        if (msg){ msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
+        return;
+      }
+
+      await auth().signInWithEmailAndPassword(email, pass);
+      if (msg){ msg.style.color = '#00ff88'; msg.textContent = 'Autentificat cu succes.'; }
+    }catch(e){
+      const msg = document.getElementById('adminLoginMsg');
+      if (msg){
+        msg.style.color = '#ff4d4d';
+        msg.textContent = 'Eroare autentificare: ' + (e?.message || e);
+      }
+    }
+  }
+
+  window.adminSignOut = async function(){
+    try{
+      if (!hasFB()) return;
+      await auth().signOut();
+      const msg = document.getElementById('adminLoginMsg');
+      if (msg){ msg.style.color = '#00ffff'; msg.textContent = 'Delogat.'; }
+    }catch(e){}
+  }
+
+
+document.addEventListener('DOMContentLoaded', ()=>{
     injectAdminControlsOnce();
-    if (!hasFB()) return;
+    setAuthUi(null, false);
+if (!hasFB()) return;
     try{
       firebase.auth().onAuthStateChanged(async (user)=>{
         const isAdmin = await computeIsAdmin(user);
         setAdminFlag(isAdmin);
+        setAuthUi(user, isAdmin);
         // update admin-only inside roadmap (if already rendered)
         document.querySelectorAll('#roadmap .admin-only').forEach(el=>{
           // butonul "Adauga faza" are display:block, row-urile din iteme au flex
@@ -1970,5 +2043,25 @@ window.addEventListener('load', ()=>{
 
 })();
 </script>
+
+<!-- ADMIN LOGIN (pentru editare Roadmap) -->
+<section id="admin-login" class="section" style="padding-top:10px;">
+  <h2 style="text-align:center; margin-bottom:14px;">Administrare</h2>
+
+  <div class="admin-login-box">
+    <input id="adminEmail" type="email" placeholder="Email administrator" autocomplete="username">
+    <input id="adminPass" type="password" placeholder="Parola administrator" autocomplete="current-password">
+    <button type="button" onclick="adminSignIn()">Autentificare</button>
+    <button type="button" id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;">Delogare</button>
+  </div>
+
+  <div class="admin-status-row">
+    <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
+    <span id="adminUserLabel" class="admin-user-label"></span>
+  </div>
+
+  <p id="adminLoginMsg" class="admin-msg"></p>
+</section>
+
 </body>
 </html>
