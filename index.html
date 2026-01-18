@@ -2232,18 +2232,26 @@ async function uploadTeamPhoto(memberId, file){
   const path = `team/${memberId}/${Date.now()}_${safe}`;
   const ref = storage.ref().child(path);
 
-  // Firebase Storage compat: ref.put(file) returns an UploadTask (thenable),
-  // but in some cases await may not resolve reliably. Wrap with a Promise.
+  // Firebase Storage compat: use UploadTask events and resolve with the snapshot.
+  // Also apply a timeout so the UI never "hangs" if the task gets stuck.
   const uploadTask = ref.put(file);
-  await new Promise((resolve, reject) => {
-    uploadTask.on('state_changed',
-      null,
-      (err) => reject(err),
-      () => resolve(true)
+  const timeoutMs = 30000;
+
+  const snapshot = await new Promise((resolve, reject) => {
+    const t = setTimeout(() => {
+      try { uploadTask.cancel(); } catch (e) {}
+      reject(new Error('Upload timeout'));
+    }, timeoutMs);
+
+    uploadTask.on(
+      'state_changed',
+      () => {},
+      (err) => { clearTimeout(t); reject(err); },
+      () => { clearTimeout(t); resolve(uploadTask.snapshot); }
     );
   });
 
-  const url = await ref.getDownloadURL();
+  const url = await snapshot.ref.getDownloadURL();
   return { url, path };
 }
 
@@ -2271,40 +2279,41 @@ window.saveTeamMember = async function saveTeamMember(){
     if (!name || !role) { alert('Completeaza Nume si Functie.'); return; }
 
     const memberId = teamId();
-    let photoUrl = '';
-    let photoPath = '';
-
-    if (file) {
-      try {
-        const up = await uploadTeamPhoto(memberId, file);
-        photoUrl = up.url;
-        photoPath = up.path;
-      } catch (upErr) {
-        console.warn('Upload foto esuat:', upErr);
-        // Nu blocam salvarea membrului; ramanem pe emoticon daca upload-ul a esuat
-        photoUrl = '';
-        photoPath = '';
-      }
-    } else if (urlInput) {
-      photoUrl = urlInput;
-    }
-
     const memberSince = joinDateRaw ? joinDateRaw : '';
 
+    // 1) Salvam imediat membrul (fara a depinde de upload) ca sa nu se piarda nimic.
+    //    Daca exista URL introdus manual, il salvam direct.
     const member = {
       id: memberId,
       name,
       role,
       memberSince,
       face,
-      photoUrl,
-      photoPath,
+      photoUrl: urlInput || '',
+      photoPath: '',
       createdAt: Date.now(),
     };
 
     __teamMembers = [member, ...(__teamMembers || [])];
     renderTeamList();
     await saveTeamToFirestore();
+
+    // 2) Daca user a ales fisier, facem upload si apoi actualizam membrul in Firestore.
+    if (file) {
+      try {
+        const up = await uploadTeamPhoto(memberId, file);
+        const idx = (__teamMembers || []).findIndex(m => m.id === memberId);
+        if (idx >= 0) {
+          __teamMembers[idx].photoUrl = up.url;
+          __teamMembers[idx].photoPath = up.path;
+          renderTeamList();
+          await saveTeamToFirestore();
+        }
+      } catch (upErr) {
+        console.warn('Upload foto esuat:', upErr);
+        // nu blocam; membrul ramane salvat cu emoticon sau cu urlInput daca exista
+      }
+    }
 
     cancelTeamMember();
   } catch (e) {
