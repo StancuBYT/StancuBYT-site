@@ -1176,6 +1176,24 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+/* ====== ROADMAP DRAG & DROP (Admin) ====== */
+.roadmap-drag-handle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:10px;
+  padding:2px 8px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  cursor: grab;
+  user-select:none;
+  font-weight:900;
+}
+.timeline-item[draggable="true"]{ cursor: grab; }
+.timeline-item.dragging{ opacity: .45; }
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1860,14 +1878,79 @@ function removeAddPhaseButton(){
   document.getElementById('roadmapAdminRow')?.remove();
 }
 
+
+// --- Drag & Drop reordonare faze (doar admin)
+let __roadmapDragEl = null;
+
+function ensureDragHandle(item){
+  if (!item) return;
+  const titleEl = item.querySelector('.timeline-date');
+  if (!titleEl) return;
+  if (titleEl.querySelector('.roadmap-drag-handle')) return;
+
+  const h = document.createElement('span');
+  h.className = 'roadmap-drag-handle';
+  h.title = 'Trage pentru a reordona';
+  h.textContent = '⇅';
+  titleEl.appendChild(h);
+}
+
+function enableRoadmapDragDrop(enable){
+  const {wrap, items} = getRoadmapEls();
+  if (!wrap) return;
+
+  items.forEach((item) => {
+    if (enable){
+      ensureDragHandle(item);
+      item.setAttribute('draggable','true');
+
+      if (!item.__dndBound){
+        item.addEventListener('dragstart', (e) => {
+          if (!window.__SBYT_ADMIN) return;
+          __roadmapDragEl = item;
+          item.classList.add('dragging');
+          try{
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', 'roadmap');
+          }catch(_){}
+        });
+
+        item.addEventListener('dragover', (e) => {
+          if (!window.__SBYT_ADMIN) return;
+          e.preventDefault();
+          if (!__roadmapDragEl || __roadmapDragEl === item) return;
+
+          const rect = item.getBoundingClientRect();
+          const after = (e.clientY - rect.top) > (rect.height / 2);
+          wrap.insertBefore(__roadmapDragEl, after ? item.nextSibling : item);
+        });
+
+        item.addEventListener('dragend', async () => {
+          item.classList.remove('dragging');
+          __roadmapDragEl = null;
+          // dupa reordonare, salvam noua ordine in Firestore
+          await saveRoadmapToFirestore();
+        });
+
+        item.__dndBound = true;
+      }
+    } else {
+      item.removeAttribute('draggable');
+      // pastram handle-ul (nu strica), dar poti sa-l ascunzi daca vrei
+    }
+  });
+}
+
 function setRoadmapAdminMode(isAdmin){
   const {items} = getRoadmapEls();
   if (isAdmin){
     items.forEach(ensureAdminButtonsOnItem);
     ensureAddPhaseButton();
+    enableRoadmapDragDrop(true);
   } else {
     items.forEach(removeAdminButtonsFromItem);
     removeAddPhaseButton();
+    enableRoadmapDragDrop(false);
   }
 }
 
