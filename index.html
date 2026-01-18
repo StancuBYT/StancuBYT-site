@@ -2229,7 +2229,7 @@ function teamId(){
 async function uploadTeamPhoto(memberId, file){
   if (!storage || !file) return { url: '', path: '' };
   const safe = String(file.name || 'photo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,80);
-  const path = `team/${memberId}/${Date.now()}_${safe}`;
+  const path = `news/team_${memberId}_${Date.now()}_${safe}`;
   const ref = storage.ref().child(path);
 
   // Firebase Storage compat: use UploadTask events and resolve with the snapshot.
