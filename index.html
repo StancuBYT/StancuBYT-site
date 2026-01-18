@@ -1176,6 +1176,39 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+/* ====== TEAM (Membri) Admin + Firebase ====== */
+.team-member-card{display:flex; gap:14px; align-items:flex-start;}
+.team-avatar{width:84px; height:84px; border-radius:50%; flex:0 0 84px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow: 0 0 18px rgba(0,102,255,0.25);}
+.team-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
+.team-emoji{font-size:2.4rem;}
+.team-meta{flex:1;}
+.team-meta h4{margin:0; color: var(--green-growth);}
+.team-role{margin-top:6px; opacity:.95;}
+.team-since{margin-top:6px; font-size:.9rem; opacity:.8;}
+.team-actions{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;}
+.team-file-input{padding:12px 14px; width:280px; max-width:92vw; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color:#fff; outline:none;}
+#teamPhotoFile{padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color:#fff;}
+
+
+
+/* ====== ROADMAP DRAG & DROP (Admin) ====== */
+.roadmap-drag-handle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:10px;
+  padding:2px 8px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  cursor: grab;
+  user-select:none;
+  font-weight:900;
+}
+.timeline-item[draggable="true"]{ cursor: grab; }
+.timeline-item.dragging{ opacity: .45; }
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1483,8 +1516,8 @@
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
                     <h4 style="margin:0; color: var(--neon-cyan);">Membri echipa (Live)</h4>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button class="news-btn" onclick="requestPassword('teamAdd')">➕ Adaugă membru</button>
-                        <button class="news-btn" onclick="requestPassword('teamClear')">🗑️ Șterge toți</button>
+                        <button class="news-btn" id="teamAddBtn" style="display:none;" onclick="openTeamForm()">➕ Adaugă membru</button>
+                        <button class="news-btn" id="teamClearBtn" style="display:none;" onclick="clearAllTeamMembers()">🗑️ Șterge toți</button>
                     </div>
                 </div>
 
@@ -1496,9 +1529,20 @@
                         <input type="text" id="teamRole" placeholder="Funcția / rol" maxlength="80">
                     </div>
                     <div class="form-row">
-                        <input type="date" id="teamJoinDate" placeholder="Data înscrierii">
-                        <input type="url" id="teamAvatar" placeholder="Link foto / avatar (opțional)" maxlength="240">
+                        <input type="date" id="teamJoinDate" placeholder="Data adaugare">
+                        <select id="teamFace" aria-label="Selecteaza emoticon" style="flex:1; padding:0.8rem 1rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 102, 255, 0.3); border-radius: 8px; color: white; font-size: 1rem;">
+                          <option value="👨‍💼">👨‍💼 Barbat</option>
+                          <option value="👩‍💼">👩‍💼 Femeie</option>
+                          <option value="🧑‍💼">🧑‍💼 Neutru</option>
+                        </select>
                     </div>
+                    <div class="form-row">
+                        <input type="file" id="teamPhotoFile" accept="image/*" />
+                        <input type="url" id="teamPhotoUrl" placeholder="Link foto (optional, daca nu incarci fisier)" maxlength="240">
+                    </div>
+                    <p style="opacity:.8; font-size:.85rem; margin-top:8px;">
+                      Daca incarci un fisier, fotografia se salveaza in Firebase Storage si va inlocui emoticonul.
+                    </p>
                     <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:10px;">
                         <button class="news-btn" onclick="saveTeamMember()">💾 Salvează</button>
                         <button class="news-btn" onclick="cancelTeamMember()">✖ Anulează</button>
@@ -1507,7 +1551,7 @@
             </div>
 
 
-            <div style="background: rgba(0, 204, 255, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
+            <div style="background: rgba(0, 204, 255, 0.05)"; padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
                 <p style="margin: 0; font-size: 0.9rem;">
                     <strong>💼 Echipa în formare:</strong> Vor fi incluși dezvoltatori blockchain, marketeri, manager comunitate. Informațiile vor fi actualizate pe măsură ce echipa se extinde.
                 </p>
@@ -1682,7 +1726,9 @@ try {
       apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
       authDomain: "stancubyt-fc2b9.firebaseapp.com",
       projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+      // IMPORTANT: Firebase Storage bucket must be the *.appspot.com bucket name
+      // Otherwise file uploads may fail even if Auth/Firestore work.
+      storageBucket: "stancubyt-fc2b9.appspot.com",
       messagingSenderId: "263244200492",
       appId: "1:263244200492:web:28adf253b726cfdafaaf89",
       measurementId: "G-272S9HSY3K"
@@ -1739,6 +1785,8 @@ function setAdminUI(isAdmin, user) {
 
   // activeaza/dezactiveaza controalele roadmap
   try { setRoadmapAdminMode(isAdmin); } catch(e) {}
+  // activeaza/dezactiveaza controalele membri echipa
+  try { setTeamAdminMode(isAdmin); } catch(e) {}
 }
 
 window.adminSignIn = async function adminSignIn(){
@@ -1776,6 +1824,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // init roadmap from firestore (daca exista)
   try { initRoadmapLive(); } catch(e) {}
+
+  // init team from firestore (live)
+  try { initTeamLive(); } catch(e) {}
 });
 
 /* ============================================================
@@ -1860,14 +1911,79 @@ function removeAddPhaseButton(){
   document.getElementById('roadmapAdminRow')?.remove();
 }
 
+
+// --- Drag & Drop reordonare faze (doar admin)
+let __roadmapDragEl = null;
+
+function ensureDragHandle(item){
+  if (!item) return;
+  const titleEl = item.querySelector('.timeline-date');
+  if (!titleEl) return;
+  if (titleEl.querySelector('.roadmap-drag-handle')) return;
+
+  const h = document.createElement('span');
+  h.className = 'roadmap-drag-handle';
+  h.title = 'Trage pentru a reordona';
+  h.textContent = '⇅';
+  titleEl.appendChild(h);
+}
+
+function enableRoadmapDragDrop(enable){
+  const {wrap, items} = getRoadmapEls();
+  if (!wrap) return;
+
+  items.forEach((item) => {
+    if (enable){
+      ensureDragHandle(item);
+      item.setAttribute('draggable','true');
+
+      if (!item.__dndBound){
+        item.addEventListener('dragstart', (e) => {
+          if (!window.__SBYT_ADMIN) return;
+          __roadmapDragEl = item;
+          item.classList.add('dragging');
+          try{
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', 'roadmap');
+          }catch(_){}
+        });
+
+        item.addEventListener('dragover', (e) => {
+          if (!window.__SBYT_ADMIN) return;
+          e.preventDefault();
+          if (!__roadmapDragEl || __roadmapDragEl === item) return;
+
+          const rect = item.getBoundingClientRect();
+          const after = (e.clientY - rect.top) > (rect.height / 2);
+          wrap.insertBefore(__roadmapDragEl, after ? item.nextSibling : item);
+        });
+
+        item.addEventListener('dragend', async () => {
+          item.classList.remove('dragging');
+          __roadmapDragEl = null;
+          // dupa reordonare, salvam noua ordine in Firestore
+          await saveRoadmapToFirestore();
+        });
+
+        item.__dndBound = true;
+      }
+    } else {
+      item.removeAttribute('draggable');
+      // pastram handle-ul (nu strica), dar poti sa-l ascunzi daca vrei
+    }
+  });
+}
+
 function setRoadmapAdminMode(isAdmin){
   const {items} = getRoadmapEls();
   if (isAdmin){
     items.forEach(ensureAdminButtonsOnItem);
     ensureAddPhaseButton();
+    enableRoadmapDragDrop(true);
   } else {
     items.forEach(removeAdminButtonsFromItem);
     removeAddPhaseButton();
+    enableRoadmapDragDrop(false);
   }
 }
 
@@ -2051,6 +2167,267 @@ function initRoadmapLive(){
   listenRoadmapLive();
 }
 
+
+
+
+/* ============================================================
+   TEAM (Membri) CRUD + PERSISTENTA
+   - Salvare in Firestore: news/team (doc)  (aceeasi colectie ca la roadmap/anunturi)
+   - Fotografii in Firebase Storage: team/<memberId>/...
+   ============================================================ */
+
+const TEAM_STATS_DOC = { col: 'news', doc: 'team' };
+let __teamUnsub = null;
+let __teamHydrating = false;
+let __teamMembers = [];
+
+function setTeamAdminMode(isAdmin){
+  const addBtn = document.getElementById('teamAddBtn');
+  const clearBtn = document.getElementById('teamClearBtn');
+  if (addBtn) addBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  if (clearBtn) clearBtn.style.display = isAdmin ? 'inline-block' : 'none';
+
+  if (!isAdmin) {
+    const form = document.getElementById('teamForm');
+    if (form) form.style.display = 'none';
+    clearTeamFormInputs();
+  }
+  renderTeamList();
+}
+
+function clearTeamFormInputs(){
+  const name = document.getElementById('teamName');
+  const role = document.getElementById('teamRole');
+  const date = document.getElementById('teamJoinDate');
+  const face = document.getElementById('teamFace');
+  const file = document.getElementById('teamPhotoFile');
+  const url = document.getElementById('teamPhotoUrl');
+  if (name) name.value='';
+  if (role) role.value='';
+  if (date) date.value='';
+  if (face) face.value='👨‍💼';
+  if (file) file.value='';
+  if (url) url.value='';
+}
+
+window.openTeamForm = function openTeamForm(){
+  if (!window.__SBYT_ADMIN) return;
+  const form = document.getElementById('teamForm');
+  if (form) form.style.display = 'block';
+}
+
+window.cancelTeamMember = function cancelTeamMember(){
+  const form = document.getElementById('teamForm');
+  if (form) form.style.display = 'none';
+  clearTeamFormInputs();
+}
+
+function teamId(){
+  return 'm_' + Date.now() + '_' + Math.random().toString(16).slice(2);
+}
+
+async function uploadTeamPhoto(memberId, file){
+  if (!storage || !file) return { url: '', path: '' };
+  const safe = String(file.name || 'photo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,80);
+  const path = `news/team_${memberId}_${Date.now()}_${safe}`;
+  const ref = storage.ref().child(path);
+
+  // Firebase Storage compat: use UploadTask events and resolve with the snapshot.
+  // Also apply a timeout so the UI never "hangs" if the task gets stuck.
+  const uploadTask = ref.put(file);
+  const timeoutMs = 30000;
+
+  const snapshot = await new Promise((resolve, reject) => {
+    const t = setTimeout(() => {
+      try { uploadTask.cancel(); } catch (e) {}
+      reject(new Error('Upload timeout'));
+    }, timeoutMs);
+
+    uploadTask.on(
+      'state_changed',
+      () => {},
+      (err) => { clearTimeout(t); reject(err); },
+      () => { clearTimeout(t); resolve(uploadTask.snapshot); }
+    );
+  });
+
+  const url = await snapshot.ref.getDownloadURL();
+  return { url, path };
+}
+
+async function saveTeamToFirestore(){
+  if (!db) throw new Error('Firestore indisponibil');
+  await db.collection(TEAM_STATS_DOC.col).doc(TEAM_STATS_DOC.doc).set({
+    members: __teamMembers,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+window.saveTeamMember = async function saveTeamMember(){
+  try {
+    if (!db || !auth?.currentUser) { alert('Nu esti autentificat.'); return; }
+    const isAdmin = await computeIsAdmin(auth.currentUser);
+    if (!isAdmin) { alert('Nu ai drepturi admin.'); return; }
+
+    const name = (document.getElementById('teamName')?.value || '').trim();
+    const role = (document.getElementById('teamRole')?.value || '').trim();
+    const joinDateRaw = (document.getElementById('teamJoinDate')?.value || '').trim();
+    const face = (document.getElementById('teamFace')?.value || '👨‍💼');
+    const file = document.getElementById('teamPhotoFile')?.files?.[0] || null;
+    const urlInput = (document.getElementById('teamPhotoUrl')?.value || '').trim();
+
+    if (!name || !role) { alert('Completeaza Nume si Functie.'); return; }
+
+    const memberId = teamId();
+    const memberSince = joinDateRaw ? joinDateRaw : '';
+
+    // 1) Salvam imediat membrul (fara a depinde de upload) ca sa nu se piarda nimic.
+    //    Daca exista URL introdus manual, il salvam direct.
+    const member = {
+      id: memberId,
+      name,
+      role,
+      memberSince,
+      face,
+      photoUrl: urlInput || '',
+      photoPath: '',
+      createdAt: Date.now(),
+    };
+
+    __teamMembers = [member, ...(__teamMembers || [])];
+    renderTeamList();
+    await saveTeamToFirestore();
+
+    // 2) Daca user a ales fisier, facem upload si apoi actualizam membrul in Firestore.
+    if (file) {
+      try {
+        const up = await uploadTeamPhoto(memberId, file);
+        const idx = (__teamMembers || []).findIndex(m => m.id === memberId);
+        if (idx >= 0) {
+          __teamMembers[idx].photoUrl = up.url;
+          __teamMembers[idx].photoPath = up.path;
+          renderTeamList();
+          await saveTeamToFirestore();
+        }
+      } catch (upErr) {
+        console.warn('Upload foto esuat:', upErr);
+        // nu blocam; membrul ramane salvat cu emoticon sau cu urlInput daca exista
+      }
+    }
+
+    cancelTeamMember();
+  } catch (e) {
+    alert('Eroare la salvare membru: ' + (e?.message || e));
+    console.warn(e);
+  }
+}
+
+window.deleteTeamMember = async function deleteTeamMember(memberId){
+  try {
+    if (!db || !auth?.currentUser) return;
+    const isAdmin = await computeIsAdmin(auth.currentUser);
+    if (!isAdmin) return;
+    if (!confirm('Stergi acest membru?')) return;
+
+    const target = (__teamMembers || []).find(m => m.id === memberId);
+    __teamMembers = (__teamMembers || []).filter(m => m.id !== memberId);
+    renderTeamList();
+    await saveTeamToFirestore();
+
+    if (target?.photoPath && storage) {
+      storage.ref().child(target.photoPath).delete().catch(()=>{});
+    }
+  } catch(e) {
+    console.warn(e);
+  }
+}
+
+window.clearAllTeamMembers = async function clearAllTeamMembers(){
+  try {
+    if (!db || !auth?.currentUser) return;
+    const isAdmin = await computeIsAdmin(auth.currentUser);
+    if (!isAdmin) return;
+    if (!confirm('Stergi TOTI membrii echipei?')) return;
+
+    const toDelete = (__teamMembers || []).slice();
+    __teamMembers = [];
+    renderTeamList();
+    await saveTeamToFirestore();
+
+    if (storage) {
+      for (const m of toDelete) {
+        if (m?.photoPath) {
+          storage.ref().child(m.photoPath).delete().catch(()=>{});
+        }
+      }
+    }
+  } catch(e) {
+    console.warn(e);
+  }
+}
+
+function renderTeamList(){
+  const host = document.getElementById('teamList');
+  if (!host) return;
+  const isAdmin = !!window.__SBYT_ADMIN;
+
+  const members = Array.isArray(__teamMembers) ? __teamMembers : [];
+
+  if (members.length === 0) {
+    host.innerHTML = `<div style="opacity:.75; padding:12px;">Nu exista membri adaugati inca.</div>`;
+    return;
+  }
+
+  host.innerHTML = members.map(m => {
+    const avatar = m.photoUrl
+      ? `<div class="team-avatar"><img src="${m.photoUrl}" alt="${(m.name||'').replace(/"/g,'&quot;')}"></div>`
+      : `<div class="team-avatar"><span class="team-emoji">${m.face || '👨‍💼'}</span></div>`;
+
+    const since = m.memberSince ? `Membru din: <strong>${m.memberSince}</strong>` : '';
+
+    const delBtn = isAdmin
+      ? `<div class="team-actions"><button class="news-btn" type="button" onclick="deleteTeamMember('${m.id}')">🗑️ Sterge</button></div>`
+      : '';
+
+    return `
+      <div class="info-card team-member-card" style="text-align:left;">
+        ${avatar}
+        <div class="team-meta">
+          <h4>${(m.name||'').replace(/</g,'&lt;')}</h4>
+          <div class="team-role"><strong>${(m.role||'').replace(/</g,'&lt;')}</strong></div>
+          <div class="team-since">${since}</div>
+          ${delBtn}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function initTeamLive(){
+  if (!db) return;
+  try {
+    if (__teamUnsub) { __teamUnsub(); __teamUnsub = null; }
+    const ref = db.collection(TEAM_STATS_DOC.col).doc(TEAM_STATS_DOC.doc);
+    __teamUnsub = ref.onSnapshot((doc) => {
+      if (!doc.exists) {
+        __teamMembers = [];
+        renderTeamList();
+        return;
+      }
+      const data = doc.data() || {};
+      const members = Array.isArray(data.members) ? data.members : [];
+      // sort: newest first
+      members.sort((a,b) => (b?.createdAt||0) - (a?.createdAt||0));
+      __teamMembers = members;
+      renderTeamList();
+    }, (err) => {
+      console.warn('team snapshot error', err);
+      renderTeamList();
+    });
+  } catch(e){
+    console.warn(e);
+  }
+}
 
 </script>
 </body>
