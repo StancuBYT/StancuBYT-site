@@ -2228,24 +2228,47 @@ function teamId(){
 
 async function uploadTeamPhoto(memberId, file){
   if (!storage || !file) return { url: '', path: '' };
-  const safe = String(file.name || 'photo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,80);
+  const safe = String(file.name || 'photo')
+    .replace(/[^a-zA-Z0-9._-]+/g,'_')
+    .slice(0,80);
+
   // Folosim exact principiul din index prezentare ok.html (upload in folderul news/)
   const path = 'news/' + Date.now() + '_' + safe;
   const ref = storage.ref().child(path);
 
-  try {
+  // UploadTask NU este Promise; il asteptam corect cu on('state_changed')
+  return await new Promise((resolve, reject) => {
+    let settled = false;
     const task = ref.put(file);
-    // timeout ca sa nu blocheze salvarea
-    await Promise.race([
-      task,
-      new Promise((_, rej) => setTimeout(() => rej(new Error('upload-timeout')), 15000))
-    ]);
-    const url = await ref.getDownloadURL();
-    return { url, path };
-  } catch (e) {
-    console.warn('uploadTeamPhoto failed:', e);
-    return { url: '', path: '' };
-  }
+
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      try { if (task && typeof task.cancel === 'function') task.cancel(); } catch(e) {}
+      reject(new Error('upload-timeout'));
+    }, 30000);
+
+    task.on('state_changed',
+      null,
+      (err) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(err);
+      },
+      async () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        try {
+          const url = await ref.getDownloadURL();
+          resolve({ url, path });
+        } catch(e) {
+          reject(e);
+        }
+      }
+    );
+  });
 }
 
 async function saveTeamToFirestore(){
