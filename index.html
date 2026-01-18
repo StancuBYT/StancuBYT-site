@@ -1726,7 +1726,9 @@ try {
       apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
       authDomain: "stancubyt-fc2b9.firebaseapp.com",
       projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+      // IMPORTANT: Firebase Storage bucket must be the *.appspot.com bucket name
+      // Otherwise file uploads may fail even if Auth/Firestore work.
+      storageBucket: "stancubyt-fc2b9.appspot.com",
       messagingSenderId: "263244200492",
       appId: "1:263244200492:web:28adf253b726cfdafaaf89",
       measurementId: "G-272S9HSY3K"
