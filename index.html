@@ -2532,6 +2532,70 @@ function initFounderLive(){
   });
 }
 
+// Proceseaza un fisier imagine din device in dataURL mic (thumbnail)
+// Functioneaza fara Firebase Storage (evita CORS/AppCheck).
+async function founderFileToDataUrl(file, maxSize = 220, quality = 0.82){
+  if (!file) return null;
+  const type = (file.type || '').toLowerCase();
+  // Browser-ul nu decodeaza unele formate (ex: HEIC). In acest caz, incercam fallback.
+  const readAsDataURL = (f) => new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result || ''));
+    r.onerror = () => reject(r.error || new Error('FileReader error'));
+    r.readAsDataURL(f);
+  });
+
+  // 1) incercam ruta "corecta": Image + canvas resize
+  try{
+    const src = await readAsDataURL(file);
+    const img = await new Promise((resolve, reject)=>{
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('Image decode failed'));
+      i.src = src;
+    });
+
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (!w || !h) throw new Error('Invalid image size');
+
+    const scale = Math.min(1, maxSize / Math.max(w, h));
+    const tw = Math.max(1, Math.round(w * scale));
+    const th = Math.max(1, Math.round(h * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = tw;
+    canvas.height = th;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas not supported');
+    ctx.drawImage(img, 0, 0, tw, th);
+
+    // Preferam webp daca e suportat, altfel jpeg.
+    let out = '';
+    try{
+      out = canvas.toDataURL('image/webp', quality);
+      if (!out || !out.startsWith('data:image/webp')) throw new Error('webp not ok');
+    } catch(e){
+      out = canvas.toDataURL('image/jpeg', quality);
+    }
+    return out;
+  }catch(e){
+    // 2) fallback: salvam dataURL original (doar daca nu e prea mare)
+    try{
+      const src = await readAsDataURL(file);
+      // Limitam ca sa nu depasim limita de 1MB / document Firestore
+      if (src.length > 650000) { // ~650KB string (safe margin)
+        throw new Error('Image too large for inline storage');
+      }
+      return src;
+    }catch(_){
+      // mesaj prietenos pt HEIC/imagini foarte mari
+      throw new Error(type.includes('heic') || type.includes('heif')
+        ? 'Format HEIC/HEIF neacceptat in browser. Converteste poza in JPG/PNG.'
+        : 'Nu s-a putut procesa imaginea. Incearca JPG/PNG mai mic.');
+    }
+  }
+}
+
 window.saveFounderPhoto = async function saveFounderPhoto(){
   try{
     if (!db || !auth?.currentUser) { setFounderMsg(false, 'Trebuie sa fii autentificat ca admin.'); return; }
@@ -2543,19 +2607,21 @@ window.saveFounderPhoto = async function saveFounderPhoto(){
     if (!file) { setFounderMsg(false, 'Alege o imagine.'); return; }
 
     setFounderMsg(true, 'Se proceseaza imaginea...');
-    const up = await uploadTeamPhoto(file); // returns {url, path} (inline)
-    if (!up || !up.url){
-      setFounderMsg(false, 'Nu s-a putut procesa imaginea.');
+    let dataUrl = null;
+    try{
+      dataUrl = await founderFileToDataUrl(file, 240, 0.84);
+    }catch(err){
+      setFounderMsg(false, err?.message || 'Nu s-a putut procesa imaginea.');
       return;
     }
 
     await db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).set({
-      photoUrl: up.url,
-      photoPath: up.path || 'inline:dataurl',
+      photoUrl: dataUrl,
+      photoPath: 'inline:dataurl',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     }, { merge:true });
 
-    applyFounderPhoto(up.url);
+    applyFounderPhoto(dataUrl);
     setFounderMsg(true, 'Foto fondator salvata.');
     try { if (input) input.value = ''; } catch(e){}
   } catch(e){
