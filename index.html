@@ -15,9 +15,7 @@
       --darker-bg:#050510;
       --orange-alert:#ff9500;
     }
-
     *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-
     body{
       background:var(--dark-bg);
       color:#fff;
@@ -27,30 +25,22 @@
         radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
         radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
     }
-
     .container{max-width:1200px;margin:0 auto;padding:0 20px;}
     .page-section{display:block;padding:80px 0 40px;position:relative;z-index:1;}
-
-    .neon-glow{
-      box-shadow:0 0 20px rgba(0,255,255,.1),0 0 40px rgba(0,102,255,.05);
-    }
-
+    .neon-glow{box-shadow:0 0 20px rgba(0,255,255,.1),0 0 40px rgba(0,102,255,.05);}
     .data-visualization{
       background:rgba(255,255,255,.03);
       border:1px solid rgba(0,255,255,.15);
       border-radius:16px;
       padding:1.5rem;
     }
-
     .contact-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
       gap:1.5rem;
     }
-
     .form-group{margin-bottom:1rem;}
     .form-group label{display:block;font-weight:700;margin-bottom:.45rem;opacity:.95;}
-
     .form-group input,
     .form-group select,
     .form-group textarea{
@@ -62,7 +52,6 @@
       color:#fff;
       outline:none;
     }
-
     .form-group select option{background:#0a0a1f;color:#fff;}
     .required{color:#ff4d4d;font-weight:900;}
 
@@ -84,7 +73,6 @@
       transition:transform .05s ease, opacity .15s ease;
     }
     .btn-refresh-modern:active{transform:translateY(1px);}
-    .btn-refresh-modern:disabled{cursor:not-allowed;opacity:.65;transform:none;}
     .refresh-icon{font-size:1.1rem;}
 
     .contact-card{
@@ -136,7 +124,6 @@
     }
     .time-item .icon{font-size:1.6rem;margin-bottom:10px;}
 
-    /* Status box */
     #contactStatus{
       margin-top:1rem;
       text-align:center;
@@ -146,15 +133,16 @@
       display:none;
     }
 
-    /* Thank you overlay */
-    #thankYou{
-      display:none;
-      margin-top: 1rem;
-      border-radius: 16px;
-      border: 1px solid rgba(0,255,255,0.18);
-      background: rgba(0,0,0,0.22);
-      padding: 1.25rem;
+    .debug-box{
+      margin-top:10px;
+      font-size:12px;
+      opacity:0.78;
       text-align:center;
+      padding:10px;
+      border-radius:12px;
+      border:1px dashed rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.18);
+      word-break: break-all;
     }
 
     /* Honeypot hidden */
@@ -181,7 +169,7 @@
       </div>
 
       <div class="contact-grid">
-        <!-- Formular -->
+        <!-- FORM REAL: fara JS/fetch, merge sigur pe GitHub Pages -->
         <div class="data-visualization neon-glow">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
             <div style="width:40px;height:40px;background:linear-gradient(45deg,var(--blue-tech),var(--purple-innov));border-radius:10px;display:flex;align-items:center;justify-content:center;">
@@ -190,67 +178,68 @@
             <h3 style="margin:0;">Formular Contact Rapid</h3>
           </div>
 
-          <!-- Honeypot anti-spam (bots will fill it) -->
-          <div class="hp-wrap" aria-hidden="true">
-            <label for="company">Company</label>
-            <input type="text" id="company" name="company" tabindex="-1" autocomplete="off" />
-          </div>
+          <form id="contactForm" action="https://formspree.io/f/xaqqekva" method="POST" novalidate>
+            <!-- Honeypot anti-spam -->
+            <div class="hp-wrap" aria-hidden="true">
+              <label for="company">Company</label>
+              <input type="text" id="company" name="company" tabindex="-1" autocomplete="off" />
+            </div>
 
-          <div class="form-group">
-            <label>Nume complet <span class="required">*</span></label>
-            <input type="text" id="contactName" placeholder="Introduceți numele complet..." autocomplete="name" required>
-          </div>
+            <!-- Redirect inapoi pe pagina dupa submit -->
+            <input type="hidden" name="_next" id="nextUrl" value="" />
+            <input type="hidden" name="_subject" id="subjectField" value="" />
 
-          <div class="form-group">
-            <label>Adresă email profesională <span class="required">*</span></label>
-            <input type="email" id="contactEmail" placeholder="ex: contact@companie.ro" autocomplete="email" required>
-          </div>
+            <div class="form-group">
+              <label>Nume complet <span class="required">*</span></label>
+              <input type="text" id="contactName" name="name" placeholder="Introduceți numele complet..." autocomplete="name" required>
+            </div>
 
-          <div class="form-group">
-            <label>Tip solicitare <span class="required">*</span></label>
-            <select id="contactType">
-              <option value="technical">Suport Tehnic</option>
-              <option value="partnership">Parteneriat de afaceri</option>
-              <option value="investment">Oportunități de investiție</option>
-              <option value="listing">Listing pe exchange</option>
-              <option value="media">Interviu media</option>
-              <option value="security">Securitate & Compliance</option>
-              <option value="other">Altceva</option>
-            </select>
-          </div>
+            <div class="form-group">
+              <label>Adresă email profesională <span class="required">*</span></label>
+              <input type="email" id="contactEmail" name="email" placeholder="ex: contact@companie.ro" autocomplete="email" required>
+            </div>
 
-          <div class="form-group">
-            <label>Mesaj detaliat <span class="required">*</span></label>
-            <textarea id="contactMessage" placeholder="Descrieți solicitarea în detaliu..." rows="6" required></textarea>
-          </div>
+            <div class="form-group">
+              <label>Tip solicitare <span class="required">*</span></label>
+              <select id="contactType" name="type" required>
+                <option value="technical">Suport Tehnic</option>
+                <option value="partnership">Parteneriat de afaceri</option>
+                <option value="investment">Oportunități de investiție</option>
+                <option value="listing">Listing pe exchange</option>
+                <option value="media">Interviu media</option>
+                <option value="security">Securitate & Compliance</option>
+                <option value="other">Altceva</option>
+              </select>
+            </div>
 
-          <div class="form-group" style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
-            <input type="checkbox" id="contactPrivacy" style="transform:scale(1.2);">
-            <label for="contactPrivacy" style="font-size:.9rem;opacity:.8;margin:0;">
-              Sunt de acord cu prelucrarea datelor conform
-              <a href="https://stancubyt.com/privacy" target="_blank" style="color:var(--neon-cyan);text-decoration:none;">Politicii de confidențialitate</a>
-            </label>
-          </div>
+            <div class="form-group">
+              <label>Mesaj detaliat <span class="required">*</span></label>
+              <textarea id="contactMessage" name="message" placeholder="Descrieți solicitarea în detaliu..." rows="6" required></textarea>
+            </div>
 
-          <button type="button" class="btn-refresh-modern" onclick="sendContactMessage()" id="submitContactBtn">
-            <span class="refresh-icon" id="sendIcon">🚀</span>
-            <span class="refresh-text" id="sendText">Trimite solicitarea</span>
-          </button>
+            <div class="form-group" style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+              <input type="checkbox" id="contactPrivacy" style="transform:scale(1.2);" required>
+              <label for="contactPrivacy" style="font-size:.9rem;opacity:.8;margin:0;">
+                Sunt de acord cu prelucrarea datelor conform
+                <a href="https://stancubyt.com/privacy" target="_blank" style="color:var(--neon-cyan);text-decoration:none;">Politicii de confidențialitate</a>
+              </label>
+            </div>
 
-          <div id="contactStatus"></div>
-
-          <div id="thankYou">
-            <div style="font-size:2rem;margin-bottom:.5rem;">✅</div>
-            <div style="font-weight:900;font-size:1.1rem;margin-bottom:.25rem;">Mulțumim! Mesajul a fost trimis.</div>
-            <div style="opacity:.85;font-size:.95rem;">Vei primi răspuns pe email în cel mai scurt timp.</div>
-            <button type="button" class="btn-refresh-modern" style="margin-top:1rem;" onclick="resetContactUI()">
-              <span class="refresh-icon">✉️</span>
-              <span class="refresh-text">Trimite alt mesaj</span>
+            <button type="submit" class="btn-refresh-modern" id="submitContactBtn">
+              <span class="refresh-icon">🚀</span>
+              <span class="refresh-text">Trimite solicitarea</span>
             </button>
-          </div>
+
+            <div class="debug-box">
+              Trimite catre: <strong>https://formspree.io/f/xaqqekva</strong><br>
+              Daca nu primesti email, verifica in Formspree → Submissions si “Form Settings / Rules / Email”.
+            </div>
+
+            <div id="contactStatus"></div>
+          </form>
         </div>
 
-        <!-- Info contact -->
+        <!-- Informații Contact -->
         <div class="data-visualization neon-glow">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
             <div style="width:40px;height:40px;background:linear-gradient(45deg,var(--green-growth),var(--neon-cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;">
@@ -299,7 +288,7 @@
         </div>
       </div>
 
-      <!-- Social -->
+      <!-- Social Links -->
       <div class="data-visualization neon-glow" style="padding:2rem;margin-bottom:2rem;">
         <h3 style="margin-bottom:1.5rem;text-align:center;color:var(--neon-cyan);">🌐 Rețele Sociale Oficiale</h3>
         <div class="social-grid">
@@ -330,7 +319,7 @@
         </div>
       </div>
 
-      <!-- Timpi -->
+      <!-- Timpi de raspuns -->
       <div class="data-visualization neon-glow" style="padding:2rem;">
         <h3 style="margin-bottom:1.5rem;text-align:center;color:var(--neon-cyan);">⏰ Timpi de răspuns</h3>
         <div class="time-grid">
@@ -367,172 +356,53 @@
   </div>
 
   <script>
-    // === SETEAZA AICI ENDPOINT-UL TAU FORMSPREE ===
-    const FORM_ENDPOINT = "https://formspree.io/f/xaqqekva"; // <-- inlocuieste cu endpoint-ul tau
-
-    // === PRO SETTINGS ===
-    const RATE_LIMIT_SECONDS = 60;            // 1 mesaj / 60 secunde (pe acelasi browser)
-    const MIN_MSG_LEN = 15;                  // mesaj minim
-    const MAX_MSG_LEN = 2000;                // mesaj maxim (anti-spam)
-    const LS_KEY_LAST_SEND = "sbyt_contact_last_send_ts";
-
-    function showStatus(message, ok) {
-      const status = document.getElementById("contactStatus");
-      status.style.display = "block";
-      status.textContent = message;
-      status.style.color = ok ? "#00ff88" : "#ff4d4d";
-      status.style.background = ok ? "rgba(0,255,136,0.10)" : "rgba(255,77,77,0.10)";
-      status.style.border = ok ? "1px solid rgba(0,255,136,0.25)" : "1px solid rgba(255,77,77,0.25)";
-    }
-
-    function setSendingUI(isSending){
-      const btn = document.getElementById("submitContactBtn");
-      const icon = document.getElementById("sendIcon");
-      const text = document.getElementById("sendText");
-      btn.disabled = isSending;
-      if (isSending){
-        icon.textContent = "⏳";
-        text.textContent = "Se trimite...";
-      } else {
-        icon.textContent = "🚀";
-        text.textContent = "Trimite solicitarea";
-      }
-    }
-
-    function nowSec(){ return Math.floor(Date.now() / 1000); }
-
-    function rateLimitCheck(){
-      const last = parseInt(localStorage.getItem(LS_KEY_LAST_SEND) || "0", 10);
-      const cur = nowSec();
-      const diff = cur - last;
-      if (diff < RATE_LIMIT_SECONDS){
-        return RATE_LIMIT_SECONDS - diff;
-      }
-      return 0;
-    }
-
-    function setRateLimitNow(){
-      localStorage.setItem(LS_KEY_LAST_SEND, String(nowSec()));
-    }
-
-    function resetContactUI(){
-      document.getElementById("thankYou").style.display = "none";
-      document.getElementById("contactStatus").style.display = "none";
-      setSendingUI(false);
-      // focus back
-      document.getElementById("contactName").focus();
-    }
-
-    async function sendContactMessage(){
-      // Endpoint setat?
-      if (!FORM_ENDPOINT || FORM_ENDPOINT.includes("XXXXYYYY")){
-        showStatus("❌ Endpoint-ul Formspree nu este setat. Pune link-ul tau in FORM_ENDPOINT.", false);
-        return;
+    // Setam redirect (_next) ca sa revenim la pagina cu status
+    document.addEventListener("DOMContentLoaded", () => {
+      const next = document.getElementById("nextUrl");
+      if (next) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("sent", "1");
+        next.value = url.toString();
       }
 
-      // Honeypot (daca e completat => bot)
-      const hp = (document.getElementById("company").value || "").trim();
-      if (hp.length > 0){
-        // ne facem ca a mers ca sa nu ajutam botii
-        showStatus("✅ Mesaj trimis.", true);
-        return;
+      // Afisam status daca venim din redirect
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("sent") === "1") {
+        const box = document.getElementById("contactStatus");
+        box.style.display = "block";
+        box.textContent = "✅ Formularul a fost trimis. Daca nu primesti email, verifica Formspree → Submissions si setarile de Email/Rules.";
+        box.style.color = "#00ff88";
+        box.style.background = "rgba(0,255,136,0.10)";
+        box.style.border = "1px solid rgba(0,255,136,0.25)";
       }
 
-      // Rate limit local
-      const wait = rateLimitCheck();
-      if (wait > 0){
-        showStatus(`⏳ Te rog asteapta ${wait}s inainte sa trimiti din nou.`, false);
-        return;
-      }
-
-      const name = document.getElementById("contactName").value.trim();
-      const email = document.getElementById("contactEmail").value.trim();
-      const type = document.getElementById("contactType").value;
-      const message = document.getElementById("contactMessage").value.trim();
-      const privacy = document.getElementById("contactPrivacy").checked;
-
-      // Validari
-      if (!name || !email || !message){
-        showStatus("❌ Completeaza numele, emailul si mesajul.", false);
-        return;
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)){
-        showStatus("❌ Email invalid.", false);
-        return;
-      }
-
-      if (!privacy){
-        showStatus("❌ Trebuie sa fii de acord cu prelucrarea datelor.", false);
-        return;
-      }
-
-      if (message.length < MIN_MSG_LEN){
-        showStatus(`❌ Mesaj prea scurt. Minim ${MIN_MSG_LEN} caractere.`, false);
-        return;
-      }
-
-      if (message.length > MAX_MSG_LEN){
-        showStatus(`❌ Mesaj prea lung. Maxim ${MAX_MSG_LEN} caractere.`, false);
-        return;
-      }
-
-      setSendingUI(true);
-      showStatus("⏳ Trimit mesajul...", true);
-
-      try{
-        const payload = {
-          name,
-          email,
-          type,
-          message,
-          _subject: `StancuBYT | ${type} | ${name}`,
-          _replyto: email,
-          // info extra (ajuta la triere in inbox)
-          page: location.href,
-          ts: new Date().toISOString()
-        };
-
-        const resp = await fetch(FORM_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!resp.ok){
-          // uneori providerul returneaza HTML; incercam json, dar nu ne bazam pe el
-          let details = "";
-          try{
-            const data = await resp.json();
-            details = data?.error ? ` (${data.error})` : "";
-          }catch{}
-          throw new Error("Form backend error" + details);
+      // Construim subiect din campuri, inainte de submit
+      const form = document.getElementById("contactForm");
+      form.addEventListener("submit", (e) => {
+        // Honeypot: daca e completat -> oprim submit
+        const hp = (document.getElementById("company").value || "").trim();
+        if (hp.length > 0) {
+          e.preventDefault();
+          const box = document.getElementById("contactStatus");
+          box.style.display = "block";
+          box.textContent = "❌ Trimiterea a fost blocata (spam detectat).";
+          box.style.color = "#ff4d4d";
+          box.style.background = "rgba(255,77,77,0.10)";
+          box.style.border = "1px solid rgba(255,77,77,0.25)";
+          return;
         }
 
-        // marcam rate-limit acum (doar dupa succes)
-        setRateLimitNow();
+        const name = document.getElementById("contactName").value.trim();
+        const type = document.getElementById("contactType").value;
+        const subject = document.getElementById("subjectField");
+        if (subject) subject.value = `StancuBYT | ${type} | ${name}`;
 
-        // UI success
-        showStatus("✅ Mesaj trimis cu succes.", true);
-        document.getElementById("thankYou").style.display = "block";
-
-        // Reset fields
-        document.getElementById("contactName").value = "";
-        document.getElementById("contactEmail").value = "";
-        document.getElementById("contactType").value = "technical";
-        document.getElementById("contactMessage").value = "";
-        document.getElementById("contactPrivacy").checked = false;
-
-      }catch(e){
-        showStatus("❌ Nu s-a putut trimite mesajul. Incearca din nou.", false);
-      }finally{
-        setSendingUI(false);
-      }
-    }
+        // UX: dezactivam butonul
+        const btn = document.getElementById("submitContactBtn");
+        btn.disabled = true;
+        btn.style.opacity = "0.75";
+      });
+    });
   </script>
 </body>
 </html>
