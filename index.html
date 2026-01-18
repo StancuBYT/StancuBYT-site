@@ -2228,24 +2228,33 @@ function teamId(){
 
 async function uploadTeamPhoto(memberId, file){
   if (!storage || !file) return { url: '', path: '' };
+
+  // IMPORTANT:
+  // In Firebase Storage compat, ref.put(file) returns an UploadTask (NOT a Promise).
+  // We must wait for completion via task.on('state_changed', ...).
+
   const safe = String(file.name || 'photo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,80);
-  // Upload in acelasi folder ca anunturile (compat cu rules existente)
   const path = 'news/' + Date.now() + '_' + safe;
   const ref = storage.ref().child(path);
 
-  // Model 1:1 cu upload-ul de imagini din index prezentare ok.html
-  // (UploadTask e thenable in compat, dar punem si timeout ca sa nu se blocheze UI)
   try {
-    const task = ref.put(file);
-    await Promise.race([
-      task,
-      new Promise((_, rej) => setTimeout(() => rej(new Error('upload-timeout')), 12000))
-    ]);
+    const metadata = { contentType: (file.type || 'application/octet-stream') };
+    const task = ref.put(file, metadata);
+
+    await new Promise((resolve, reject) => {
+      const to = setTimeout(() => reject(new Error('upload-timeout')), 45000);
+      task.on(
+        'state_changed',
+        null,
+        (err) => { clearTimeout(to); reject(err); },
+        () => { clearTimeout(to); resolve(); }
+      );
+    });
+
     const url = await ref.getDownloadURL();
     return { url, path };
   } catch (e) {
     console.warn('uploadTeamPhoto failed:', e);
-    // IMPORTANT: nu blocam salvarea membrului; ramanem pe emoticon / link manual
     return { url: '', path: '' };
   }
 }
