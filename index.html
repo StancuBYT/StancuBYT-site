@@ -2231,7 +2231,18 @@ async function uploadTeamPhoto(memberId, file){
   const safe = String(file.name || 'photo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,80);
   const path = `team/${memberId}/${Date.now()}_${safe}`;
   const ref = storage.ref().child(path);
-  await ref.put(file);
+
+  // Firebase Storage compat: ref.put(file) returns an UploadTask (thenable),
+  // but in some cases await may not resolve reliably. Wrap with a Promise.
+  const uploadTask = ref.put(file);
+  await new Promise((resolve, reject) => {
+    uploadTask.on('state_changed',
+      null,
+      (err) => reject(err),
+      () => resolve(true)
+    );
+  });
+
   const url = await ref.getDownloadURL();
   return { url, path };
 }
@@ -2264,9 +2275,16 @@ window.saveTeamMember = async function saveTeamMember(){
     let photoPath = '';
 
     if (file) {
-      const up = await uploadTeamPhoto(memberId, file);
-      photoUrl = up.url;
-      photoPath = up.path;
+      try {
+        const up = await uploadTeamPhoto(memberId, file);
+        photoUrl = up.url;
+        photoPath = up.path;
+      } catch (upErr) {
+        console.warn('Upload foto esuat:', upErr);
+        // Nu blocam salvarea membrului; ramanem pe emoticon daca upload-ul a esuat
+        photoUrl = '';
+        photoPath = '';
+      }
     } else if (urlInput) {
       photoUrl = urlInput;
     }
@@ -2290,7 +2308,7 @@ window.saveTeamMember = async function saveTeamMember(){
 
     cancelTeamMember();
   } catch (e) {
-    alert('Eroare la salvare membri in Firestore (verifica Rules pentru news/team).');
+    alert('Eroare la salvare membru: ' + (e?.message || e));
     console.warn(e);
   }
 }
