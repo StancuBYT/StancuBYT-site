@@ -1502,14 +1502,30 @@
             <h3>7. Echipa</h3>
             
             <div style="display: flex; align-items: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
-                <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-                    👨‍💼
+                <div id="founderAvatar" style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
+                    <img id="founderPhoto" alt="Founder photo" style="display:none;width:100%;height:100%;border-radius:50%;object-fit:cover;">
+                    <span id="founderEmoji" style="display:inline-block;font-size:2.5rem;line-height:1;">👨‍💼</span>
                 </div>
                 <div>
                     <h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Stancu Marian</h4>
                     <p><strong>Fondator & CEO</strong></p>
                     <p style="opacity: 0.8; margin-top: 0.5rem;">Inițiator și coordonator proiect StancuBYT</p>
                 </div>
+            </div>
+
+            <div id="founderAdminControls" style="display:none; margin: 0.5rem 0 1.5rem; padding: 0.9rem; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <strong style="color: var(--neon-cyan);">Fondator - Foto (Admin)</strong>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <input id="founderPhotoFile" type="file" accept="image/*" style="max-width: 320px;" />
+                        <button class="news-btn" type="button" onclick="saveFounderPhoto()">💾 Salveaza foto</button>
+                        <button class="news-btn" type="button" onclick="removeFounderPhoto()">🗑️ Sterge foto</button>
+                    </div>
+                </div>
+                <div style="margin-top:8px; font-size:0.9rem; opacity:0.85;">
+                    Dupa salvare, poza apare in locul emoticonului (se salveaza in Firebase).
+                </div>
+                <div id="founderPhotoMsg" style="margin-top:8px; font-weight:700;"></div>
             </div>
             <!-- Management echipa (salvare permanenta - Firebase) -->
             <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.12);">
@@ -1785,6 +1801,7 @@ function setAdminUI(isAdmin, user) {
 
   // activeaza/dezactiveaza controalele roadmap
   try { setRoadmapAdminMode(isAdmin); } catch(e) {}
+  try { setFounderAdminUI(isAdmin); } catch(e) {}
   // activeaza/dezactiveaza controalele membri echipa
   try { setTeamAdminMode(isAdmin); } catch(e) {}
 }
@@ -1824,6 +1841,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // init roadmap from firestore (daca exista)
   try { initRoadmapLive(); } catch(e) {}
+
+  // init founder live photo
+  try { initFounderLive(); } catch(e) {}
 
   // init team from firestore (live)
   try { initTeamLive(); } catch(e) {}
@@ -2461,6 +2481,108 @@ function initTeamLive(){
     console.warn(e);
   }
 }
+
+
+
+/* ============================================================
+   FOUNDER PHOTO (Admin) - persistenta Firebase (fara Storage)
+   Salvare in: Firestore -> news/founder
+   Foloseste aceeasi metoda ca la membri (dataURL thumbnail).
+   ============================================================ */
+
+const FOUNDER_DOC = { col: 'news', id: 'founder' };
+let __founderUnsub = null;
+
+function applyFounderPhoto(photoUrl){
+  const img = document.getElementById('founderPhoto');
+  const emoji = document.getElementById('founderEmoji');
+  if (!img || !emoji) return;
+  const url = (photoUrl || '').trim();
+  if (url){
+    img.src = url;
+    img.style.display = 'block';
+    emoji.style.display = 'none';
+  } else {
+    img.removeAttribute('src');
+    img.style.display = 'none';
+    emoji.style.display = 'inline-block';
+  }
+}
+
+function setFounderAdminUI(isAdmin){
+  const box = document.getElementById('founderAdminControls');
+  if (box) box.style.display = isAdmin ? 'block' : 'none';
+}
+
+function setFounderMsg(ok, text){
+  const el = document.getElementById('founderPhotoMsg');
+  if (!el) return;
+  el.style.color = ok ? '#00ff88' : '#ff4d4d';
+  el.textContent = text || '';
+}
+
+function initFounderLive(){
+  if (!db) return;
+  if (__founderUnsub) { try{ __founderUnsub(); }catch(e){} }
+  __founderUnsub = db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).onSnapshot((doc)=>{
+    const data = (doc && doc.exists) ? (doc.data() || {}) : {};
+    applyFounderPhoto(data.photoUrl || '');
+  }, (err)=>{
+    console.warn('Founder photo read error:', err);
+  });
+}
+
+window.saveFounderPhoto = async function saveFounderPhoto(){
+  try{
+    if (!db || !auth?.currentUser) { setFounderMsg(false, 'Trebuie sa fii autentificat ca admin.'); return; }
+    const isAdmin = await computeIsAdmin(auth.currentUser);
+    if (!isAdmin) { setFounderMsg(false, 'Nu ai drepturi admin.'); return; }
+
+    const input = document.getElementById('founderPhotoFile');
+    const file = input?.files?.[0];
+    if (!file) { setFounderMsg(false, 'Alege o imagine.'); return; }
+
+    setFounderMsg(true, 'Se proceseaza imaginea...');
+    const up = await uploadTeamPhoto(file); // returns {url, path} (inline)
+    if (!up || !up.url){
+      setFounderMsg(false, 'Nu s-a putut procesa imaginea.');
+      return;
+    }
+
+    await db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).set({
+      photoUrl: up.url,
+      photoPath: up.path || 'inline:dataurl',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge:true });
+
+    applyFounderPhoto(up.url);
+    setFounderMsg(true, 'Foto fondator salvata.');
+    try { if (input) input.value = ''; } catch(e){}
+  } catch(e){
+    console.warn('Founder photo save error:', e);
+    setFounderMsg(false, 'Eroare la salvare foto fondator.');
+  }
+};
+
+window.removeFounderPhoto = async function removeFounderPhoto(){
+  try{
+    if (!db || !auth?.currentUser) { setFounderMsg(false, 'Trebuie sa fii autentificat ca admin.'); return; }
+    const isAdmin = await computeIsAdmin(auth.currentUser);
+    if (!isAdmin) { setFounderMsg(false, 'Nu ai drepturi admin.'); return; }
+
+    await db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).set({
+      photoUrl: firebase.firestore.FieldValue.delete(),
+      photoPath: firebase.firestore.FieldValue.delete(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge:true });
+
+    applyFounderPhoto('');
+    setFounderMsg(true, 'Foto fondator stearsa.');
+  } catch(e){
+    console.warn('Founder photo remove error:', e);
+    setFounderMsg(false, 'Eroare la stergere foto fondator.');
+  }
+};
 
 </script>
 </body>
