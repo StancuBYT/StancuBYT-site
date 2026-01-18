@@ -1780,12 +1780,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ============================================================
    ROADMAP CRUD + PERSISTENTA (1:1 ca principiu cu anunturile)
-   - Salvare in Firestore: stats/roadmap (doc)
+   - Salvare in Firestore: news/roadmap (doc)
    - Citire live pentru oricine: onSnapshot
    - NU schimba structura paginii: foloseste .timeline-item existente
    ============================================================ */
 
-const ROADMAP_STATS_DOC = { col: 'stats', doc: 'roadmap' };
+const ROADMAP_STATS_DOC = { col: 'news', doc: 'roadmap' } // folosim colectia 'news' (ca anunturile) pentru a evita rules pe stats;
 let __roadmapUnsub = null;
 let __roadmapHydrating = false; // evita bucle (snapshot -> render -> save)
 
@@ -1943,8 +1943,8 @@ async function saveRoadmapToFirestore(){
       updatedBy: auth.currentUser.email || null
     }, { merge: true });
   }catch(e){
-    console.warn('Roadmap save (stats/roadmap) error:', e);
-    alert('Eroare la salvare roadmap in Firestore (verifica Rules pentru stats/roadmap).');
+    console.warn('Roadmap save (news/roadmap) error:', e);
+    alert('Eroare la salvare roadmap in Firestore (verifica Rules pentru news/roadmap).');
   }
 }
 
