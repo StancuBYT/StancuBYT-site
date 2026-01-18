@@ -1262,7 +1262,7 @@
                         <td><strong>Website oficial</strong></td>
                         <td>
                             <a href="https://stancubyt.com/" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                                www.stancubyt.com
+                                https://stancubyt.com/
                             </a>
                         </td>
                     </tr>
@@ -1514,7 +1514,7 @@
             
             <div style="margin: 1.5rem 0;">
                 <div class="social-grid">
-                    <a href="www.stancubyt.com" target="_blank" class="social-card">
+                    <a href="https://stancubyt.com/" target="_blank" class="social-card">
                         <div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">
                             🌐
                         </div>
@@ -1646,6 +1646,329 @@ window.addEventListener('load', ()=>{
   if (wpContact) wpContact.id = 'contact-wp';
 });
 
+</script>
+
+<script>
+/* ============================================================
+   WHITEPAPER ROADMAP CRUD (Firebase Auth + Firestore + Storage)
+   - NU modifica structura paginii: folosim containerul existent
+     "#roadmap .roadmap-timeline" si adaugam controale din JS.
+   - Scrierea (add/edit/delete) este permisa doar adminului deja
+     autentificat prin Firebase Auth (ca in index prezentare ok.html).
+   ============================================================ */
+
+(function(){
+  // ---------- Firebase init (identic cu index prezentare ok.html) ----------
+  try {
+    if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+        authDomain: "stancubyt-fc2b9.firebaseapp.com",
+        projectId: "stancubyt-fc2b9",
+        storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+        messagingSenderId: "263244200492",
+        appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+        measurementId: "G-272S9HSY3K"
+      });
+    }
+  } catch (e) {}
+
+  // ---------- Helpers ----------
+  const $ = (sel)=>document.querySelector(sel);
+  const escapeHtml = (s)=>String(s ?? '').replace(/[&<>"'`=\/]/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
+  }[ch] || ch));
+
+  const ADMIN_EMAILS = ["stancubyt@gmail.com"];
+  const ROADMAP_COLLECTION = 'roadmap';
+
+  function hasFB(){
+    try{ return typeof firebase !== 'undefined' && firebase.auth && firebase.firestore; }catch(e){ return false; }
+  }
+  function auth(){ return firebase.auth(); }
+  function db(){ return firebase.firestore(); }
+  function storage(){ return firebase.storage(); }
+
+  async function computeIsAdmin(user){
+    if (!user) return false;
+    try{
+      const token = await user.getIdTokenResult(true);
+      if (token?.claims?.admin === true) return true;
+    }catch(e){}
+    const email = String(user.email||'').toLowerCase();
+    return ADMIN_EMAILS.map(x=>String(x).toLowerCase()).includes(email);
+  }
+
+  function setAdminFlag(isAdmin){
+    window.__SBYT_ADMIN = !!isAdmin;
+    // daca exista elemente .admin-only in pagina, le respectam
+    document.querySelectorAll('.admin-only').forEach(el=>{
+      el.style.display = isAdmin ? 'block' : 'none';
+    });
+  }
+
+  function statusLabel(status){
+    const s = String(status||'planned').toLowerCase();
+    if (s === 'done' || s === 'completed' || s === 'completat') return { text:'Completat', cls:'badge-success' };
+    if (s === 'inprogress' || s === 'in_curs' || s === 'in curs') return { text:'În Curs', cls:'badge-warning' };
+    return { text:'Planificat', cls:'badge-info' };
+  }
+
+  function ensureAdminOrWarn(){
+    if (window.__SBYT_ADMIN) return true;
+    alert('Actiune permisa doar administratorului. Autentifica-te in pagina de prezentare (Firebase) si revino aici.');
+    return false;
+  }
+
+  function getTimelineEl(){
+    return document.querySelector('#roadmap .roadmap-timeline');
+  }
+
+  function injectAdminControlsOnce(){
+    const roadmapCard = document.getElementById('roadmap');
+    const timeline = getTimelineEl();
+    if (!roadmapCard || !timeline) return;
+    if (roadmapCard.__adminInjected) return;
+    roadmapCard.__adminInjected = true;
+
+    // Butonul se adauga doar din JS (nu schimbam structura HTML sursa)
+    const btnWrap = document.createElement('div');
+    btnWrap.className = 'admin-only';
+    btnWrap.style.margin = '12px 0 18px';
+    btnWrap.style.display = 'none';
+
+    const btn = document.createElement('button');
+    btn.className = 'download-btn';
+    btn.type = 'button';
+    btn.innerHTML = '<span>➕</span> Adauga faza';
+    btn.addEventListener('click', ()=> addPhaseFlow());
+    btnWrap.appendChild(btn);
+
+    roadmapCard.insertBefore(btnWrap, timeline);
+  }
+
+  async function uploadOptionalImage(docId){
+    try{
+      const want = confirm('Vrei sa incarci o imagine pentru aceasta faza? (optional)');
+      if (!want) return { imageUrl:null, imagePath:null };
+
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'image/*';
+      inp.style.display = 'none';
+      document.body.appendChild(inp);
+
+      const file = await new Promise((resolve)=>{
+        inp.addEventListener('change', ()=> resolve(inp.files && inp.files[0] ? inp.files[0] : null), { once:true });
+        inp.click();
+      });
+
+      inp.remove();
+      if (!file) return { imageUrl:null, imagePath:null };
+
+      const safeName = (file.name || 'image').replace(/[^a-zA-Z0-9._-]+/g,'_');
+      const path = `roadmap/${docId}/${Date.now()}_${safeName}`;
+      const ref = storage().ref().child(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      return { imageUrl:url, imagePath:path };
+    }catch(e){
+      console.warn('uploadOptionalImage:', e);
+      alert('Nu am putut incarca imaginea (Storage/Rules). Continui fara imagine.');
+      return { imageUrl:null, imagePath:null };
+    }
+  }
+
+  async function addPhaseFlow(){
+    if (!ensureAdminOrWarn()) return;
+    if (!hasFB()) { alert('Firebase nu este incarcat corect.'); return; }
+
+    const title = (prompt('Titlu faza (ex: Faza 5: Ecosistem)') || '').trim();
+    if (!title) return;
+    const desc = (prompt('Descriere scurta pentru faza:') || '').trim();
+    if (!desc) return;
+    const status = (prompt('Status: completat | in curs | planificat', 'planificat') || 'planificat').trim();
+    const orderStr = (prompt('Ordine (numar) - ex: 5', '5') || '').trim();
+    const order = Number(orderStr);
+
+    try{
+      const docRef = await db().collection(ROADMAP_COLLECTION).add({
+        title,
+        description: desc,
+        status,
+        order: Number.isFinite(order) ? order : 999,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        imageUrl: null,
+        imagePath: null
+      });
+
+      const up = await uploadOptionalImage(docRef.id);
+      if (up.imageUrl){
+        await docRef.update({ imageUrl: up.imageUrl, imagePath: up.imagePath, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      }
+    }catch(e){
+      console.error(e);
+      alert('Eroare la salvare (Firestore Rules/Auth).');
+    }
+  }
+
+  async function editPhaseFlow(id, current){
+    if (!ensureAdminOrWarn()) return;
+    const title = (prompt('Titlu faza:', current.title || '') || '').trim();
+    if (!title) return;
+    const desc = (prompt('Descriere:', current.description || '') || '').trim();
+    if (!desc) return;
+    const status = (prompt('Status: completat | in curs | planificat', current.status || 'planificat') || '').trim();
+    const orderStr = (prompt('Ordine (numar):', String(current.order ?? ''))) || '';
+    const order = Number(orderStr);
+
+    try{
+      const ref = db().collection(ROADMAP_COLLECTION).doc(id);
+      await ref.update({
+        title,
+        description: desc,
+        status,
+        order: Number.isFinite(order) ? order : (current.order ?? 999),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // optional: upload new image
+      const want = confirm('Vrei sa inlocuiesti imaginea?');
+      if (want){
+        const up = await uploadOptionalImage(id);
+        const patch = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if (up.imageUrl){
+          patch.imageUrl = up.imageUrl;
+          patch.imagePath = up.imagePath;
+        }
+        await ref.update(patch);
+      }
+    }catch(e){
+      console.error(e);
+      alert('Eroare la editare (Rules/Auth).');
+    }
+  }
+
+  async function deletePhaseFlow(id, imagePath){
+    if (!ensureAdminOrWarn()) return;
+    if (!confirm('Stergi aceasta faza din roadmap?')) return;
+    try{
+      await db().collection(ROADMAP_COLLECTION).doc(id).delete();
+      if (imagePath){
+        try{ await storage().ref().child(imagePath).delete(); }catch(e){}
+      }
+    }catch(e){
+      console.error(e);
+      alert('Eroare la stergere (Rules/Auth).');
+    }
+  }
+
+  function renderRoadmap(items){
+    const timeline = getTimelineEl();
+    if (!timeline) return;
+
+    // pastreaza fallback-ul initial (static) in caz ca Firestore e gol
+    if (!timeline.__origHtml) timeline.__origHtml = timeline.innerHTML;
+
+    if (!items || !items.length){
+      timeline.innerHTML = timeline.__origHtml;
+      return;
+    }
+
+    timeline.innerHTML = '';
+    items.forEach(it=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'timeline-item';
+
+      const st = statusLabel(it.status);
+      const img = it.imageUrl ? `
+        <div style="margin:10px 0 0; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);">
+          <img src="${escapeHtml(it.imageUrl)}" alt="" style="width:100%; height:auto; display:block;" loading="lazy">
+        </div>
+      ` : '';
+
+      wrap.innerHTML = `
+        <div class="timeline-date">${escapeHtml(it.title || '')}</div>
+        <p>${escapeHtml(it.description || '')}</p>
+        ${img}
+        <span class="badge ${st.cls}">${st.text}</span>
+        <div class="admin-only" style="display:none; justify-content:flex-end; gap:10px; margin-top:12px;">
+          <button class="news-btn" type="button" data-act="edit">✏️ Editeaza</button>
+          <button class="news-btn" type="button" data-act="del">🗑️ Sterge</button>
+        </div>
+      `;
+
+      const adminRow = wrap.querySelector('.admin-only');
+      const editBtn = wrap.querySelector('button[data-act="edit"]');
+      const delBtn  = wrap.querySelector('button[data-act="del"]');
+      if (editBtn) editBtn.addEventListener('click', ()=> editPhaseFlow(it.id, it));
+      if (delBtn)  delBtn.addEventListener('click',  ()=> deletePhaseFlow(it.id, it.imagePath || null));
+
+      timeline.appendChild(wrap);
+    });
+
+    // afiseaza admin-only daca e admin
+    document.querySelectorAll('#roadmap .admin-only').forEach(el=>{
+      el.style.display = window.__SBYT_ADMIN ? 'flex' : 'none';
+    });
+  }
+
+  function listenRoadmap(){
+    if (!hasFB()) return;
+    const timeline = getTimelineEl();
+    if (!timeline) return;
+
+    try{
+      db().collection(ROADMAP_COLLECTION)
+        .orderBy('order','asc')
+        .onSnapshot((snap)=>{
+          const items = [];
+          snap.forEach(doc=>{
+            const d = doc.data() || {};
+            items.push({
+              id: doc.id,
+              title: d.title || '',
+              description: d.description || d.desc || '',
+              status: d.status || 'planificat',
+              order: (typeof d.order === 'number') ? d.order : 999,
+              imageUrl: d.imageUrl || null,
+              imagePath: d.imagePath || null
+            });
+          });
+          renderRoadmap(items);
+        }, (err)=>{
+          console.warn('Roadmap snapshot error:', err);
+          // daca nu avem permisiuni de read, pastram fallback-ul static
+          renderRoadmap(null);
+        });
+    }catch(e){
+      console.warn('listenRoadmap:', e);
+      renderRoadmap(null);
+    }
+  }
+
+  // ---------- Init ----------
+  document.addEventListener('DOMContentLoaded', ()=>{
+    injectAdminControlsOnce();
+    if (!hasFB()) return;
+    try{
+      firebase.auth().onAuthStateChanged(async (user)=>{
+        const isAdmin = await computeIsAdmin(user);
+        setAdminFlag(isAdmin);
+        // update admin-only inside roadmap (if already rendered)
+        document.querySelectorAll('#roadmap .admin-only').forEach(el=>{
+          // butonul "Adauga faza" are display:block, row-urile din iteme au flex
+          const isRow = (el.tagName||'').toLowerCase()==='div' && (el.style.justifyContent || '').includes('flex-end');
+          el.style.display = isAdmin ? (isRow ? 'flex' : 'block') : 'none';
+        });
+      });
+    }catch(e){}
+
+    listenRoadmap();
+  });
+
+})();
 </script>
 </body>
 </html>
