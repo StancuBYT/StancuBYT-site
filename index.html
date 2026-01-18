@@ -2229,30 +2229,23 @@ function teamId(){
 async function uploadTeamPhoto(memberId, file){
   if (!storage || !file) return { url: '', path: '' };
   const safe = String(file.name || 'photo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,80);
-  const path = `news/team_${memberId}_${Date.now()}_${safe}`;
+  // Folosim exact principiul din index prezentare ok.html (upload in folderul news/)
+  const path = 'news/' + Date.now() + '_' + safe;
   const ref = storage.ref().child(path);
 
-  // Firebase Storage compat: use UploadTask events and resolve with the snapshot.
-  // Also apply a timeout so the UI never "hangs" if the task gets stuck.
-  const uploadTask = ref.put(file);
-  const timeoutMs = 30000;
-
-  const snapshot = await new Promise((resolve, reject) => {
-    const t = setTimeout(() => {
-      try { uploadTask.cancel(); } catch (e) {}
-      reject(new Error('Upload timeout'));
-    }, timeoutMs);
-
-    uploadTask.on(
-      'state_changed',
-      () => {},
-      (err) => { clearTimeout(t); reject(err); },
-      () => { clearTimeout(t); resolve(uploadTask.snapshot); }
-    );
-  });
-
-  const url = await snapshot.ref.getDownloadURL();
-  return { url, path };
+  try {
+    const task = ref.put(file);
+    // timeout ca sa nu blocheze salvarea
+    await Promise.race([
+      task,
+      new Promise((_, rej) => setTimeout(() => rej(new Error('upload-timeout')), 15000))
+    ]);
+    const url = await ref.getDownloadURL();
+    return { url, path };
+  } catch (e) {
+    console.warn('uploadTeamPhoto failed:', e);
+    return { url: '', path: '' };
+  }
 }
 
 async function saveTeamToFirestore(){
