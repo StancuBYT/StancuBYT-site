@@ -2229,30 +2229,32 @@ function teamId(){
 async function uploadTeamPhoto(memberId, file){
   if (!storage || !file) return { url: '', path: '' };
 
-  // IMPORTANT:
-  // In Firebase Storage compat, ref.put(file) returns an UploadTask (NOT a Promise).
-  // We must wait for completion via task.on('state_changed', ...).
-
+  // Same principle as announcements in index prezentare ok.html:
+  // - upload to Storage
+  // - wait for completion with a timeout
+  // - getDownloadURL
   const safe = String(file.name || 'photo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,80);
-  const path = 'news/' + Date.now() + '_' + safe;
-  const ref = storage.ref().child(path);
+  const pathGuess = 'news/' + Date.now() + '_' + safe;
+  const ref = storage.ref().child(pathGuess);
 
   try {
-    const metadata = { contentType: (file.type || 'application/octet-stream') };
-    const task = ref.put(file, metadata);
+    const task = ref.put(file);
 
-    await new Promise((resolve, reject) => {
-      const to = setTimeout(() => reject(new Error('upload-timeout')), 45000);
-      task.on(
-        'state_changed',
-        null,
-        (err) => { clearTimeout(to); reject(err); },
-        () => { clearTimeout(to); resolve(); }
-      );
-    });
+    // Wait for completion (UploadTask is not a Promise in compat)
+    const snapshot = await Promise.race([
+      new Promise((resolve, reject) => {
+        task.on('state_changed',
+          () => {},
+          (err) => reject(err),
+          () => resolve(task.snapshot)
+        );
+      }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('upload-timeout')), 45000))
+    ]);
 
     const url = await ref.getDownloadURL();
-    return { url, path };
+    const fullPath = (snapshot.ref && snapshot.ref.fullPath) ? snapshot.ref.fullPath : pathGuess;
+    return { url, path: fullPath };
   } catch (e) {
     console.warn('uploadTeamPhoto failed:', e);
     return { url: '', path: '' };
