@@ -1681,8 +1681,7 @@ window.addEventListener('load', ()=>{
 
   const ADMIN_EMAILS = ["stancubyt@gmail.com"];
   const ROADMAP_COLLECTION = 'roadmap';
-  const ROADMAP_DOC_COLLECTION = 'stats';
-  const ROADMAP_DOC_ID = 'roadmap';
+  const ROADMAP_COLLECTION = 'roadmap';
 
 
   function hasFB(){
@@ -1783,144 +1782,8 @@ window.addEventListener('load', ()=>{
   }
 
   
-  // ---------- Roadmap persistence (folosim acelasi principiu ca la anunturi, dar salvam in stats/roadmap pentru a ramane vizibil si dupa delogare) ----------
-  async function getRoadmapItems(){
-    try{
-      const snap = await db().collection(ROADMAP_DOC_COLLECTION).doc(ROADMAP_DOC_ID).get();
-      if (!snap.exists) return [];
-      const data = snap.data() || {};
-      return Array.isArray(data.items) ? data.items : [];
-    }catch(e){
-      console.warn('getRoadmapItems:', e);
-      return [];
-    }
-  }
-
-  async function setRoadmapItems(items){
-    try{
-      await db().collection(ROADMAP_DOC_COLLECTION).doc(ROADMAP_DOC_ID).set({
-        items: Array.isArray(items) ? items : [],
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      return true;
-    }catch(e){
-      console.error('setRoadmapItems:', e);
-      alert('Eroare la salvare (verifica Firestore Rules/Auth).');
-      return false;
-    }
-  }
-
-  function sortRoadmapItems(items){
-    return (items||[]).slice().sort((a,b)=>{
-      const oa = Number(a.order ?? 0);
-      const ob = Number(b.order ?? 0);
-      if (oa !== ob) return oa - ob;
-      return String(a.id||'').localeCompare(String(b.id||''));
-    });
-  }
-
-
-async function addPhaseFlow(){
-    if (!ensureAdminOrWarn()) return;
-    if (!hasFB()) { alert('Firebase nu este incarcat corect.'); return; }
-
-    const title = (prompt('Titlu faza (ex: Faza 5: Ecosistem)') || '').trim();
-    if (!title) return;
-    const desc = (prompt('Descriere scurta pentru faza:') || '').trim();
-    if (!desc) return;
-    const status = (prompt('Status: completat | in curs | planificat', 'planificat') || 'planificat').trim();
-    const orderStr = (prompt('Ordine (numar) - ex: 5', '5') || '').trim();
-    const order = Number(orderStr);
-
-    const id = 'phase_' + Date.now();
-
-    const items = await getRoadmapItems();
-    const next = Array.isArray(items) ? items.slice() : [];
-    next.push({
-      id,
-      title,
-      description: desc,
-      status,
-      order: Number.isFinite(order) ? order : (next.length + 1),
-      imageUrl: '',
-      imagePath: '',
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    });
-
-    // optional image upload
-    const up = await uploadOptionalImage(id);
-    if (up && up.imageUrl){
-      const idx = next.findIndex(x=>x.id===id);
-      if (idx >= 0){
-        next[idx].imageUrl = up.imageUrl;
-        next[idx].imagePath = up.imagePath || '';
-      }
-    }
-
-    await setRoadmapItems(sortRoadmapItems(next));
-  }
-
-  async function editPhaseFlow(id, current){
-    if (!ensureAdminOrWarn()) return;
-    const title = (prompt('Titlu faza:', current.title || '') || '').trim();
-    if (!title) return;
-    const desc = (prompt('Descriere:', current.description || '') || '').trim();
-    if (!desc) return;
-    const status = (prompt('Status: completat | in curs | planificat', current.status || 'planificat') || 'planificat').trim();
-    const orderStr = (prompt('Ordine (numar):', String(current.order ?? '')) || '').trim();
-    const order = Number(orderStr);
-
-    const items = await getRoadmapItems();
-    const next = Array.isArray(items) ? items.slice() : [];
-    const idx = next.findIndex(x=>String(x.id)===String(id));
-    if (idx < 0){
-      alert('Faza nu a fost gasita in baza de date.');
-      return;
-    }
-
-    next[idx] = {
-      ...next[idx],
-      title,
-      description: desc,
-      status,
-      order: Number.isFinite(order) ? order : next[idx].order,
-      updatedAt: Date.now()
-    };
-
-    // optional image replace
-    if (confirm('Vrei sa inlocuiesti / adaugi o imagine pentru aceasta faza? (optional)')){
-      // sterge vechea imagine daca exista
-      try{
-        const oldPath = next[idx].imagePath || '';
-        if (oldPath) await storage().ref().child(oldPath).delete();
-      }catch(e){}
-      const up = await uploadOptionalImage(id);
-      if (up && up.imageUrl){
-        next[idx].imageUrl = up.imageUrl;
-        next[idx].imagePath = up.imagePath || '';
-      }
-    }
-
-    await setRoadmapItems(sortRoadmapItems(next));
-  }
-
-  async function deletePhaseFlow(id, imagePath){
-    if (!ensureAdminOrWarn()) return;
-    if (!confirm('Sigur vrei sa stergi aceasta faza?')) return;
-
-    try{
-      if (imagePath){
-        try{ await storage().ref().child(imagePath).delete(); }catch(e){}
-      }
-    }catch(e){}
-
-    const items = await getRoadmapItems();
-    const next = (Array.isArray(items) ? items : []).filter(x=>String(x.id)!==String(id));
-    await setRoadmapItems(sortRoadmapItems(next));
-  }
-
-  function renderRoadmap(items){
+  // ---------- Roadmap persistence (1:1 ca la anunturi: Firestore collection + onSnapshot) ----------\n\n  let __roadmapUnsub = null;\n\n  function normalizeStatus(s){\n    const v = String(s||'').toLowerCase().trim();\n    if (v.includes('complet')) return 'completat';\n    if (v.includes('curs')) return 'in curs';\n    return 'planificat';\n  }\n\n  function readDomPhases(){\n    const timeline = getTimelineEl();\n    if (!timeline) return [];\n    const nodes = Array.from(timeline.querySelectorAll('.timeline-item'));\n    return nodes.map((n, idx)=>{\n      const title = (n.querySelector('.timeline-date')?.textContent || '').trim();\n      const desc  = (n.querySelector('p')?.textContent || '').trim();\n      const badge = (n.querySelector('.badge')?.textContent || '').trim();\n      const status = normalizeStatus(badge);\n      const staticId = n.getAttribute('data-roadmap-id') || `phase_${idx+1}`;\n      return { id: staticId, title, description: desc, status, order: idx+1, imageUrl:'', imagePath:'' };\n    });\n  }\n\n  async function isRoadmapEmpty(){\n    try{\n      const snap = await db().collection(ROADMAP_COLLECTION).limit(1).get();\n      return snap.empty;\n    }catch(e){\n      console.warn('isRoadmapEmpty:', e);\n      return true\n    }\n  }\n\n  async function seedRoadmapFromDOMIfEmpty(){\n    if (!hasFB()) return false;\n    try{\n      const snap = await db().collection(ROADMAP_COLLECTION).limit(1).get();\n      if (!snap.empty) return false;\n\n      const items = readDomPhases();\n      if (!items.length) return false;\n\n      const batch = db().batch();\n      for (const it of items){\n        const ref = db().collection(ROADMAP_COLLECTION).doc(String(it.id));\n        batch.set(ref, {\n          title: it.title,\n          description: it.description,\n          status: it.status,\n          order: it.order,\n          imageUrl: it.imageUrl || '',\n          imagePath: it.imagePath || '',\n          createdAt: firebase.firestore.FieldValue.serverTimestamp(),\n          updatedAt: firebase.firestore.FieldValue.serverTimestamp()\n        }, { merge:true });\n      }\n      await batch.commit();\n      return true;\n    }catch(e){\n      console.error('seedRoadmapFromDOMIfEmpty:', e);\n      return false;\n    }\n  }\n\n  function attachAdminButtonsToStaticDOM(){\n    const timeline = getTimelineEl();\n    if (!timeline) return;\n    const nodes = Array.from(timeline.querySelectorAll('.timeline-item'));\n    nodes.forEach((n, idx)=>{\n      const rid = n.getAttribute('data-roadmap-id') || `phase_${idx+1}`;\n      n.setAttribute('data-roadmap-id', rid);\n\n      if (!n.querySelector('.admin-only')){\n        const row = document.createElement('div');\n        row.className = 'admin-only';\n        row.style.display = 'none';\n        row.style.justifyContent = 'flex-end';\n        row.style.gap = '10px';\n        row.style.marginTop = '12px';\n        row.innerHTML = `\n          <button class=\"news-btn\" type=\"button\" data-act=\"edit\">✏️ Editeaza</button>\n          <button class=\"news-btn\" type=\"button\" data-act=\"del\">🗑️ Sterge</button>\n        `;\n        n.appendChild(row);\n\n        row.querySelector('[data-act=edit]')?.addEventListener('click', async ()=>{\n          if (!ensureAdminOrWarn()) return;\n          await seedRoadmapFromDOMIfEmpty();\n          await editPhaseFlow(rid, null, n);\n        });\n        row.querySelector('[data-act=del]')?.addEventListener('click', async ()=>{\n          if (!ensureAdminOrWarn()) return;\n          await seedRoadmapFromDOMIfEmpty();\n          await deletePhaseFlow(rid, null, n);\n        });\n      }\n    });\n\n    // toggle\n    document.querySelectorAll('#roadmap .admin-only').forEach(el=>{\n      el.style.display = window.__SBYT_ADMIN ? 'flex' : 'none';\n    });\n  }\n\n  function listenRoadmap(){\n    if (!hasFB()) return;\n    const timeline = getTimelineEl();\n    if (!timeline) return;\n    if (!timeline.__origHtml) timeline.__origHtml = timeline.innerHTML;\n\n    try{\n      if (__roadmapUnsub) { try{ __roadmapUnsub(); }catch(_){} __roadmapUnsub=null; }\n\n      __roadmapUnsub = db().collection(ROADMAP_COLLECTION)\n        .orderBy('order','asc')\n        .onSnapshot((snap)=>{\n          const items = [];\n          snap.forEach(doc=> items.push({ id: doc.id, ...doc.data() }));\n\n          if (!items.length){\n            // Firestore gol: raman fazele din HTML + (cand e admin) atasam butoane si seed la prima actiune\n            timeline.innerHTML = timeline.__origHtml;\n            attachAdminButtonsToStaticDOM();\n            return;\n          }\n\n          renderRoadmap(items);\n        }, (err)=>{\n          console.warn('Roadmap snapshot error:', err);\n          // fara permisiuni -> fallback static + butoane doar daca admin\n          timeline.innerHTML = timeline.__origHtml;\n          attachAdminButtonsToStaticDOM();\n        });\n    }catch(e){\n      console.warn('listenRoadmap:', e);\n      attachAdminButtonsToStaticDOM();\n    }\n  }\n\n  async function addPhaseFlow(){\n    if (!ensureAdminOrWarn()) return;\n    if (!hasFB()) { alert('Firebase nu este incarcat corect.'); return; }\n\n    await seedRoadmapFromDOMIfEmpty();\n\n    const title = (prompt('Titlu faza (ex: Faza 5: Ecosistem)') || '').trim();\n    if (!title) return;\n    const desc = (prompt('Descriere scurta pentru faza:') || '').trim();\n    if (!desc) return;\n    const status = normalizeStatus(prompt('Status: completat | in curs | planificat', 'planificat') || 'planificat');\n    const orderStr = (prompt('Ordine (numar) - ex: 5', '5') || '').trim();\n    const order = Number(orderStr);
+    const orderVal = Number.isFinite(order) ? order : null\n\n    const ref = db().collection(ROADMAP_COLLECTION).doc();\n    const docId = ref.id;\n\n    await ref.set({\n      title,\n      description: desc,\n      status,\n      order: (orderVal !== null ? orderVal : 9999),\n      imageUrl: '',\n      imagePath: '',\n      createdAt: firebase.firestore.FieldValue.serverTimestamp(),\n      updatedAt: firebase.firestore.FieldValue.serverTimestamp()\n    }, { merge:true });\n\n    if (confirm('Vrei sa adaugi o imagine pentru aceasta faza? (optional)')){\n      const up = await uploadOptionalImage(docId);\n      if (up && up.imageUrl){\n        await ref.set({ imageUrl: up.imageUrl, imagePath: up.imagePath || '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });\n      }\n    }\n  }\n\n  async function editPhaseFlow(id, current, domNode){\n    if (!ensureAdminOrWarn()) return;\n\n    // daca avem domNode (static), luam valorile din DOM\n    const curTitle = current?.title || (domNode?.querySelector('.timeline-date')?.textContent || '').trim();\n    const curDesc  = current?.description || (domNode?.querySelector('p')?.textContent || '').trim();\n    const curStatus= normalizeStatus(current?.status || (domNode?.querySelector('.badge')?.textContent || '').trim());\n    const curOrder = current?.order ?? (()=>{\n      const m = String(curTitle||'').match(/Faza\s*(\d+)/i);\n      return m ? Number(m[1]) : undefined;\n    })();\n\n    const title = (prompt('Titlu faza:', curTitle) || '').trim();\n    if (!title) return;\n    const desc  = (prompt('Descriere:', curDesc) || '').trim();\n    if (!desc) return;\n    const status= normalizeStatus(prompt('Status: completat | in curs | planificat', curStatus) || curStatus);\n    const orderStr = (prompt('Ordine (numar):', String(curOrder ?? '')) || '').trim();\n    const order = Number(orderStr);\n\n    const ref = db().collection(ROADMAP_COLLECTION).doc(String(id));\n    await ref.set({\n      title,\n      description: desc,\n      status,\n      order: Number.isFinite(order) ? order : (Number.isFinite(curOrder) ? curOrder : 9999),\n      updatedAt: firebase.firestore.FieldValue.serverTimestamp()\n    }, { merge:true });\n\n    if (confirm('Vrei sa inlocuiesti / adaugi o imagine pentru aceasta faza? (optional)')){\n      try{\n        const snap = await ref.get();\n        const oldPath = snap.exists ? (snap.data()||{}).imagePath || '' : '';\n        if (oldPath) { try{ await storage().ref().child(oldPath).delete(); }catch(e){} }\n      }catch(e){}\n      const up = await uploadOptionalImage(String(id));\n      if (up && up.imageUrl){\n        await ref.set({ imageUrl: up.imageUrl, imagePath: up.imagePath || '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });\n      }\n    }\n  }\n\n  async function deletePhaseFlow(id, imagePath, domNode){\n    if (!ensureAdminOrWarn()) return;\n    if (!confirm('Sigur vrei sa stergi aceasta faza?')) return;\n\n    try{\n      const ref = db().collection(ROADMAP_COLLECTION).doc(String(id));\n      // incearca sa stearga imaginea daca exista\n      try{\n        const snap = await ref.get();\n        const p = (snap.exists ? (snap.data()||{}).imagePath : '') || imagePath || '';\n        if (p) { try{ await storage().ref().child(p).delete(); }catch(e){} }\n      }catch(e){}\n\n      await ref.delete();\n\n      // daca era doar static si nu exista doc, sterge din DOM\n      if (domNode && domNode.parentNode){ domNode.parentNode.removeChild(domNode); }\n    }catch(e){\n      console.error('deletePhaseFlow:', e);\n      alert('Eroare la stergere (verifica Firestore Rules/Auth).');\n    }\n  }\n\nfunction renderRoadmap(items){
     const timeline = getTimelineEl();
     if (!timeline) return;
 
@@ -1958,8 +1821,8 @@ async function addPhaseFlow(){
       const adminRow = wrap.querySelector('.admin-only');
       const editBtn = wrap.querySelector('button[data-act="edit"]');
       const delBtn  = wrap.querySelector('button[data-act="del"]');
-      if (editBtn) editBtn.addEventListener('click', ()=> editPhaseFlow(it.id, it));
-      if (delBtn)  delBtn.addEventListener('click',  ()=> deletePhaseFlow(it.id, it.imagePath || null));
+      if (editBtn) editBtn.addEventListener('click', ()=> editPhaseFlow(it.id, it, null));
+      if (delBtn)  delBtn.addEventListener('click',  ()=> deletePhaseFlow(it.id, it.imagePath || null, null));
 
       timeline.appendChild(wrap);
     });
@@ -1968,32 +1831,6 @@ async function addPhaseFlow(){
     document.querySelectorAll('#roadmap .admin-only').forEach(el=>{
       el.style.display = window.__SBYT_ADMIN ? 'flex' : 'none';
     });
-  }
-
-  function listenRoadmap(){
-    if (!hasFB()) return;
-    const timeline = getTimelineEl();
-    if (!timeline) return;
-
-    try{
-      db().collection(ROADMAP_DOC_COLLECTION).doc(ROADMAP_DOC_ID)
-        .onSnapshot((snap)=>{
-          if (!snap.exists){
-            renderRoadmap(null);
-            return;
-          }
-          const data = snap.data() || {};
-          const items = Array.isArray(data.items) ? data.items : [];
-          renderRoadmap(sortRoadmapItems(items));
-        }, (err)=>{
-          console.warn('Roadmap snapshot error:', err);
-          // daca nu avem permisiuni de read, pastram fallback-ul static
-          renderRoadmap(null);
-        });
-    }catch(e){
-      console.warn('listenRoadmap:', e);
-      renderRoadmap(null);
-    }
   }
 
   // ---------- Init ----------
