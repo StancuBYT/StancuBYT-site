@@ -1176,6 +1176,25 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+  // Firebase init (must run before any firebase.auth()/firestore/storage usage)
+  window.firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+    messagingSenderId: "263244200492",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+    measurementId: "G-272S9HSY3K"
+  };
+  try {
+    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  } catch (e) {
+    console.warn("Firebase init warning:", e);
+  }
+</script>
 </head>
 
 <body>
@@ -1558,7 +1577,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
         }
 
         // Pentru butoanele existente în HTML (care apelează requestPassword)
-        function requestPassword(action, id) {
+        async function requestPassword(action, id) {
             // păstrăm compatibilitatea cu HTML-ul existent
             if (action === 'add') return addNews();
             if (action === 'clear') return clearNews();
@@ -1582,13 +1601,13 @@ async function etherscanProxyRequest(module, action, params = {}) {
             localStorage.setItem(LS_PROMOS, JSON.stringify(arr));
         }
 
-        function showPromoForm() {
+        async function showPromoForm() {
             if (!verifyPassword()) return;
             const f = $('promoForm');
             if (f) f.style.display = 'block';
         }
 
-        function cancelPromo() {
+        async function cancelPromo() {
             const f = $('promoForm');
             if (f) f.style.display = 'none';
             if ($('promoTitle')) $('promoTitle').value = '';
@@ -1779,12 +1798,12 @@ async function etherscanProxyRequest(module, action, params = {}) {
         // =============================================
         // ETHERSCAN – DATE REALE (fără endpoint-uri inexistente)
         // =============================================
-        function setText(id, value) {
+        async function setText(id, value) {
             const el = document.getElementById(id);
             if (el) el.textContent = value;
         }
 
-        function setStatusHtml(htmlStr) {
+        async function setStatusHtml(htmlStr) {
             const el = $('serverStatus');
             if (el) el.innerHTML = htmlStr;
         }
@@ -2111,7 +2130,7 @@ async function fetchDexScreenerBestPair() {
         }
 
         
-        function startPriceAutoUpdate() {
+        async function startPriceAutoUpdate() {
             // rulează imediat și apoi la fiecare 10s
             updateLivePriceAndChart('live');
             if (window.__stancu_priceInterval) clearInterval(window.__stancu_priceInterval);
@@ -2176,7 +2195,7 @@ async function updateLivePriceAndChart(period = 'live') {
 
         // Butoane tip grafic (lumânări/linie). În varianta B folosim linie (live).
         // Dacă se apasă "Lumânări", nu crăpăm site-ul: rămânem pe linie.
-        function changeChartType(type) {
+        async function changeChartType(type) {
             // compatibilitate cu UI existent
             if (!type) return;
             // În această implementare simplă rămânem pe line chart (Chart.js standard)
@@ -2392,7 +2411,7 @@ function _escapeHtml(str) {
   }[s]));
 }
 
-function _badgeForType(type) {
+async function _badgeForType(type) {
   const t = String(type||'update');
   if (t === 'announcement') return { cls:'badge-announcement', txt:'Anunt Important' };
   if (t === 'event') return { cls:'badge-event', txt:'Eveniment' };
@@ -2544,7 +2563,7 @@ async function clearNews() {
 let __promosUnsub = null;
 let __leaderUnsub = null;
 
-function showPromoForm() {
+async function showPromoForm() {
   ensureAdminAuth().then(ok => {
     if (!ok) return;
     const f = document.getElementById('promoForm');
@@ -2552,7 +2571,7 @@ function showPromoForm() {
   });
 }
 
-function cancelPromo() {
+async function cancelPromo() {
   const f = document.getElementById('promoForm');
   if (f) f.style.display = 'none';
   ['promoTitle','promoPrize','promoDesc','promoEnds','promoPoints'].forEach(id => {
@@ -2632,7 +2651,7 @@ async function deletePromo(promoId) {
   }
 }
 
-function listenPromos() {
+async function listenPromos() {
   const list = document.getElementById('promoList');
   if (!list || !db) return;
 
@@ -2698,7 +2717,7 @@ function openPromo(promoId) {
   listenLeaderboard(promoId);
 }
 
-function _genParticipantId() {
+async function _genParticipantId() {
   // STBYT-XXXXXX
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let s = 'STBYT-';
@@ -2803,7 +2822,7 @@ function listenLeaderboard(promoId) {
 }
 
 // requestPassword mapping (keep existing buttons)
-function requestPassword(action, id) {
+async function requestPassword(action, id) {
   if (action === 'add') {
     // show existing form
     if (typeof addNews === 'function') addNews();
@@ -3099,7 +3118,7 @@ window.addEventListener('load', () => {
   // ---------- Echipa (Firestore) ----------
   let __teamUnsub = null;
 
-  function showTeamForm(){
+  async function showTeamForm(){
     const f = $('teamForm');
     if (f) f.style.display='block';
   }
@@ -3188,7 +3207,7 @@ window.addEventListener('load', () => {
     });
   }
 
-  function listenTeam(){
+  async function listenTeam(){
     if (!db) return;
     if (__teamUnsub) { try{__teamUnsub();}catch(e){} __teamUnsub=null; }
     __teamUnsub = db.collection('team').orderBy('createdAt','desc').limit(50).onSnapshot(snap=>{
@@ -3254,7 +3273,7 @@ window.addEventListener('load', () => {
   // (3) render promos with registration + email + code
   let __promosUnsub = null;
 
-  function _randCode(){
+  async function _randCode(){
     const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let s='';
     for(let i=0;i<10;i++) s += a[Math.floor(Math.random()*a.length)];
@@ -3389,7 +3408,7 @@ window.addEventListener('load', () => {
     }
   };
 
-  function listenPromos(){
+  async function listenPromos(){
     if (!db) return;
     if (__promosUnsub) { try{__promosUnsub();}catch(e){} __promosUnsub=null; }
     __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(async snap=>{
@@ -4026,13 +4045,13 @@ window.addEventListener('load', () => {
     const end = new Date(endDate + 'T23:59:59');
     return new Date() > end;
   }
-  function uidSafe(){ try{ return firebase?.auth()?.currentUser?.uid || null; }catch(e){ return null; } }
+  async function uidSafe(){ try{ return firebase?.auth()?.currentUser?.uid || null; }catch(e){ return null; } }
 
   // ---------- Firebase presence ----------
-  function hasFirestore(){
+  async function hasFirestore(){
     try{ return typeof firebase !== 'undefined' && !!firebase.firestore; }catch(e){ return false; }
   }
-  function db(){ return firebase.firestore(); }
+  async function db(){ return firebase.firestore(); }
 
   // ---------- Etherscan LIVE ----------
   // IMPORTANT: set your key (optional) in localStorage 'SBYT_ETHERSCAN_KEY' or edit below.
@@ -4043,7 +4062,7 @@ window.addEventListener('load', () => {
     if (!r.ok) throw new Error('Etherscan HTTP ' + r.status);
     return await r.json();
   }
-  function formatTokensFromWei(weiStr, decimals=18){
+  async function formatTokensFromWei(weiStr, decimals=18){
     try{
       const s = String(weiStr || '0');
       // simple big int formatting without floating errors
@@ -4823,7 +4842,7 @@ service cloud.firestore {
   };
 
   // ===== PROMOS (collection promos) =====
-  function promoGetVal(...ids){
+  async function promoGetVal(...ids){
     for(const id of ids){
       const el=$(id);
       if(el && typeof el.value!=="undefined") return (el.value||"").trim();
@@ -4914,7 +4933,7 @@ service cloud.firestore {
     });
   }
 
-  function listenPromos(){
+  async function listenPromos(){
     const db = fs(); if(!db) return;
     db.collection("promos").orderBy("createdAt","desc").limit(50).onSnapshot(snap=>{
       const items=[];
@@ -4960,7 +4979,7 @@ service cloud.firestore {
 
   // ETH price + simple chart
   let ethPriceHistory = [];
-  function pushEthPrice(point){
+  async function pushEthPrice(point){
     ethPriceHistory.push(point);
     if(ethPriceHistory.length>60) ethPriceHistory.shift();
     // update DOM
