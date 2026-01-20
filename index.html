@@ -6,161 +6,219 @@
   <title>StancuBYT | Contact</title>
 
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0a0a1f;
-      color: #ffffff;
+    :root{
+      --blue:#0066ff;
+      --cyan:#00ffff;
+      --green:#00ff88;
+      --purple:#8a2be2;
+      --bg:#0a0a1f;
     }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 40px 20px;
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+
+    body{
+      background:var(--bg);
+      color:#fff;
     }
 
-    h1 {
-      text-align: center;
-      background: linear-gradient(45deg, #0066ff, #00ffff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .container{
+      max-width:1200px;
+      margin:auto;
+      padding:40px 20px;
     }
 
-    .box {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(0,255,255,0.15);
-      border-radius: 16px;
-      padding: 24px;
-      margin-top: 30px;
+    h1,h2,h3{
+      background:linear-gradient(45deg,var(--blue),var(--cyan));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
     }
 
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 16px;
+    .section{
+      margin-top:50px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(0,255,255,0.15);
+      border-radius:16px;
+      padding:24px;
     }
 
-    input, textarea, select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(0,0,0,0.4);
-      color: #fff;
-      margin-top: 6px;
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:24px;
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 120px;
+    label{display:block;margin-top:14px;font-weight:bold;}
+
+    input,textarea,select{
+      width:100%;
+      margin-top:6px;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.15);
+      background:rgba(0,0,0,0.4);
+      color:#fff;
     }
 
-    button {
-      width: 100%;
-      margin-top: 24px;
-      padding: 14px;
-      font-weight: bold;
-      font-size: 16px;
-      border-radius: 14px;
-      border: none;
-      cursor: pointer;
-      background: linear-gradient(45deg, #00ff88, #00ffff);
-      color: #041014;
+    textarea{min-height:120px;}
+
+    button{
+      width:100%;
+      margin-top:20px;
+      padding:14px;
+      border:none;
+      border-radius:14px;
+      font-weight:bold;
+      cursor:pointer;
+      background:linear-gradient(45deg,var(--green),var(--cyan));
+      color:#041014;
     }
 
-    button:hover {
-      opacity: 0.9;
+    .card{
+      background:rgba(0,0,0,0.25);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:14px;
+      padding:16px;
+      margin-top:14px;
     }
 
-    .status {
-      margin-top: 20px;
-      padding: 14px;
-      border-radius: 12px;
-      text-align: center;
+    .social a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:10px;
+      text-decoration:none;
+      color:#fff;
     }
 
-    .success {
-      background: rgba(0,255,136,0.15);
-      border: 1px solid rgba(0,255,136,0.3);
-      color: #00ff88;
+    .time{
+      text-align:center;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(0,0,0,0.25);
+      border:1px solid rgba(255,255,255,0.12);
     }
 
-    .error {
-      background: rgba(255,77,77,0.15);
-      border: 1px solid rgba(255,77,77,0.3);
-      color: #ff4d4d;
+    .status{
+      margin-top:20px;
+      padding:14px;
+      border-radius:12px;
+      text-align:center;
     }
 
-    /* Honeypot */
-    .hp {
-      position: absolute;
-      left: -9999px;
-      top: -9999px;
+    .success{
+      background:rgba(0,255,136,0.15);
+      border:1px solid rgba(0,255,136,0.3);
+      color:var(--green);
     }
+
+    /* honeypot */
+    .hp{display:none;}
   </style>
 </head>
 
 <body>
   <div class="container">
+
     <h1>Centru de Contact Tehnic</h1>
+    <p style="opacity:0.8;margin-top:8px;">
+      Contact direct pentru suport, colaborări și parteneriate StancuBYT
+    </p>
 
-    <div class="box">
+    <div class="section grid">
 
-      <form action="https://formspree.io/f/mjggyzno" method="POST">
+      <!-- FORMULAR -->
+      <div>
+        <h2>📨 Mesaj rapid</h2>
 
-        <!-- Honeypot anti-spam -->
-        <div class="hp">
-          <label>Company</label>
-          <input type="text" name="company">
+        <form action="https://formspree.io/f/mjggyzno" method="POST">
+          <div class="hp">
+            <input type="text" name="company">
+          </div>
+
+          <input type="hidden" name="_next" value="?sent=1">
+          <input type="hidden" name="_subject" value="StancuBYT | Mesaj nou">
+
+          <label>Nume *</label>
+          <input type="text" name="name" required>
+
+          <label>Email *</label>
+          <input type="email" name="email" required>
+
+          <label>Tip solicitare *</label>
+          <select name="type" required>
+            <option value="technical">Suport tehnic</option>
+            <option value="partnership">Parteneriat</option>
+            <option value="listing">Listing</option>
+            <option value="investment">Investiții</option>
+            <option value="media">Media</option>
+            <option value="security">Securitate</option>
+          </select>
+
+          <label>Mesaj *</label>
+          <textarea name="message" required></textarea>
+
+          <label style="margin-top:14px;">
+            <input type="checkbox" required>
+            Sunt de acord cu
+            <a href="https://stancubyt.com/privacy" target="_blank" style="color:var(--cyan);">
+              politica de confidențialitate
+            </a>
+          </label>
+
+          <button type="submit">Trimite mesaj</button>
+        </form>
+
+        <div id="status"></div>
+      </div>
+
+      <!-- INFO CONTACT -->
+      <div>
+        <h2>📍 Informații contact</h2>
+
+        <div class="card">
+          <strong>Stancu Marian</strong><br>
+          Fondator & CEO<br><br>
+          📧 <a href="mailto:contact@stancubyt.com" style="color:var(--cyan);">contact@stancubyt.com</a>
         </div>
 
-        <!-- Redirect dupa trimitere -->
-        <input type="hidden" name="_next" value="?sent=1">
+        <div class="card">
+          🤝 <strong>Parteneriate</strong><br>
+          📧 <a href="mailto:partnerships@stancubyt.com" style="color:var(--cyan);">partnerships@stancubyt.com</a>
+        </div>
 
-        <!-- Subiect email -->
-        <input type="hidden" name="_subject" value="StancuBYT | Mesaj nou">
-
-        <label>Nume complet *</label>
-        <input type="text" name="name" required>
-
-        <label>Email *</label>
-        <input type="email" name="email" required>
-
-        <label>Tip solicitare *</label>
-        <select name="type" required>
-          <option value="technical">Suport Tehnic</option>
-          <option value="partnership">Parteneriat</option>
-          <option value="listing">Listing</option>
-          <option value="investment">Investitii</option>
-          <option value="media">Media</option>
-          <option value="security">Securitate</option>
-          <option value="other">Altceva</option>
-        </select>
-
-        <label>Mesaj *</label>
-        <textarea name="message" required></textarea>
-
-        <label style="margin-top:20px;">
-          <input type="checkbox" required>
-          Sunt de acord cu prelucrarea datelor conform
-          <a href="https://stancubyt.com/privacy" target="_blank" style="color:#00ffff;">Politicii de confidențialitate</a>
-        </label>
-
-        <button type="submit">Trimite mesajul</button>
-      </form>
-
-      <!-- Mesaj dupa redirect -->
-      <div id="status"></div>
+        <div class="card">
+          🛡️ <strong>Securitate</strong><br>
+          📧 <a href="mailto:security@stancubyt.com" style="color:var(--cyan);">security@stancubyt.com</a>
+        </div>
+      </div>
 
     </div>
+
+    <!-- SOCIAL -->
+    <div class="section social">
+      <h2>🌐 Rețele oficiale</h2>
+      <a href="https://twitter.com/StancuBYT" target="_blank">🐦 Twitter @StancuBYT</a>
+      <a href="https://t.me/StancuBYT_Official" target="_blank">📢 Telegram oficial</a>
+      <a href="https://github.com/StancuBYT" target="_blank">💻 GitHub</a>
+      <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank">👔 LinkedIn</a>
+    </div>
+
+    <!-- TIMPI -->
+    <div class="section grid">
+      <div class="time">📧 Email<br><strong>24h</strong></div>
+      <div class="time">💬 Telegram<br><strong>2–4h</strong></div>
+      <div class="time">🐦 Twitter<br><strong>6–12h</strong></div>
+      <div class="time">🛡️ Security<br><strong>12h</strong></div>
+    </div>
+
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("sent") === "1") {
-      const box = document.getElementById("status");
-      box.className = "status success";
-      box.textContent = "✅ Mesajul a fost trimis cu succes. Verifica inboxul si spam.";
+    const p = new URLSearchParams(window.location.search);
+    if (p.get("sent") === "1") {
+      const s = document.getElementById("status");
+      s.className = "status success";
+      s.textContent = "✅ Mesaj trimis cu succes. Verifică inboxul și Spam.";
     }
   </script>
 </body>
