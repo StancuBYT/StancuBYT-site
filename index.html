@@ -1244,38 +1244,105 @@
 
         <div class="data-visualization neon-glow">
             <h3>📌 Promoții / Giveaway-uri</h3>
+            <div class="admin-only" style="margin-top:12px; display:none; gap:10px; flex-wrap:wrap;">
+              <button class="news-btn" style="min-width:220px;" onclick="openCampaignForm('promo')">➕ Adaugă promoție</button>
+              <button class="news-btn trophy-btn" style="min-width:220px;" onclick="openCampaignForm('giveaway')">🎁 Adaugă concurs / giveaway</button>
+            </div>
             <div id="promoList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
 
             <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
-    <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
-
-    <div class="form-row">
-        <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT)" maxlength="120">
-        <input type="datetime-local" id="promoEnds" placeholder="Data si ora expirarii">
+    <h3 style="margin-bottom: 0.75rem; color: var(--neon-cyan);">Creează promoție / concurs</h3>
+    <div style="opacity:0.8; margin-bottom:1rem; line-height:1.4;">
+      Tip: alege <strong>promoție</strong> pentru campanii de marketing (bonusuri, reduceri, airdrop) sau <strong>concurs/giveaway</strong> pentru competiții cu clasament.
     </div>
 
     <div class="form-row">
-        <input type="text" id="promoPrize" placeholder="Premiu (ex: 5000 SBYT + bonusuri)" maxlength="160">
+        <select id="promoKind" style="width:100%;">
+          <option value="promo">📣 Promoție</option>
+          <option value="giveaway">🎁 Concurs / Giveaway</option>
+        </select>
+        <input type="datetime-local" id="promoEnds" placeholder="Data și ora expirării">
+    </div>
+
+    <div class="form-row">
+        <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT — 7 zile + premii)" maxlength="120">
         <input type="number" id="promoPoints" min="1" step="1" value="10" placeholder="Puncte / promovare">
     </div>
 
     <div class="form-row">
-        <textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
+        <textarea id="promoHook" placeholder="Hook / mesaj scurt (max 1-2 fraze) — folosit pe card + social (ex: Intră în top 5 și câștigă bonusuri!)" rows="2" style="width:100%;"></textarea>
     </div>
 
     <div class="form-row">
+        <textarea id="promoDesc" placeholder="Descriere scurtă (ce primește participantul, de ce merită, ce se întâmplă la final)" rows="4" style="width:100%;"></textarea>
+    </div>
+
+    <!-- Vizual (psihologie: impact imediat) -->
+    <div style="margin-top:10px; font-weight:800;">🎨 Vizual</div>
+    <div style="opacity:0.75; font-size:0.9rem; margin:6px 0 10px;">
+      Recomandare: folosește un <strong>banner</strong> + 1-3 imagini de fundal (creează „vibe” și crește rata de înscriere).
+    </div>
+    <div class="form-row">
+        <input type="file" id="promoBanner" accept="image/*">
+        <input type="file" id="promoBg" accept="image/*" multiple>
+    </div>
+
+    <!-- Premii (psihologie: distribuție + surpriză) -->
+    <div style="margin-top:12px; font-weight:800;">🏆 Premii & distribuție</div>
+    <div class="form-row">
+        <input type="text" id="prize1" placeholder="Premiul I (ex: 10.000 SBYT + NFT Special)" maxlength="180">
+        <input type="text" id="prize2" placeholder="Premiul II (ex: 5.000 SBYT)" maxlength="180">
+    </div>
+    <div class="form-row">
+        <input type="text" id="prize3" placeholder="Premiul III (ex: 2.500 SBYT)" maxlength="180">
+        <input type="text" id="prizeTop5" placeholder="Primele 5 locuri după premii (ex: 500 SBYT fiecare)" maxlength="180">
+    </div>
+    <div class="form-row">
+        <input type="text" id="prizeNext10" placeholder="Următoarele 10 locuri (ex: 200 SBYT fiecare)" maxlength="180">
+        <input type="text" id="prizeLucky" placeholder="Bonus surpriză (ex: 3 câștigători aleși random)" maxlength="180">
+    </div>
+
+    <!-- Mecanică (gamification) -->
+    <div style="margin-top:12px; font-weight:800;">🎮 Mecanică & marketing</div>
+    <div class="form-row">
+        <textarea id="promoHowTo" placeholder="Cum participi (pași clari, 3-6 bullet-uri). Ex:
+1) Completează nume + email + wallet
+2) Distribuie postarea (opțional)
+3) Revino zilnic pentru puncte bonus
+4) La final anunțăm câștigătorii" rows="5" style="width:100%;"></textarea>
+    </div>
+    <div class="form-row">
+        <input type="text" id="promoCTA" placeholder="Call-to-action (ex: Înscrie-te acum — locurile se ocupă rapid!)" maxlength="160">
+        <input type="number" id="promoMax" min="0" step="1" value="0" placeholder="Limită participanți (0 = nelimitat)">
+    </div>
+
+    <!-- Regulament -->
+    <div style="margin-top:12px; font-weight:800;">📜 Regulament & condiții</div>
+    <div class="form-row">
+        <textarea id="promoRules" placeholder="Regulament (criterii, perioadă, eligibilitate, cum se calculează clasamentul, anunțarea câștigătorilor)" rows="6" style="width:100%;"></textarea>
+    </div>
+    <div class="form-row">
+        <textarea id="promoTerms" placeholder="Condiții (ex: un singur cont per persoană, date corecte, wallet valid, fără spam/fraudă, drept de anulare în caz de abuz etc.)" rows="5" style="width:100%;"></textarea>
+    </div>
+
+    <!-- Media extra (opțional) -->
+    <div style="margin-top:12px; font-weight:800;">📎 Media extra (opțional)</div>
+    <div class="form-row">
         <input type="file" id="promoMedia" accept="image/*,video/*">
+        <input type="text" id="promoLink" placeholder="Link (opțional: postare, Telegram, X, site)" maxlength="240">
     </div>
 
-    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
-        <button class="news-btn" onclick="savePromo()">💾 Salveaza</button>
-        <button class="news-btn" onclick="cancelPromo()">❌ Anuleaza</button>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 1rem;">
+        <button class="news-btn" onclick="savePromo()">✅ Salvează</button>
+        <button class="news-btn" onclick="cancelPromo()">❌ Anulează</button>
     </div>
 
-    <small style="display:block; margin-top:0.8rem; opacity:0.75;">
-        Media (foto/video) se incarca in Firebase Storage (doar admin). Participantii se inscriu public, cu ID automat.
+    <small style="display:block; margin-top:0.8rem; opacity:0.75; line-height:1.4;">
+        Sugestii rapide: <strong>urgență</strong> (deadline clar), <strong>recompense în trepte</strong> (nu doar 1 câștigător), <strong>bonus surpriză</strong> (random), și <strong>pași simpli</strong> (max 30 secunde înscriere).
     </small>
 </div>
+
+        </div>
         </div>
 
         <div class="data-visualization neon-glow">
@@ -1583,7 +1650,8 @@ async function etherscanProxyRequest(module, action, params = {}) {
             if (action === 'clear') return clearNews();
 
             // Giveaway / promo
-            if (action === 'promoAdd') return showPromoForm();
+            if (action === 'promoAdd') return openCampaignForm('promo');
+            if (action === 'giveawayAdd') return openCampaignForm('giveaway');
             if (action === 'promoClear') return clearPromos();
 
             // fallback
@@ -1601,7 +1669,18 @@ async function etherscanProxyRequest(module, action, params = {}) {
             localStorage.setItem(LS_PROMOS, JSON.stringify(arr));
         }
 
-        async function showPromoForm() {
+        
+        function openCampaignForm(kind){
+            if (!verifyPassword()) return;
+            const f = $('promoForm');
+            if (f) f.style.display = 'block';
+            const sel = document.getElementById('promoKind');
+            if (sel) sel.value = (kind === 'giveaway') ? 'giveaway' : 'promo';
+            // scroll into view
+            setTimeout(()=>f?.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+        }
+
+async function showPromoForm() {
             if (!verifyPassword()) return;
             const f = $('promoForm');
             if (f) f.style.display = 'block';
@@ -2596,16 +2675,38 @@ async function savePromo() {
   const ok = await ensureAdminAuth();
   if (!ok) return;
 
+  const kind = (document.getElementById('promoKind')?.value || 'promo').trim();
   const title = (document.getElementById('promoTitle')?.value || '').trim();
-  const prize = (document.getElementById('promoPrize')?.value || '').trim();
+  const hook = (document.getElementById('promoHook')?.value || '').trim();
   const desc = (document.getElementById('promoDesc')?.value || '').trim();
+  const howTo = (document.getElementById('promoHowTo')?.value || '').trim();
+  const cta = (document.getElementById('promoCTA')?.value || '').trim();
+  const link = (document.getElementById('promoLink')?.value || '').trim();
+  const rules = (document.getElementById('promoRules')?.value || '').trim();
+  const terms = (document.getElementById('promoTerms')?.value || '').trim();
   const ends = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
   const points = parseInt(document.getElementById('promoPoints')?.value || '10', 10) || 10;
+  const maxParticipants = parseInt(document.getElementById('promoMax')?.value || '0', 10) || 0;
+
+  const prizes = {
+    first: (document.getElementById('prize1')?.value || '').trim() || null,
+    second: (document.getElementById('prize2')?.value || '').trim() || null,
+    third: (document.getElementById('prize3')?.value || '').trim() || null,
+    top5: (document.getElementById('prizeTop5')?.value || '').trim() || null,
+    next10: (document.getElementById('prizeNext10')?.value || '').trim() || null,
+    lucky: (document.getElementById('prizeLucky')?.value || '').trim() || null,
+  };
+
   const file = document.getElementById('promoMedia')?.files?.[0] || null;
+  const bannerFile = document.getElementById('promoBanner')?.files?.[0] || null;
+  const bgFiles = Array.from(document.getElementById('promoBg')?.files || []);
 
   if (!title || !ends || !desc) {
-    alert('Completeaza titlul, data de final si descrierea.');
+    alert('Completează titlul, data de final și descrierea.');
     return;
+  }
+  if (!howTo) {
+    // nu e obligatoriu, dar recomandat
   }
 
   const endsAt = new Date(ends).getTime();
@@ -2616,19 +2717,43 @@ async function savePromo() {
 
   try {
     const ref = await db.collection('promos').add({
+      kind: (kind === 'giveaway') ? 'giveaway' : 'promo',
       title,
-      prize: prize || null,
+      hook: hook || null,
       desc,
+      howTo: howTo || null,
+      cta: cta || null,
+      link: link || null,
+      rules: rules || null,
+      terms: terms || null,
+      prizes,
       endsAt,
+      maxParticipants: maxParticipants || 0,
       pointsPerPromotion: points,
       createdAt: Date.now(),
       status: 'active',
-      media: null
+      media: null,
+      banner: null,
+      bg: []
     });
 
     if (file) {
       const media = await uploadPromoMedia(ref.id, file);
       if (media) await ref.update({ media });
+    }
+    if (bannerFile) {
+      const banner = await uploadPromoMedia(ref.id, bannerFile);
+      if (banner) await ref.update({ banner });
+    }
+    if (bgFiles && bgFiles.length) {
+      const bgArr = [];
+      for (const f of bgFiles.slice(0, 6)) { // max 6 imagini
+        try {
+          const x = await uploadPromoMedia(ref.id, f);
+          if (x) bgArr.push(x);
+        } catch(e) {}
+      }
+      if (bgArr.length) await ref.update({ bg: bgArr });
     }
 
     cancelPromo();
@@ -2829,7 +2954,8 @@ async function requestPassword(action, id) {
     return;
   }
   if (action === 'clear') return clearNews();
-  if (action === 'promoAdd') return showPromoForm();
+  if (action === 'promoAdd') return openCampaignForm('promo');
+            if (action === 'giveawayAdd') return openCampaignForm('giveaway');
   if (action === 'promoClear') {
     // clear promos needs admin
     ensureAdminAuth().then(async ok => {
@@ -3358,13 +3484,42 @@ window.addEventListener('load', () => {
         : `<div style="margin-top:10px; opacity:0.8;">Niciun participant încă.</div>`;
 
       card.innerHTML = `
+        ${(p.banner && p.banner.url) || (p.bg && p.bg.length && p.bg[0].url)
+          ? `<div style="height:140px; border-radius:14px; overflow:hidden; margin-bottom:10px; background:rgba(255,255,255,0.04); position:relative;">
+               <div style="position:absolute; inset:0; background-image:url('${_escape(((p.banner&&p.banner.url) || (p.bg&&p.bg.length&&p.bg[0].url))||'')}'); background-size:cover; background-position:center;"></div>
+               <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.75));"></div>
+               <div style="position:absolute; left:12px; right:12px; bottom:10px; display:flex; align-items:flex-end; justify-content:space-between; gap:10px;">
+                 <div style="font-weight:900; font-size:1.05rem; color:#fff; text-shadow:0 2px 18px rgba(0,0,0,0.6);">${_escape(p.hook||'')}</div>
+                 ${p.cta ? `<div style="padding:6px 10px; border-radius:999px; background:rgba(0,255,255,0.15); border:1px solid rgba(0,255,255,0.35); font-weight:800; color:#fff; white-space:nowrap;">${_escape(p.cta)}</div>`:''}
+               </div>
+             </div>`
+          : (p.hook ? `<div style="opacity:0.85; margin-bottom:10px; font-weight:800;">${_escape(p.hook)}</div>`:'')}
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
           <div style="font-weight:800; color:#fff;">${_escape(p.title||'')}</div>
           <div style="padding:6px 10px; border-radius:999px; background:rgba(0,255,136,0.12); border:1px solid rgba(0,255,136,0.25); font-size:0.85rem;">${badge}</div>
         </div>
         <div style="opacity:0.85; margin-top:6px;">⏳ Expiră: <strong>${_escape(endsStr)}</strong></div>
-        ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${_escape(p.prize)}</strong></div>`:''}
+        ${(p.prizes && (p.prizes.first||p.prizes.second||p.prizes.third||p.prizes.top5||p.prizes.next10||p.prizes.lucky)) || p.prize
+          ? `<div style="margin-top:8px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">
+               <div style="font-weight:900; margin-bottom:6px;">🏆 Premii</div>
+               <div style="display:grid; gap:4px; opacity:0.92; line-height:1.35;">
+                 ${(p.prizes && p.prizes.first) ? `🥇 Premiul I: <strong>${_escape(p.prizes.first)}</strong>` : (p.prize ? `🎁 Premiu: <strong>${_escape(p.prize)}</strong>`:'')}
+                 ${(p.prizes && p.prizes.second) ? `<span>🥈 Premiul II: <strong>${_escape(p.prizes.second)}</strong></span>`:''}
+                 ${(p.prizes && p.prizes.third) ? `<span>🥉 Premiul III: <strong>${_escape(p.prizes.third)}</strong></span>`:''}
+                 ${(p.prizes && p.prizes.top5) ? `<span>⭐ Top 5 după premii: <strong>${_escape(p.prizes.top5)}</strong></span>`:''}
+                 ${(p.prizes && p.prizes.next10) ? `<span>🔥 Următoarele 10 locuri: <strong>${_escape(p.prizes.next10)}</strong></span>`:''}
+                 ${(p.prizes && p.prizes.lucky) ? `<span>🎲 Bonus surpriză: <strong>${_escape(p.prizes.lucky)}</strong></span>`:''}
+               </div>
+             </div>` : ''}
         <div style="opacity:0.92; margin-top:10px; line-height:1.5;">${_escape(p.desc||'')}</div>
+        ${(p.howTo||p.rules||p.terms||p.link) ? `
+          <details style="margin-top:10px; border-radius:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:10px 12px;">
+            <summary style="cursor:pointer; font-weight:900; opacity:0.95;">📌 Detalii & regulament</summary>
+            ${p.howTo ? `<div style="margin-top:10px;"><div style="font-weight:800; margin-bottom:4px;">Cum participi</div><div style="opacity:0.9; white-space:pre-wrap; line-height:1.45;">${_escape(p.howTo)}</div></div>`:''}
+            ${p.rules ? `<div style="margin-top:10px;"><div style="font-weight:800; margin-bottom:4px;">Regulament</div><div style="opacity:0.9; white-space:pre-wrap; line-height:1.45;">${_escape(p.rules)}</div></div>`:''}
+            ${p.terms ? `<div style="margin-top:10px;"><div style="font-weight:800; margin-bottom:4px;">Condiții</div><div style="opacity:0.9; white-space:pre-wrap; line-height:1.45;">${_escape(p.terms)}</div></div>`:''}
+            ${p.link ? `<div style="margin-top:10px;"><a href="${_escape(p.link)}" target="_blank" rel="noopener" style="color:var(--neon-cyan); font-weight:800;">🔗 Link</a></div>`:''}
+          </details>` : ''}
 
         <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
           <div style="font-weight:700; margin-bottom:8px;">Înscriere</div>
