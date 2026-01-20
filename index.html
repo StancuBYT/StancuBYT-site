@@ -5072,9 +5072,20 @@ service cloud.firestore {
       alert("Completeaza minim Titlu si Data expirarii.");
       return;
     }
-    const endsAt = parseDateInput(ends);
-    if(!endsAt || Number.isNaN(endsAt)){
-      alert("Data expirarii nu este valida.");
+    // --- robust end date parsing (datetime-local / text) ---
+    let endsAt = NaN;
+    const endsEl = document.getElementById("promoEnds") || document.getElementById("promoEndDate") || document.getElementById("promoEndDateTime");
+    if(endsEl){
+      // Some browsers expose valueAsNumber for date/time inputs; use it if valid
+      if(Number.isFinite(endsEl.valueAsNumber) && endsEl.valueAsNumber>0) endsAt = endsEl.valueAsNumber;
+      // Fallback to string parsing
+      if(!Number.isFinite(endsAt)) endsAt = parseDateInput((endsEl.value||"").trim());
+    } else {
+      endsAt = parseDateInput(ends);
+    }
+    if(!Number.isFinite(endsAt)){
+      alert("Data expirarii nu este valida. Foloseste formatul YYYY-MM-DD sau YYYY-MM-DDTHH:MM.");
+
       return;
     }
 
