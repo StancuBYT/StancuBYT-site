@@ -6,7 +6,6 @@
   <title>StancuBYT | Contact</title>
 
   <style>
-        /* Variabile culori conform psihologiei marketingului */
         :root {
             --blue-tech: #0066ff;
             --green-growth: #00ff88;
@@ -34,7 +33,6 @@
                 radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
         }
 
-        /* Particle Animation Background */
         #particles-js {
             position: fixed;
             width: 100%;
@@ -42,48 +40,12 @@
             z-index: -1;
         }
 
-        /* Logo Background pentru Hero Section */
-        .hero-logo-bg {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-            opacity: 0.12;
-        }
-        .logo-3d-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: min(600px, 80vw);
-            height: min(600px, 80vw);
-            animation: rotate3d 20s linear infinite;
-            filter: drop-shadow(0 0 50px rgba(0, 255, 136, 0.3));
-        }
-        .logo-3d-bg img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 50%;
-        }
-        @keyframes rotate3d {
-            0% { transform: translate(-50%, -50%) rotateY(0deg) rotateX(0deg); }
-            25% { transform: translate(-50%, -50%) rotateY(90deg) rotateX(10deg); }
-            50% { transform: translate(-50%, -50%) rotateY(180deg) rotateX(0deg); }
-            75% { transform: translate(-50%, -50%) rotateY(270deg) rotateX(-10deg); }
-            100% { transform: translate(-50%, -50%) rotateY(360deg) rotateX(0deg); }
-        }
-
-        /* Container principal */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
-        /* Secțiuni pagină */
         .page-section {
             display: block;
             padding: 80px 0 40px;
@@ -91,14 +53,12 @@
             z-index: 1;
         }
 
-        /* Efect neon */
         .neon-glow {
             box-shadow:
                 0 0 20px rgba(0, 255, 255, 0.1),
                 0 0 40px rgba(0, 102, 255, 0.05);
         }
 
-        /* Carduri / box-uri */
         .data-visualization {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(0, 255, 255, 0.15);
@@ -106,7 +66,6 @@
             padding: 1.5rem;
         }
 
-        /* Contact grid */
         .contact-grid{
             display:grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -139,7 +98,6 @@
         }
         .required{ color:#ff4d4d; font-weight: 900; }
 
-        /* Buton modern */
         .btn-refresh-modern{
             display:inline-flex;
             align-items:center;
@@ -153,11 +111,16 @@
             color: #061018;
             background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
             box-shadow: 0 12px 28px rgba(0,255,136,0.18);
+            transition: transform .06s ease, opacity .15s ease;
         }
         .btn-refresh-modern:active{ transform: translateY(1px); }
+        .btn-refresh-modern:disabled{
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
         .refresh-icon{ font-size: 1.1rem; }
 
-        /* Contact cards */
         .contact-card{
             padding: 14px 14px;
             border-radius: 14px;
@@ -168,7 +131,6 @@
         .contact-card.partnership{ border-color: rgba(0,102,255,0.18); }
         .contact-card.security{ border-color: rgba(138,43,226,0.18); }
 
-        /* Social grid */
         .social-grid{
             display:grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -184,6 +146,7 @@
             color:#fff;
             border: 1px solid rgba(255,255,255,0.10);
             background: rgba(0,0,0,0.18);
+            transition: transform .08s ease, border-color .12s ease;
         }
         .social-card:hover{
             border-color: rgba(0,255,255,0.22);
@@ -200,7 +163,6 @@
             border: 1px solid rgba(255,255,255,0.12);
         }
 
-        /* Time grid */
         .time-grid{
             display:grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -218,11 +180,7 @@
             margin-bottom: 10px;
         }
 
-        @media (max-width: 768px){
-            .page-section{ padding: 60px 0 30px; }
-        }
-
-        /* Honeypot anti-spam (invizibil) */
+        /* Honeypot anti-spam */
         .hp-wrap{
             position:absolute;
             left:-9999px;
@@ -230,16 +188,62 @@
             width:1px;height:1px;
             overflow:hidden;
         }
+
+        /* PRO++: status + log */
+        .mini-status{
+            margin-top: 12px;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 10px 12px;
+            border-radius: 12px;
+            display: none;
+        }
+        .mini-status.ok{
+            display:block;
+            color: var(--green-growth);
+            background: rgba(0,255,136,0.10);
+            border: 1px solid rgba(0,255,136,0.25);
+        }
+        .mini-status.bad{
+            display:block;
+            color: #ff4d4d;
+            background: rgba(255,77,77,0.10);
+            border: 1px solid rgba(255,77,77,0.25);
+        }
+
+        .send-log{
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.10);
+        }
+        .send-log h4{
+            margin-bottom: 10px;
+            color: var(--neon-cyan);
+        }
+        .send-log-item{
+            font-size: 0.88rem;
+            opacity: 0.9;
+            padding: 10px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.18);
+            margin-bottom: 10px;
+        }
+        .send-log-item:last-child{ margin-bottom: 0; }
+
+        @media (max-width: 768px){
+            .page-section{ padding: 60px 0 30px; }
+        }
   </style>
 </head>
 
 <body>
-  <!-- optional particles layer (daca ai script in alta parte, va functiona) -->
   <div id="particles-js"></div>
 
   <div class="container">
 
-    <!-- PAGINA CONTACT -->
     <section id="contact" class="page-section">
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -249,7 +253,7 @@
         </div>
 
         <div class="contact-grid">
-            <!-- Formular Contact (Formspree - email real) -->
+            <!-- Formular Contact (Formspree - PRO++) -->
             <div class="data-visualization neon-glow">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
                     <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
@@ -265,8 +269,10 @@
                         <input type="text" id="company" name="company" tabindex="-1" autocomplete="off" />
                     </div>
 
-                    <!-- redirect inapoi pe pagina (afiseaza mesaj) -->
-                    <input type="hidden" name="_next" value="?sent=1">
+                    <!-- PRO++: redirect pe pagina separata -->
+                    <input type="hidden" name="_next" value="thank-you.html">
+
+                    <!-- subject din JS -->
                     <input type="hidden" name="_subject" id="contactSubject" value="StancuBYT | Mesaj nou">
 
                     <div class="form-group">
@@ -306,15 +312,32 @@
                     </div>
 
                     <button class="btn-refresh-modern" style="width: 100%; margin-top: 1rem;" type="submit" id="submitContactBtn">
-                        <span class="refresh-icon">🚀</span>
-                        <span class="refresh-text">Trimite solicitarea</span>
+                        <span class="refresh-icon" id="sendIcon">🚀</span>
+                        <span class="refresh-text" id="sendText">Trimite solicitarea</span>
                     </button>
 
-                    <div id="contactStatus" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+                    <!-- PRO++: status local (nu depinde de Formspree) -->
+                    <div id="localStatus" class="mini-status"></div>
+
+                    <!-- PRO++: log local -->
+                    <div class="send-log">
+                        <h4>📌 Ultimele trimiteri (local)</h4>
+                        <div id="sendLogList"></div>
+                        <div style="margin-top:10px; text-align:right;">
+                          <button type="button" class="btn-refresh-modern" style="background: linear-gradient(45deg, var(--blue-tech), var(--neon-cyan)); color:#061018; padding:10px 12px;"
+                                  id="clearLogBtn">
+                            🧹 Curăță log
+                          </button>
+                        </div>
+                        <p style="opacity:0.7; font-size:0.82rem; margin-top:10px;">
+                          *Logul este salvat în browser (localStorage), util doar pentru debugging.
+                        </p>
+                    </div>
+
                 </form>
             </div>
 
-            <!-- Informații Contact -->
+            <!-- Informații Contact (neschimbat) -->
             <div class="data-visualization neon-glow">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
                     <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
@@ -375,7 +398,7 @@
             </div>
         </div>
 
-        <!-- Social Links Grid -->
+        <!-- Social (neschimbat) -->
         <div class="data-visualization neon-glow" style="padding: 2rem; margin-bottom: 2rem;">
             <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">🌐 Rețele Sociale Oficiale</h3>
 
@@ -412,7 +435,7 @@
             </div>
         </div>
 
-        <!-- Timpi de răspuns -->
+        <!-- Timpi (neschimbat) -->
         <div class="data-visualization neon-glow" style="padding: 2rem;">
             <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">⏰ Timpi de răspuns</h3>
 
@@ -454,39 +477,107 @@
   </div>
 
   <script>
-    // 1) Afisam mesaj dupa redirect (?sent=1)
-    (function(){
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('sent') === '1') {
-        const status = document.getElementById('contactStatus');
-        if (status){
-          status.textContent = '✅ Mesaj trimis. Dacă nu apare în inbox, verifică și Spam + Formspree → Submissions.';
-          status.style.color = '#00ff88';
-          status.style.background = 'rgba(0,255,136,0.10)';
-          status.style.border = '1px solid rgba(0,255,136,0.25)';
-          status.style.padding = '0.6rem';
-          status.style.borderRadius = '10px';
-        }
-      }
-    })();
-
-    // 2) Setam subiect din campuri (profi, dar simplu)
+    // PRO++: UI sending + subject + local log
     (function(){
       const form = document.getElementById('quickContactForm');
       if (!form) return;
 
-      form.addEventListener('submit', function(){
-        const name = (document.getElementById('contactName')?.value || '').trim();
-        const type = (document.getElementById('contactType')?.value || 'contact').trim();
+      const btn = document.getElementById('submitContactBtn');
+      const icon = document.getElementById('sendIcon');
+      const text = document.getElementById('sendText');
+      const status = document.getElementById('localStatus');
+
+      const LS_KEY = 'sbyt_contact_send_log_v1';
+
+      function setStatus(msg, ok){
+        status.className = 'mini-status ' + (ok ? 'ok' : 'bad');
+        status.textContent = msg;
+      }
+
+      function readLog(){
+        try {
+          const raw = localStorage.getItem(LS_KEY);
+          const arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function writeLog(arr){
+        try { localStorage.setItem(LS_KEY, JSON.stringify(arr)); } catch {}
+      }
+
+      function maskEmail(em){
+        // afiseaza partial
+        const s = String(em || '');
+        const at = s.indexOf('@');
+        if (at <= 1) return s;
+        return s.slice(0, 2) + '***' + s.slice(at);
+      }
+
+      function renderLog(){
+        const list = document.getElementById('sendLogList');
+        const arr = readLog();
+        if (!arr.length){
+          list.innerHTML = '<div style="opacity:0.75; font-size:0.9rem;">Nu există trimiteri salvate încă.</div>';
+          return;
+        }
+        list.innerHTML = arr.map(item => {
+          const when = new Date(item.ts).toLocaleString('ro-RO');
+          return `
+            <div class="send-log-item">
+              <div><strong>${item.name || 'Vizitator'}</strong> • <span style="opacity:0.8">${maskEmail(item.email)}</span></div>
+              <div style="opacity:0.85; margin-top:6px;">Tip: <strong>${item.type}</strong> • ${when}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('clearLogBtn')?.addEventListener('click', () => {
+        writeLog([]);
+        renderLog();
+        setStatus('🧹 Log curățat.', true);
+        setTimeout(()=>{ status.style.display='none'; }, 1800);
+      });
+
+      renderLog();
+
+      form.addEventListener('submit', function(e){
+        // Honeypot: daca e completat, oprim submit clar
+        const hp = (document.getElementById('company').value || '').trim();
+        if (hp.length > 0){
+          e.preventDefault();
+          setStatus('❌ Trimiterea a fost blocată (spam detectat).', false);
+          return;
+        }
+
+        // Subject din campuri
+        const name = (document.getElementById('contactName').value || '').trim();
+        const type = (document.getElementById('contactType').value || 'contact').trim();
         const subj = document.getElementById('contactSubject');
         if (subj) subj.value = `StancuBYT | ${type} | ${name || 'Vizitator'}`;
 
-        // UX: disable buton ca sa nu se apese de 10 ori
-        const btn = document.getElementById('submitContactBtn');
-        if (btn) {
+        // Local log (nu garanteaza ca Formspree a livrat emailul, dar confirma ca user a dat submit)
+        const email = (document.getElementById('contactEmail').value || '').trim();
+        const arr = readLog();
+        arr.unshift({ name, email, type, ts: Date.now() });
+        writeLog(arr.slice(0, 5));
+        renderLog();
+
+        // UX: blocam buton + “se trimite...”
+        if (btn){
           btn.disabled = true;
-          btn.style.opacity = '0.8';
-          btn.style.cursor = 'not-allowed';
+          if (icon) icon.textContent = '⏳';
+          if (text) text.textContent = 'Se trimite...';
+          setStatus('⏳ Se trimite mesajul către server...', true);
+
+          // safety re-enable după 12s (în caz de back / eroare)
+          setTimeout(() => {
+            btn.disabled = false;
+            if (icon) icon.textContent = '🚀';
+            if (text) text.textContent = 'Trimite solicitarea';
+          }, 12000);
         }
       });
     })();
