@@ -2730,7 +2730,7 @@ async function savePromo() {
     // nu e obligatoriu, dar recomandat
   }
 
-  const endsAt = new Date(ends).getTime();
+  const endsAt = parseDateInput(ends);
   if (!endsAt || endsAt <= Date.now()) {
     alert('Data expirarii trebuie sa fie in viitor!');
     return;
@@ -3392,7 +3392,7 @@ window.addEventListener('load', () => {
       return;
     }
 
-    const endsAt = new Date(ends).getTime();
+    const endsAt = parseDateInput(ends);
     if (!endsAt || endsAt <= Date.now()) {
       alert('Data expirării trebuie să fie în viitor!');
       return;
@@ -5026,6 +5026,36 @@ service cloud.firestore {
     return "";
   }
 
+  function parseDateInput(val){
+    if(!val) return NaN;
+    val = String(val).trim();
+
+    // ISO date-time from <input type="datetime-local">: YYYY-MM-DDTHH:MM
+    let m = val.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+    if(m){
+      const y=+m[1], mo=+m[2]-1, d=+m[3], hh=+m[4], mm=+m[5];
+      return new Date(y,mo,d,hh,mm,0,0).getTime();
+    }
+
+    // ISO date: YYYY-MM-DD (treat as end of day)
+    m = val.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m){
+      const y=+m[1], mo=+m[2]-1, d=+m[3];
+      return new Date(y,mo,d,23,59,59,0).getTime();
+    }
+
+    // Romanian style: DD.MM.YYYY or DD/MM/YYYY with optional HH:MM
+    m = val.match(/^(\d{2})[\.\/](\d{2})[\.\/](\d{4})(?:[\sT](\d{2}):(\d{2}))?$/);
+    if(m){
+      const d=+m[1], mo=+m[2]-1, y=+m[3], hh=+(m[4]||0), mm=+(m[5]||0);
+      return new Date(y,mo,d,hh,mm,0,0).getTime();
+    }
+
+    // Last resort
+    return new Date(val).getTime();
+  }
+
+
   window.savePromo = async function(){
     const ok = await window.ensureAdminAuth(); if(!ok) return;
     const db = fs(); if(!db) return alert("Firestore nu e incarcat.");
@@ -5042,7 +5072,7 @@ service cloud.firestore {
       alert("Completeaza minim Titlu si Data expirarii.");
       return;
     }
-    const endsAt = new Date(ends).getTime();
+    const endsAt = parseDateInput(ends);
     if(!endsAt || Number.isNaN(endsAt)){
       alert("Data expirarii nu este valida.");
       return;
@@ -5066,7 +5096,16 @@ service cloud.firestore {
     }
   };
 
-  window.deletePromoDoc = async function(docId){
+  
+
+  // --- Ensure the UI button calls the correct (latest) promo save function ---
+  // Some older blocks define `function savePromo()` too; we force it to call this latest admin save.
+  window.__savePromoLatest__ = window.savePromo;
+  window.savePromo = async function(){ return await window.__savePromoLatest__(); };
+  // global for onclick="savePromo()"
+  function savePromo(){ return window.savePromo(); }
+
+window.deletePromoDoc = async function(docId){
     const ok = await window.ensureAdminAuth(); if(!ok) return;
     if(!confirm("Stergi aceasta promotie/giveaway?")) return;
     const db = fs(); if(!db) return;
