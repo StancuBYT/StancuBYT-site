@@ -1218,8 +1218,8 @@
             <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
 
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-                <button class="news-btn" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
-                <button class="news-btn trophy-btn" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                <button class="news-btn admin-only" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
+                <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
                 </div>
         </div>
 
@@ -1266,6 +1266,25 @@
         </div>
     </section>
 
+<!-- ADMIN LOGIN (ca in index prezentare ok.html) -->
+<section id="admin-login" class="admin-login">
+  <h2>🔐 Administrator Login</h2>
+  <p class="admin-desc">Autentificare (Firebase Auth) necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
+
+  <div class="admin-login-box">
+    <input type="email" id="adminEmail" placeholder="Email administrator" autocomplete="username" />
+    <input type="password" id="adminPass" placeholder="Parola administrator" autocomplete="current-password" />
+    <button type="button" onclick="adminSignIn()">Autentificare</button>
+    <button type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Delogare</button>
+  </div>
+
+  <div class="admin-status-row">
+    <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
+    <span id="adminUserLabel" class="admin-user-label"></span>
+  </div>
+
+  <p id="adminLoginMsg" class="admin-msg"></p>
+</section>
 
 <script>
   // Minimal navigation helper for single-page build
