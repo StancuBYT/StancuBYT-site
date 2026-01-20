@@ -1149,7 +1149,7 @@
 .admin-pill.off{
   background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
 }
-.admin-only{ display:none !important; }
+.admin-only{ display:none; }
 
 /* ====== TROPHY BUTTON (Giveaway add) ====== */
 .trophy-btn{
@@ -1244,7 +1244,7 @@
 
         <div class="data-visualization neon-glow">
             <h3>📌 Promoții / Giveaway-uri</h3>
-            <div class="admin-only" style="margin-top:12px; display:none; gap:10px; flex-wrap:wrap;">
+            <div id="adminCampaignToolbar" class="admin-only" style="margin-top:12px; gap:10px; flex-wrap:wrap;">
               <button class="news-btn" style="min-width:220px;" onclick="openCampaignForm('promo')">➕ Adaugă promoție</button>
               <button class="news-btn trophy-btn" style="min-width:220px;" onclick="openCampaignForm('giveaway')">🎁 Adaugă concurs / giveaway</button>
             </div>
@@ -2395,9 +2395,30 @@ function setAdminUI(isAdmin, user) {
       : 'Autentifica-te cu email + parola (Firebase).';
   }
 
-  // arata/ascunde elemente admin-only daca exista
+  // arata/ascunde elemente admin-only
   document.querySelectorAll('.admin-only').forEach(el => {
-    el.style.display = isAdmin ? 'block' : 'none';
+    if (!isAdmin){
+      el.classList.remove('admin-show');
+      el.style.display = 'none';
+      return;
+    }
+    // admin ON
+    el.classList.add('admin-show');
+
+    // Toolbar (container) -> flex
+    if (el.id === 'adminCampaignToolbar') {
+      el.style.display = 'flex';
+      return;
+    }
+
+    // Butoane -> inline-flex ca sa arate bine
+    if (el.tagName === 'BUTTON') {
+      el.style.display = 'inline-flex';
+      return;
+    }
+
+    // Restul elementelor -> block
+    el.style.display = 'block';
   });
 }
 
