@@ -1174,14 +1174,22 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script>
-    window.firebaseConfig = {};
+    // Firebase init 1:1 din index whitepaper ok.html
     try {
-      if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
-        firebase.initializeApp(window.firebaseConfig);
-      }
-    } catch (e) {
-      console.warn("Firebase init warning:", e);
-    }
+  if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+      authDomain: "stancubyt-fc2b9.firebaseapp.com",
+      projectId: "stancubyt-fc2b9",
+      // IMPORTANT: Firebase Storage bucket must be the *.appspot.com bucket name
+      // Otherwise file uploads may fail even if Auth/Firestore work.
+      storageBucket: "stancubyt-fc2b9.appspot.com",
+      messagingSenderId: "263244200492",
+      appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+      measurementId: "G-272S9HSY3K"
+    });
+  }
+} catch (e) {}
   </script>
 </head>
 
@@ -1356,20 +1364,22 @@
   try { if (auth) await auth.signOut(); } catch(e) {}
 }
 
-    // Listener auth state -> update UI + show/hide admin-only
+    // auth listener
     document.addEventListener('DOMContentLoaded', () => {
       try {
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-          firebase.auth().onAuthStateChanged(async (user) => {
-            const isAdmin = await computeIsAdmin(user);
-            window.__SBYT_ADMIN = isAdmin;
-            setAdminUI(isAdmin, user);
+        firebase.auth().onAuthStateChanged(async (user) => {
+          const isAdmin = await computeIsAdmin(user);
+          window.__SBYT_ADMIN = isAdmin;
+          setAdminUI(isAdmin, user);
+          // show/hide add buttons that exist in giveaway section
+          document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = isAdmin ? '' : 'none';
           });
-        }
-      } catch (e) {}
+        });
+      } catch(e) {}
     });
 
-    // ====== Navigation helper ======
+    // ====== Section navigation ======
     function showSection(id){
       const sec = document.getElementById(id);
       if (!sec) return;
@@ -1379,7 +1389,7 @@
     }
     window.addEventListener('load', ()=>showSection('giveaway'));
 
-    // ====== Promo CRUD (Firestore + Storage) ======
+    // ====== Promo CRUD (din whitepaper - date + imagini) ======
     let __promosUnsub = null;
     async function uploadPromoMedia(promoId, file) {
   if (!storage || !file) return null;
@@ -1604,8 +1614,7 @@
       }
     };
   }
-}
-    async function cancelPromo() {
+}async function cancelPromo() {
             const f = $('promoForm');
             if (f) f.style.display = 'none';
             if ($('promoTitle')) $('promoTitle').value = '';
@@ -1814,34 +1823,32 @@
     return { wei, tokens };
 }
 
-    // Buttons router (the page uses requestPassword in HTML)
+    // router pt butoanele din UI (promotii.html folosește requestPassword)
     async function requestPassword(action, id){
-      if (action === 'promoAdd') {
+      if(action === 'promoAdd'){
         const ok = await ensureAdminAuth();
         if(!ok) return;
         const f = document.getElementById('promoForm');
-        if (f) f.style.display = 'block';
+        if(f) f.style.display = 'block';
         return;
       }
-      if (action === 'giveawayAdd') {
+      if(action === 'giveawayAdd'){
         const ok = await ensureAdminAuth();
         if(!ok) return;
         const f = document.getElementById('promoForm');
-        if (f) f.style.display = 'block';
+        if(f) f.style.display = 'block';
         const sel = document.getElementById('promoKind');
-        if (sel) sel.value = 'giveaway';
+        if(sel) sel.value = 'giveaway';
         return;
       }
-      if (action === 'deletePromo') return deletePromo(id);
+      if(action === 'deletePromo') return deletePromo(id);
     }
 
-    // init listeners
+    // init list
     document.addEventListener('DOMContentLoaded', () => {
       try {
         if (db && typeof listenPromos === 'function') listenPromos();
-      } catch(e) {
-        console.warn(e);
-      }
+      } catch(e) { console.warn(e); }
       try {
         if (typeof particlesJS !== 'undefined') {
           particlesJS('particles-js', {
