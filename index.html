@@ -1149,7 +1149,7 @@
 .admin-pill.off{
   background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
 }
-.admin-only{ display:none !important; }
+.admin-only{ display:none; }
 
 /* ====== TROPHY BUTTON (Giveaway add) ====== */
 .trophy-btn{
@@ -1591,209 +1591,564 @@ async function etherscanProxyRequest(module, action, params = {}) {
         }
 
         // =============================================
-        // GIVEAWAY & PROMOȚII (local – varianta B)
+
         // =============================================
-        function getPromos() {
-            try { return JSON.parse(localStorage.getItem(LS_PROMOS) || '[]'); }
-            catch { return []; }
+        // GIVEAWAY & PROMOȚII (Firestore + Storage)
+        // - Colectie: promos
+        // - Subcolectie: promos/{promoId}/participants
+        // - Media in Storage: promos/{promoId}/...
+        // - Optional email: collection "mail" (Firebase Extension: Trigger Email)
+        // =============================================
+
+        let __promosUnsub = null;
+        let __participantsCache = new Map(); // promoId -> participants[]
+        let __activePromoForJoin = null;
+
+        function _serverTimestamp(){
+          try { return firebase.firestore.FieldValue.serverTimestamp(); } catch(e){ return Date.now(); }
         }
-        function setPromos(arr) {
-            localStorage.setItem(LS_PROMOS, JSON.stringify(arr));
+        function _randCode9(){
+          const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // fara 0/O/1/I pentru lizibilitate
+          let out = "";
+          for (let i=0;i<9;i++) out += chars[Math.floor(Math.random()*chars.length)];
+          return out;
+        }
+        function _maskEmail(e){
+          const s = String(e||'');
+          const at = s.indexOf('@');
+          if (at <= 2) return s;
+          return s.slice(0,2) + "****" + s.slice(at);
         }
 
-        async function showPromoForm() {
-            if (!verifyPassword()) return;
-            const f = $('promoForm');
-            if (f) f.style.display = 'block';
+        async function uploadPromoMedia(promoId, file){
+          if (!storage || !file) return null;
+          const safeName = String(file.name || 'file').replace(/[^\w.\-]+/g, '_');
+          const path = `promos/${promoId}/${Date.now()}_${safeName}`;
+          const ref = storage.ref().child(path);
+          await ref.put(file);
+          const url = await ref.getDownloadURL();
+          return { url, path, contentType: file.type || 'application/octet-stream', name: safeName };
         }
 
-        async function cancelPromo() {
-            const f = $('promoForm');
-            if (f) f.style.display = 'none';
-            if ($('promoTitle')) $('promoTitle').value = '';
-            if ($('promoEndDate')) $('promoEndDate').value = '';
-            if ($('promoDesc')) $('promoDesc').value = '';
+        async function showPromoForm(){
+          const ok = await ensureAdminAuth();
+          if (!ok) return;
+          const f = document.getElementById('promoForm');
+          if (f) f.style.display = 'block';
         }
 
-        function savePromo() {
-            if (!verifyPassword()) return;
+        async function cancelPromo(){
+          const f = document.getElementById('promoForm');
+          if (f) f.style.display = 'none';
+          ['promoTitle','promoPrize','promoDesc','promoEnds','promoPoints','promoMailFrom','promoMailName','promoRules','promoPrize1','promoPrize2','promoPrize3','promoPrize4']
+            .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+          const file = document.getElementById('promoMedia');
+          if (file) file.value = '';
+        }
 
-            const title = ($('promoTitle')?.value || '').trim();
-            const endDate = ($('promoEndDate')?.value || '').trim();
-            const desc = ($('promoDesc')?.value || '').trim();
+        // Adaugam dinamic campuri "marketing" daca nu exista deja in formular
+        function _ensurePromoExtraFields(){
+          const form = document.getElementById('promoForm');
+          if (!form || form.__extras) return;
+          form.__extras = true;
 
-            if (!title || !endDate || !desc) {
-                alert('Completează titlul, data de final și descrierea.');
-                return;
-            }
+          const extra = document.createElement('div');
+          extra.style.marginTop = "12px";
+          extra.innerHTML = `
+            <div class="form-row">
+              <input type="text" id="promoPrize1" placeholder="Premiul I (ex: 10.000 SBYT)" maxlength="160">
+              <input type="text" id="promoPrize2" placeholder="Premiul II (ex: 5.000 SBYT)" maxlength="160">
+            </div>
+            <div class="form-row">
+              <input type="text" id="promoPrize3" placeholder="Premiul III (ex: 2.500 SBYT)" maxlength="160">
+              <input type="text" id="promoPrize4" placeholder="Primele 5 / Urmatoarele 10 (ex: Bonus 100 SBYT)" maxlength="160">
+            </div>
+            <div class="form-row">
+              <textarea id="promoRules" placeholder="Regulament & Conditii (clar, scurt, atractiv)" rows="4" style="width:100%;"></textarea>
+            </div>
+            <div class="form-row">
+              <input type="text" id="promoMailFrom" placeholder="Email expeditor (doar pentru mail extension) ex: no-reply@..." maxlength="120">
+              <input type="text" id="promoMailName" placeholder="Nume expeditor (ex: StancuBYT Team)" maxlength="80">
+            </div>
+            <small style="display:block; margin-top:0.4rem; opacity:0.75;">
+              Email-urile automate necesita Firebase Extension “Trigger Email”. Daca nu o ai, campurile pot ramane goale.
+            </small>
+          `;
+          form.insertBefore(extra, form.querySelector('small') || null);
+        }
 
-            const promos = getPromos();
-            const newId = promos.length ? Math.max(...promos.map(p => Number(p.id) || 0)) + 1 : 1;
+        async function savePromo(){
+          const ok = await ensureAdminAuth();
+          if (!ok) return;
+          _ensurePromoExtraFields();
 
-            promos.push({
-                id: newId,
-                title,
-                endDate,
-                desc,
-                createdAt: new Date().toISOString(),
-                participants: [] // {name,wallet,points,joinedAt}
+          const title = (document.getElementById('promoTitle')?.value || '').trim();
+          const prize = (document.getElementById('promoPrize')?.value || '').trim();
+          const desc  = (document.getElementById('promoDesc')?.value || '').trim();
+          const ends  = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
+          const points = parseInt(document.getElementById('promoPoints')?.value || '10', 10) || 10;
+          const file = document.getElementById('promoMedia')?.files?.[0] || null;
+
+          const prize1 = (document.getElementById('promoPrize1')?.value || '').trim();
+          const prize2 = (document.getElementById('promoPrize2')?.value || '').trim();
+          const prize3 = (document.getElementById('promoPrize3')?.value || '').trim();
+          const prize4 = (document.getElementById('promoPrize4')?.value || '').trim();
+          const rules  = (document.getElementById('promoRules')?.value || '').trim();
+
+          const mailFrom = (document.getElementById('promoMailFrom')?.value || '').trim();
+          const mailName = (document.getElementById('promoMailName')?.value || '').trim();
+
+          if (!title || !ends || !desc){
+            alert('Completeaza titlul, descrierea si data expirarii.');
+            return;
+          }
+          const endsAt = new Date(ends).getTime();
+          if (!endsAt || endsAt <= Date.now()){
+            alert('Data expirarii trebuie sa fie in viitor!');
+            return;
+          }
+
+          try{
+            const docRef = await db.collection('promos').add({
+              type: 'promo', // poti schimba manual ulterior daca vrei
+              title,
+              prize: prize || null,
+              desc,
+              rules: rules || null,
+              prizes: { p1: prize1||null, p2: prize2||null, p3: prize3||null, p4: prize4||null },
+              endsAt,
+              pointsPerPromotion: points,
+              createdAt: Date.now(),
+              status: 'active',
+              media: null,
+              mail: (mailFrom || mailName) ? { from: mailFrom||null, fromName: mailName||null } : null
             });
 
-            setPromos(promos);
+            if (file){
+              const media = await uploadPromoMedia(docRef.id, file);
+              if (media) await docRef.update({ media });
+            }
+
             cancelPromo();
-            renderPromos();
-            renderLeaderboard();
-            alert('Promoția/Giveaway-ul a fost adăugat.');
+            alert('Promoția / Giveaway-ul a fost adăugat!');
+          }catch(e){
+            console.error('savePromo error:', e);
+            alert('Eroare la salvare (verifica Firestore Rules pentru promos + Storage rules).');
+          }
         }
 
-        function clearPromos() {
-            if (!verifyPassword()) return;
-            if (!confirm('Ștergi toate promoțiile/giveaway-urile?')) return;
-            localStorage.removeItem(LS_PROMOS);
-            renderPromos();
-            renderLeaderboard();
+        async function deletePromo(promoId){
+          const ok = await ensureAdminAuth();
+          if (!ok) return;
+          if (!confirm('Stergi aceasta promotie/giveaway?')) return;
+          try{
+            await db.collection('promos').doc(promoId).delete();
+          }catch(e){
+            console.error('deletePromo error:', e);
+            alert('Eroare la stergere (Rules).');
+          }
         }
 
-        function deletePromo(promoId) {
-            if (!verifyPassword()) return;
-            if (!confirm('Ștergi această promoție/giveaway?')) return;
-            const promos = getPromos().filter(p => Number(p.id) !== Number(promoId));
-            setPromos(promos);
-            renderPromos();
-            renderLeaderboard();
+        function listenPromos(){
+          const list = document.getElementById('promoList');
+          if (!list || !db) return;
+
+          if (__promosUnsub) { try{__promosUnsub()}catch(e){} __promosUnsub=null; }
+
+          __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(snap=>{
+            const promos = [];
+            snap.forEach(doc => promos.push({ _id: doc.id, ...(doc.data()||{}) }));
+            renderPromos(promos);
+          }, err=>{
+            console.error('listenPromos err', err);
+          });
         }
 
-        function joinPromo(promoId) {
-            const name = ($('joinName_' + promoId)?.value || '').trim();
-            const wallet = ($('joinWallet_' + promoId)?.value || '').trim();
-            const pointsStr = ($('joinPoints_' + promoId)?.value || '').trim();
-            const points = Math.max(0, parseInt(pointsStr || '0', 10) || 0);
-
-            if (!name || !wallet) {
-                alert('Completează numele și wallet-ul.');
-                return;
-            }
-
-            const promos = getPromos();
-            const p = promos.find(x => Number(x.id) === Number(promoId));
-            if (!p) return;
-
-            // expirare
-            const now = new Date();
-            const end = new Date(p.endDate + 'T23:59:59');
-            if (now > end) {
-                alert('Acest giveaway/promoție a expirat.');
-                return;
-            }
-
-            p.participants = p.participants || [];
-            const existing = p.participants.find(u => (u.wallet || '').toLowerCase() === wallet.toLowerCase());
-            if (existing) {
-                existing.name = name;
-                existing.points = Math.max(existing.points || 0, points);
-            } else {
-                p.participants.push({ name, wallet, points, joinedAt: new Date().toISOString() });
-            }
-
-            setPromos(promos);
-            renderPromos();
-            renderLeaderboard();
-            alert('Înscriere salvată (local pe device).');
+        function _timeLeft(endsAt){
+          const ms = Math.max(0, (endsAt||0) - Date.now());
+          const sec = Math.floor(ms/1000);
+          const d = Math.floor(sec/86400);
+          const h = Math.floor((sec%86400)/3600);
+          const m = Math.floor((sec%3600)/60);
+          return { d,h,m, ended: ms<=0 };
         }
 
-        function renderPromos() {
-            const list = $('promoList');
-            if (!list) return;
+        function renderPromos(promos){
+          const promoList = document.getElementById('promoList');
+          if (!promoList) return;
 
-            const promos = getPromos();
-            if (!promos.length) {
-                list.innerHTML = `<div style="opacity:0.85;">Nu există promoții active încă.</div>`;
-                return;
-            }
+          promoList.innerHTML = '';
+          if (!promos || !promos.length){
+            promoList.innerHTML = '<div style="opacity:0.85;">Nu exista promoții active încă.</div>';
+            return;
+          }
 
-            // sort: cele care expiră mai repede primele
-            promos.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+          promos.forEach(p=>{
+            const endsAt = Number(p.endsAt||0);
+            const t = _timeLeft(endsAt);
+            const active = !t.ended && (p.status||'active') === 'active';
 
-            list.innerHTML = '';
-            promos.forEach(p => {
-                const end = new Date(p.endDate + 'T23:59:59');
-                const expired = new Date() > end;
+            const mediaUrl = p.media && p.media.url ? p.media.url : '';
+            const badge = active ? 'Activ' : 'Expirat';
+            const badgeCls = active ? 'badge-event' : 'badge-announcement';
 
-                const card = document.createElement('div');
-                card.className = 'news-card';
-                card.innerHTML = `
-                    <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
-                    <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
-                    <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.desc)}</p>
-                    <div class="news-date" style="margin-top:0.8rem;">
-                        <span>⏳</span> Expiră: ${new Date(p.endDate).toLocaleDateString('ro-RO')}
+            const prizes = p.prizes || {};
+            const rules = p.rules || '';
+
+            const card = document.createElement('div');
+            // card mai mare + background media
+            card.className = 'news-card';
+            card.style.borderRadius = '18px';
+            card.style.padding = '0';
+            card.style.overflow = 'hidden';
+            card.style.border = '1px solid rgba(0,102,255,0.25)';
+            card.style.boxShadow = '0 18px 45px rgba(0,0,0,0.35)';
+
+            card.innerHTML = `
+              <div style="
+                position:relative;
+                min-height: 210px;
+                padding: 18px 18px 16px;
+                background:
+                  radial-gradient(circle at 20% 20%, rgba(0,255,136,.12), transparent 35%),
+                  radial-gradient(circle at 80% 0%, rgba(0,102,255,.14), transparent 45%),
+                  radial-gradient(circle at 60% 80%, rgba(138,43,226,.12), transparent 45%),
+                  rgba(255,255,255,0.03);
+              ">
+                ${mediaUrl ? `
+                  <div style="position:absolute; inset:0; background:url('${mediaUrl}') center/cover no-repeat; filter: blur(0.5px) brightness(0.7);"></div>
+                  <div style="position:absolute; inset:0; background: linear-gradient(180deg, rgba(5,5,16,.35), rgba(5,5,16,.92));"></div>
+                ` : `<div style="position:absolute; inset:0; background: linear-gradient(135deg, rgba(0,102,255,.12), rgba(0,255,136,.08), rgba(138,43,226,.10));"></div>`}
+
+                <div style="position:relative; z-index:1;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <div class="news-badge ${badgeCls}">${badge}</div>
+                    <div style="font-weight:800; letter-spacing:.3px; color:#fff; opacity:.95;">
+                      ${t.ended ? '⛔ Închis' : `⏳ ${t.d}z ${t.h}h ${t.m}m`}
                     </div>
+                  </div>
 
-                    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
-                        <h4 style="margin:0 0 0.6rem 0; color: var(--neon-cyan);">Înscriere</h4>
-                        <div class="form-row">
-                            <input id="joinName_${p.id}" type="text" placeholder="Nume" maxlength="60">
-                            <input id="joinWallet_${p.id}" type="text" placeholder="Wallet (0x...)" maxlength="60">
-                        </div>
-                        <div class="form-row">
-                            <input id="joinPoints_${p.id}" type="number" min="0" step="1" placeholder="Promovări (puncte)" />
-                        </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="news-btn" onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
-                            <button class="news-btn" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
-                        </div>
-                        <small style="display:block; margin-top:0.6rem; opacity:0.75;">
-                            În varianta B, înscrierile/clasamentul sunt salvate doar pe device-ul tău.
-                        </small>
+                  <h3 style="margin:10px 0 6px; font-size:1.35rem; color:#fff; text-shadow:0 10px 30px rgba(0,0,0,.55);">
+                    ${_escapeHtml(p.title||'')}
+                  </h3>
+
+                  <p style="margin:0; opacity:.92; line-height:1.55; max-width: 70ch;">
+                    ${_escapeHtml(p.desc||'')}
+                  </p>
+
+                  ${(p.prize || prizes.p1 || prizes.p2 || prizes.p3 || prizes.p4) ? `
+                    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                      ${p.prize ? `<span class="badge badge-success">🎁 ${_escapeHtml(p.prize)}</span>` : ''}
+                      ${prizes.p1 ? `<span class="badge badge-warning">🥇 ${_escapeHtml(prizes.p1)}</span>` : ''}
+                      ${prizes.p2 ? `<span class="badge badge-info">🥈 ${_escapeHtml(prizes.p2)}</span>` : ''}
+                      ${prizes.p3 ? `<span class="badge badge-info">🥉 ${_escapeHtml(prizes.p3)}</span>` : ''}
+                      ${prizes.p4 ? `<span class="badge badge-success">✨ ${_escapeHtml(prizes.p4)}</span>` : ''}
                     </div>
-                `;
-                list.appendChild(card);
-            });
+                  ` : ''}
+
+                  ${rules ? `
+                    <details style="margin-top:12px;">
+                      <summary style="cursor:pointer; color: var(--neon-cyan); font-weight:700;">📜 Regulament & condiții</summary>
+                      <div style="margin-top:8px; opacity:.9; line-height:1.6;">${_escapeHtml(rules)}</div>
+                    </details>
+                  ` : ''}
+
+                  <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <button class="btn-refresh-modern" style="padding: 0.75rem 1.2rem; font-size: 1rem;" onclick="openJoinModal('${p._id||p.id}')">
+                      ✅ Participă
+                    </button>
+
+                    <a class="news-btn" href="#join" onclick="openJoinModal('${p._id||p.id}')" style="text-decoration:none;">📝 Înscriere</a>
+
+                    ${window.__SBYT_ADMIN ? `<button class="news-btn" onclick="deletePromo('${p._id||p.id}')">🗑️ Șterge</button>` : ''}
+
+                    <span style="opacity:.8; font-size:.9rem;">
+                      Expiră: ${endsAt ? new Date(endsAt).toLocaleString('ro-RO') : '-'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            promoList.appendChild(card);
+          });
         }
 
-        function renderLeaderboard() {
-            const lb = $('leaderboard');
-            if (!lb) return;
+        function _ensureJoinModal(){
+          if (document.getElementById('joinModal')) return;
 
-            const promos = getPromos();
-            const now = new Date();
+          const modal = document.createElement('div');
+          modal.id = 'joinModal';
+          modal.style.cssText = `
+            position:fixed; inset:0; background: rgba(0,0,0,.65);
+            display:none; align-items:center; justify-content:center;
+            z-index: 2000; padding: 20px;
+          `;
+          modal.innerHTML = `
+            <div style="
+              width: min(720px, 100%);
+              border-radius: 18px;
+              background: rgba(10,10,31,.96);
+              border: 1px solid rgba(0,102,255,.28);
+              box-shadow: 0 25px 80px rgba(0,0,0,.55);
+              padding: 18px 18px 16px;
+              position:relative;
+              overflow:hidden;
+            ">
+              <div style="position:absolute; inset:-80px; background:
+                radial-gradient(circle at 20% 20%, rgba(0,255,136,.14), transparent 35%),
+                radial-gradient(circle at 80% 10%, rgba(0,102,255,.18), transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(138,43,226,.14), transparent 45%);
+                filter: blur(0px);
+              "></div>
 
-            // agregare participanți din promoțiile active (neexpirate)
-            const map = new Map(); // wallet -> {name,wallet,points}
-            promos.forEach(p => {
-                const end = new Date(p.endDate + 'T23:59:59');
-                if (now > end) return;
-                (p.participants || []).forEach(u => {
-                    const key = (u.wallet || '').toLowerCase();
-                    if (!key) return;
-                    const current = map.get(key);
-                    const pts = Number(u.points) || 0;
-                    if (!current || pts > current.points) {
-                        map.set(key, { name: u.name || 'Anonim', wallet: u.wallet, points: pts });
-                    }
-                });
-            });
+              <div style="position:relative; z-index:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                  <h2 style="margin:0; font-size:1.35rem; color:#fff;">📝 Înscriere la promoție</h2>
+                  <button class="news-btn" onclick="closeJoinModal()">✖ Închide</button>
+                </div>
 
-            const arr = Array.from(map.values()).sort((a, b) => b.points - a.points);
-            if (!arr.length) {
-                lb.innerHTML = `<div style="opacity:0.85;">Nu există participanți încă.</div>`;
+                <p id="joinPromoMeta" style="margin:10px 0 14px; opacity:.9;"></p>
+
+                <div class="form-row">
+                  <input id="joinName" type="text" placeholder="Nume" maxlength="60">
+                  <input id="joinEmail" type="email" placeholder="Email" maxlength="90">
+                </div>
+                <div class="form-row">
+                  <input id="joinWallet" type="text" placeholder="Wallet (0x...)" maxlength="80">
+                  <input id="joinReferral" type="text" placeholder="Cod referal (opțional)" maxlength="16" style="text-transform:uppercase;">
+                </div>
+
+                <label style="display:flex; gap:10px; align-items:flex-start; margin-top:10px; opacity:.9;">
+                  <input type="checkbox" id="joinAgree" style="margin-top:4px;">
+                  <span>Confirm că datele sunt corecte și accept regulamentul promoției.</span>
+                </label>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+                  <button class="btn-refresh-modern" style="padding: 0.75rem 1.2rem; font-size: 1rem;" onclick="submitJoin()">🚀 Finalizează înscrierea</button>
+                  <button class="news-btn" onclick="closeJoinModal()">❌ Renunță</button>
+                </div>
+
+                <p id="joinMsg" style="margin-top:12px; font-weight:700;"></p>
+
+                <small style="display:block; margin-top:10px; opacity:.75;">
+                  După înscriere primești un cod unic (9 caractere). Îl poți folosi ca referal.
+                </small>
+              </div>
+            </div>
+          `;
+          modal.addEventListener('click', (e)=>{ if (e.target === modal) closeJoinModal(); });
+          document.body.appendChild(modal);
+        }
+
+        async function openJoinModal(promoId){
+          _ensureJoinModal();
+          __activePromoForJoin = String(promoId);
+
+          // meta
+          let promo = null;
+          try{
+            const doc = await db.collection('promos').doc(__activePromoForJoin).get();
+            promo = doc.exists ? doc.data() : null;
+          }catch(e){}
+          const meta = document.getElementById('joinPromoMeta');
+          if (meta){
+            meta.innerHTML = promo ? (
+              `<span style="color:var(--neon-cyan); font-weight:800;">${_escapeHtml(promo.title||'')}</span>
+               <span style="opacity:.85;">• expiră ${promo.endsAt ? new Date(promo.endsAt).toLocaleString('ro-RO') : '-'}</span>`
+            ) : '';
+          }
+
+          const msg = document.getElementById('joinMsg');
+          if (msg){ msg.textContent=''; msg.style.color=''; }
+
+          const modal = document.getElementById('joinModal');
+          if (modal) modal.style.display = 'flex';
+        }
+
+        function closeJoinModal(){
+          const modal = document.getElementById('joinModal');
+          if (modal) modal.style.display = 'none';
+        }
+
+        async function submitJoin(){
+          const msg = document.getElementById('joinMsg');
+          const setMsg = (t, ok=false)=>{
+            if (!msg) return;
+            msg.textContent = t;
+            msg.style.color = ok ? '#00ff88' : '#ff4d4d';
+          };
+
+          const promoId = __activePromoForJoin;
+          if (!promoId){ setMsg('Promoție invalidă.'); return; }
+
+          const name = (document.getElementById('joinName')?.value || '').trim();
+          const email = (document.getElementById('joinEmail')?.value || '').trim();
+          const wallet = (document.getElementById('joinWallet')?.value || '').trim();
+          const referral = (document.getElementById('joinReferral')?.value || '').trim().toUpperCase();
+          const agree = !!document.getElementById('joinAgree')?.checked;
+
+          if (!agree){ setMsg('Bifează acordul pentru a continua.'); return; }
+          if (!name || !email || !wallet){ setMsg('Completează nume, email și wallet.'); return; }
+
+          // check promo active
+          let promo = null;
+          try{
+            const doc = await db.collection('promos').doc(promoId).get();
+            promo = doc.exists ? doc.data() : null;
+          }catch(e){}
+          if (!promo){ setMsg('Promoția nu există.'); return; }
+          if (promo.endsAt && Date.now() > Number(promo.endsAt)){ setMsg('Această promoție este expirată.'); return; }
+
+          try{
+            // load participants for referral validation
+            const partRef = db.collection('promos').doc(promoId).collection('participants');
+
+            // validate referral: must exist (generated earlier)
+            if (referral){
+              const q = await partRef.where('code','==', referral).limit(1).get();
+              if (q.empty){
+                setMsg('Codul referal nu este valid. Trebuie să fie un cod generat anterior.');
                 return;
+              }
             }
 
-            // tabel simplu
-            let html = `<div class="table-container"><table class="whitepaper-table">
-                <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>`;
-            arr.slice(0, 100).forEach((u, i) => {
-                html += `<tr>
-                    <td>${i + 1}</td>
-                    <td>${escapeHtml(u.name)}</td>
-                    <td style="font-family: monospace; font-size: 0.9rem;">${escapeHtml(u.wallet)}</td>
-                    <td><span class="badge badge-success">${Number(u.points).toLocaleString('ro-RO')}</span></td>
-                </tr>`;
+            // prevent duplicates by email or wallet
+            const dupEmail = await partRef.where('email','==', email).limit(1).get();
+            if (!dupEmail.empty){
+              setMsg('Ești deja înscris cu acest email.');
+              return;
+            }
+            const dupWallet = await partRef.where('wallet','==', wallet).limit(1).get();
+            if (!dupWallet.empty){
+              setMsg('Wallet-ul este deja înscris.');
+              return;
+            }
+
+            const code = _randCode9();
+            const doc = await partRef.add({
+              name, email, wallet,
+              code,
+              referral: referral || '',
+              createdAt: Date.now(),
+              createdAtServer: _serverTimestamp()
             });
-            html += `</table></div>`;
-            lb.innerHTML = html;
+
+            // optional email queue (Firebase Trigger Email extension uses collection "mail")
+            // We store the "from" in promo.mail (optional). Extension config decides actual sender.
+            try{
+              const mailCfg = promo.mail || null;
+              await db.collection('mail').add({
+                to: email,
+                message: {
+                  subject: `Codul tău de participare: ${code}`,
+                  html: `
+                    <div style="font-family: Arial, sans-serif;">
+                      <h2 style="margin:0 0 10px;">Mulțumim pentru înscriere!</h2>
+                      <p>Promoție: <b>${_escapeHtml(promo.title||'StancuBYT Promo')}</b></p>
+                      <p>Codul tău unic (9 caractere):</p>
+                      <div style="font-size: 22px; font-weight: 900; letter-spacing: 2px; padding: 12px 14px; border-radius: 12px; background:#0a0a1f; color:#00ff88; display:inline-block;">
+                        ${code}
+                      </div>
+                      <p style="margin-top:12px;">Poți folosi acest cod ca <b>referal</b> pentru a urca în clasament.</p>
+                      <p style="opacity:.8;">Dacă nu ai primit acest email automat, verifică setarea Firebase Trigger Email Extension.</p>
+                    </div>
+                  `
+                },
+                promoId,
+                participantId: doc.id,
+                createdAt: Date.now(),
+                from: mailCfg?.from || null,
+                fromName: mailCfg?.fromName || null
+              });
+            }catch(e){
+              // ignore if extension not installed / rules block "mail"
+              console.warn('email queue skipped:', e);
+            }
+
+            setMsg(`Înscriere reușită! Codul tău: ${code}`, true);
+          }catch(e){
+            console.error('submitJoin error:', e);
+            setMsg('Eroare la înscriere (verifică Firestore Rules pentru participants).');
+          }
         }
+
+        // Leaderboard: cine are cei mai multi inscrisi pe codul sau
+        async function renderLeaderboard(){
+          const lb = document.getElementById('leaderboard');
+          if (!lb || !db) return;
+
+          // incarcam ultimele promos si participantii lor (top simplu)
+          try{
+            const promosSnap = await db.collection('promos').orderBy('createdAt','desc').limit(20).get();
+            const promos = [];
+            promosSnap.forEach(d => promos.push({ id: d.id, ...(d.data()||{}) }));
+
+            let out = '';
+            for (const p of promos){
+              const partSnap = await db.collection('promos').doc(p.id).collection('participants').orderBy('createdAt','asc').get();
+              const participants = [];
+              partSnap.forEach(d => participants.push({ id:d.id, ...(d.data()||{}) }));
+
+              // counts
+              const counts = new Map();
+              participants.forEach(x=>{
+                const ref = (x.referral||'').trim().toUpperCase();
+                if (!ref) return;
+                counts.set(ref, (counts.get(ref)||0)+1);
+              });
+
+              const ranked = participants.map(x=>{
+                const code = (x.code||'').trim().toUpperCase();
+                const points = code ? (counts.get(code)||0) : 0;
+                return { ...x, points };
+              }).sort((a,b)=> (b.points - a.points) || (Number(a.createdAt||0)-Number(b.createdAt||0)));
+
+              out += `
+                <div style="margin-bottom: 18px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); border:1px solid rgba(0,255,136,0.18);">
+                  <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <h4 style="margin:0; color:var(--neon-cyan);">${_escapeHtml(p.title||'Promoție')}</h4>
+                    <span style="opacity:.8;">Participanți: <b>${participants.length}</b></span>
+                  </div>
+
+                  ${ranked.length ? `
+                    <div class="table-responsive" style="margin-top: 10px;">
+                      <table class="lb-table">
+                        <thead>
+                          <tr>
+                            <th>#</th><th>Email</th><th>Cod</th><th>Recomandări</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${ranked.slice(0, 10).map((u,i)=>`
+                            <tr class="${i===0?'lb-top1':i===1?'lb-top2':i===2?'lb-top3':''}">
+                              <td><b>${i+1}</b></td>
+                              <td>${_escapeHtml(_maskEmail(u.email))}</td>
+                              <td class="mono"><b>${_escapeHtml(u.code||'')}</b></td>
+                              <td><span class="badge badge-success">${u.points||0}</span></td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                    </div>
+                  ` : `<div style="opacity:.85; margin-top:10px;">Nu există participanți încă.</div>`}
+                </div>
+              `;
+            }
+
+            lb.innerHTML = out || '<div style="opacity:.85;">Nu există date de clasament încă.</div>';
+          }catch(e){
+            console.error('renderLeaderboard error', e);
+            lb.innerHTML = '<div style="opacity:.85;">Eroare la încărcarea clasamentului (Rules?).</div>';
+          }
+        }
+
+        // boot
+        document.addEventListener('DOMContentLoaded', ()=>{
+          try{ _ensurePromoExtraFields(); }catch(e){}
+          try{ listenPromos(); }catch(e){}
+          try{ renderLeaderboard(); }catch(e){}
+        });
 
         // =============================================
         // ETHERSCAN – DATE REALE (fără endpoint-uri inexistente)
