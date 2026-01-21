@@ -1,366 +1,1309 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>StancuBYT | Giveaway & Promoții</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StancuBYT | Giveaway & Promoții</title>
+  <style>
+        /* Variabile culori conform psihologiei marketingului */
+        :root {
+            --blue-tech: #0066ff;
+            --green-growth: #00ff88;
+            --purple-innov: #8a2be2;
+            --neon-cyan: #00ffff;
+            --dark-bg: #0a0a1f;
+            --darker-bg: #050510;
+            --orange-alert: #ff9500;
+        }
 
-<style>
-:root {
-  --bg0:#050510; --bg1:#0a0a1f;
-  --txt:rgba(255,255,255,.92); --muted:rgba(255,255,255,.72);
-  --stroke: rgba(255,255,255,.14);
-  --r: 22px;
-  --shadow: 0 18px 60px rgba(0,0,0,.55);
-  --shadow2: 0 8px 26px rgba(0,0,0,.45);
-  --neon-cyan:#00ffff; --blue:#0066ff; --green:#00ff88; --purple:#8a2be2; --gold:#ffd166; --orange:#ff9500; --red:#ff4d4d;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
+        }
+
+        /* Particle Animation Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Logo Background pentru Hero Section */
+        .hero-logo-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .logo-3d-bg {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: float3d 20s infinite ease-in-out;
+        }
+
+        .logo-3d-bg img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            filter: blur(1px) brightness(1.2);
+        }
+
+        @keyframes float3d {
+            0%, 100% { 
+                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
+            }
+            25% { 
+                transform: translateY(-20px) rotateX(5deg) rotateY(5deg); 
+            }
+            50% { 
+                transform: translateY(0px) rotateX(0deg) rotateY(10deg); 
+            }
+            75% { 
+                transform: translateY(20px) rotateX(-5deg) rotateY(5deg); 
+            }
+        }
+
+        /* 3D Logo Animation */
+        .logo-3d-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            perspective: 1000px;
+        }
+
+        .logo-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate3d 8s infinite linear;
+        }
+
+        .logo-3d img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            backface-visibility: hidden;
+        }
+
+        .backnote-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translate(-50%, -50%);
+            animation: orbit 6s infinite linear;
+        }
+
+        .backnote {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.7;
+        }
+
+        .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+        .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+        .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+
+        @keyframes rotate3d {
+            0% { transform: rotateY(0deg) rotateX(5deg); }
+            100% { transform: rotateY(360deg) rotateX(5deg); }
+        }
+
+        @keyframes orbit {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Buton Modern Reîmprospătează Datele */
+        .btn-refresh-modern {
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-refresh-modern:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
+        }
+
+        .btn-refresh-modern:active {
+            transform: translateY(0) scale(1);
+        }
+
+        .refresh-icon {
+            font-size: 1.3rem;
+            transition: transform 0.5s ease;
+        }
+
+        .btn-refresh-modern:hover .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .refresh-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50px;
+            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+            opacity: 0;
+            z-index: -1;
+            animation: pulseEffect 2s infinite;
+        }
+
+        @keyframes rotate360 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseEffect {
+            0% { 
+                transform: scale(1); 
+                opacity: 0.7; 
+            }
+            100% { 
+                transform: scale(1.2); 
+                opacity: 0; 
+            }
+        }
+
+        /* Loading animation pentru buton */
+        .btn-refresh-modern.loading {
+            background: linear-gradient(45deg, #666, #888);
+            cursor: wait;
+        }
+
+        .btn-refresh-modern.loading .refresh-icon {
+            animation: rotate360 1s linear infinite;
+        }
+
+        .btn-refresh-modern.loading .refresh-text {
+            opacity: 0.7;
+        }
+
+        /* Animatie pentru actualizare succes */
+        @keyframes successFlash {
+            0%, 100% { 
+                background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); 
+            }
+            50% { 
+                background: linear-gradient(45deg, var(--green-growth), #00cc66); 
+            }
+        }
+
+        .btn-refresh-modern.success {
+            animation: successFlash 0.5s ease 2;
+        }
+
+        /* Navigation - Scientific Style */
+        .scientific-nav {
+            background: rgba(10, 10, 31, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--blue-tech);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        /* Main Content Sections */
+        .page-section {
+            min-height: 100vh;
+            padding: 120px 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .active-section {
+            display: block;
+        }
+
+        /* Hero Section - Prezentare */
+        .hero {
+            text-align: center;
+            padding-top: 150px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--blue-tech), var(--green-growth), var(--purple-innov));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(45deg); }
+        }
+
+        /* Sectiune Noutati */
+        .news-section {
+            margin: 3rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--green-growth);
+        }
+
+        .news-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .news-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .news-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .news-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--green-growth);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.1);
+        }
+
+        .news-card.pinned {
+            border: 2px solid var(--orange-alert);
+            background: rgba(255, 149, 0, 0.05);
+        }
+
+        .news-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .badge-update {
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--blue-tech);
+            border: 1px solid var(--blue-tech);
+        }
+
+        .badge-announcement {
+            background: rgba(255, 149, 0, 0.2);
+            color: var(--orange-alert);
+            border: 1px solid var(--orange-alert);
+        }
+
+        .badge-event {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-growth);
+            border: 1px solid var(--green-growth);
+        }
+
+        .news-date {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-form {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            outline: none;
+        }
+
+        /* Contor Vizite */
+        .visit-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 10, 31, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--blue-tech);
+            border-radius: 15px;
+            padding: 0.8rem 1.2rem;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .visit-counter:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+
+        .counter-icon {
+            animation: pulse 2s infinite;
+        }
+
+        .token-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--green-growth);
+        }
+
+        /* Social Links in Hero */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .social-btn:hover {
+            background: rgba(0, 102, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
+        }
+
+        /* Buton Uniswap */
+        .uniswap-btn {
+            background: linear-gradient(45deg, #ff007a, #8a2be2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+
+        .uniswap-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.4);
+        }
+
+        /* Scientific Data Visualization */
+        .data-visualization {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .period-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn.active {
+            background: var(--blue-tech);
+            border-color: var(--blue-tech);
+        }
+
+        .period-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            margin: 0.5rem 0;
+        }
+
+        .neon-glow {
+            box-shadow: 
+                0 0 20px rgba(0, 102, 255, 0.3),
+                0 0 40px rgba(0, 255, 136, 0.2),
+                inset 0 0 20px rgba(138, 43, 226, 0.1);
+        }
+
+        /* Status Indicators */
+        .status-online {
+            color: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        .status-offline {
+            color: #ff4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Token Price Display */
+        .price-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .price-change {
+            font-size: 1.2rem;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
+        .positive { color: #00ff88; background: rgba(0, 255, 136, 0.1); }
+        .negative { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
+
+        /* Whitepaper Specific Styles */
+        .whitepaper-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 20px;
+        }
+
+        .whitepaper-logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            padding: 15px;
+            box-shadow: 0 0 40px rgba(0, 102, 255, 0.4);
+        }
+
+        .whitepaper-logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .toc {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--green-growth);
+        }
+
+        .toc h3 {
+            margin-bottom: 1rem;
+            color: var(--neon-cyan);
+        }
+
+        .toc ul {
+            columns: 2;
+            column-gap: 3rem;
+        }
+
+        .toc li {
+            margin-bottom: 0.8rem;
+            break-inside: avoid;
+        }
+
+        .toc a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--neon-cyan);
+            text-decoration: underline;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+        }
+
+        .section-card h3 {
+            color: var(--green-growth);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .whitepaper-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .whitepaper-table th {
+            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .whitepaper-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .whitepaper-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .whitepaper-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.2rem;
+        }
+
+        .badge-success {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-growth);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(0, 204, 255, 0.2);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 204, 255, 0.3);
+        }
+
+        .roadmap-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 2rem 0;
+        }
+
+        .roadmap-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--blue-tech), var(--purple-innov));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .timeline-date {
+            font-weight: bold;
+            color: var(--green-growth);
+            margin-bottom: 0.5rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, var(--green-growth), var(--blue-tech));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .social-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .social-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
+            border-color: var(--blue-tech);
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .required {
+            color: #ff4444;
+        }
+
+        .contact-card {
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 3px solid;
+            margin-bottom: 1rem;
+        }
+
+        .contact-card.business {
+            border-color: var(--green-growth);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .contact-card.partnership {
+            border-color: var(--blue-tech);
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .contact-card.security {
+            border-color: var(--purple-innov);
+            background: rgba(138, 43, 226, 0.05);
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .time-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .time-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-logo-bg {
+                width: 400px;
+                height: 400px;
+            }
+
+            .token-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-display {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .btn-refresh-modern {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .social-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc ul {
+                columns: 1;
+            }
+
+            .whitepaper-table {
+                font-size: 0.9rem;
+            }
+
+            .whitepaper-table th,
+            .whitepaper-table td {
+                padding: 0.5rem;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .visit-counter {
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .nav-links a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .whitepaper-logo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    
+        .form-group select option {
+            background: var(--darker-bg);
+            color: #ffffff;
+        }
+
+    
+/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
+.admin-login{
+  margin-top: 80px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  border-top: 2px solid rgba(122,92,255,.8);
+  text-align: center;
+  border-radius: 16px;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
-body{
-  color:var(--txt);
-  background:
-    radial-gradient(1000px 520px at 18% 12%, rgba(0,255,255,.12), transparent 60%),
-    radial-gradient(900px 480px at 82% 18%, rgba(138,43,226,.16), transparent 60%),
-    radial-gradient(1100px 560px at 50% 92%, rgba(0,255,136,.10), transparent 60%),
-    linear-gradient(180deg, var(--bg1), var(--bg0));
-  min-height:100vh;
+.admin-login h2{ color:#fff; margin:0 0 10px; }
+.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
+.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+.admin-login-box input{
+  padding:12px 14px; width:280px; max-width:92vw;
+  border-radius:10px; border:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25); color:#fff; outline:none;
 }
-.wrap{max-width:1200px;margin:0 auto;padding:22px 16px 70px}
-
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:14px;
-  padding:14px 16px;border:1px solid var(--stroke);
-  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-  border-radius:var(--r);box-shadow:var(--shadow2);
-  position:sticky;top:10px;z-index:30;backdrop-filter:blur(10px);
+.admin-login-box button{
+  padding:12px 16px; border-radius:10px; border:none;
+  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
 }
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.18);
-  background:
-    radial-gradient(circle at 30% 30%, rgba(0,255,255,.45), transparent 52%),
-    radial-gradient(circle at 70% 20%, rgba(138,43,226,.45), transparent 55%),
-    radial-gradient(circle at 40% 75%, rgba(0,255,136,.35), transparent 58%),
-    rgba(255,255,255,.06);
-  box-shadow:0 10px 26px rgba(0,0,0,.45);overflow:hidden;
+.admin-login-box button:hover{ filter: brightness(1.08); }
+.admin-msg{ margin-top:12px; font-weight:700; }
+.admin-pill{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px; font-size:.9rem;
+  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
 }
-.logo img{width:100%;height:100%;object-fit:cover;opacity:.9}
-.brand h1{font-size:16px;letter-spacing:.2px}
-.brand .sub{font-size:12px;color:var(--muted);margin-top:2px}
-
-.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-.pill{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--txt);font-size:13px;white-space:nowrap}
-.btn{cursor:pointer;border:none;border-radius:14px;padding:11px 14px;color:#061018;font-weight:800;letter-spacing:.2px;box-shadow:0 16px 45px rgba(0,0,0,.45);transition:transform .15s ease, filter .15s ease, opacity .15s ease;display:inline-flex;align-items:center;gap:9px;user-select:none}
-.btn:active{transform:translateY(1px) scale(.99)}
-.btn:hover{filter:brightness(1.05)}
-.btn[disabled]{opacity:.55;cursor:not-allowed;filter:grayscale(.3)}
-.btn-primary{background:linear-gradient(90deg, rgba(0,255,255,.95), rgba(0,102,255,.95))}
-.btn-accent{background:linear-gradient(90deg, rgba(255,209,102,.96), rgba(255,149,0,.96))}
-.btn-ghost{color:var(--txt);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);box-shadow:none}
-
-.hero{
-  margin-top:16px;border:1px solid var(--stroke);border-radius:var(--r);
-  background:
-    radial-gradient(680px 340px at 22% 25%, rgba(0,255,255,.16), transparent 60%),
-    radial-gradient(680px 340px at 78% 18%, rgba(138,43,226,.18), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  box-shadow:var(--shadow);overflow:hidden;position:relative
+.admin-pill.off{
+  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
 }
-.hero:before{content:"";position:absolute;inset:-2px;background:linear-gradient(120deg, rgba(0,255,255,.14), rgba(138,43,226,.14), rgba(0,0,0,.0), rgba(0,255,136,.12));filter:blur(32px);opacity:.8;pointer-events:none}
-.hero-inner{position:relative;padding:22px 18px}
-.hero h2{font-size:22px;margin-bottom:6px}
-.hero p{color:var(--muted);line-height:1.5;max-width:80ch}
-.hero .hint{margin-top:10px;font-size:12px;color:rgba(255,255,255,.65)}
-.hero .quick{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
-.tag{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);font-size:12px;color:rgba(255,255,255,.84)}
+.admin-only{ display:none !important; }
 
-.grid{margin-top:18px;display:grid;grid-template-columns:repeat(12,1fr);gap:14px;align-items:start}
-.panel{border:1px solid var(--stroke);border-radius:var(--r);background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));box-shadow:var(--shadow2);overflow:hidden}
-.panel .hd{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.panel .hd h3{font-size:14px;letter-spacing:.2px}
-.panel .bd{padding:14px}
-.left{grid-column:span 4}
-.right{grid-column:span 8}
-@media(max-width:980px){.left,.right{grid-column:span 12}}
-
-.admin-only{display:none}
-
-.admin-desc{color:var(--muted);margin:8px 0 12px;line-height:1.45}
-.admin-login-box{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-.admin-login-box input{padding:12px 14px;width:280px;max-width:92vw;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#fff;outline:none}
-.admin-login-box button{padding:12px 16px;border-radius:10px;border:none;background:#7a5cff;color:#fff;font-weight:700;cursor:pointer}
-.admin-login-box button:hover{filter:brightness(1.08)}
-.admin-status-row{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap}
-.admin-badge{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);font-size:12px}
-.admin-badge-on{border-color:rgba(0,255,136,.35);background:rgba(0,255,136,.10)}
-.admin-badge-off{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.08)}
-.admin-user-label{font-size:12px;color:rgba(255,255,255,.75)}
-.admin-msg{margin-top:12px;font-weight:700;text-align:center}
-
-input,select,textarea{width:100%;padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.22);color:var(--txt);outline:none}
-textarea{min-height:120px;resize:vertical}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.two>*{flex:1 1 180px}
-.three>*{flex:1 1 140px}
-
-.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-@media(max-width:900px){.cards{grid-template-columns:1fr}}
-
-.promo-card{border:1px solid rgba(255,255,255,.16);border-radius:calc(var(--r) + 6px);overflow:hidden;position:relative;box-shadow:var(--shadow);min-height:420px;background:rgba(0,0,0,.25)}
-.promo-bg{position:absolute;inset:0;background:
-  radial-gradient(700px 360px at 30% 20%, rgba(0,255,255,.18), transparent 60%),
-  radial-gradient(740px 360px at 80% 25%, rgba(138,43,226,.20), transparent 60%),
-  radial-gradient(760px 380px at 50% 92%, rgba(0,255,136,.15), transparent 60%),
-  linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.65));
-  filter:saturate(1.05);transform:scale(1.03)
+/* ====== TROPHY BUTTON (Giveaway add) ====== */
+.trophy-btn{
+  padding: 10px 14px !important;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  min-width: 54px;
 }
-.promo-bg.has-img{background-size:cover;background-position:center}
-.promo-overlay{position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.75))}
-.promo-inner{position:relative;padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px;height:100%}
-.promo-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:rgba(255,255,255,.92)}
-.badge.live{background:linear-gradient(90deg, rgba(0,255,136,.18), rgba(0,255,255,.14));border-color:rgba(0,255,136,.30)}
-.badge.ended{background:rgba(255,77,77,.10);border-color:rgba(255,77,77,.28)}
-.promo-title{font-size:20px;font-weight:900;letter-spacing:.2px;line-height:1.15}
-.promo-sub{color:rgba(255,255,255,.78);font-size:13px;line-height:1.5}
-.promo-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:rgba(255,255,255,.80);font-size:12px}
-.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06)}
-.promo-prizes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.prize{border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);border-radius:18px;padding:10px 10px;min-height:78px}
-.prize b{display:block;font-size:12px;color:rgba(255,255,255,.88);margin-bottom:6px}
-.prize .v{font-size:12px;color:rgba(255,255,255,.75);line-height:1.35}
-.cta-row{margin-top:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.10);padding-top:12px}
-.link{color:rgba(0,255,255,.95);text-decoration:none;font-weight:800}
-.link:hover{text-decoration:underline}
+.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
+.trophy-btn .trophy-logo{
+  width: 22px; height: 22px; border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0,255,136,.25);
+}
+.table-responsive{ overflow-x:auto; width:100%; }
+.lb-table{ width:100%; border-collapse: collapse; }
+.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
+.lb-top1{ background: rgba(255,215,0,.12); }
+.lb-top2{ background: rgba(192,192,192,.12); }
+.lb-top3{ background: rgba(205,127,50,.12); }
+.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;z-index:90;padding:16px}
-.modal.open{display:flex}
-.modal-card{width:min(720px,100%);border-radius:22px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));box-shadow:var(--shadow);overflow:hidden}
-.modal-hd{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.modal-hd h3{font-size:14px}
-.x{cursor:pointer;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:rgba(255,255,255,.85);font-weight:800}
-.modal-bd{padding:14px}
-.small{font-size:12px;color:rgba(255,255,255,.72);line-height:1.45}
-.hr{height:1px;background:rgba(255,255,255,.10);margin:10px 0}
-.check{display:flex;gap:10px;align-items:flex-start;margin-top:8px;color:rgba(255,255,255,.75);font-size:12px}
-.check input{width:auto;margin-top:2px}
 </style>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-<script>
-  // Firebase init 1:1
-  firebaseConfig = {
-    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-    authDomain: "stancubyt-fc2b9.firebaseapp.com",
-    projectId: "stancubyt-fc2b9",
-    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
-    messagingSenderId: "263244200492",
-    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-    measurementId: "G-272S9HSY3K"
-  };
-  try {
-    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+  <script>
+    window.firebaseConfig = {};
+    try {
+      if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
+        firebase.initializeApp(window.firebaseConfig);
+      }
+    } catch (e) {
+      console.warn("Firebase init warning:", e);
     }
-  } catch(e) {}
-</script>
+  </script>
 </head>
 
 <body>
-<div class="wrap">
-
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo"><img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" onerror="this.style.display='none'"></div>
-      <div>
-        <h1>Giveaway & Promoții</h1>
-        <div class="sub">Carduri mari • efecte moderne • participare instant</div>
-      </div>
+  <div id="particles-js"></div>
+  <div class="visit-counter" id="visitCounter">
+        <span class="counter-icon">👁️</span>
+        <span id="visitCount">0</span> vizite
     </div>
-
-    <div class="top-actions">
-      <div class="pill" id="authPill">🔒 Neautentificat</div>
-
-      <div class="admin-only" style="display:none; gap:10px; align-items:center;" id="adminButtons">
-        <button class="btn btn-accent" type="button" onclick="openAdminForm('promo')">➕ Adaugă Promoție</button>
-        <button class="btn btn-accent" type="button" onclick="openAdminForm('giveaway')">🎁 Adaugă Giveaway</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="hero">
-    <div class="hero-inner">
-      <h2>Promoții care “prind” (psihologie + design modern)</h2>
-      <p>
-        Fiecare card are <b>fundal + banner</b>, <b>premii pe nivele</b>, <b>urgenta (countdown)</b> și
-        <b>buton Participă</b> cu formular. Salvarea se face în <b>Firestore: promos</b> și imaginile în <b>Storage</b>.
-      </p>
-      <div class="quick">
-        <span class="tag">⏳ Countdown</span>
-        <span class="tag">🔥 Top 5 + următoarele 10</span>
-        <span class="tag">🏆 Premii clare</span>
-        <span class="tag">🚀 CTA: Participă</span>
-      </div>
-      <div class="hint">Admin: autentificarea de mai jos este 1:1 ca în fișierele tale.</div>
-    </div>
-  </div>
-
-  <div class="grid">
-    <div class="panel left">
-      <div class="hd"><h3>Admin</h3><span class="pill" id="adminPill">—</span></div>
-      <div class="bd">
-        <section class="admin-login" id="admin-login">
-<h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Autentificare necesara pentru adaugare/stergere membri, anunturi, noutati, giveaway si promotii.</p>
-<div class="admin-login-box">
-<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
-<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
-<button onclick="adminSignIn()" type="button">Autentificare</button>
-<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-</div>
-<div class="admin-status-row">
-<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-<span class="admin-user-label" id="adminUserLabel"></span>
-</div>
-<p class="admin-msg" id="adminLoginMsg"></p>
-
-</section>
-
-        <div class="admin-only" id="adminFormWrap" style="display:none; margin-top:14px;">
-          <div class="pill" id="adminFormTitle">➕ Adaugă campanie</div>
-          <div class="row two" style="margin-top:10px;">
-            <select id="promoType">
-              <option value="promo">Promoție</option>
-              <option value="giveaway">Giveaway</option>
-            </select>
-            <input id="promoEnds" type="datetime-local" />
-          </div>
-
-          <div class="row" style="margin-top:10px;">
-            <input id="promoTitle" type="text" maxlength="120" placeholder="Titlu (ex: Mega Giveaway SBYT)">
-          </div>
-          <div class="row" style="margin-top:10px;">
-            <input id="promoPrize" type="text" maxlength="160" placeholder="Premiu principal (rezumat) (ex: 10.000 SBYT)">
-          </div>
-          <div class="row" style="margin-top:10px;">
-            <textarea id="promoDesc" placeholder="Descriere scurtă, incitantă (ce câștigi, ce trebuie să faci)"></textarea>
-          </div>
-
-          <div class="row three" style="margin-top:10px;">
-            <input id="p1" type="text" placeholder="Premiul I">
-            <input id="p2" type="text" placeholder="Premiul II">
-            <input id="p3" type="text" placeholder="Premiul III">
-          </div>
-          <div class="row two" style="margin-top:10px;">
-            <input id="pTop5" type="text" placeholder="Primele 5 locuri după premii">
-            <input id="pNext10" type="text" placeholder="Următoarele 10 locuri">
-          </div>
-
-          <div class="row" style="margin-top:10px;">
-            <textarea id="promoRules" placeholder="Regulament & condiții (clar, pe pași)"></textarea>
-          </div>
-
-          <div class="row two" style="margin-top:10px;">
-            <input id="ctaText" type="text" placeholder="Text buton (ex: Participă acum!)">
-            <input id="ctaUrl" type="url" placeholder="Link înregistrare (opțional)">
-          </div>
-
-          <div class="row two" style="margin-top:10px;">
-            <div>
-              <div class="small" style="margin-bottom:6px;">Imagine fundal (background)</div>
-              <input id="promoBg" type="file" accept="image/*">
+  <nav class="scientific-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-3d-container">
+                    <div class="logo-3d">
+                        <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'">
+                    </div>
+                    <div class="backnote-orbit">
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                        <div class="backnote"></div>
+                    </div>
+                </div>
+                <div class="logo-text">StancuBYT</div>
             </div>
-            <div>
-              <div class="small" style="margin-bottom:6px;">Banner (cover)</div>
-              <input id="promoBanner" type="file" accept="image/*">
+            <div class="nav-links">
+                <a href="#giveaway" onclick="showSection('giveaway')">Giveaway & Promoții</a>
             </div>
-          </div>
-
-          <div class="row two" style="margin-top:10px;">
-            <input id="promoPoints" type="number" value="10" min="1" placeholder="Puncte per participare (opțional)">
-            <button class="btn btn-primary" type="button" onclick="savePromo()">💾 Salvează</button>
-          </div>
-          <p class="admin-msg" id="saveMsg" style="display:none;"></p>
         </div>
-      </div>
+    </nav>
+
+  <section id="giveaway" class="page-section active-section">
+        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Giveaway & Promoții
+            </h1>
+            <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
+
+            <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                <button class="news-btn admin-only" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
+                <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                </div>
+        </div>
+
+        <div class="data-visualization neon-glow">
+            <h3>📌 Promoții / Giveaway-uri</h3>
+            <div id="promoList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
+
+            <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+    <h3 style="margin-bottom: 1rem; color: var(--neon-cyan);">Adauga promotie / giveaway</h3>
+
+    <div class="form-row">
+        <input type="text" id="promoTitle" placeholder="Titlu (ex: Giveaway SBYT)" maxlength="120">
+        <input type="datetime-local" id="promoEnds" placeholder="Data si ora expirarii">
     </div>
 
-    <div class="panel right">
-      <div class="hd"><h3>Campanii</h3><span class="pill">📌 Live</span></div>
-      <div class="bd">
-        <div id="promoList" class="cards"></div>
-        <div id="emptyState" class="small" style="display:none;">Nu există campanii încă.</div>
-      </div>
+    <div class="form-row">
+        <input type="text" id="promoPrize" placeholder="Premiu (ex: 5000 SBYT + bonusuri)" maxlength="160">
+        <input type="number" id="promoPoints" min="1" step="1" value="10" placeholder="Puncte / promovare">
     </div>
-  </div>
+
+    <div class="form-row">
+        <textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
+    </div>
+
+    <div class="form-row">
+        <input type="file" id="promoMedia" accept="image/*,video/*">
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
+        <button class="news-btn" onclick="savePromo()">💾 Salveaza</button>
+        <button class="news-btn" onclick="cancelPromo()">❌ Anuleaza</button>
+    </div>
+
+    <small style="display:block; margin-top:0.8rem; opacity:0.75;">
+        Media (foto/video) se incarca in Firebase Storage (doar admin). Participantii se inscriu public, cu ID automat.
+    </small>
 </div>
+        </div>
 
-<!-- Participate modal -->
-<div class="modal" id="joinModal" onclick="if(event.target.id==='joinModal') closeJoin()">
-  <div class="modal-card">
-    <div class="modal-hd">
-      <h3 id="joinTitle">Participă</h3>
-      <button class="x" onclick="closeJoin()">✕</button>
-    </div>
-    <div class="modal-bd">
-      <div id="joinInfo" class="small"></div>
-      <div class="hr"></div>
-      <div class="row two">
-        <input id="joinName" type="text" placeholder="Nume (opțional)">
-        <input id="joinEmail" type="email" placeholder="Email (obligatoriu)">
-      </div>
-      <div class="row two" style="margin-top:10px;">
-        <input id="joinWallet" type="text" placeholder="Wallet (opțional)">
-        <input id="joinReferral" type="text" placeholder="Cod referral (opțional)">
-      </div>
-      <div class="check">
-        <input id="joinAgree" type="checkbox">
-        <label for="joinAgree">Sunt de acord să fiu contactat/ă pentru confirmarea participării.</label>
-      </div>
-      <div class="row" style="justify-content:flex-end; margin-top:12px;">
-        <button class="btn btn-primary" id="joinBtn" type="button" onclick="submitJoin()">✅ Confirmă participarea</button>
-        <button class="btn btn-ghost" type="button" onclick="closeJoin()">Anulează</button>
-      </div>
-      <p class="admin-msg" id="joinMsg" style="display:none;"></p>
-    </div>
-  </div>
-</div>
+        <div class="data-visualization neon-glow">
+            <h3>🏆 Clasament participanți</h3>
+            
+            <div id="leaderboard" style="margin-top:1rem;"></div>
+        </div>
+    </section>
 
-<script>
-const ADMIN_EMAILS = ["stancubyt@gmail.com"];
+  <section class="admin-login" id="admin-login">
+            <h2>🔐 Administrator Login</h2>
+            <p class="admin-desc">Autentificare necesara pentru editarea sectiunii 5. Plan de lansare / Roadmap.</p>
+            <div class="admin-login-box">
+                <input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
+                <input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
+                <button onclick="adminSignIn()" type="button">Autentificare</button>
+                <button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
+            </div>
+            <div class="admin-status-row">
+                <span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
+                <span class="admin-user-label" id="adminUserLabel"></span>
+            </div>
+            <p class="admin-msg" id="adminLoginMsg"></p>
+        </section>
 
-const auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
-const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
-const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
-function $(id) { return document.getElementById(id); }
+  <script>
+    // ====== Firebase handles ======
+    const auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
+    const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+    const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
 
-function maskEmail(email) {
+    // ====== Admin login (1:1 whitepaper) ======
+    window.__SBYT_ADMIN = false;
+    const ADMIN_EMAILS = ["stancubyt@gmail.com"];
+    function maskEmail(email) {
   if (!email || typeof email !== 'string') return '';
-  const [u, d] = email.split('@');
-  if (!d) return email;
+  const parts = email.split('@');
+  if (parts.length !== 2) return email;
+  const u = parts[0], d = parts[1];
   const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
   return `${u2}@${d}`;
-}
-
-
-function escapeHtml(s) {
-  return String(s||'').replace(/[&<>"'`=\/]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'}[ch]));
-}
-
-function formatCountdown(ms) {
-  if (ms <= 0) return '0d 0h 0m';
-  const m = Math.floor(ms/60000);
-  const d = Math.floor(m/(60*24));
-  const h = Math.floor((m - d*60*24)/60);
-  const mm = m - d*60*24 - h*60;
-  return `${d}d ${h}h ${mm}m`;
-}
-
-function setAdminUI(isAdmin, user) {
+}function setAdminUI(isAdmin, user) {
   const badge = document.getElementById('adminStatusBadge');
   const label = document.getElementById('adminUserLabel');
   const msg = document.getElementById('adminLoginMsg');
@@ -371,79 +1314,74 @@ function setAdminUI(isAdmin, user) {
     badge.classList.add(isAdmin ? 'admin-badge-on' : 'admin-badge-off');
     badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
   }
-  if (label) {
-    label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
-  }
+  if (label) label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
   if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
 
   if (msg) {
     msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
     msg.textContent = user
-      ? (isAdmin ? 'Mod administrator activ.' : 'Autentificat, dar fara drepturi admin.')
+      ? (isAdmin ? 'Mod administrator activ. Roadmap poate fi editat.' : 'Autentificat, dar fara drepturi admin.')
       : 'Autentifica-te cu email + parola (Firebase).';
   }
 
-  // arata/ascunde elemente admin-only daca exista
-  document.querySelectorAll('.admin-only').forEach(el => {
-    el.style.display = isAdmin ? 'block' : 'none';
-  });
-  try { ensureNewsAdminUI(); } catch(e) {}
-  try { loadNews(); } catch(e) {}
-
-}
-
-async function computeIsAdmin(user) {
+  // activeaza/dezactiveaza controalele roadmap
+  try { setRoadmapAdminMode(isAdmin); } catch(e) {}
+  try { setFounderAdminUI(isAdmin); } catch(e) {}
+  // activeaza/dezactiveaza controalele membri echipa
+  try { setTeamAdminMode(isAdmin); } catch(e) {}
+}async function computeIsAdmin(user) {
   if (!user) return false;
   try {
-    // 1) custom claim admin
     const token = await user.getIdTokenResult(true);
     if (token && token.claims && token.claims.admin === true) return true;
   } catch (e) {}
-  // 2) whitelist email
   const email = (user.email || '').toLowerCase();
   return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
-}
-
-async function adminSignIn() {
+}async function adminSignIn(){
   try {
-    if (typeof firebase === 'undefined' || !firebase.auth) {
-      alert('Firebase Auth nu este incarcat.');
-      return;
-    }
+    if (!auth) { alert('Firebase Auth nu este incarcat.'); return; }
     const email = (document.getElementById('adminEmail')?.value || '').trim();
     const pass = (document.getElementById('adminPass')?.value || '');
-
     if (!email || !pass) {
       const msg = document.getElementById('adminLoginMsg');
       if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
       return;
     }
-
-    await firebase.auth().signInWithEmailAndPassword(email, pass);
-    // onAuthStateChanged va actualiza UI
+    await auth.signInWithEmailAndPassword(email, pass);
   } catch (e) {
     const msg = document.getElementById('adminLoginMsg');
     if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
   }
+}async function adminSignOut(){
+  try { if (auth) await auth.signOut(); } catch(e) {}
 }
 
-async function adminSignOut() {
-  try {
-    if (typeof firebase === 'undefined' || !firebase.auth) return;
-    await firebase.auth().signOut();
-  } catch (e) {}
-}
+    // Listener auth state -> update UI + show/hide admin-only
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+          firebase.auth().onAuthStateChanged(async (user) => {
+            const isAdmin = await computeIsAdmin(user);
+            window.__SBYT_ADMIN = isAdmin;
+            setAdminUI(isAdmin, user);
+          });
+        }
+      } catch (e) {}
+    });
 
-function openAdminForm(kind) {
-  const wrap = $('adminFormWrap');
-  if (wrap) wrap.style.display = 'block';
-  const sel = $('promoType');
-  if (sel) sel.value = (kind === 'giveaway') ? 'giveaway' : 'promo';
-  const t = $('adminFormTitle');
-  if (t) t.textContent = (kind === 'giveaway') ? '🎁 Adaugă Giveaway' : '➕ Adaugă Promoție';
-}
+    // ====== Navigation helper ======
+    function showSection(id){
+      const sec = document.getElementById(id);
+      if (!sec) return;
+      document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active-section'));
+      sec.classList.add('active-section');
+      window.location.hash = '#'+id;
+    }
+    window.addEventListener('load', ()=>showSection('giveaway'));
 
-async function uploadPromoMedia(promoId, file) {
+    // ====== Promo CRUD (Firestore + Storage) ======
+    let __promosUnsub = null;
+    async function uploadPromoMedia(promoId, file) {
   if (!storage || !file) return null;
   const safeName = String(file.name || 'file').replace(/[^\w.\-]+/g, '_');
   const path = `promos/${promoId}/${Date.now()}_${safeName}`;
@@ -451,56 +1389,25 @@ async function uploadPromoMedia(promoId, file) {
   await ref.put(file);
   const url = await ref.getDownloadURL();
   return { url, path, contentType: file.type || 'application/octet-stream', name: safeName };
-}
+}async function savePromo() {
+  const ok = await ensureAdminAuth();
+  if (!ok) return;
 
-let __promosUnsub = null;
-let __activePromoId = null;
-let __activePromo = null;
-
-function cancelPromo() {
-  ['promoTitle','promoPrize','promoDesc','promoEnds','p1','p2','p3','pTop5','pNext10','promoRules','ctaText','ctaUrl'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
-  if ($('promoBg')) $('promoBg').value = '';
-  if ($('promoBanner')) $('promoBanner').value = '';
-}
-
-async function savePromo() {
-  if (!db || !auth?.currentUser) {
-    alert('Autentificare necesară.');
-    return;
-  }
-  const isAdmin = await computeIsAdmin(auth.currentUser);
-  if (!isAdmin) {
-    alert('Autentificat, dar fără drepturi admin.');
-    return;
-  }
-
-  const title = ($('promoTitle')?.value || '').trim();
-  const prize = ($('promoPrize')?.value || '').trim();
-  const desc = ($('promoDesc')?.value || '').trim();
-  const ends = ($('promoEnds')?.value || '').trim();
-  const points = parseInt($('promoPoints')?.value || '10', 10) || 10;
-
-  const type = ($('promoType')?.value || 'promo').trim();
-  const p1 = ($('p1')?.value || '').trim();
-  const p2 = ($('p2')?.value || '').trim();
-  const p3 = ($('p3')?.value || '').trim();
-  const top5 = ($('pTop5')?.value || '').trim();
-  const next10 = ($('pNext10')?.value || '').trim();
-  const rules = ($('promoRules')?.value || '').trim();
-  const ctaText = ($('ctaText')?.value || '').trim() || 'Participă acum!';
-  const ctaUrl = ($('ctaUrl')?.value || '').trim();
-
-  const bgFile = $('promoBg')?.files?.[0] || null;
-  const bannerFile = $('promoBanner')?.files?.[0] || null;
+  const title = (document.getElementById('promoTitle')?.value || '').trim();
+  const prize = (document.getElementById('promoPrize')?.value || '').trim();
+  const desc = (document.getElementById('promoDesc')?.value || '').trim();
+  const ends = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
+  const points = parseInt(document.getElementById('promoPoints')?.value || '10', 10) || 10;
+  const file = document.getElementById('promoMedia')?.files?.[0] || null;
 
   if (!title || !ends || !desc) {
-    alert('Completează titlul, descrierea și data expirării.');
+    alert('Completeaza titlul, data de final si descrierea.');
     return;
   }
 
   const endsAt = new Date(ends).getTime();
   if (!endsAt || endsAt <= Date.now()) {
-    alert('Data expirării trebuie să fie în viitor!');
+    alert('Data expirarii trebuie sa fie in viitor!');
     return;
   }
 
@@ -510,167 +1417,35 @@ async function savePromo() {
       prize: prize || null,
       desc,
       endsAt,
-      endDate: ends,
       pointsPerPromotion: points,
-      type,
-      prizes: { p1: p1||null, p2: p2||null, p3: p3||null, top5: top5||null, next10: next10||null },
-      rules: rules || null,
-      ctaText,
-      ctaUrl: ctaUrl || null,
       createdAt: Date.now(),
       status: 'active',
-      bg: null,
-      banner: null
+      media: null
     });
 
-    if (bgFile) {
-      const bg = await uploadPromoMedia(ref.id, bgFile);
-      if (bg) await db.collection('promos').doc(ref.id).update({ bg });
-    }
-    if (bannerFile) {
-      const banner = await uploadPromoMedia(ref.id, bannerFile);
-      if (banner) await db.collection('promos').doc(ref.id).update({ banner });
+    if (file) {
+      const media = await uploadPromoMedia(ref.id, file);
+      if (media) await ref.update({ media });
     }
 
     cancelPromo();
-    alert('Giveaway/Promoție adăugată!');
+    alert('Giveaway/Promotie adaugata!');
   } catch (e) {
     console.error("savePromo error:", e);
-    alert('Eroare la salvare (verifică Firestore Rules pentru promos / Storage).');
+    alert('Eroare la salvarea giveaway-ului (verifica Rules / Storage).');
   }
-}
-
-async function deletePromo(promoId) {
-  const isAdmin = await computeIsAdmin(auth?.currentUser);
-  if (!isAdmin) return;
-  if (!confirm('Ștergi această promoție/giveaway?')) return;
+}async function deletePromo(promoId) {
+  const ok = await ensureAdminAuth();
+  if (!ok) return;
+  if (!confirm('Stergi aceasta promotie/giveaway?')) return;
   try {
     await db.collection('promos').doc(promoId).delete();
-  } catch(e) {
-    console.error(e);
-    alert('Eroare la ștergere (Rules).');
+  } catch (e) {
+    console.error("deletePromo error:", e);
+    alert('Eroare la stergere (Rules).');
   }
-}
-
-function renderPromos(promos) {
-  const host = $('promoList');
-  const empty = $('emptyState');
-  if (!host) return;
-
-  if (!promos || !promos.length) {
-    host.innerHTML = '';
-    if (empty) empty.style.display = 'block';
-    return;
-  }
-  if (empty) empty.style.display = 'none';
-
-  const now = Date.now();
-  host.innerHTML = promos.map(p => {
-    const endAt = Number(p.endsAt || p.endAt || 0);
-    const live = endAt && endAt > now;
-    const left = endAt ? (endAt - now) : 0;
-
-    let bgStyle = '';
-    let bgClass = 'promo-bg';
-    if (p.bg && p.bg.url) {
-      bgClass += ' has-img';
-      const u = String(p.bg.url).replace(/["'()\\]/g,'');
-      bgStyle = `background-image: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.78)), url(${u});`;
-    }
-
-    const bannerHtml = (p.banner && p.banner.url)
-      ? `<div style="margin-top:8px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14)">
-           <img src="${String(p.banner.url).replace(/["'()\\]/g,'')}" alt="" style="width:100%;height:160px;object-fit:cover;display:block">
-         </div>`
-      : ``;
-
-    const badgeCls = live ? 'live' : 'ended';
-    const badgeTxt = live ? 'LIVE' : 'EXPIRAT';
-    const typeLbl = (String(p.type||'promo')==='giveaway') ? '🎁 Giveaway' : '⚡ Promoție';
-    const when = p.endDate ? escapeHtml(String(p.endDate).replace('T',' ')) : (endAt ? new Date(endAt).toLocaleString('ro-RO') : '—');
-
-    const prizes = p.prizes || {};
-    const p1 = escapeHtml(prizes.p1 || p.prize || '—');
-    const p2 = escapeHtml(prizes.p2 || '—');
-    const p3 = escapeHtml(prizes.p3 || '—');
-    const top5 = escapeHtml(prizes.top5 || '');
-    const next10 = escapeHtml(prizes.next10 || '');
-
-    const rules = escapeHtml(p.rules || '');
-    const ctaText = escapeHtml(p.ctaText || 'Participă acum!');
-    const ctaUrl = (p.ctaUrl || '').trim();
-
-    const adminBtns = window.__SBYT_ADMIN
-      ? `<button class="btn btn-ghost" style="padding:10px 12px" onclick="deletePromo('${p._id}')">🗑️ Șterge</button>`
-      : ``;
-
-    const ctaBtn = live
-      ? `<button class="btn btn-primary" style="padding:12px 16px" onclick="openJoin('${p._id}')">🚀 ${ctaText}</button>`
-      : `<button class="btn btn-ghost" style="padding:12px 16px" disabled>Campanie închisă</button>`;
-
-    const linkHtml = (ctaUrl && live)
-      ? `<a class="link" href="${escapeHtml(ctaUrl)}" target="_blank" rel="noopener">Link înregistrare</a>`
-      : '';
-
-    return `
-      <div class="promo-card">
-        <div class="${bgClass}" style="${bgStyle}"></div>
-        <div class="promo-overlay"></div>
-        <div class="promo-inner">
-          <div class="promo-top">
-            <div class="badge ${badgeCls}">${typeLbl} • ${badgeTxt}</div>
-            <div class="badge ${badgeCls}">⏳ ${live ? formatCountdown(left) : '0d 0h 0m'}</div>
-          </div>
-
-          <div>
-            <div class="promo-title">${escapeHtml(p.title||'Fără titlu')}</div>
-            <div class="promo-sub">${escapeHtml(p.desc||'')}</div>
-          </div>
-
-          ${bannerHtml}
-
-          <div class="promo-meta">
-            <span class="chip">📅 Expiră: <b>${when}</b></span>
-            <span class="chip">🎯 Bonus: <b>referral + clasament</b></span>
-          </div>
-
-          <div class="promo-prizes">
-            <div class="prize"><b>🏆 Premiul I</b><div class="v">${p1}</div></div>
-            <div class="prize"><b>🥈 Premiul II</b><div class="v">${p2}</div></div>
-            <div class="prize"><b>🥉 Premiul III</b><div class="v">${p3}</div></div>
-          </div>
-
-          ${(top5||next10) ? `
-            <div class="promo-prizes" style="grid-template-columns:1fr 1fr">
-              <div class="prize"><b>🔥 Primele 5 locuri</b><div class="v">${top5||'—'}</div></div>
-              <div class="prize"><b>✨ Următoarele 10 locuri</b><div class="v">${next10||'—'}</div></div>
-            </div>
-          ` : ''}
-
-          <div class="promo-sub" style="border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);padding:10px 12px;border-radius:18px">
-            <b style="color:rgba(255,255,255,.92)">📜 Regulament</b><br>
-            ${rules ? (rules.length>320 ? rules.slice(0,320)+'…' : rules) : '—'}
-          </div>
-
-          <div class="cta-row">
-            <div class="promo-meta">
-              <span>✅ Participare rapidă</span>
-              ${linkHtml ? `<span>•</span>${linkHtml}` : ''}
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-              ${adminBtns}
-              ${ctaBtn}
-            </div>
-          </div>
-
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function listenPromos() {
-  const list = $('promoList');
+}async function listenPromos() {
+  const list = document.getElementById('promoList');
   if (!list || !db) return;
 
   if (__promosUnsub) { try { __promosUnsub(); } catch(_) {} __promosUnsub = null; }
@@ -679,130 +1454,410 @@ function listenPromos() {
     const promos = [];
     snap.forEach(doc => promos.push({ _id: doc.id, ...doc.data() }));
     renderPromos(promos);
-  }, err => {
-    console.error(err);
-    $('emptyState').style.display = 'block';
-    $('emptyState').textContent = 'Nu pot citi campaniile (verifică Firestore Rules pentru read).';
   });
-}
-
-function openJoin(promoId) {
-  __activePromoId = promoId;
-  $('joinModal')?.classList.add('open');
-  $('joinMsg').style.display='none';
-  $('joinBtn').disabled = true;
-  loadJoin(promoId);
-}
-function closeJoin() {
-  $('joinModal')?.classList.remove('open');
-  __activePromoId=null; __activePromo=null;
-  ['joinName','joinEmail','joinWallet','joinReferral'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
-  if ($('joinAgree')) $('joinAgree').checked=false;
-  $('joinMsg').style.display='none';
-}
-async function loadJoin(promoId) {
-  try {
-    const doc = await db.collection('promos').doc(promoId).get();
-    if (!doc.exists) throw new Error('Campania nu există.');
-    const p = { _id: doc.id, ...doc.data() };
-    __activePromo = p;
+}async function renderPromos(promos){
+    const list = $('promoList');
+    if (!list) return;
+    list.innerHTML = '';
     const now = Date.now();
-    const endAt = Number(p.endsAt||0);
-    const live = endAt>now;
 
-    $('joinTitle').textContent = (String(p.type)==='giveaway') ? '🎁 Participă la Giveaway' : '⚡ Participă la Promoție';
-    $('joinInfo').innerHTML = `<b>${escapeHtml(p.title||'')}</b><br>
-      <span class="small">${escapeHtml(p.desc||'')}</span><br>
-      <span class="small">⏳ ${live ? ('Timp rămas: <b>'+formatCountdown(endAt-now)+'</b>') : '<b>Campanie expiratã</b>'}</span>`;
-    $('joinBtn').disabled = !live;
-    if (!live) {
-      $('joinMsg').style.display='block';
-      $('joinMsg').style.color = '#ff4d4d';
-      $('joinMsg').textContent = 'Campania este expirată.';
+    if (!promos.length){
+      list.innerHTML = '<div style="opacity:0.85;">Nu există promoții/giveaway-uri active încă.</div>';
+      return;
     }
-  } catch(e) {
-    $('joinInfo').textContent = 'Nu pot încărca detaliile.';
-    $('joinMsg').style.display='block';
-    $('joinMsg').style.color = '#ff4d4d';
-    $('joinMsg').textContent = 'Eroare: ' + (e?.message||e);
+
+    for (const p of promos){
+      const expired = p.endsAt && p.endsAt <= now;
+      const badge = expired ? 'Expirat' : (p.kind==='giveaway' ? 'Giveaway' : 'Promoție');
+
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      card.style.margin = '0';
+
+      const endsStr = p.endsAt ? new Date(p.endsAt).toLocaleString('ro-RO') : '-';
+      const participants = await _loadParticipants(p._id);
+
+      const participantsHtml = participants.length
+        ? `<div style="margin-top:10px; opacity:0.95;">
+             <div style="font-weight:700; margin-bottom:6px;">Participanți (${participants.length})</div>
+             <div style="display:grid; gap:6px;">
+               ${participants.map(x=>`<div style="display:flex;justify-content:space-between;gap:10px; background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:10px;">
+                   <div style="min-width:0;">
+                     <div style="font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${_escape(x.name||'')}</div>
+                     <div style="opacity:0.8; font-size:0.85rem;">${_escape(x.email||'')} • ${_escape(x.wallet||'')}</div>
+                   </div>
+                   <div style="opacity:0.85; font-size:0.85rem;">ID: <strong>${_escape(x.code||'')}</strong></div>
+                 </div>`).join('')}
+             </div>
+           </div>`
+        : `<div style="margin-top:10px; opacity:0.8;">Niciun participant încă.</div>`;
+
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="font-weight:800; color:#fff;">${_escape(p.title||'')}</div>
+          <div style="padding:6px 10px; border-radius:999px; background:rgba(0,255,136,0.12); border:1px solid rgba(0,255,136,0.25); font-size:0.85rem;">${badge}</div>
+        </div>
+        <div style="opacity:0.85; margin-top:6px;">⏳ Expiră: <strong>${_escape(endsStr)}</strong></div>
+        ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${_escape(p.prize)}</strong></div>`:''}
+        <div style="opacity:0.92; margin-top:10px; line-height:1.5;">${_escape(p.desc||'')}</div>
+
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
+          <div style="font-weight:700; margin-bottom:8px;">Înscriere</div>
+          <div class="form-row">
+            <input type="text" id="joinName_${_escape(p._id)}" placeholder="Nume" maxlength="80">
+            <input type="email" id="joinEmail_${_escape(p._id)}" placeholder="Email" maxlength="120">
+          </div>
+          <div class="form-row">
+            <input type="text" id="joinWallet_${_escape(p._id)}" placeholder="Wallet (0x...)" maxlength="64">
+            <button class="news-btn" onclick="joinPromo('${_escape(p._id)}')" ${expired?'disabled':''} style="min-width:160px;">✅ Înscrie-te</button>
+          </div>
+          <div style="opacity:0.75; font-size:0.85rem; margin-top:6px;">
+            După înscriere primești un cod (ID) și se deschide emailul de confirmare.
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
+            <button class="news-btn" onclick="deletePromo('${_escape(p._id)}')">🗑️ Șterge</button>
+          </div>
+          ${participantsHtml}
+        </div>
+      `;
+      list.appendChild(card);
+    }
+  }
+  window.renderPromos = renderPromos;
+
+  window.deletePromo = async function(promoId){
+    const ok = await _ensureAdmin();
+    if (!ok) return;
+    if (!db) return;
+    if (!confirm('Ștergi această promoție/giveaway?')) return;
+    try{
+      // delete participants subcollection
+      const partSnap = await db.collection('promos').doc(promoId).collection('participants').get();
+      const batch = db.batch();
+      partSnap.forEach(d=>batch.delete(d.ref));
+      batch.delete(db.collection('promos').doc(promoId));
+      await batch.commit();
+    }catch(e){
+      console.error('deletePromo:', e);
+      alert('Eroare la ștergere (Rules).');
+    }
+  };
+
+  async function listenPromos(){
+    if (!db) return;
+    if (__promosUnsub) { try{__promosUnsub();}catch(e){} __promosUnsub=null; }
+    __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(async snap=>{
+      const promos=[]; snap.forEach(doc=>promos.push({ _id: doc.id, ...doc.data() }));
+      await renderPromos(promos);
+    }, err=>console.error('promos listen:', err));
+  }
+  window.listenPromos = listenPromos;
+
+  // ---------- Chart: embed CoinMarketCap DEX page ----------
+  function initCmcEmbed(){
+    const container = document.querySelector('.chart-container');
+    const canvas = $('priceChart');
+    if (!container) return;
+
+    // evită dublare
+    if (container.querySelector('iframe[data-cmc="1"]')) return;
+
+    // păstrează canvas în DOM, dar îl ascundem (nu ștergem structura)
+    if (canvas) canvas.style.display = 'none';
+
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('data-cmc','1');
+    iframe.src = 'https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/';
+    iframe.style.width = '100%';
+    iframe.style.height = '420px';
+    iframe.style.border = '0';
+    iframe.style.borderRadius = '14px';
+    iframe.loading = 'lazy';
+    container.appendChild(iframe);
+
+    const live = $('lastUpdated');
+    if (live) live.textContent = 'coinmarketcap LIVE';
+  }
+
+  // ---------- Init ----------
+  window.addEventListener('load', ()=>{
+    try{ window.loadNews && window.loadNews(); }catch(e){}
+    try{ window.updateVisitCounter && window.updateVisitCounter(); }catch(e){}
+    try{ listenTeam(); }catch(e){}
+    try{ listenPromos(); }catch(e){}
+    try{ initCmcEmbed(); }catch(e){}
+  });
+
+  // also when switching to statistics page
+  const _origShowSection = window.showSection;
+  if (typeof _origShowSection === 'function'){
+    window.showSection = function(sectionId){
+      _origShowSection(sectionId);
+      if (sectionId === 'stats' || sectionId === 'statistici') {
+        setTimeout(()=>{ try{ initCmcEmbed(); }catch(e){} }, 200);
+      }
+      if (sectionId === 'whitepaper') {
+        setTimeout(()=>{ try{ listenTeam(); }catch(e){} }, 200);
+      }
+      if (sectionId === 'giveaway' || sectionId === 'promotii') {
+        setTimeout(()=>{ try{ listenPromos(); }catch(e){} }, 200);
+      }
+    };
   }
 }
-function rid() {
-  return (Date.now().toString(36)+Math.random().toString(36).slice(2,10)).toUpperCase();
+    async function cancelPromo() {
+            const f = $('promoForm');
+            if (f) f.style.display = 'none';
+            if ($('promoTitle')) $('promoTitle').value = '';
+            if ($('promoEndDate')) $('promoEndDate').value = '';
+            if ($('promoDesc')) $('promoDesc').value = '';
+        }
+
+        function savePromo() {
+            if (!verifyPassword()) return;
+
+            const title = ($('promoTitle')?.value || '').trim();
+            const endDate = ($('promoEndDate')?.value || '').trim();
+            const desc = ($('promoDesc')?.value || '').trim();
+
+            if (!title || !endDate || !desc) {
+                alert('Completează titlul, data de final și descrierea.');
+                return;
+            }
+
+            const promos = getPromos();
+            const newId = promos.length ? Math.max(...promos.map(p => Number(p.id) || 0)) + 1 : 1;
+
+            promos.push({
+                id: newId,
+                title,
+                endDate,
+                desc,
+                createdAt: new Date().toISOString(),
+                participants: [] // {name,wallet,points,joinedAt}
+            });
+
+            setPromos(promos);
+            cancelPromo();
+            renderPromos();
+            renderLeaderboard();
+            alert('Promoția/Giveaway-ul a fost adăugat.');
+        }
+
+        function clearPromos() {
+            if (!verifyPassword()) return;
+            if (!confirm('Ștergi toate promoțiile/giveaway-urile?')) return;
+            localStorage.removeItem(LS_PROMOS);
+            renderPromos();
+            renderLeaderboard();
+        }
+
+        function deletePromo(promoId) {
+            if (!verifyPassword()) return;
+            if (!confirm('Ștergi această promoție/giveaway?')) return;
+            const promos = getPromos().filter(p => Number(p.id) !== Number(promoId));
+            setPromos(promos);
+            renderPromos();
+            renderLeaderboard();
+        }
+
+        function joinPromo(promoId) {
+            const name = ($('joinName_' + promoId)?.value || '').trim();
+            const wallet = ($('joinWallet_' + promoId)?.value || '').trim();
+            const pointsStr = ($('joinPoints_' + promoId)?.value || '').trim();
+            const points = Math.max(0, parseInt(pointsStr || '0', 10) || 0);
+
+            if (!name || !wallet) {
+                alert('Completează numele și wallet-ul.');
+                return;
+            }
+
+            const promos = getPromos();
+            const p = promos.find(x => Number(x.id) === Number(promoId));
+            if (!p) return;
+
+            // expirare
+            const now = new Date();
+            const end = new Date(p.endDate + 'T23:59:59');
+            if (now > end) {
+                alert('Acest giveaway/promoție a expirat.');
+                return;
+            }
+
+            p.participants = p.participants || [];
+            const existing = p.participants.find(u => (u.wallet || '').toLowerCase() === wallet.toLowerCase());
+            if (existing) {
+                existing.name = name;
+                existing.points = Math.max(existing.points || 0, points);
+            } else {
+                p.participants.push({ name, wallet, points, joinedAt: new Date().toISOString() });
+            }
+
+            setPromos(promos);
+            renderPromos();
+            renderLeaderboard();
+            alert('Înscriere salvată (local pe device).');
+        }
+
+        function renderPromos() {
+            const list = $('promoList');
+            if (!list) return;
+
+            const promos = getPromos();
+            if (!promos.length) {
+                list.innerHTML = `<div style="opacity:0.85;">Nu există promoții active încă.</div>`;
+                return;
+            }
+
+            // sort: cele care expiră mai repede primele
+            promos.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+
+            list.innerHTML = '';
+            promos.forEach(p => {
+                const end = new Date(p.endDate + 'T23:59:59');
+                const expired = new Date() > end;
+
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.innerHTML = `
+                    <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
+                    <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
+                    <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.desc)}</p>
+                    <div class="news-date" style="margin-top:0.8rem;">
+                        <span>⏳</span> Expiră: ${new Date(p.endDate).toLocaleDateString('ro-RO')}
+                    </div>
+
+                    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+                        <h4 style="margin:0 0 0.6rem 0; color: var(--neon-cyan);">Înscriere</h4>
+                        <div class="form-row">
+                            <input id="joinName_${p.id}" type="text" placeholder="Nume" maxlength="60">
+                            <input id="joinWallet_${p.id}" type="text" placeholder="Wallet (0x...)" maxlength="60">
+                        </div>
+                        <div class="form-row">
+                            <input id="joinPoints_${p.id}" type="number" min="0" step="1" placeholder="Promovări (puncte)" />
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="news-btn" onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
+                            <button class="news-btn" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
+                        </div>
+                        <small style="display:block; margin-top:0.6rem; opacity:0.75;">
+                            În varianta B, înscrierile/clasamentul sunt salvate doar pe device-ul tău.
+                        </small>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function renderLeaderboard() {
+            const lb = $('leaderboard');
+            if (!lb) return;
+
+            const promos = getPromos();
+            const now = new Date();
+
+            // agregare participanți din promoțiile active (neexpirate)
+            const map = new Map(); // wallet -> {name,wallet,points}
+            promos.forEach(p => {
+                const end = new Date(p.endDate + 'T23:59:59');
+                if (now > end) return;
+                (p.participants || []).forEach(u => {
+                    const key = (u.wallet || '').toLowerCase();
+                    if (!key) return;
+                    const current = map.get(key);
+                    const pts = Number(u.points) || 0;
+                    if (!current || pts > current.points) {
+                        map.set(key, { name: u.name || 'Anonim', wallet: u.wallet, points: pts });
+                    }
+                });
+            });
+
+            const arr = Array.from(map.values()).sort((a, b) => b.points - a.points);
+            if (!arr.length) {
+                lb.innerHTML = `<div style="opacity:0.85;">Nu există participanți încă.</div>`;
+                return;
+            }
+
+            // tabel simplu
+            let html = `<div class="table-container"><table class="whitepaper-table">
+                <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>`;
+            arr.slice(0, 100).forEach((u, i) => {
+                html += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${escapeHtml(u.name)}</td>
+                    <td style="font-family: monospace; font-size: 0.9rem;">${escapeHtml(u.wallet)}</td>
+                    <td><span class="badge badge-success">${Number(u.points).toLocaleString('ro-RO')}</span></td>
+                </tr>`;
+            });
+            html += `</table></div>`;
+            lb.innerHTML = html;
+        }
+
+        // =============================================
+        // ETHERSCAN – DATE REALE (fără endpoint-uri inexistente)
+        // =============================================
+        async function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        async function setStatusHtml(htmlStr) {
+            const el = $('serverStatus');
+            if (el) el.innerHTML = htmlStr;
+        }
+
+        async function fetchTokenSupplyAPI() {
+    const j = await etherscanProxyRequest('stats','tokensupply',{ contractaddress: CONTRACT_ADDRESS });
+    const weiStr = j.result;
+    const wei = Number(weiStr);
+    const tokens = wei / Math.pow(10, 18);
+    return { wei, tokens };
 }
-async function submitJoin() {
-  const msg = $('joinMsg');
-  msg.style.display='none';
 
-  if (!__activePromoId || !__activePromo) {
-    msg.style.display='block'; msg.style.color='#ff4d4d';
-    msg.textContent='Nu am identificat campania.'; return;
-  }
-  const p = __activePromo;
-  if (Number(p.endsAt||0) <= Date.now()) {
-    msg.style.display='block'; msg.style.color='#ff4d4d';
-    msg.textContent='Campania este expirată.'; return;
-  }
+    // Buttons router (the page uses requestPassword in HTML)
+    async function requestPassword(action, id){
+      if (action === 'promoAdd') {
+        const ok = await ensureAdminAuth();
+        if(!ok) return;
+        const f = document.getElementById('promoForm');
+        if (f) f.style.display = 'block';
+        return;
+      }
+      if (action === 'giveawayAdd') {
+        const ok = await ensureAdminAuth();
+        if(!ok) return;
+        const f = document.getElementById('promoForm');
+        if (f) f.style.display = 'block';
+        const sel = document.getElementById('promoKind');
+        if (sel) sel.value = 'giveaway';
+        return;
+      }
+      if (action === 'deletePromo') return deletePromo(id);
+    }
 
-  const email = ($('joinEmail')?.value||'').trim();
-  const name = ($('joinName')?.value||'').trim();
-  const wallet = ($('joinWallet')?.value||'').trim();
-  const referral = ($('joinReferral')?.value||'').trim();
-  const agree = !!$('joinAgree')?.checked;
-
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email || !re.test(email)) {
-    msg.style.display='block'; msg.style.color='#ff4d4d';
-    msg.textContent='Introdu un email valid.'; return;
-  }
-  if (!agree) {
-    msg.style.display='block'; msg.style.color='#ff4d4d';
-    msg.textContent='Bifează acordul.'; return;
-  }
-
-  try {
-    $('joinBtn').disabled = true;
-    const code = rid();
-    await db.collection('promos').doc(__activePromoId).collection('participants').add({
-      email,
-      name: name||null,
-      wallet: wallet||null,
-      referral: referral||null,
-      code,
-      createdAt: Date.now()
+    // init listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        if (db && typeof listenPromos === 'function') listenPromos();
+      } catch(e) {
+        console.warn(e);
+      }
+      try {
+        if (typeof particlesJS !== 'undefined') {
+          particlesJS('particles-js', {
+            particles: {
+              number: { value: 55 },
+              size: { value: 3 },
+              move: { speed: 1.4 },
+              line_linked: { enable: true }
+            },
+            interactivity: {
+              events: { onhover: { enable: true, mode: "repulse" } }
+            }
+          });
+        }
+      } catch(e) {}
     });
-    msg.style.display='block'; msg.style.color='#00ff9c';
-    msg.textContent = '✅ Înscris! Codul tău: ' + code;
-  } catch(e) {
-    console.error(e);
-    msg.style.display='block'; msg.style.color='#ff4d4d';
-    msg.textContent='Eroare la înscriere (Rules participants).';
-    $('joinBtn').disabled = false;
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    auth?.onAuthStateChanged(async (user) => {
-      const isAdmin = await computeIsAdmin(user);
-      window.__SBYT_ADMIN = isAdmin;
-
-      const pill = $('authPill');
-      if (pill) pill.textContent = user ? ('✅ ' + (user.email||'Autentificat')) : '🔒 Neautentificat';
-
-      setAdminUI(isAdmin, user);
-
-      const b = $('adminButtons');
-      if (b) b.style.display = isAdmin ? 'flex' : 'none';
-
-      const adminPill = $('adminPill');
-      if (adminPill) adminPill.textContent = isAdmin ? '⭐ Admin' : (user ? 'User' : '—');
-    });
-  } catch(e) {}
-
-  try { listenPromos(); } catch(e) {}
-});
-</script>
-
+  </script>
 </body>
 </html>
