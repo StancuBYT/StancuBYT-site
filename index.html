@@ -1225,7 +1225,14 @@
                 <a href="#giveaway" onclick="showSection('giveaway')">Giveaway & Promoții</a>
             </div>
         </div>
-    </nav>
+    
+        <div class="admin-only" style="display:none; gap:10px; align-items:center; margin-left:10px;">
+          <button class="news-btn" id="topAddPromoBtn" onclick="requestPassword('promoAdd')" class="news-btn admin-only">➕ Adaugă Promoție</button>
+          <button class="news-btn trophy-btn" id="topAddGiveawayBtn" onclick="requestPassword('giveawayAdd')" class="news-btn trophy-btn admin-only">🎁 Adaugă Giveaway</button>
+          <button class="news-btn" id="topLogoutBtn" onclick="adminSignOut()">🚪 Delogare</button>
+        </div>
+        
+</nav>
 
 
 <!-- Giveaway & Promoții Section -->
@@ -1237,8 +1244,8 @@
             <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
 
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-                <button class="news-btn admin-only" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
-                <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                <button class="news-btn admin-only" onclick="requestPassword('promoAdd')" class="news-btn admin-only">➕ Adaugă promoție</button>
+                <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway" class="news-btn trophy-btn admin-only"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
                 </div>
         </div>
 
@@ -2677,6 +2684,14 @@ function setAdminUI(isAdmin, user) {
   });
 }
 
+    function __toggleAdminOnly(isAdmin){
+      document.querySelectorAll('.admin-only').forEach(el=>{
+        el.style.display = isAdmin ? '' : 'none';
+      });
+    }
+    
+
+
 async function computeIsAdmin(user) {
   if (!user) return false;
   try {
@@ -2728,7 +2743,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.__SBYT_ADMIN = isAdmin;
         setAdminUI(isAdmin, user);
 
-        // daca user e autentificat dar nu e admin -> optional delogare automata
+        
+            __toggleAdminOnly(isAdmin);
+// daca user e autentificat dar nu e admin -> optional delogare automata
         // if (user && !isAdmin) await firebase.auth().signOut();
       });
     }
