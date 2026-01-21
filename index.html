@@ -1438,15 +1438,16 @@ async function etherscanProxyRequest(module, action, params = {}) {
       return false;
     }
     if (!window.__SBYT_ADMIN || window.__SBYT_ADMIN !== true) {
-      alert('Actiune restrictionata. Autentifica-te ca administrator (sectiunea Administrator Login).');
+      alert('Actiune restrictionata. Autentifica-te ca administrator (jos, pe pagina Prezentare).');
       try {
-        document.getElementById('admin-login')?.scrollIntoView({behavior:'smooth', block:'start'});
-      } catch(e) {}
+        showSection('prezentare');
+        setTimeout(() => document.getElementById('admin-login')?.scrollIntoView({behavior:'smooth', block:'start'}), 150);
+      } catch(e){}
       return false;
     }
     return true;
   } catch (e) {
-    console.error('verifyPassword:', e);
+    alert('Eroare verificare admin: ' + (e?.message || e));
     return false;
   }
 }
@@ -1693,7 +1694,7 @@ async function showPromoForm() {
             if ($('promoDesc')) $('promoDesc').value = '';
         }
 
-        function savePromo() {
+        function savePromo__old() {
             if (!verifyPassword()) return;
 
             const title = ($('promoTitle')?.value || '').trim();
@@ -2487,20 +2488,18 @@ const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
 async function ensureAdminAuth() {
   // admin login required for write actions
   if (!auth) { alert("Firebase Auth nu este incarcat."); return false; }
-  if (!auth.currentUser) {
-    alert("Te rog autentifica-te cu email/parola in sectiunea Administrator Login.");
-    return false;
-  }
+  if (auth.currentUser) return true;
+
+  const email = "admin@stancubyt.com";
+  const pass = prompt("Parola admin:");
+  if (!pass) return false;
+
   try {
-    const ok = await computeIsAdmin(auth.currentUser);
-    if (!ok) {
-      alert("Acest cont nu are drepturi de administrator.");
-      return false;
-    }
+    await auth.signInWithEmailAndPassword(email, pass);
     return true;
   } catch (e) {
-    console.error("ensureAdminAuth:", e);
-    alert("Eroare verificare admin.");
+    console.error("Auth error:", e);
+    alert("Nu te poti autentifica. Verifica in Firebase: Authentication -> Email/Password enabled si userul admin exista.");
     return false;
   }
 }
@@ -2693,111 +2692,96 @@ async function uploadPromoMedia(promoId, file) {
   return { url, path, contentType: file.type || 'application/octet-stream', name: safeName };
 }
 
-async function savePromo() {
+async function savePromo__old() {
   const ok = await ensureAdminAuth();
   if (!ok) return;
 
   const kind = (document.getElementById('promoKind')?.value || 'promo').trim();
   const title = (document.getElementById('promoTitle')?.value || '').trim();
-  const desc = (document.getElementById('promoDesc')?.value || '').trim();
   const hook = (document.getElementById('promoHook')?.value || '').trim();
+  const desc = (document.getElementById('promoDesc')?.value || '').trim();
   const howTo = (document.getElementById('promoHowTo')?.value || '').trim();
   const cta = (document.getElementById('promoCTA')?.value || '').trim();
+  const link = (document.getElementById('promoLink')?.value || '').trim();
   const rules = (document.getElementById('promoRules')?.value || '').trim();
-  const externalLink = (document.getElementById('promoLink')?.value || '').trim();
-
-  const pointsPerPromotion = parseInt(document.getElementById('promoPoints')?.value || '10', 10) || 10;
+  const terms = (document.getElementById('promoTerms')?.value || '').trim();
+  const ends = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
+  const points = parseInt(document.getElementById('promoPoints')?.value || '10', 10) || 10;
   const maxParticipants = parseInt(document.getElementById('promoMax')?.value || '0', 10) || 0;
 
-  const endsRaw = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
-  if (!title || !endsRaw || !desc) {
-    alert('Completează titlul, data expirării și descrierea.');
-    return;
-  }
-
-  const endsAt = new Date(endsRaw).getTime();
-  if (!endsAt || Number.isNaN(endsAt)) {
-    alert('Data expirării nu este validă.');
-    return;
-  }
-  if (endsAt <= Date.now()) {
-    alert('Data expirării trebuie să fie în viitor.');
-    return;
-  }
-
   const prizes = {
-    p1: (document.getElementById('prize1')?.value || '').trim() || null,
-    p2: (document.getElementById('prize2')?.value || '').trim() || null,
-    p3: (document.getElementById('prize3')?.value || '').trim() || null,
+    first: (document.getElementById('prize1')?.value || '').trim() || null,
+    second: (document.getElementById('prize2')?.value || '').trim() || null,
+    third: (document.getElementById('prize3')?.value || '').trim() || null,
     top5: (document.getElementById('prizeTop5')?.value || '').trim() || null,
     next10: (document.getElementById('prizeNext10')?.value || '').trim() || null,
-    lucky: (document.getElementById('prizeLucky')?.value || '').trim() || null
+    lucky: (document.getElementById('prizeLucky')?.value || '').trim() || null,
   };
 
+  const file = document.getElementById('promoMedia')?.files?.[0] || null;
   const bannerFile = document.getElementById('promoBanner')?.files?.[0] || null;
   const bgFiles = Array.from(document.getElementById('promoBg')?.files || []);
 
-  try {
-    if (!db) throw new Error('Firestore indisponibil');
+  if (!title || !ends || !desc) {
+    alert('Completează titlul, data de final și descrierea.');
+    return;
+  }
+  if (!howTo) {
+    // nu e obligatoriu, dar recomandat
+  }
 
-    // 1) creeaza doc (ca sa avem ID pt upload)
-    const docRef = await db.collection('promos').add({
+  const endsAt = parseDateInput(ends);
+  if (!endsAt || endsAt <= Date.now()) {
+    alert('Data expirarii trebuie sa fie in viitor!');
+    return;
+  }
+
+  try {
+    const ref = await db.collection('promos').add({
       kind: (kind === 'giveaway') ? 'giveaway' : 'promo',
       title,
       hook: hook || null,
       desc,
       howTo: howTo || null,
       cta: cta || null,
+      link: link || null,
       rules: rules || null,
-      externalLink: externalLink || null,
-      endsAt,
-      pointsPerPromotion,
-      maxParticipants,
+      terms: terms || null,
       prizes,
-      // pentru compat cu orderBy('createdAt','desc') - pastram numeric + serverTimestamp
+      endsAt,
+      maxParticipants: maxParticipants || 0,
+      pointsPerPromotion: points,
       createdAt: Date.now(),
-      createdAtServer: firebase.firestore.FieldValue.serverTimestamp(),
       status: 'active',
+      media: null,
       banner: null,
       bg: []
     });
 
-    // 2) upload media (optional)
-    if (storage) {
-      let banner = null;
-      if (bannerFile) {
-        banner = await uploadPromoMedia(docRef.id, bannerFile);
-      }
-
-      const bg = [];
-      for (const f of bgFiles.slice(0, 6)) { // limita safe
+    if (file) {
+      const media = await uploadPromoMedia(ref.id, file);
+      if (media) await ref.update({ media });
+    }
+    if (bannerFile) {
+      const banner = await uploadPromoMedia(ref.id, bannerFile);
+      if (banner) await ref.update({ banner });
+    }
+    if (bgFiles && bgFiles.length) {
+      const bgArr = [];
+      for (const f of bgFiles.slice(0, 6)) { // max 6 imagini
         try {
-          const up = await uploadPromoMedia(docRef.id, f);
-          if (up) bg.push(up);
-        } catch (e) {
-          console.warn('bg upload failed:', e);
-        }
+          const x = await uploadPromoMedia(ref.id, f);
+          if (x) bgArr.push(x);
+        } catch(e) {}
       }
-
-      if (banner || bg.length) {
-        await docRef.update({
-          banner: banner || null,
-          bg: bg
-        });
-      }
+      if (bgArr.length) await ref.update({ bg: bgArr });
     }
 
     cancelPromo();
-    alert('✅ Campania a fost salvată!');
+    alert('Giveaway/Promotie adaugata!');
   } catch (e) {
-    console.error('savePromo error:', e);
-    const msg = (e && e.message) ? e.message : String(e);
-    // Firestore permission denied -> Rules
-    if (/permission|denied|insufficient/i.test(msg)) {
-      alert('Eroare la salvare: nu ai permisiuni (Firestore Rules). Autentifică-te cu contul admin corect.');
-    } else {
-      alert('Eroare la salvare: ' + msg);
-    }
+    console.error("savePromo error:", e);
+    alert('Eroare la salvarea giveaway-ului (verifica Rules / Storage).');
   }
 }
 
@@ -5126,11 +5110,11 @@ service cloud.firestore {
   
 
   // --- Ensure the UI button calls the correct (latest) promo save function ---
-  // Some older blocks define `function savePromo()` too; we force it to call this latest admin save.
+  // Some older blocks define `function savePromo__old()` too; we force it to call this latest admin save.
   window.__savePromoLatest__ = window.savePromo;
   window.savePromo = async function(){ return await window.__savePromoLatest__(); };
   // global for onclick="savePromo()"
-  function savePromo(){ return window.savePromo(); }
+  function savePromo__old(){ return window.savePromo(); }
 
 window.deletePromoDoc = async function(docId){
     const ok = await window.ensureAdminAuth(); if(!ok) return;
@@ -5302,3 +5286,115 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 
 </body>
 </html>
+
+<script>
+// --- FIX: single authoritative savePromo (localStorage + optional Storage uploads) ---
+async function savePromo() {
+  // Require admin (login from Firebase Auth page logic)
+  if (!window.__SBYT_ADMIN) {
+    alert('Trebuie să fii logat ca administrator.');
+    return;
+  }
+
+  const kind = (document.getElementById('promoKind')?.value || 'promo').toLowerCase();
+  const title = (document.getElementById('promoTitle')?.value || '').trim();
+  const hook  = (document.getElementById('promoHook')?.value || '').trim();
+  const desc  = (document.getElementById('promoDesc')?.value || '').trim();
+  const howTo = (document.getElementById('promoHowTo')?.value || '').trim();
+  const cta   = (document.getElementById('promoCta')?.value || '').trim();
+  const link  = (document.getElementById('promoLink')?.value || '').trim();
+
+  const rules = (document.getElementById('promoRules')?.value || '').trim();
+  const terms = (document.getElementById('promoTerms')?.value || '').trim();
+
+  const endsRaw = (document.getElementById('promoEndDate')?.value || '').trim();
+  const ends = window.parseDateSafe ? window.parseDateSafe(endsRaw) : new Date(endsRaw);
+
+  const prizes = {
+    first:  (document.getElementById('prize1')?.value || '').trim() || null,
+    second: (document.getElementById('prize2')?.value || '').trim() || null,
+    third:  (document.getElementById('prize3')?.value || '').trim() || null,
+    top5:   (document.getElementById('prizeTop5')?.value || '').trim() || null,
+    next10: (document.getElementById('prizeNext10')?.value || '').trim() || null,
+    lucky:  (document.getElementById('prizeLucky')?.value || '').trim() || null,
+  };
+
+  const bannerFile = document.getElementById('promoBanner')?.files?.[0] || null;
+  const bgFiles = Array.from(document.getElementById('promoBg')?.files || []);
+
+  if (!title || !desc || !endsRaw) {
+    alert('Completează titlul, descrierea și data expirării.');
+    return;
+  }
+  if (!(ends instanceof Date) || isNaN(ends.getTime())) {
+    alert('Data expirării nu este validă.');
+    return;
+  }
+
+  // Optional: enforce ends in future
+  const now = new Date();
+  if (ends.getTime() < now.getTime()) {
+    alert('Data expirării trebuie să fie în viitor.');
+    return;
+  }
+
+  // Uploads to Firebase Storage (if available). If upload fails, we still save text data.
+  async function uploadToStorage(file, pathPrefix) {
+    if (!file) return null;
+    if (typeof firebase === 'undefined' || !firebase.storage) return null;
+    try {
+      const storage = firebase.storage();
+      const safeName = String(file.name || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
+      const ref = storage.ref().child(`${pathPrefix}/${Date.now()}_${safeName}`);
+      await ref.put(file);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      console.warn('Storage upload failed:', e);
+      return null;
+    }
+  }
+
+  const bannerUrl = await uploadToStorage(bannerFile, 'promos/banners');
+  const bgUrls = [];
+  for (const f of bgFiles) {
+    const url = await uploadToStorage(f, 'promos/backgrounds');
+    if (url) bgUrls.push(url);
+  }
+
+  // Save to localStorage (same pattern as prezentare ok)
+  const promos = (typeof getPromos === 'function') ? getPromos() : JSON.parse(localStorage.getItem('stancubyt_promos') || '[]');
+  const newId = (promos && promos.length) ? (Math.max(...promos.map(p => Number(p.id) || 0)) + 1) : 1;
+
+  const item = {
+    id: newId,
+    kind: (kind === 'giveaway') ? 'giveaway' : 'promo',
+    title,
+    hook: hook || null,
+    desc,
+    howTo: howTo || null,
+    cta: cta || null,
+    link: link || null,
+    rules: rules || null,
+    terms: terms || null,
+    prizes,
+    banner: bannerUrl || null,
+    backgrounds: bgUrls,
+    endDate: ends.toISOString(),
+    createdAt: new Date().toISOString(),
+    participants: []
+  };
+
+  promos.push(item);
+  if (typeof setPromos === 'function') setPromos(promos);
+  else localStorage.setItem('stancubyt_promos', JSON.stringify(promos));
+
+  // Reset form + rerender
+  if (typeof cancelPromo === 'function') cancelPromo();
+  if (typeof renderPromos === 'function') renderPromos();
+  if (typeof renderLeaderboard === 'function') renderLeaderboard();
+  alert('Salvat! Promoția/concursul a fost adăugat.');
+}
+
+// Ensure onclick bindings hit the right function
+window.savePromo = savePromo;
+</script>
