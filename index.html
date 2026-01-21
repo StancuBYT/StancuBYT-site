@@ -1226,9 +1226,9 @@
             </div>
         </div>
     
-        <div class="admin-only" style="display:none; gap:10px; align-items:center; margin-left:10px;">
-          <button class="news-btn" id="topAddPromoBtn" onclick="requestPassword('promoAdd')" class="news-btn admin-only">➕ Adaugă Promoție</button>
-          <button class="news-btn trophy-btn" id="topAddGiveawayBtn" onclick="requestPassword('giveawayAdd')" class="news-btn trophy-btn admin-only">🎁 Adaugă Giveaway</button>
+        <div class="admin-only" data-display="inline-flex" data-display="flex" style="display:none; gap:10px; align-items:center; margin-left:10px;">
+          <button class="news-btn" id="topAddPromoBtn" onclick="requestPassword('promoAdd')" class="news-btn admin-only" data-display="inline-flex">➕ Adaugă Promoție</button>
+          <button class="news-btn trophy-btn" id="topAddGiveawayBtn" onclick="requestPassword('giveawayAdd')" class="news-btn trophy-btn admin-only" data-display="inline-flex">🎁 Adaugă Giveaway</button>
           <button class="news-btn" id="topLogoutBtn" onclick="adminSignOut()">🚪 Delogare</button>
         </div>
         
@@ -1244,8 +1244,8 @@
             <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
 
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-                <button class="news-btn admin-only" onclick="requestPassword('promoAdd')" class="news-btn admin-only">➕ Adaugă promoție</button>
-                <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway" class="news-btn trophy-btn admin-only"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                <button class="news-btn admin-only" data-display="inline-flex" onclick="requestPassword('promoAdd')" class="news-btn admin-only" data-display="inline-flex">➕ Adaugă promoție</button>
+                <button class="news-btn trophy-btn admin-only" data-display="inline-flex" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway" class="news-btn trophy-btn admin-only" data-display="inline-flex"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
                 </div>
         </div>
 
@@ -2685,23 +2685,19 @@ function setAdminUI(isAdmin, user) {
 }
 
     function __toggleAdminOnly(isAdmin){
-      document.querySelectorAll('.admin-only').forEach(el=>{
-        el.style.display = isAdmin ? '' : 'none';
-      });
+  document.querySelectorAll('.admin-only').forEach(el=>{
+    if(!isAdmin){
+      el.style.display = 'none';
+      return;
     }
-    
-
-
-async async function computeIsAdmin(user){
-  if(!user) return false;
-  // 1) custom claim admin (optional)
-  try{
-    const token = await user.getIdTokenResult(true);
-    if(token && token.claims && token.claims.admin === true) return true;
-  }catch(e){}
-  // 2) email whitelist
-  const email = (user.email || "").toLowerCase();
-  return (ADMIN_EMAILS || []).map(x=>String(x).toLowerCase()).includes(email);
+    // show
+    const preferred = el.getAttribute('data-display');
+    if (preferred) { el.style.display = preferred; return; }
+    // heuristics
+    if (el.tagName === 'DIV') el.style.display = 'flex';
+    else if (el.tagName === 'BUTTON' || el.tagName === 'A') el.style.display = 'inline-flex';
+    else el.style.display = 'block';
+  });
 }
 
 async function adminSignIn() {
@@ -4130,7 +4126,7 @@ window.addEventListener('load', () => {
         </div>` : `<div style="margin-top:10px; opacity:.85;">Nu exista participanti inca.</div>`;
 
       const adminBtns = `
-        <div class="admin-only" style="margin-top:12px; text-align:right;">
+        <div class="admin-only" data-display="inline-flex" style="margin-top:12px; text-align:right;">
           <button class="news-btn" onclick="deletePromo(${Number(p.id)})">🗑️ Sterge</button>
         </div>`;
 
@@ -4321,7 +4317,7 @@ window.addEventListener('load', () => {
             <div style="opacity:.7; margin-top:8px; font-size:.9rem;">📅 ${escapeHtml(m.joinDate||'')}</div>
           </div>
         </div>
-        <div class="admin-only" style="display:flex; justify-content:flex-end; margin-top:12px;">
+        <div class="admin-only" data-display="inline-flex" style="display:flex; justify-content:flex-end; margin-top:12px;">
           <button class="news-btn" onclick="deleteTeamMemberLocal(${Number(m.id)})">🗑️ Sterge</button>
         </div>
       `;
@@ -4800,7 +4796,7 @@ try{
       </div>
       <p id="adminLoginMsg" class="admin-msg"></p>
 
-      <div class="admin-only" style="display:none; margin-top:18px;">
+      <div class="admin-only" data-display="inline-flex" style="display:none; margin-top:18px;">
         <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
           <button type="button" onclick="window.showTeamForm && window.showTeamForm()">👥 Adauga membru</button>
           <button type="button" onclick="window.showAnnouncementForm && window.showAnnouncementForm()">📢 Adauga anunt</button>
