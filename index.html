@@ -1,852 +1,356 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StancuBYT | Giveaway & Promoții</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StancuBYT | Giveaway & Promoții</title>
 
-  <style>
-    :root{
-      --bg0:#050510;
-      --bg1:#0a0a1f;
-      --glass: rgba(255,255,255,.06);
-      --glass2: rgba(255,255,255,.10);
-      --stroke: rgba(255,255,255,.14);
-      --txt: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.70);
+<style>
+:root {
+  --bg0:#050510; --bg1:#0a0a1f;
+  --txt:rgba(255,255,255,.92); --muted:rgba(255,255,255,.72);
+  --stroke: rgba(255,255,255,.14);
+  --r: 22px;
+  --shadow: 0 18px 60px rgba(0,0,0,.55);
+  --shadow2: 0 8px 26px rgba(0,0,0,.45);
+  --neon-cyan:#00ffff; --blue:#0066ff; --green:#00ff88; --purple:#8a2be2; --gold:#ffd166; --orange:#ff9500; --red:#ff4d4d;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+body{
+  color:var(--txt);
+  background:
+    radial-gradient(1000px 520px at 18% 12%, rgba(0,255,255,.12), transparent 60%),
+    radial-gradient(900px 480px at 82% 18%, rgba(138,43,226,.16), transparent 60%),
+    radial-gradient(1100px 560px at 50% 92%, rgba(0,255,136,.10), transparent 60%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+  min-height:100vh;
+}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 16px 70px}
 
-      --neon-cyan:#00ffff;
-      --blue-tech:#0066ff;
-      --green:#00ff88;
-      --purple:#8a2be2;
-      --gold:#ffd166;
-      --red:#ff4d4d;
-      --orange:#ff9500;
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 16px;border:1px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border-radius:var(--r);box-shadow:var(--shadow2);
+  position:sticky;top:10px;z-index:30;backdrop-filter:blur(10px);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.18);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(0,255,255,.45), transparent 52%),
+    radial-gradient(circle at 70% 20%, rgba(138,43,226,.45), transparent 55%),
+    radial-gradient(circle at 40% 75%, rgba(0,255,136,.35), transparent 58%),
+    rgba(255,255,255,.06);
+  box-shadow:0 10px 26px rgba(0,0,0,.45);overflow:hidden;
+}
+.logo img{width:100%;height:100%;object-fit:cover;opacity:.9}
+.brand h1{font-size:16px;letter-spacing:.2px}
+.brand .sub{font-size:12px;color:var(--muted);margin-top:2px}
 
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --shadow2: 0 8px 26px rgba(0,0,0,.45);
-      --r: 22px;
-    }
+.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--txt);font-size:13px;white-space:nowrap}
+.btn{cursor:pointer;border:none;border-radius:14px;padding:11px 14px;color:#061018;font-weight:800;letter-spacing:.2px;box-shadow:0 16px 45px rgba(0,0,0,.45);transition:transform .15s ease, filter .15s ease, opacity .15s ease;display:inline-flex;align-items:center;gap:9px;user-select:none}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn:hover{filter:brightness(1.05)}
+.btn[disabled]{opacity:.55;cursor:not-allowed;filter:grayscale(.3)}
+.btn-primary{background:linear-gradient(90deg, rgba(0,255,255,.95), rgba(0,102,255,.95))}
+.btn-accent{background:linear-gradient(90deg, rgba(255,209,102,.96), rgba(255,149,0,.96))}
+.btn-ghost{color:var(--txt);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);box-shadow:none}
 
-    *{ box-sizing:border-box; margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; }
-    body{
-      color: var(--txt);
-      background:
-        radial-gradient(1000px 520px at 18% 12%, rgba(0,255,255,.12), transparent 60%),
-        radial-gradient(900px 480px at 82% 18%, rgba(138,43,226,.16), transparent 60%),
-        radial-gradient(1100px 560px at 50% 92%, rgba(0,255,136,.10), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg0));
-      min-height:100vh;
-    }
+.hero{
+  margin-top:16px;border:1px solid var(--stroke);border-radius:var(--r);
+  background:
+    radial-gradient(680px 340px at 22% 25%, rgba(0,255,255,.16), transparent 60%),
+    radial-gradient(680px 340px at 78% 18%, rgba(138,43,226,.18), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  box-shadow:var(--shadow);overflow:hidden;position:relative
+}
+.hero:before{content:"";position:absolute;inset:-2px;background:linear-gradient(120deg, rgba(0,255,255,.14), rgba(138,43,226,.14), rgba(0,0,0,.0), rgba(0,255,136,.12));filter:blur(32px);opacity:.8;pointer-events:none}
+.hero-inner{position:relative;padding:22px 18px}
+.hero h2{font-size:22px;margin-bottom:6px}
+.hero p{color:var(--muted);line-height:1.5;max-width:80ch}
+.hero .hint{margin-top:10px;font-size:12px;color:rgba(255,255,255,.65)}
+.hero .quick{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);font-size:12px;color:rgba(255,255,255,.84)}
 
-    .wrap{ max-width:1200px; margin: 0 auto; padding: 22px 16px 70px; }
+.grid{margin-top:18px;display:grid;grid-template-columns:repeat(12,1fr);gap:14px;align-items:start}
+.panel{border:1px solid var(--stroke);border-radius:var(--r);background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));box-shadow:var(--shadow2);overflow:hidden}
+.panel .hd{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.panel .hd h3{font-size:14px;letter-spacing:.2px}
+.panel .bd{padding:14px}
+.left{grid-column:span 4}
+.right{grid-column:span 8}
+@media(max-width:980px){.left,.right{grid-column:span 12}}
 
-    /* Top bar */
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:14px;
-      padding: 14px 16px;
-      border:1px solid var(--stroke);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border-radius: var(--r);
-      box-shadow: var(--shadow2);
-      position: sticky;
-      top: 10px;
-      z-index: 30;
-      backdrop-filter: blur(10px);
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-      min-width: 220px;
-    }
-    .logo{
-      width:44px; height:44px; border-radius:14px;
-      border:1px solid rgba(255,255,255,.18);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(0,255,255,.45), transparent 52%),
-        radial-gradient(circle at 70% 20%, rgba(138,43,226,.45), transparent 55%),
-        radial-gradient(circle at 40% 75%, rgba(0,255,136,.35), transparent 58%),
-        rgba(255,255,255,.06);
-      display:grid; place-items:center;
-      box-shadow: 0 10px 26px rgba(0,0,0,.45);
-      overflow:hidden;
-    }
-    .logo img{ width:100%; height:100%; object-fit:cover; opacity:.9; }
-    .brand h1{ font-size: 16px; letter-spacing:.2px; }
-    .brand .sub{ font-size: 12px; color: var(--muted); margin-top:2px; }
+.admin-only{display:none}
 
-    .top-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-    .pill{
-      display:flex; align-items:center; gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      color: var(--txt);
-      font-size:13px;
-      white-space:nowrap;
-    }
-    .btn{
-      cursor:pointer;
-      border:none;
-      border-radius: 14px;
-      padding: 11px 14px;
-      color: #061018;
-      font-weight: 700;
-      letter-spacing:.2px;
-      box-shadow: 0 16px 45px rgba(0,0,0,.45);
-      transition: transform .15s ease, filter .15s ease, opacity .15s ease;
-      display:inline-flex; align-items:center; gap:9px;
-      user-select:none;
-    }
-    .btn:active{ transform: translateY(1px) scale(.99); }
-    .btn:hover{ filter: brightness(1.05); }
-    .btn[disabled]{ opacity:.55; cursor:not-allowed; filter: grayscale(.3); }
-    .btn-primary{
-      background: linear-gradient(90deg, rgba(0,255,255,.95), rgba(0,102,255,.95));
-    }
-    .btn-accent{
-      background: linear-gradient(90deg, rgba(255,209,102,.96), rgba(255,149,0,.96));
-    }
-    .btn-ghost{
-      color: var(--txt);
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: none;
-    }
+.admin-desc{color:var(--muted);margin:8px 0 12px;line-height:1.45}
+.admin-login-box{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.admin-login-box input{padding:12px 14px;width:280px;max-width:92vw;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#fff;outline:none}
+.admin-login-box button{padding:12px 16px;border-radius:10px;border:none;background:#7a5cff;color:#fff;font-weight:700;cursor:pointer}
+.admin-login-box button:hover{filter:brightness(1.08)}
+.admin-status-row{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap}
+.admin-badge{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);font-size:12px}
+.admin-badge-on{border-color:rgba(0,255,136,.35);background:rgba(0,255,136,.10)}
+.admin-badge-off{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.08)}
+.admin-user-label{font-size:12px;color:rgba(255,255,255,.75)}
+.admin-msg{margin-top:12px;font-weight:700;text-align:center}
 
-    /* Hero */
-    .hero{
-      margin-top: 16px;
-      border:1px solid var(--stroke);
-      border-radius: var(--r);
-      background:
-        radial-gradient(680px 340px at 22% 25%, rgba(0,255,255,.16), transparent 60%),
-        radial-gradient(680px 340px at 78% 18%, rgba(138,43,226,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .hero:before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: linear-gradient(120deg, rgba(0,255,255,.14), rgba(138,43,226,.14), rgba(0,255,136,.12));
-      filter: blur(32px);
-      opacity:.8;
-      pointer-events:none;
-    }
-    .hero-inner{
-      position:relative;
-      padding: 22px 18px;
-      display:flex;
-      gap:18px;
-      align-items:flex-start;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .hero h2{ font-size: 22px; margin-bottom: 6px; }
-    .hero p{ color: var(--muted); line-height:1.5; max-width: 72ch; }
-    .hero .hint{ margin-top:10px; font-size: 12px; color: rgba(255,255,255,.65); }
-    .hero .quick{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-      margin-top: 14px;
-    }
-    .tag{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.18);
-      font-size: 12px;
-      color: rgba(255,255,255,.84);
-    }
+input,select,textarea{width:100%;padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.22);color:var(--txt);outline:none}
+textarea{min-height:120px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.two>*{flex:1 1 180px}
+.three>*{flex:1 1 140px}
 
-    /* Grid */
-    .grid{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 14px;
-      align-items:start;
-    }
-    .panel{
-      border:1px solid var(--stroke);
-      border-radius: var(--r);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      box-shadow: var(--shadow2);
-      overflow:hidden;
-    }
-    .panel .hd{
-      padding: 14px 14px 12px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-    }
-    .panel .hd h3{ font-size: 14px; letter-spacing:.2px; }
-    .panel .bd{ padding: 14px; }
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media(max-width:900px){.cards{grid-template-columns:1fr}}
 
-    .admin-col{ grid-column: span 4; }
-    .list-col{ grid-column: span 8; }
+.promo-card{border:1px solid rgba(255,255,255,.16);border-radius:calc(var(--r) + 6px);overflow:hidden;position:relative;box-shadow:var(--shadow);min-height:420px;background:rgba(0,0,0,.25)}
+.promo-bg{position:absolute;inset:0;background:
+  radial-gradient(700px 360px at 30% 20%, rgba(0,255,255,.18), transparent 60%),
+  radial-gradient(740px 360px at 80% 25%, rgba(138,43,226,.20), transparent 60%),
+  radial-gradient(760px 380px at 50% 92%, rgba(0,255,136,.15), transparent 60%),
+  linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.65));
+  filter:saturate(1.05);transform:scale(1.03)
+}
+.promo-bg.has-img{background-size:cover;background-position:center}
+.promo-overlay{position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.75))}
+.promo-inner{position:relative;padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px;height:100%}
+.promo-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:rgba(255,255,255,.92)}
+.badge.live{background:linear-gradient(90deg, rgba(0,255,136,.18), rgba(0,255,255,.14));border-color:rgba(0,255,136,.30)}
+.badge.ended{background:rgba(255,77,77,.10);border-color:rgba(255,77,77,.28)}
+.promo-title{font-size:20px;font-weight:900;letter-spacing:.2px;line-height:1.15}
+.promo-sub{color:rgba(255,255,255,.78);font-size:13px;line-height:1.5}
+.promo-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:rgba(255,255,255,.80);font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06)}
+.promo-prizes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.prize{border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);border-radius:18px;padding:10px 10px;min-height:78px}
+.prize b{display:block;font-size:12px;color:rgba(255,255,255,.88);margin-bottom:6px}
+.prize .v{font-size:12px;color:rgba(255,255,255,.75);line-height:1.35}
+.cta-row{margin-top:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.10);padding-top:12px}
+.link{color:rgba(0,255,255,.95);text-decoration:none;font-weight:800}
+.link:hover{text-decoration:underline}
 
-    @media (max-width: 980px){
-      .admin-col{ grid-column: span 12; }
-      .list-col{ grid-column: span 12; }
-    }
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;z-index:90;padding:16px}
+.modal.open{display:flex}
+.modal-card{width:min(720px,100%);border-radius:22px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));box-shadow:var(--shadow);overflow:hidden}
+.modal-hd{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.modal-hd h3{font-size:14px}
+.x{cursor:pointer;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:rgba(255,255,255,.85);font-weight:800}
+.modal-bd{padding:14px}
+.small{font-size:12px;color:rgba(255,255,255,.72);line-height:1.45}
+.hr{height:1px;background:rgba(255,255,255,.10);margin:10px 0}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:8px;color:rgba(255,255,255,.75);font-size:12px}
+.check input{width:auto;margin-top:2px}
+</style>
 
-    /* Login */
-    .login-box{
-      display:flex; flex-direction:column; gap:10px;
-    }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; }
-    input, select, textarea{
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.22);
-      color: var(--txt);
-      outline:none;
-    }
-    textarea{ min-height: 120px; resize: vertical; }
-    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.55); }
-    .two > *{ flex: 1 1 180px; }
-    .three > *{ flex: 1 1 140px; }
-    .msg{
-      font-size: 12px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.20);
-      color: rgba(255,255,255,.82);
-      line-height: 1.4;
-    }
-    .msg.ok{ border-color: rgba(0,255,136,.30); background: rgba(0,255,136,.08); }
-    .msg.bad{ border-color: rgba(255,77,77,.35); background: rgba(255,77,77,.08); }
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-    .admin-only{ display:none; }
-
-    /* Promo cards */
-    .cards{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 14px;
+<script>
+  // Firebase init 1:1
+  firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+    messagingSenderId: "263244200492",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+    measurementId: "G-272S9HSY3K"
+  };
+  try {
+    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-    @media (max-width: 900px){
-      .cards{ grid-template-columns: 1fr; }
-    }
-
-    .promo-card{
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: calc(var(--r) + 4px);
-      overflow:hidden;
-      position:relative;
-      box-shadow: var(--shadow);
-      min-height: 360px;
-      background: rgba(0,0,0,.25);
-    }
-    .promo-bg{
-      position:absolute; inset:0;
-      background:
-        radial-gradient(700px 360px at 30% 20%, rgba(0,255,255,.18), transparent 60%),
-        radial-gradient(740px 360px at 80% 25%, rgba(138,43,226,.20), transparent 60%),
-        radial-gradient(760px 380px at 50% 92%, rgba(0,255,136,.15), transparent 60%),
-        linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.65));
-      filter: saturate(1.05);
-      transform: scale(1.03);
-    }
-    .promo-bg.has-img{
-      background-size: cover;
-      background-position: center;
-    }
-    .promo-overlay{
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.72));
-    }
-    .promo-inner{
-      position:relative;
-      padding: 16px 16px 14px;
-      display:flex;
-      flex-direction:column;
-      gap: 12px;
-      height:100%;
-    }
-    .promo-top{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-    }
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.25);
-      color: rgba(255,255,255,.92);
-    }
-    .badge.live{
-      background: linear-gradient(90deg, rgba(0,255,136,.18), rgba(0,255,255,.14));
-      border-color: rgba(0,255,136,.30);
-    }
-    .badge.ended{
-      background: rgba(255,77,77,.10);
-      border-color: rgba(255,77,77,.28);
-      color: rgba(255,255,255,.88);
-    }
-
-    .promo-title{
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing:.2px;
-      line-height:1.2;
-    }
-    .promo-sub{
-      color: rgba(255,255,255,.75);
-      font-size: 12.5px;
-      line-height:1.45;
-    }
-
-    .promo-meta{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-      color: rgba(255,255,255,.78);
-      font-size: 12px;
-    }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      white-space: nowrap;
-    }
-
-    .promo-prizes{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 10px;
-    }
-    .prize{
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      border-radius: 18px;
-      padding: 10px 10px;
-      min-height: 78px;
-    }
-    .prize b{ display:block; font-size:12px; color: rgba(255,255,255,.85); margin-bottom: 6px; }
-    .prize .v{ font-size: 12px; color: rgba(255,255,255,.75); line-height:1.35; }
-
-    .cta-row{
-      margin-top:auto;
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      border-top: 1px solid rgba(255,255,255,.10);
-      padding-top: 12px;
-    }
-    .cta-left{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-      color: rgba(255,255,255,.80);
-      font-size: 12px;
-    }
-    .cta-right{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    }
-
-    .link{
-      color: rgba(0,255,255,.95);
-      text-decoration:none;
-      font-weight:700;
-    }
-    .link:hover{ text-decoration:underline; }
-
-    /* Modal */
-    .modal{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.62);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index: 90;
-      padding: 16px;
-    }
-    .modal.open{ display:flex; }
-    .modal-card{
-      width: min(720px, 100%);
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .modal-hd{
-      padding: 14px 14px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.12);
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-    }
-    .modal-hd h3{ font-size: 14px; }
-    .x{
-      cursor:pointer;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.18);
-      color: rgba(255,255,255,.85);
-      font-weight:700;
-    }
-    .modal-bd{ padding: 14px; }
-    .small{ font-size:12px; color: rgba(255,255,255,.70); line-height:1.45; }
-
-    .hr{ height:1px; background: rgba(255,255,255,.10); margin: 10px 0; }
-
-    .check{
-      display:flex; gap:10px; align-items:flex-start;
-      margin-top: 8px;
-      color: rgba(255,255,255,.75);
-      font-size: 12px;
-    }
-    .check input{ width:auto; margin-top: 2px; }
-
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
-  </style>
-
-  <!-- Firebase (compat) - same as index prezentare ok.html -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <script>
-    // Firebase init (same project)
-    window.firebaseConfig = {
-      apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-      authDomain: "stancubyt-fc2b9.firebaseapp.com",
-      projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
-      messagingSenderId: "263244200492",
-      appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-      measurementId: "G-272S9HSY3K"
-    };
-    try{
-      if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
-        firebase.initializeApp(window.firebaseConfig);
-      }
-    }catch(e){
-      console.warn("Firebase init warning:", e);
-    }
-  </script>
+  } catch(e) {}
+</script>
 </head>
 
 <body>
-  <div class="wrap">
+<div class="wrap">
 
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">
-          <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" onerror="this.style.display='none'">
-        </div>
-        <div>
-          <h1>Giveaway & Promoții</h1>
-          <div class="sub">Campanii atractive • participare rapidă • clasament & referral</div>
-        </div>
-      </div>
-
-      <div class="top-actions">
-        <div class="pill" id="authPill">🔒 Neautentificat</div>
-
-        <!-- Admin buttons (appear after login + admin) -->
-        <button class="btn btn-accent admin-only" id="btnAddPromo" onclick="openAdminForm('promo')">➕ Adaugă Promoție</button>
-        <button class="btn btn-accent admin-only" id="btnAddGiveaway" onclick="openAdminForm('giveaway')">🎁 Adaugă Giveaway</button>
-        <button class="btn btn-ghost admin-only" id="btnLogout" onclick="adminSignOut()">Ieși</button>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"><img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" onerror="this.style.display='none'"></div>
+      <div>
+        <h1>Giveaway & Promoții</h1>
+        <div class="sub">Carduri mari • efecte moderne • participare instant</div>
       </div>
     </div>
 
-    <div class="hero">
-      <div class="hero-inner">
-        <div>
-          <h2>Fă-ți comunitatea să revină zilnic 🧠🎮</h2>
-          <p>
-            Construim promoții ca în jocuri: <b>premii clare</b>, <b>timp limitat</b>, <b>tensiune (countdown)</b>,
-            <b>progres</b> și <b>recompense extra</b> prin referral.
-            Participarea e ușoară: completezi formularul, primești un cod și poți invita prieteni.
-          </p>
-          <div class="quick">
-            <span class="tag">⏳ Urgență: „se termină în curând”</span>
-            <span class="tag">🏆 Status: Live / Expirat</span>
-            <span class="tag">🔥 Bonus: Top 5 + următoarele 10</span>
-            <span class="tag">🎯 CTA: buton „Participă”</span>
-          </div>
-          <div class="hint">Admin: autentifică-te ca în pagina „Prezentare” și vei vedea butoanele de adăugare.</div>
-        </div>
-      </div>
-    </div>
+    <div class="top-actions">
+      <div class="pill" id="authPill">🔒 Neautentificat</div>
 
-    <div class="grid">
-      <!-- Admin / Login -->
-      <div class="panel admin-col">
-        <div class="hd">
-          <h3>Admin • Autentificare</h3>
-          <span class="pill" id="adminBadge">—</span>
-        </div>
-        <div class="bd">
-          <div class="login-box" id="loginBox">
-            <div class="row two">
-              <input id="adminEmail" type="email" placeholder="Email admin" autocomplete="username">
-              <input id="adminPass" type="password" placeholder="Parolă" autocomplete="current-password">
-            </div>
-            <div class="row" style="justify-content:flex-end;">
-              <button class="btn btn-primary" type="button" onclick="adminSignIn()">🔑 Autentifică</button>
-            </div>
-            <div id="adminLoginMsg" class="msg" style="display:none;"></div>
-            <div class="small">
-              Dacă vezi erori de tip <span class="mono">Missing or insufficient permissions</span>, înseamnă că <b>Firestore Rules</b>
-              nu permit scriere în <span class="mono">promos</span> pentru contul cu care ești logat.
-            </div>
-          </div>
-
-          <!-- Admin form -->
-          <div class="admin-only" id="adminForm" style="margin-top:14px;">
-            <div class="msg ok" id="adminFormTitle" style="margin-bottom:10px;">➕ Adaugă campanie</div>
-
-            <div class="row two">
-              <select id="promoType">
-                <option value="promo">Promoție</option>
-                <option value="giveaway">Giveaway</option>
-              </select>
-              <input id="promoEnd" type="datetime-local" placeholder="Data și ora expirării">
-            </div>
-
-            <div class="row">
-              <input id="promoTitle" maxlength="120" type="text" placeholder="Titlu (ex: Mega Giveaway SBYT)">
-            </div>
-
-            <div class="row">
-              <input id="promoTagline" maxlength="160" type="text" placeholder="Tagline (ex: Intră în top și ia bonus!)">
-            </div>
-
-            <div class="row three">
-              <input id="p1" maxlength="160" type="text" placeholder="Premiul I (ex: 10.000 SBYT)">
-              <input id="p2" maxlength="160" type="text" placeholder="Premiul II (ex: 5.000 SBYT)">
-              <input id="p3" maxlength="160" type="text" placeholder="Premiul III (ex: 2.500 SBYT)">
-            </div>
-            <div class="row two">
-              <input id="pTop5" maxlength="160" type="text" placeholder="Primele 5 locuri (ex: bonus 500 SBYT)">
-              <input id="pNext10" maxlength="160" type="text" placeholder="Următoarele 10 locuri (ex: bonus 100 SBYT)">
-            </div>
-
-            <div class="row">
-              <textarea id="promoRules" placeholder="Regulament & condiții (pași, criterii, eligibilitate, termen, etc.)"></textarea>
-            </div>
-
-            <div class="row two">
-              <input id="ctaUrl" type="url" placeholder="Link înregistrare (ex: https://stancubyt.com/#signup)">
-              <input id="ctaText" type="text" maxlength="40" placeholder="Text buton (ex: Participă acum!)">
-            </div>
-
-            <div class="row two">
-              <div>
-                <div class="small" style="margin-bottom:6px;">Imagine fundal card (background)</div>
-                <input id="bgFile" type="file" accept="image/*">
-              </div>
-              <div>
-                <div class="small" style="margin-bottom:6px;">Banner / cover (opțional)</div>
-                <input id="bannerFile" type="file" accept="image/*">
-              </div>
-            </div>
-
-            <div class="row" style="justify-content:flex-end;">
-              <button class="btn btn-primary" type="button" onclick="saveCampaign()">💾 Salvează</button>
-              <button class="btn btn-ghost" type="button" onclick="closeAdminForm()">❌ Închide</button>
-            </div>
-
-            <div id="adminSaveMsg" class="msg" style="display:none;"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- List -->
-      <div class="panel list-col">
-        <div class="hd">
-          <h3>Campanii active / istorice</h3>
-          <div class="pill">📌 Live update</div>
-        </div>
-        <div class="bd">
-          <div id="promoList" class="cards"></div>
-          <div id="emptyState" class="msg" style="display:none; margin-top:12px;">
-            Nu există campanii încă. Autentifică-te ca admin și apasă „Adaugă Promoție / Giveaway”.
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Participate modal -->
-  <div class="modal" id="joinModal" onclick="if(event.target.id==='joinModal') closeJoin()">
-    <div class="modal-card">
-      <div class="modal-hd">
-        <h3 id="joinTitle">Participă</h3>
-        <button class="x" onclick="closeJoin()">✕</button>
-      </div>
-      <div class="modal-bd">
-        <div id="joinInfo" class="small"></div>
-        <div class="hr"></div>
-
-        <div class="row two">
-          <input id="joinName" type="text" placeholder="Nume (opțional)">
-          <input id="joinEmail" type="email" placeholder="Email (obligatoriu)">
-        </div>
-        <div class="row two">
-          <input id="joinWallet" type="text" placeholder="Wallet (opțional, 0x...)">
-          <input id="joinReferral" type="text" placeholder="Cod referral (opțional)">
-        </div>
-
-        <div class="check">
-          <input id="joinAgree" type="checkbox">
-          <label for="joinAgree">Sunt de acord să fiu contactat/ă pentru detalii despre campanie și confirmare participare.</label>
-        </div>
-
-        <div class="row" style="justify-content:flex-end; margin-top:12px;">
-          <button class="btn btn-primary" id="joinBtn" type="button" onclick="submitJoin()">✅ Confirmă participarea</button>
-          <button class="btn btn-ghost" type="button" onclick="closeJoin()">Anulează</button>
-        </div>
-
-        <div id="joinMsg" class="msg" style="display:none; margin-top:12px;"></div>
+      <div class="admin-only" style="display:none; gap:10px; align-items:center;" id="adminButtons">
+        <button class="btn btn-accent" type="button" onclick="openAdminForm('promo')">➕ Adaugă Promoție</button>
+        <button class="btn btn-accent" type="button" onclick="openAdminForm('giveaway')">🎁 Adaugă Giveaway</button>
       </div>
     </div>
   </div>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <h2>Promoții care “prind” (psihologie + design modern)</h2>
+      <p>
+        Fiecare card are <b>fundal + banner</b>, <b>premii pe nivele</b>, <b>urgenta (countdown)</b> și
+        <b>buton Participă</b> cu formular. Salvarea se face în <b>Firestore: promos</b> și imaginile în <b>Storage</b>.
+      </p>
+      <div class="quick">
+        <span class="tag">⏳ Countdown</span>
+        <span class="tag">🔥 Top 5 + următoarele 10</span>
+        <span class="tag">🏆 Premii clare</span>
+        <span class="tag">🚀 CTA: Participă</span>
+      </div>
+      <div class="hint">Admin: autentificarea de mai jos este 1:1 ca în fișierele tale.</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel left">
+      <div class="hd"><h3>Admin</h3><span class="pill" id="adminPill">—</span></div>
+      <div class="bd">
+        <section id="admin-login">
+<h2>🔐 Administrator Login</h2>
+<p class="admin-desc">Autentificare necesara pentru adaugare/stergere concursuri si promotii.</p>
+<div class="admin-login-box">
+<input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
+<input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
+<button onclick="adminSignIn()" type="button">Autentificare</button>
+<button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
+</div>
+<div class="admin-status-row">
+<span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
+<span class="admin-user-label" id="adminUserLabel"></span>
+</div>
+<p class="admin-msg" id="adminLoginMsg"></p>
+</section>
+
+        <div class="admin-only" id="adminFormWrap" style="display:none; margin-top:14px;">
+          <div class="pill" id="adminFormTitle">➕ Adaugă campanie</div>
+          <div class="row two" style="margin-top:10px;">
+            <select id="promoType">
+              <option value="promo">Promoție</option>
+              <option value="giveaway">Giveaway</option>
+            </select>
+            <input id="promoEnds" type="datetime-local" />
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <input id="promoTitle" type="text" maxlength="120" placeholder="Titlu (ex: Mega Giveaway SBYT)">
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <input id="promoPrize" type="text" maxlength="160" placeholder="Premiu principal (rezumat) (ex: 10.000 SBYT)">
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <textarea id="promoDesc" placeholder="Descriere scurtă, incitantă (ce câștigi, ce trebuie să faci)"></textarea>
+          </div>
+
+          <div class="row three" style="margin-top:10px;">
+            <input id="p1" type="text" placeholder="Premiul I">
+            <input id="p2" type="text" placeholder="Premiul II">
+            <input id="p3" type="text" placeholder="Premiul III">
+          </div>
+          <div class="row two" style="margin-top:10px;">
+            <input id="pTop5" type="text" placeholder="Primele 5 locuri după premii">
+            <input id="pNext10" type="text" placeholder="Următoarele 10 locuri">
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <textarea id="promoRules" placeholder="Regulament & condiții (clar, pe pași)"></textarea>
+          </div>
+
+          <div class="row two" style="margin-top:10px;">
+            <input id="ctaText" type="text" placeholder="Text buton (ex: Participă acum!)">
+            <input id="ctaUrl" type="url" placeholder="Link înregistrare (opțional)">
+          </div>
+
+          <div class="row two" style="margin-top:10px;">
+            <div>
+              <div class="small" style="margin-bottom:6px;">Imagine fundal (background)</div>
+              <input id="promoBg" type="file" accept="image/*">
+            </div>
+            <div>
+              <div class="small" style="margin-bottom:6px;">Banner (cover)</div>
+              <input id="promoBanner" type="file" accept="image/*">
+            </div>
+          </div>
+
+          <div class="row two" style="margin-top:10px;">
+            <input id="promoPoints" type="number" value="10" min="1" placeholder="Puncte per participare (opțional)">
+            <button class="btn btn-primary" type="button" onclick="savePromo()">💾 Salvează</button>
+          </div>
+          <p class="admin-msg" id="saveMsg" style="display:none;"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel right">
+      <div class="hd"><h3>Campanii</h3><span class="pill">📌 Live</span></div>
+      <div class="bd">
+        <div id="promoList" class="cards"></div>
+        <div id="emptyState" class="small" style="display:none;">Nu există campanii încă.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Participate modal -->
+<div class="modal" id="joinModal" onclick="if(event.target.id==='joinModal') closeJoin()">
+  <div class="modal-card">
+    <div class="modal-hd">
+      <h3 id="joinTitle">Participă</h3>
+      <button class="x" onclick="closeJoin()">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div id="joinInfo" class="small"></div>
+      <div class="hr"></div>
+      <div class="row two">
+        <input id="joinName" type="text" placeholder="Nume (opțional)">
+        <input id="joinEmail" type="email" placeholder="Email (obligatoriu)">
+      </div>
+      <div class="row two" style="margin-top:10px;">
+        <input id="joinWallet" type="text" placeholder="Wallet (opțional)">
+        <input id="joinReferral" type="text" placeholder="Cod referral (opțional)">
+      </div>
+      <div class="check">
+        <input id="joinAgree" type="checkbox">
+        <label for="joinAgree">Sunt de acord să fiu contactat/ă pentru confirmarea participării.</label>
+      </div>
+      <div class="row" style="justify-content:flex-end; margin-top:12px;">
+        <button class="btn btn-primary" id="joinBtn" type="button" onclick="submitJoin()">✅ Confirmă participarea</button>
+        <button class="btn btn-ghost" type="button" onclick="closeJoin()">Anulează</button>
+      </div>
+      <p class="admin-msg" id="joinMsg" style="display:none;"></p>
+    </div>
+  </div>
+</div>
 
 <script>
-/* ============================================================
-   Giveaway & Promoții (Firestore + Storage) - functional & pro
-   - Firebase config identic cu index prezentare ok.html
-   - Admin login + admin whitelist
-   - Save campaigns in Firestore: collection promos
-   - Upload background/banner to Firebase Storage: promos/{id}/...
-   - Render big attractive cards + Participate button -> modal
-   - Save participants in subcollection: promos/{id}/participants
-   ============================================================ */
-
-const ADMIN_EMAILS = [
-  "stancubyt@gmail.com",
-  "admin@stancubyt.com"
-];
-
-const $ = (id)=>document.getElementById(id);
+const ADMIN_EMAILS = ["stancubyt@gmail.com"];
 
 const auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
 const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
 const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
 
-let __promosUnsub = null;
-let __activePromoId = null;
-let __activePromo = null;
+function $(id) { return document.getElementById(id); }
 
-function showMsg(el, ok, text){
-  if (!el) return;
-  el.style.display = 'block';
-  el.classList.remove('ok','bad');
-  el.classList.add(ok ? 'ok' : 'bad');
-  el.textContent = text;
-}
-function hideMsg(el){ if(el) el.style.display='none'; }
-
-async function computeIsAdmin(user){
-  if (!user) return false;
-  try{
-    const token = await user.getIdTokenResult(true);
-    if (token && token.claims && token.claims.admin === true) return true;
-  }catch(e){}
-  const email = (user.email || '').toLowerCase();
-  return ADMIN_EMAILS.map(x=>String(x).toLowerCase()).includes(email);
+function maskEmail(email) {
+  if (!email || typeof email !== 'string') return '';
+  const [u, d] = email.split('@');
+  if (!d) return email;
+  const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
+  return `${u2}@${d}`;
 }
 
-function setAdminUI(isAdmin, user){
-  // pills
-  const pill = $('authPill');
-  const badge = $('adminBadge');
-  if (pill){
-    if (user) pill.textContent = '✅ ' + (user.email || 'Autentificat');
-    else pill.textContent = '🔒 Neautentificat';
-  }
-  if (badge){
-    badge.textContent = isAdmin ? '⭐ Admin activ' : (user ? 'User' : '—');
-  }
 
-  // show/hide admin-only elements
-  document.querySelectorAll('.admin-only').forEach(el=>{
-    el.style.display = isAdmin ? '' : 'none';
-  });
-
-  // login box is shown even if admin, but message changes
-  const loginBox = $('loginBox');
-  const adminForm = $('adminForm');
-  if (loginBox && isAdmin){
-    // keep it visible, but show a small hint
-    const msg = $('adminLoginMsg');
-    showMsg(msg, true, 'Autentificat ca admin. Poți adăuga campanii din butoanele de sus.');
-  }
-  if (adminForm && !isAdmin){
-    adminForm.style.display = 'none';
-  }
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"'`=\/]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'}[ch]));
 }
 
-async function adminSignIn(){
-  try{
-    if (!auth){ alert('Firebase Auth nu este încărcat.'); return; }
-    const email = (($('adminEmail')?.value)||'').trim();
-    const pass = (($('adminPass')?.value)||'');
-    const msg = $('adminLoginMsg');
-    if (!email || !pass){ showMsg(msg, false, 'Completează email și parolă.'); return; }
-    await auth.signInWithEmailAndPassword(email, pass);
-    // onAuthStateChanged updates UI
-  }catch(e){
-    const msg = $('adminLoginMsg');
-    showMsg(msg, false, 'Eroare autentificare: ' + (e?.message || e));
-  }
-}
-async function adminSignOut(){
-  try{ await auth?.signOut(); }catch(e){}
-}
-
-function openAdminForm(kind){
-  const f = $('adminForm');
-  if (f) f.style.display = 'block';
-  if ($('promoType')) $('promoType').value = (kind === 'giveaway') ? 'giveaway' : 'promo';
-  const t = $('adminFormTitle');
-  if (t) t.textContent = (kind === 'giveaway') ? '🎁 Adaugă Giveaway' : '➕ Adaugă Promoție';
-  hideMsg($('adminSaveMsg'));
-}
-function closeAdminForm(){
-  const f = $('adminForm');
-  if (f) f.style.display = 'none';
-  hideMsg($('adminSaveMsg'));
-}
-
-function safeName(name){
-  return String(name || 'file').replace(/[^\w.\-]+/g, '_');
-}
-
-async function uploadToStorage(promoId, file, kind){
-  if (!storage || !file) return null;
-  const path = `promos/${promoId}/${kind}_${Date.now()}_${safeName(file.name)}`;
-  const ref = storage.ref().child(path);
-  await ref.put(file);
-  const url = await ref.getDownloadURL();
-  return { url, path, contentType: file.type || 'application/octet-stream', name: safeName(file.name) };
-}
-
-function dateTimeLocalToMs(v){
-  // v: "YYYY-MM-DDTHH:mm"
-  const t = new Date(v).getTime();
-  return Number.isFinite(t) ? t : 0;
-}
-
-function cleanText(s){ return String(s||'').trim(); }
-
-function campaignValidate(payload){
-  if (!payload.title) return 'Completează titlul.';
-  if (!payload.endAt || payload.endAt <= Date.now()) return 'Completează o dată de expirare validă (în viitor).';
-  if (!payload.rules) return 'Completează regulamentul / condițiile.';
-  // prizes at least P1
-  if (!payload.prizes?.p1) return 'Completează minim Premiul I.';
-  return '';
-}
-
-async function saveCampaign(){
-  const msg = $('adminSaveMsg');
-  hideMsg(msg);
-
-  if (!db || !auth?.currentUser){
-    showMsg(msg, false, 'Nu ești autentificat. Loghează-te ca admin.');
-    return;
-  }
-  const isAdmin = await computeIsAdmin(auth.currentUser);
-  if (!isAdmin){
-    showMsg(msg, false, 'Nu ai drepturi admin pentru a salva.');
-    return;
-  }
-
-  const type = cleanText($('promoType')?.value || 'promo'); // promo|giveaway
-  const endRaw = cleanText($('promoEnd')?.value || '');
-  const endAt = dateTimeLocalToMs(endRaw);
-
-  const payload = {
-    type,
-    title: cleanText($('promoTitle')?.value || ''),
-    tagline: cleanText($('promoTagline')?.value || ''),
-    endAt,
-    endDate: endRaw || null,
-    prizes: {
-      p1: cleanText($('p1')?.value || ''),
-      p2: cleanText($('p2')?.value || ''),
-      p3: cleanText($('p3')?.value || ''),
-      top5: cleanText($('pTop5')?.value || ''),
-      next10: cleanText($('pNext10')?.value || '')
-    },
-    rules: cleanText($('promoRules')?.value || ''),
-    ctaUrl: cleanText($('ctaUrl')?.value || ''),
-    ctaText: cleanText($('ctaText')?.value || '') || 'Participă acum!',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    createdBy: auth.currentUser.uid,
-    status: 'active',
-    bg: null,
-    banner: null
-  };
-
-  const vErr = campaignValidate(payload);
-  if (vErr){ showMsg(msg, false, vErr); return; }
-
-  const bgFile = $('bgFile')?.files?.[0] || null;
-  const bannerFile = $('bannerFile')?.files?.[0] || null;
-
-  try{
-    showMsg(msg, true, 'Se salvează campania...');
-
-    // 1) create doc first
-    const ref = await db.collection('promos').add(payload);
-
-    // 2) uploads (optional) and update
-    const updates = {};
-    if (bgFile){
-      try{
-        updates.bg = await uploadToStorage(ref.id, bgFile, 'bg');
-      }catch(e){
-        console.warn('bg upload fail', e);
-      }
-    }
-    if (bannerFile){
-      try{
-        updates.banner = await uploadToStorage(ref.id, bannerFile, 'banner');
-      }catch(e){
-        console.warn('banner upload fail', e);
-      }
-    }
-    if (Object.keys(updates).length){
-      await db.collection('promos').doc(ref.id).set(updates, { merge:true });
-    }
-
-    showMsg(msg, true, '✅ Salvat în Firestore + Storage. Cardul apare imediat în listă.');
-    // reset a bit
-    $('promoTitle').value = '';
-    $('promoTagline').value = '';
-    $('promoEnd').value = '';
-    $('p1').value = '';
-    $('p2').value = '';
-    $('p3').value = '';
-    $('pTop5').value = '';
-    $('pNext10').value = '';
-    $('promoRules').value = '';
-    $('ctaUrl').value = '';
-    $('ctaText').value = '';
-    if ($('bgFile')) $('bgFile').value = '';
-    if ($('bannerFile')) $('bannerFile').value = '';
-  }catch(e){
-    console.error('saveCampaign', e);
-    showMsg(msg, false, '❌ Eroare la salvare (Firestore Rules pentru promos). Asigură-te că ești logat cu email admin și rules permit write.');
-  }
-}
-
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"'`=\/]/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
-  }[ch]));
-}
-
-function formatCountdown(ms){
+function formatCountdown(ms) {
   if (ms <= 0) return '0d 0h 0m';
   const m = Math.floor(ms/60000);
   const d = Math.floor(m/(60*24));
@@ -855,24 +359,204 @@ function formatCountdown(ms){
   return `${d}d ${h}h ${mm}m`;
 }
 
-function promoBadge(p){
-  const now = Date.now();
-  const endAt = Number(p.endAt || 0);
-  const live = endAt && endAt > now;
-  return live ? {cls:'live', txt:'LIVE'} : {cls:'ended', txt:'EXPIRAT'};
+function setAdminUI(isAdmin, user) {
+  const badge = document.getElementById('adminStatusBadge');
+  const label = document.getElementById('adminUserLabel');
+  const msg = document.getElementById('adminLoginMsg');
+  const logoutBtn = document.getElementById('adminLogoutBtn');
+
+  if (badge) {
+    badge.classList.remove('admin-badge-on','admin-badge-off');
+    badge.classList.add(isAdmin ? 'admin-badge-on' : 'admin-badge-off');
+    badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
+  }
+  if (label) {
+    label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
+  }
+  if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
+
+  if (msg) {
+    msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
+    msg.textContent = user
+      ? (isAdmin ? 'Mod administrator activ.' : 'Autentificat, dar fara drepturi admin.')
+      : 'Autentifica-te cu email + parola (Firebase).';
+  }
+
+  // arata/ascunde elemente admin-only daca exista
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? 'block' : 'none';
+  });
+  try { ensureNewsAdminUI(); } catch(e) {}
+  try { loadNews(); } catch(e) {}
+
 }
 
-function promoTypeLabel(type){
-  const t = String(type||'promo');
-  return (t === 'giveaway') ? '🎁 Giveaway' : '⚡ Promoție';
+async function computeIsAdmin(user) {
+  if (!user) return false;
+  try {
+    // 1) custom claim admin
+    const token = await user.getIdTokenResult(true);
+    if (token && token.claims && token.claims.admin === true) return true;
+  } catch (e) {}
+  // 2) whitelist email
+  const email = (user.email || '').toLowerCase();
+  return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
 }
 
-function renderPromos(promos){
+async function adminSignIn() {
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      alert('Firebase Auth nu este incarcat.');
+      return;
+    }
+    const email = (document.getElementById('adminEmail')?.value || '').trim();
+    const pass = (document.getElementById('adminPass')?.value || '');
+
+    if (!email || !pass) {
+      const msg = document.getElementById('adminLoginMsg');
+      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
+      return;
+    }
+
+    await firebase.auth().signInWithEmailAndPassword(email, pass);
+    // onAuthStateChanged va actualiza UI
+  } catch (e) {
+    const msg = document.getElementById('adminLoginMsg');
+    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
+  }
+}
+
+async function adminSignOut() {
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    await firebase.auth().signOut();
+  } catch (e) {}
+}
+
+function openAdminForm(kind) {
+  const wrap = $('adminFormWrap');
+  if (wrap) wrap.style.display = 'block';
+  const sel = $('promoType');
+  if (sel) sel.value = (kind === 'giveaway') ? 'giveaway' : 'promo';
+  const t = $('adminFormTitle');
+  if (t) t.textContent = (kind === 'giveaway') ? '🎁 Adaugă Giveaway' : '➕ Adaugă Promoție';
+}
+
+async function uploadPromoMedia(promoId, file) {
+  if (!storage || !file) return null;
+  const safeName = String(file.name || 'file').replace(/[^\w.\-]+/g, '_');
+  const path = `promos/${promoId}/${Date.now()}_${safeName}`;
+  const ref = storage.ref().child(path);
+  await ref.put(file);
+  const url = await ref.getDownloadURL();
+  return { url, path, contentType: file.type || 'application/octet-stream', name: safeName };
+}
+
+let __promosUnsub = null;
+let __activePromoId = null;
+let __activePromo = null;
+
+function cancelPromo() {
+  ['promoTitle','promoPrize','promoDesc','promoEnds','p1','p2','p3','pTop5','pNext10','promoRules','ctaText','ctaUrl'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
+  if ($('promoBg')) $('promoBg').value = '';
+  if ($('promoBanner')) $('promoBanner').value = '';
+}
+
+async function savePromo() {
+  if (!db || !auth?.currentUser) {
+    alert('Autentificare necesară.');
+    return;
+  }
+  const isAdmin = await computeIsAdmin(auth.currentUser);
+  if (!isAdmin) {
+    alert('Autentificat, dar fără drepturi admin.');
+    return;
+  }
+
+  const title = ($('promoTitle')?.value || '').trim();
+  const prize = ($('promoPrize')?.value || '').trim();
+  const desc = ($('promoDesc')?.value || '').trim();
+  const ends = ($('promoEnds')?.value || '').trim();
+  const points = parseInt($('promoPoints')?.value || '10', 10) || 10;
+
+  const type = ($('promoType')?.value || 'promo').trim();
+  const p1 = ($('p1')?.value || '').trim();
+  const p2 = ($('p2')?.value || '').trim();
+  const p3 = ($('p3')?.value || '').trim();
+  const top5 = ($('pTop5')?.value || '').trim();
+  const next10 = ($('pNext10')?.value || '').trim();
+  const rules = ($('promoRules')?.value || '').trim();
+  const ctaText = ($('ctaText')?.value || '').trim() || 'Participă acum!';
+  const ctaUrl = ($('ctaUrl')?.value || '').trim();
+
+  const bgFile = $('promoBg')?.files?.[0] || null;
+  const bannerFile = $('promoBanner')?.files?.[0] || null;
+
+  if (!title || !ends || !desc) {
+    alert('Completează titlul, descrierea și data expirării.');
+    return;
+  }
+
+  const endsAt = new Date(ends).getTime();
+  if (!endsAt || endsAt <= Date.now()) {
+    alert('Data expirării trebuie să fie în viitor!');
+    return;
+  }
+
+  try {
+    const ref = await db.collection('promos').add({
+      title,
+      prize: prize || null,
+      desc,
+      endsAt,
+      endDate: ends,
+      pointsPerPromotion: points,
+      type,
+      prizes: { p1: p1||null, p2: p2||null, p3: p3||null, top5: top5||null, next10: next10||null },
+      rules: rules || null,
+      ctaText,
+      ctaUrl: ctaUrl || null,
+      createdAt: Date.now(),
+      status: 'active',
+      bg: null,
+      banner: null
+    });
+
+    if (bgFile) {
+      const bg = await uploadPromoMedia(ref.id, bgFile);
+      if (bg) await db.collection('promos').doc(ref.id).update({ bg });
+    }
+    if (bannerFile) {
+      const banner = await uploadPromoMedia(ref.id, bannerFile);
+      if (banner) await db.collection('promos').doc(ref.id).update({ banner });
+    }
+
+    cancelPromo();
+    alert('Giveaway/Promoție adăugată!');
+  } catch (e) {
+    console.error("savePromo error:", e);
+    alert('Eroare la salvare (verifică Firestore Rules pentru promos / Storage).');
+  }
+}
+
+async function deletePromo(promoId) {
+  const isAdmin = await computeIsAdmin(auth?.currentUser);
+  if (!isAdmin) return;
+  if (!confirm('Ștergi această promoție/giveaway?')) return;
+  try {
+    await db.collection('promos').doc(promoId).delete();
+  } catch(e) {
+    console.error(e);
+    alert('Eroare la ștergere (Rules).');
+  }
+}
+
+function renderPromos(promos) {
   const host = $('promoList');
   const empty = $('emptyState');
   if (!host) return;
 
-  if (!Array.isArray(promos) || !promos.length){
+  if (!promos || !promos.length) {
     host.innerHTML = '';
     if (empty) empty.style.display = 'block';
     return;
@@ -880,50 +564,48 @@ function renderPromos(promos){
   if (empty) empty.style.display = 'none';
 
   const now = Date.now();
-  host.innerHTML = promos.map(p=>{
-    const id = p._id;
-    const badge = promoBadge(p);
-    const endAt = Number(p.endAt||0);
+  host.innerHTML = promos.map(p => {
+    const endAt = Number(p.endsAt || p.endAt || 0);
+    const live = endAt && endAt > now;
     const left = endAt ? (endAt - now) : 0;
 
-    // background
     let bgStyle = '';
     let bgClass = 'promo-bg';
-    if (p.bg && p.bg.url){
+    if (p.bg && p.bg.url) {
       bgClass += ' has-img';
       const u = String(p.bg.url).replace(/["'()\\]/g,'');
-      bgStyle = `background-image: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.74)), url(${u});`;
+      bgStyle = `background-image: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.78)), url(${u});`;
     }
 
-    const title = escapeHtml(p.title || 'Fără titlu');
-    const tagline = escapeHtml(p.tagline || '');
-    const rules = escapeHtml(p.rules || '');
-    const ctaText = escapeHtml(p.ctaText || 'Participă');
-    const ctaUrl = (p.ctaUrl || '').trim();
-
-    const prizes = p.prizes || {};
-    const p1 = escapeHtml(prizes.p1 || '');
-    const p2 = escapeHtml(prizes.p2 || '');
-    const p3 = escapeHtml(prizes.p3 || '');
-    const top5 = escapeHtml(prizes.top5 || '');
-    const next10 = escapeHtml(prizes.next10 || '');
-
     const bannerHtml = (p.banner && p.banner.url)
-      ? `<div style="margin-top:8px; border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,.14);">
-           <img src="${String(p.banner.url).replace(/["'()\\]/g,'')}" alt="" style="width:100%; height:140px; object-fit:cover; display:block;">
+      ? `<div style="margin-top:8px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14)">
+           <img src="${String(p.banner.url).replace(/["'()\\]/g,'')}" alt="" style="width:100%;height:160px;object-fit:cover;display:block">
          </div>`
       : ``;
 
-    const live = endAt && endAt > now;
-    const when = p.endDate ? escapeHtml(p.endDate.replace('T',' ')) : (endAt ? new Date(endAt).toLocaleString('ro-RO') : '—');
+    const badgeCls = live ? 'live' : 'ended';
+    const badgeTxt = live ? 'LIVE' : 'EXPIRAT';
+    const typeLbl = (String(p.type||'promo')==='giveaway') ? '🎁 Giveaway' : '⚡ Promoție';
+    const when = p.endDate ? escapeHtml(String(p.endDate).replace('T',' ')) : (endAt ? new Date(endAt).toLocaleString('ro-RO') : '—');
 
-    const adminBtns = (window.__SBYT_ADMIN)
-      ? `<button class="btn btn-ghost" style="padding:10px 12px;" onclick="deleteCampaign('${id}')">🗑️ Șterge</button>`
+    const prizes = p.prizes || {};
+    const p1 = escapeHtml(prizes.p1 || p.prize || '—');
+    const p2 = escapeHtml(prizes.p2 || '—');
+    const p3 = escapeHtml(prizes.p3 || '—');
+    const top5 = escapeHtml(prizes.top5 || '');
+    const next10 = escapeHtml(prizes.next10 || '');
+
+    const rules = escapeHtml(p.rules || '');
+    const ctaText = escapeHtml(p.ctaText || 'Participă acum!');
+    const ctaUrl = (p.ctaUrl || '').trim();
+
+    const adminBtns = window.__SBYT_ADMIN
+      ? `<button class="btn btn-ghost" style="padding:10px 12px" onclick="deletePromo('${p._id}')">🗑️ Șterge</button>`
       : ``;
 
     const ctaBtn = live
-      ? `<button class="btn btn-primary" style="padding:11px 14px;" onclick="openJoin('${id}')">🚀 ${ctaText}</button>`
-      : `<button class="btn btn-ghost" style="padding:11px 14px;" disabled>Campanie închisă</button>`;
+      ? `<button class="btn btn-primary" style="padding:12px 16px" onclick="openJoin('${p._id}')">🚀 ${ctaText}</button>`
+      : `<button class="btn btn-ghost" style="padding:12px 16px" disabled>Campanie închisă</button>`;
 
     const linkHtml = (ctaUrl && live)
       ? `<a class="link" href="${escapeHtml(ctaUrl)}" target="_blank" rel="noopener">Link înregistrare</a>`
@@ -933,281 +615,193 @@ function renderPromos(promos){
       <div class="promo-card">
         <div class="${bgClass}" style="${bgStyle}"></div>
         <div class="promo-overlay"></div>
-
         <div class="promo-inner">
           <div class="promo-top">
-            <div class="badge ${badge.cls}">
-              <span>${promoTypeLabel(p.type)}</span>
-              <span>•</span>
-              <span>${badge.txt}</span>
-            </div>
-            <div class="badge ${live?'live':'ended'}" title="Timp rămas">
-              ⏳ ${live ? formatCountdown(left) : '0d 0h 0m'}
-            </div>
+            <div class="badge ${badgeCls}">${typeLbl} • ${badgeTxt}</div>
+            <div class="badge ${badgeCls}">⏳ ${live ? formatCountdown(left) : '0d 0h 0m'}</div>
           </div>
 
           <div>
-            <div class="promo-title">${title}</div>
-            ${tagline ? `<div class="promo-sub">${tagline}</div>` : ''}
+            <div class="promo-title">${escapeHtml(p.title||'Fără titlu')}</div>
+            <div class="promo-sub">${escapeHtml(p.desc||'')}</div>
           </div>
 
           ${bannerHtml}
 
           <div class="promo-meta">
             <span class="chip">📅 Expiră: <b>${when}</b></span>
-            <span class="chip">🎯 Mecanică: <b>referral + clasament</b></span>
+            <span class="chip">🎯 Bonus: <b>referral + clasament</b></span>
           </div>
 
           <div class="promo-prizes">
-            <div class="prize">
-              <b>🏆 Premiul I</b>
-              <div class="v">${p1 || '—'}</div>
-            </div>
-            <div class="prize">
-              <b>🥈 Premiul II</b>
-              <div class="v">${p2 || '—'}</div>
-            </div>
-            <div class="prize">
-              <b>🥉 Premiul III</b>
-              <div class="v">${p3 || '—'}</div>
-            </div>
+            <div class="prize"><b>🏆 Premiul I</b><div class="v">${p1}</div></div>
+            <div class="prize"><b>🥈 Premiul II</b><div class="v">${p2}</div></div>
+            <div class="prize"><b>🥉 Premiul III</b><div class="v">${p3}</div></div>
           </div>
 
-          ${(top5 || next10) ? `
-            <div class="promo-prizes" style="grid-template-columns: 1fr 1fr;">
-              <div class="prize">
-                <b>🔥 Primele 5 locuri</b>
-                <div class="v">${top5 || '—'}</div>
-              </div>
-              <div class="prize">
-                <b>✨ Următoarele 10 locuri</b>
-                <div class="v">${next10 || '—'}</div>
-              </div>
+          ${(top5||next10) ? `
+            <div class="promo-prizes" style="grid-template-columns:1fr 1fr">
+              <div class="prize"><b>🔥 Primele 5 locuri</b><div class="v">${top5||'—'}</div></div>
+              <div class="prize"><b>✨ Următoarele 10 locuri</b><div class="v">${next10||'—'}</div></div>
             </div>
           ` : ''}
 
-          <div class="promo-sub" style="border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.18); padding:10px 12px; border-radius:18px;">
-            <b style="color:rgba(255,255,255,.92)">📜 Regulament (pe scurt)</b><br/>
-            ${rules ? rules.slice(0, 320) + (rules.length>320?'…':'') : '—'}
+          <div class="promo-sub" style="border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);padding:10px 12px;border-radius:18px">
+            <b style="color:rgba(255,255,255,.92)">📜 Regulament</b><br>
+            ${rules ? (rules.length>320 ? rules.slice(0,320)+'…' : rules) : '—'}
           </div>
 
           <div class="cta-row">
-            <div class="cta-left">
+            <div class="promo-meta">
               <span>✅ Participare rapidă</span>
-              <span>•</span>
-              <span>📩 Cod după înscriere</span>
               ${linkHtml ? `<span>•</span>${linkHtml}` : ''}
             </div>
-            <div class="cta-right">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
               ${adminBtns}
               ${ctaBtn}
             </div>
           </div>
+
         </div>
       </div>
     `;
   }).join('');
 }
 
-async function listenPromos(){
-  const host = $('promoList');
-  if (!db || !host) return;
+function listenPromos() {
+  const list = $('promoList');
+  if (!list || !db) return;
 
-  if (__promosUnsub){ try{ __promosUnsub(); }catch(e){} __promosUnsub = null; }
+  if (__promosUnsub) { try { __promosUnsub(); } catch(_) {} __promosUnsub = null; }
 
-  __promosUnsub = db.collection('promos')
-    .orderBy('createdAt','desc')
-    .onSnapshot((snap)=>{
-      const arr = [];
-      snap.forEach(doc => arr.push({ _id: doc.id, ...doc.data() }));
-      renderPromos(arr);
-    }, (err)=>{
-      console.error('promos listen', err);
-      // show empty + error
-      const empty = $('emptyState');
-      if (empty){
-        empty.style.display = 'block';
-        empty.textContent = 'Nu pot citi campaniile (verifică Firestore Rules pentru read).';
-      }
-    });
+  __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(snap => {
+    const promos = [];
+    snap.forEach(doc => promos.push({ _id: doc.id, ...doc.data() }));
+    renderPromos(promos);
+  }, err => {
+    console.error(err);
+    $('emptyState').style.display = 'block';
+    $('emptyState').textContent = 'Nu pot citi campaniile (verifică Firestore Rules pentru read).';
+  });
 }
 
-async function deleteCampaign(promoId){
-  try{
-    if (!window.__SBYT_ADMIN){ alert('Doar admin poate șterge.'); return; }
-    if (!db) return;
-    if (!confirm('Ștergi această campanie?')) return;
-
-    // delete participants + promo doc (batch)
-    const partSnap = await db.collection('promos').doc(promoId).collection('participants').get();
-    const batch = db.batch();
-    partSnap.forEach(d => batch.delete(d.ref));
-    batch.delete(db.collection('promos').doc(promoId));
-    await batch.commit();
-  }catch(e){
-    console.error('deleteCampaign', e);
-    alert('Eroare la ștergere (Rules).');
-  }
-}
-
-/* ---------- Participate flow ---------- */
-
-function openJoin(promoId){
+function openJoin(promoId) {
   __activePromoId = promoId;
-  // we'll fetch promo doc for full info
-  openJoinModalLoading();
-  fetchPromoForJoin(promoId);
-}
-function openJoinModalLoading(){
   $('joinModal')?.classList.add('open');
-  hideMsg($('joinMsg'));
-  $('joinTitle').textContent = 'Participă';
-  $('joinInfo').textContent = 'Se încarcă detaliile campaniei...';
+  $('joinMsg').style.display='none';
   $('joinBtn').disabled = true;
+  loadJoin(promoId);
 }
-function closeJoin(){
+function closeJoin() {
   $('joinModal')?.classList.remove('open');
-  __activePromoId = null;
-  __activePromo = null;
-  // reset
-  if ($('joinName')) $('joinName').value = '';
-  if ($('joinEmail')) $('joinEmail').value = '';
-  if ($('joinWallet')) $('joinWallet').value = '';
-  if ($('joinReferral')) $('joinReferral').value = '';
-  if ($('joinAgree')) $('joinAgree').checked = false;
-  hideMsg($('joinMsg'));
+  __activePromoId=null; __activePromo=null;
+  ['joinName','joinEmail','joinWallet','joinReferral'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
+  if ($('joinAgree')) $('joinAgree').checked=false;
+  $('joinMsg').style.display='none';
 }
-async function fetchPromoForJoin(promoId){
-  try{
-    if (!db) throw new Error('Firestore missing');
+async function loadJoin(promoId) {
+  try {
     const doc = await db.collection('promos').doc(promoId).get();
-    if (!doc.exists) throw new Error('Promo not found');
+    if (!doc.exists) throw new Error('Campania nu există.');
     const p = { _id: doc.id, ...doc.data() };
     __activePromo = p;
-
     const now = Date.now();
-    const endAt = Number(p.endAt || 0);
-    const live = endAt && endAt > now;
+    const endAt = Number(p.endsAt||0);
+    const live = endAt>now;
 
-    $('joinTitle').textContent = (p.type === 'giveaway' ? '🎁 Participă la Giveaway' : '⚡ Participă la Promoție');
-    $('joinInfo').innerHTML = `
-      <b>${escapeHtml(p.title || '')}</b><br>
-      ${p.tagline ? `<span class="small">${escapeHtml(p.tagline)}</span><br>` : ''}
-      <span class="small">⏳ ${live ? 'Timp rămas: <b>'+formatCountdown(endAt-now)+'</b>' : '<b>Campanie expiratã</b>'}</span><br>
-      <span class="small">După înscriere primești un <b>cod unic</b>. Dacă alții folosesc codul tău ca <b>referral</b>, urci în clasament.</span>
-    `;
+    $('joinTitle').textContent = (String(p.type)==='giveaway') ? '🎁 Participă la Giveaway' : '⚡ Participă la Promoție';
+    $('joinInfo').innerHTML = `<b>${escapeHtml(p.title||'')}</b><br>
+      <span class="small">${escapeHtml(p.desc||'')}</span><br>
+      <span class="small">⏳ ${live ? ('Timp rămas: <b>'+formatCountdown(endAt-now)+'</b>') : '<b>Campanie expiratã</b>'}</span>`;
     $('joinBtn').disabled = !live;
-    if (!live){
-      showMsg($('joinMsg'), false, 'Campania este expirată. Nu se mai pot înregistra participanți.');
+    if (!live) {
+      $('joinMsg').style.display='block';
+      $('joinMsg').style.color = '#ff4d4d';
+      $('joinMsg').textContent = 'Campania este expirată.';
     }
-  }catch(e){
-    console.error('fetchPromoForJoin', e);
-    $('joinInfo').textContent = 'Nu pot încărca detaliile campaniei.';
-    showMsg($('joinMsg'), false, 'Eroare: ' + (e?.message || e));
+  } catch(e) {
+    $('joinInfo').textContent = 'Nu pot încărca detaliile.';
+    $('joinMsg').style.display='block';
+    $('joinMsg').style.color = '#ff4d4d';
+    $('joinMsg').textContent = 'Eroare: ' + (e?.message||e);
   }
 }
-
-function rid(){
-  return (Date.now().toString(36) + Math.random().toString(36).slice(2,10)).toUpperCase();
+function rid() {
+  return (Date.now().toString(36)+Math.random().toString(36).slice(2,10)).toUpperCase();
 }
-function maskEmail(email){
-  email = String(email||"").trim();
-  const [u,d] = email.split("@");
-  if(!u || !d) return email;
-  const u2 = u.length<=2 ? (u[0]||"*")+"*" : u.slice(0,2)+"***";
-  const d2 = d.replace(/(^.).*?(\..+$)/, "$1***$2");
-  return `${u2}@${d2}`;
-}
-
-async function submitJoin(){
+async function submitJoin() {
   const msg = $('joinMsg');
-  hideMsg(msg);
+  msg.style.display='none';
 
-  const promoId = __activePromoId;
-  const promo = __activePromo;
-  if (!promoId || !promo){
-    showMsg(msg, false, 'Nu am identificat campania. Închide și încearcă din nou.');
-    return;
+  if (!__activePromoId || !__activePromo) {
+    msg.style.display='block'; msg.style.color='#ff4d4d';
+    msg.textContent='Nu am identificat campania.'; return;
+  }
+  const p = __activePromo;
+  if (Number(p.endsAt||0) <= Date.now()) {
+    msg.style.display='block'; msg.style.color='#ff4d4d';
+    msg.textContent='Campania este expirată.'; return;
   }
 
-  const now = Date.now();
-  const endAt = Number(promo.endAt || 0);
-  if (!endAt || endAt <= now){
-    showMsg(msg, false, 'Campania este expirată.');
-    $('joinBtn').disabled = true;
-    return;
-  }
-
-  const email = cleanText($('joinEmail')?.value || '');
-  const name = cleanText($('joinName')?.value || '');
-  const wallet = cleanText($('joinWallet')?.value || '');
-  const referral = cleanText($('joinReferral')?.value || '');
+  const email = ($('joinEmail')?.value||'').trim();
+  const name = ($('joinName')?.value||'').trim();
+  const wallet = ($('joinWallet')?.value||'').trim();
+  const referral = ($('joinReferral')?.value||'').trim();
   const agree = !!$('joinAgree')?.checked;
 
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email || !re.test(email)){
-    showMsg(msg, false, 'Introdu un email valid.');
-    return;
+  if (!email || !re.test(email)) {
+    msg.style.display='block'; msg.style.color='#ff4d4d';
+    msg.textContent='Introdu un email valid.'; return;
   }
-  if (!agree){
-    showMsg(msg, false, 'Bifează acordul de contact/confirmare.');
-    return;
-  }
-
-  if (!db){
-    showMsg(msg, false, 'Firestore nu este încărcat.');
-    return;
+  if (!agree) {
+    msg.style.display='block'; msg.style.color='#ff4d4d';
+    msg.textContent='Bifează acordul.'; return;
   }
 
-  // create participant
-  const code = rid();
-  const participant = {
-    email,
-    emailMasked: maskEmail(email),
-    name: name || null,
-    wallet: wallet || null,
-    code,
-    referral: referral || null,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  try{
+  try {
     $('joinBtn').disabled = true;
-    showMsg(msg, true, 'Se salvează participarea...');
-
-    await db.collection('promos').doc(promoId).collection('participants').add(participant);
-
-    showMsg(msg, true, `✅ Înscriere confirmată! Codul tău: ${code}`);
-    // optional: open mail client
-    try{
-      const subj = encodeURIComponent(`StancuBYT | Confirmare participare | ${promo.title || 'Campanie'}`);
-      const body = encodeURIComponent(
-        `Ai fost înscris/ă la campania: ${promo.title || ''}\n\nCodul tău: ${code}\nReferral (dă codul prietenilor): ${code}\n\nSucces!\n— StancuBYT`
-      );
-      window.location.href = `mailto:${email}?subject=${subj}&body=${body}`;
-    }catch(e){}
-
-  }catch(e){
-    console.error('submitJoin', e);
-    showMsg(msg, false, '❌ Eroare la înscriere (verifică Firestore Rules pentru participants).');
+    const code = rid();
+    await db.collection('promos').doc(__activePromoId).collection('participants').add({
+      email,
+      name: name||null,
+      wallet: wallet||null,
+      referral: referral||null,
+      code,
+      createdAt: Date.now()
+    });
+    msg.style.display='block'; msg.style.color='#00ff9c';
+    msg.textContent = '✅ Înscris! Codul tău: ' + code;
+  } catch(e) {
+    console.error(e);
+    msg.style.display='block'; msg.style.color='#ff4d4d';
+    msg.textContent='Eroare la înscriere (Rules participants).';
     $('joinBtn').disabled = false;
   }
 }
 
-/* ---------- Init ---------- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  // auth listener
-  try{
-    auth?.onAuthStateChanged(async (user)=>{
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    auth?.onAuthStateChanged(async (user) => {
       const isAdmin = await computeIsAdmin(user);
       window.__SBYT_ADMIN = isAdmin;
-      setAdminUI(isAdmin, user);
-    });
-  }catch(e){}
 
-  // start listening promos
-  try{ listenPromos(); }catch(e){}
+      const pill = $('authPill');
+      if (pill) pill.textContent = user ? ('✅ ' + (user.email||'Autentificat')) : '🔒 Neautentificat';
+
+      setAdminUI(isAdmin, user);
+
+      const b = $('adminButtons');
+      if (b) b.style.display = isAdmin ? 'flex' : 'none';
+
+      const adminPill = $('adminPill');
+      if (adminPill) adminPill.textContent = isAdmin ? '⭐ Admin' : (user ? 'User' : '—');
+    });
+  } catch(e) {}
+
+  try { listenPromos(); } catch(e) {}
 });
 </script>
+
 </body>
 </html>
