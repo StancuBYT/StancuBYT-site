@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StancuBYT | Giveaway & Promoții</title>
-  <style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StancuBYT | Giveaway & Promoții</title>
+<style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
             --blue-tech: #0066ff;
@@ -1169,13 +1169,29 @@
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
 </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <script>
-    // Firebase init 1:1 din index whitepaper ok.html
-    try {
+<script>
+try{
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }catch(e){}
+};
+
+window.addEventListener('load', ()=>{
+  // evita conflictul de id duplicat (in cazul in care exista #contact in whitepaper)
+  const wpContact = document.querySelector('#whitepaper #contact');
+  if (wpContact) wpContact.id = 'contact-wp';
+});
+
+
+/* ============================================================
+   FIREBASE INIT + AUTH ADMIN (1:1 principiu ca in prezentare)
+   ============================================================ */
+
+try {
   if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
     firebase.initializeApp({
       apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
@@ -1190,16 +1206,15 @@
     });
   }
 } catch (e) {}
-  </script>
+</script>
 </head>
-
 <body>
-  <div id="particles-js"></div>
-  <div class="visit-counter" id="visitCounter">
+<div id="particles-js"></div>
+<div class="visit-counter" id="visitCounter">
         <span class="counter-icon">👁️</span>
         <span id="visitCount">0</span> vizite
     </div>
-  <nav class="scientific-nav">
+<nav class="scientific-nav">
         <div class="nav-container">
             <div class="logo">
                 <div class="logo-3d-container">
@@ -1220,8 +1235,23 @@
             </div>
         </div>
     </nav>
+<section id="giveaway" class="page-section active-section">
+<section class="admin-login" id="admin-login">
+            <h2>🔐 Administrator Login</h2>
+            <p class="admin-desc">Autentificare necesara pentru editarea sectiunii 5. Plan de lansare / Roadmap.</p>
+            <div class="admin-login-box">
+                <input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
+                <input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
+                <button onclick="adminSignIn()" type="button">Autentificare</button>
+                <button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
+            </div>
+            <div class="admin-status-row">
+                <span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
+                <span class="admin-user-label" id="adminUserLabel"></span>
+            </div>
+            <p class="admin-msg" id="adminLoginMsg"></p>
+        </section>
 
-  <section id="giveaway" class="page-section active-section">
         <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 Giveaway & Promoții
@@ -1277,41 +1307,24 @@
         </div>
     </section>
 
-  <section class="admin-login" id="admin-login">
-            <h2>🔐 Administrator Login</h2>
-            <p class="admin-desc">Autentificare necesara pentru editarea sectiunii 5. Plan de lansare / Roadmap.</p>
-            <div class="admin-login-box">
-                <input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
-                <input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
-                <button onclick="adminSignIn()" type="button">Autentificare</button>
-                <button id="adminLogoutBtn" onclick="adminSignOut()" style="display:none;" type="button">Delogare</button>
-            </div>
-            <div class="admin-status-row">
-                <span class="admin-badge admin-badge-off" id="adminStatusBadge">Neautentificat</span>
-                <span class="admin-user-label" id="adminUserLabel"></span>
-            </div>
-            <p class="admin-msg" id="adminLoginMsg"></p>
-        </section>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+const auth = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth() : null;
+const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
+const storage = (typeof firebase !== 'undefined' && firebase.storage) ? firebase.storage() : null;
 
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+window.__SBYT_ADMIN = false;
+const ADMIN_EMAILS = ["stancubyt@gmail.com"];
 
-  <script>
-    // ====== Firebase handles ======
-    const auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
-    const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
-    const storage = (typeof firebase !== 'undefined') ? firebase.storage() : null;
-
-    // ====== Admin login (1:1 whitepaper) ======
-    window.__SBYT_ADMIN = false;
-    const ADMIN_EMAILS = ["stancubyt@gmail.com"];
-    function maskEmail(email) {
+function maskEmail(email) {
   if (!email || typeof email !== 'string') return '';
   const parts = email.split('@');
   if (parts.length !== 2) return email;
   const u = parts[0], d = parts[1];
   const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
   return `${u2}@${d}`;
-}function setAdminUI(isAdmin, user) {
+}
+function setAdminUI(isAdmin, user) {
   const badge = document.getElementById('adminStatusBadge');
   const label = document.getElementById('adminUserLabel');
   const msg = document.getElementById('adminLoginMsg');
@@ -1337,7 +1350,8 @@
   try { setFounderAdminUI(isAdmin); } catch(e) {}
   // activeaza/dezactiveaza controalele membri echipa
   try { setTeamAdminMode(isAdmin); } catch(e) {}
-}async function computeIsAdmin(user) {
+}
+async function computeIsAdmin(user) {
   if (!user) return false;
   try {
     const token = await user.getIdTokenResult(true);
@@ -1345,7 +1359,8 @@
   } catch (e) {}
   const email = (user.email || '').toLowerCase();
   return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
-}async function adminSignIn(){
+}
+async function adminSignIn(){
   try {
     if (!auth) { alert('Firebase Auth nu este incarcat.'); return; }
     const email = (document.getElementById('adminEmail')?.value || '').trim();
@@ -1360,38 +1375,86 @@
     const msg = document.getElementById('adminLoginMsg');
     if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
   }
-}async function adminSignOut(){
+}
+async function adminSignOut(){
   try { if (auth) await auth.signOut(); } catch(e) {}
 }
 
-    // auth listener
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        firebase.auth().onAuthStateChanged(async (user) => {
-          const isAdmin = await computeIsAdmin(user);
-          window.__SBYT_ADMIN = isAdmin;
-          setAdminUI(isAdmin, user);
-          // show/hide add buttons that exist in giveaway section
-          document.querySelectorAll('.admin-only').forEach(el => {
-            el.style.display = isAdmin ? '' : 'none';
-          });
-        });
-      } catch(e) {}
+
+async function ensureAdminAuth(){
+  const user = auth?.currentUser || null;
+  if(!user){
+    const msg = document.getElementById('adminLoginMsg');
+    if(msg){ msg.style.color='#ff4d4d'; msg.textContent='Autentificare necesară (admin).'; }
+    document.getElementById('adminEmail')?.focus();
+    return false;
+  }
+  const ok = await computeIsAdmin(user);
+  if(!ok){
+    const msg = document.getElementById('adminLoginMsg');
+    if(msg){ msg.style.color='#ff4d4d'; msg.textContent='Autentificat, dar nu ești admin (ADMIN_EMAILS).'; }
+    return false;
+  }
+  return true;
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    auth?.onAuthStateChanged(async (user) => {
+      const isAdmin = await computeIsAdmin(user);
+      window.__SBYT_ADMIN = isAdmin;
+      setAdminUI(isAdmin, user);
+
+      // show/hide admin-only
+      document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = isAdmin ? '' : 'none';
+      });
     });
+  } catch(e) { console.warn(e); }
 
-    // ====== Section navigation ======
-    function showSection(id){
-      const sec = document.getElementById(id);
-      if (!sec) return;
-      document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active-section'));
-      sec.classList.add('active-section');
-      window.location.hash = '#'+id;
-    }
-    window.addEventListener('load', ()=>showSection('giveaway'));
+  // show giveaway section
+  try {
+    document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active-section'));
+    document.getElementById('giveaway')?.classList.add('active-section');
+  } catch(e) {}
 
-    // ====== Promo CRUD (din whitepaper - date + imagini) ======
-    let __promosUnsub = null;
-    async function uploadPromoMedia(promoId, file) {
+  // start promos listener
+  try {
+    if (db && typeof listenPromos === 'function') listenPromos();
+  } catch(e) { console.warn(e); }
+
+  // particles
+  try {
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 55 },
+        size: { value: 3 },
+        move: { speed: 1.4 },
+        line_linked: { enable: true }
+      },
+      interactivity: {
+        events: { onhover: { enable: true, mode: "repulse" } }
+      }
+    });
+  } catch(e) {}
+});
+
+// route buttons from promotii UI
+async function requestPassword(action, id) {
+  if (action === 'promoAdd' || action === 'giveawayAdd') {
+    const ok = await ensureAdminAuth();
+    if (!ok) return;
+    const f = document.getElementById('promoForm');
+    if (f) f.style.display = 'block';
+    const kind = document.getElementById('promoKind');
+    if (kind) kind.value = (action === 'giveawayAdd') ? 'giveaway' : 'promo';
+    return;
+  }
+  if (action === 'deletePromo') return deletePromo(id);
+}
+
+async function uploadPromoMedia(promoId, file) {
   if (!storage || !file) return null;
   const safeName = String(file.name || 'file').replace(/[^\w.\-]+/g, '_');
   const path = `promos/${promoId}/${Date.now()}_${safeName}`;
@@ -1399,7 +1462,8 @@
   await ref.put(file);
   const url = await ref.getDownloadURL();
   return { url, path, contentType: file.type || 'application/octet-stream', name: safeName };
-}async function savePromo() {
+}
+async function savePromo() {
   const ok = await ensureAdminAuth();
   if (!ok) return;
 
@@ -1444,7 +1508,8 @@
     console.error("savePromo error:", e);
     alert('Eroare la salvarea giveaway-ului (verifica Rules / Storage).');
   }
-}async function deletePromo(promoId) {
+}
+async function deletePromo(promoId) {
   const ok = await ensureAdminAuth();
   if (!ok) return;
   if (!confirm('Stergi aceasta promotie/giveaway?')) return;
@@ -1454,7 +1519,8 @@
     console.error("deletePromo error:", e);
     alert('Eroare la stergere (Rules).');
   }
-}async function listenPromos() {
+}
+async function listenPromos() {
   const list = document.getElementById('promoList');
   if (!list || !db) return;
 
@@ -1465,7 +1531,8 @@
     snap.forEach(doc => promos.push({ _id: doc.id, ...doc.data() }));
     renderPromos(promos);
   });
-}async function renderPromos(promos){
+}
+async function renderPromos(promos){
     const list = $('promoList');
     if (!list) return;
     list.innerHTML = '';
@@ -1614,7 +1681,8 @@
       }
     };
   }
-}async function cancelPromo() {
+}
+async function cancelPromo() {
             const f = $('promoForm');
             if (f) f.style.display = 'none';
             if ($('promoTitle')) $('promoTitle').value = '';
@@ -1822,49 +1890,6 @@
     const tokens = wei / Math.pow(10, 18);
     return { wei, tokens };
 }
-
-    // router pt butoanele din UI (promotii.html folosește requestPassword)
-    async function requestPassword(action, id){
-      if(action === 'promoAdd'){
-        const ok = await ensureAdminAuth();
-        if(!ok) return;
-        const f = document.getElementById('promoForm');
-        if(f) f.style.display = 'block';
-        return;
-      }
-      if(action === 'giveawayAdd'){
-        const ok = await ensureAdminAuth();
-        if(!ok) return;
-        const f = document.getElementById('promoForm');
-        if(f) f.style.display = 'block';
-        const sel = document.getElementById('promoKind');
-        if(sel) sel.value = 'giveaway';
-        return;
-      }
-      if(action === 'deletePromo') return deletePromo(id);
-    }
-
-    // init list
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        if (db && typeof listenPromos === 'function') listenPromos();
-      } catch(e) { console.warn(e); }
-      try {
-        if (typeof particlesJS !== 'undefined') {
-          particlesJS('particles-js', {
-            particles: {
-              number: { value: 55 },
-              size: { value: 3 },
-              move: { speed: 1.4 },
-              line_linked: { enable: true }
-            },
-            interactivity: {
-              events: { onhover: { enable: true, mode: "repulse" } }
-            }
-          });
-        }
-      } catch(e) {}
-    });
-  </script>
+</script>
 </body>
 </html>
