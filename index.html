@@ -2692,16 +2692,16 @@ function setAdminUI(isAdmin, user) {
     
 
 
-async function computeIsAdmin(user) {
-  if (!user) return false;
-  try {
-    // 1) custom claim admin
+async async function computeIsAdmin(user){
+  if(!user) return false;
+  // 1) custom claim admin (optional)
+  try{
     const token = await user.getIdTokenResult(true);
-    if (token && token.claims && token.claims.admin === true) return true;
-  } catch (e) {}
-  // 2) whitelist email
-  const email = (user.email || '').toLowerCase();
-  return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
+    if(token && token.claims && token.claims.admin === true) return true;
+  }catch(e){}
+  // 2) email whitelist
+  const email = (user.email || "").toLowerCase();
+  return (ADMIN_EMAILS || []).map(x=>String(x).toLowerCase()).includes(email);
 }
 
 async function adminSignIn() {
