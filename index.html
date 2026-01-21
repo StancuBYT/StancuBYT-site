@@ -1170,6 +1170,43 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+/* ===== Giveaway/Promo cards (marketing/game feel) ===== */
+.campaign-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;margin-top:14px}
+.campaign-card{position:relative;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);box-shadow:0 16px 40px rgba(0,0,0,0.45)}
+.campaign-hero{position:relative;min-height:220px;background-size:cover;background-position:center}
+.campaign-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.92) 100%)}
+.campaign-badges{position:absolute;top:14px;left:14px;z-index:2;display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.2px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.35);backdrop-filter:blur(10px)}
+.badge.hot{background:rgba(255,149,0,0.18)}
+.badge.live{background:rgba(0,255,136,0.14)}
+.badge.soon{background:rgba(0,255,255,0.12)}
+.campaign-banner{position:absolute;right:14px;top:14px;z-index:2;width:68px;height:68px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.05)}
+.campaign-body{position:relative;z-index:2;padding:16px 16px 14px}
+.campaign-title{font-size:18px;font-weight:900;line-height:1.15;margin:2px 0 6px}
+.campaign-hook{font-size:13px;opacity:.92;margin:0 0 10px}
+.campaign-meta{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+.meta-pill{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);font-size:12px;opacity:.95}
+.countdown{font-variant-numeric:tabular-nums;font-weight:800}
+.campaign-section{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.10)}
+.prize-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.prize-box{padding:10px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10)}
+.prize-box h4{margin:0 0 6px;font-size:12px;opacity:.9}
+.prize-box p{margin:0;font-size:12px;font-weight:800}
+.tiers{margin-top:10px;display:grid;grid-template-columns:1fr;gap:8px}
+.tier{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);font-size:12px}
+.tier strong{font-weight:900}
+.campaign-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn-primary{cursor:pointer;border:none;border-radius:14px;padding:10px 14px;font-weight:900;background:linear-gradient(90deg,var(--green-growth),var(--neon-cyan));color:#051018}
+.btn-secondary{cursor:pointer;border-radius:14px;padding:10px 14px;font-weight:800;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);color:#eaf7ff}
+.btn-danger{cursor:pointer;border-radius:14px;padding:10px 14px;font-weight:800;background:rgba(255,0,0,0.08);border:1px solid rgba(255,255,255,0.14);color:#ffd6d6}
+.details{margin-top:10px}
+.details summary{cursor:pointer;font-weight:900;opacity:.95}
+.details .details-inner{margin-top:8px;opacity:.9;font-size:13px;line-height:1.45}
+.join-panel{margin-top:18px;padding:16px;border-radius:18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10)}
+.join-panel h3{margin:0 0 10px;font-size:18px}
+.join-panel .small{opacity:.75;font-size:12px;margin-top:8px}
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1249,6 +1286,26 @@
               <button class="news-btn trophy-btn" style="min-width:220px;" onclick="openCampaignForm('giveaway')">🎁 Adaugă concurs / giveaway</button>
             </div>
             <div id="promoList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-top:1rem;"></div>
+
+<div id="joinPanel" class="join-panel">
+  <h3>🎫 Înscriere la campanie</h3>
+  <div style="opacity:.85; margin-bottom:10px;">Completează datele și apasă <b>Participă</b>. Vei primi un cod de înscriere.</div>
+  <div class="form-row">
+    <input id="joinCampaignId" type="hidden">
+    <input id="joinName" placeholder="Nume / Username" />
+  </div>
+  <div class="form-row">
+    <input id="joinEmail" placeholder="Email" />
+  </div>
+  <div class="form-row">
+    <input id="joinReferral" placeholder="Referral (opțional)" />
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <button class="btn-primary" onclick="submitJoin()">✅ Participă</button>
+    <button class="btn-secondary" onclick="clearJoin()">Reset</button>
+  </div>
+  <div id="joinResult" class="small"></div>
+</div>
 
             <div id="promoForm" style="display:none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
     <h3 style="margin-bottom: 0.75rem; color: var(--neon-cyan);">Creează promoție / concurs</h3>
@@ -1780,55 +1837,108 @@ async function showPromoForm() {
             alert('Înscriere salvată (local pe device).');
         }
 
-        function renderPromos() {
-            const list = $('promoList');
-            if (!list) return;
+        
+function renderPromos() {
+  const list = $('promoList');
+  if (!list) return;
 
-            const promos = getPromos();
-            if (!promos.length) {
-                list.innerHTML = `<div style="opacity:0.85;">Nu există promoții active încă.</div>`;
-                return;
-            }
+  const promos = getPromos().slice();
+  // active first, soon-to-expire first
+  promos.sort((a,b)=> new Date(a.endDate) - new Date(b.endDate));
 
-            // sort: cele care expiră mai repede primele
-            promos.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+  if (!promos.length) {
+    list.innerHTML = `<div style="opacity:0.85;">Nu există promoții/concursuri încă.</div>`;
+    return;
+  }
 
-            list.innerHTML = '';
-            promos.forEach(p => {
-                const end = new Date(p.endDate + 'T23:59:59');
-                const expired = new Date() > end;
+  list.innerHTML = `<div class="campaign-grid"></div>`;
+  const grid = list.querySelector('.campaign-grid');
 
-                const card = document.createElement('div');
-                card.className = 'news-card';
-                card.innerHTML = `
-                    <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
-                    <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
-                    <p style="opacity:0.9; line-height:1.5;">${escapeHtml(p.desc)}</p>
-                    <div class="news-date" style="margin-top:0.8rem;">
-                        <span>⏳</span> Expiră: ${new Date(p.endDate).toLocaleDateString('ro-RO')}
-                    </div>
+  promos.forEach(p=>{
+    const now = Date.now();
+    const endMs = new Date(p.endDate).getTime();
+    const diff = endMs - now;
 
-                    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
-                        <h4 style="margin:0 0 0.6rem 0; color: var(--neon-cyan);">Înscriere</h4>
-                        <div class="form-row">
-                            <input id="joinName_${p.id}" type="text" placeholder="Nume" maxlength="60">
-                            <input id="joinWallet_${p.id}" type="text" placeholder="Wallet (0x...)" maxlength="60">
-                        </div>
-                        <div class="form-row">
-                            <input id="joinPoints_${p.id}" type="number" min="0" step="1" placeholder="Promovări (puncte)" />
-                        </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="news-btn" onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
-                            <button class="news-btn" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
-                        </div>
-                        <small style="display:block; margin-top:0.6rem; opacity:0.75;">
-                            În varianta B, înscrierile/clasamentul sunt salvate doar pe device-ul tău.
-                        </small>
-                    </div>
-                `;
-                list.appendChild(card);
-            });
-        }
+    const isLive = diff > 0;
+    const hoursLeft = diff/36e5;
+    const isHot = isLive && hoursLeft <= 24;
+    const isSoon = isLive && hoursLeft <= 72;
+
+    const bg = (p.bgUrls && p.bgUrls.length ? p.bgUrls[0] : (p.bannerUrl||'')) || '';
+    const banner = p.bannerUrl || (p.bgUrls && p.bgUrls.length ? p.bgUrls[0] : '');
+
+    const kindLabel = (p.kind||'promo').toLowerCase()==='giveaway' ? 'CONCURS' : 'PROMOȚIE';
+    const ctaLabel  = (p.cta && String(p.cta).trim()) ? String(p.cta).trim() : 'Participă acum';
+
+    const card = document.createElement('div');
+    card.className = 'campaign-card';
+
+    card.innerHTML = `
+      <div class="campaign-hero" style="${bg?`background-image:url('${escapeHtmlAttr(bg)}')`:`background:linear-gradient(135deg, rgba(0,255,136,0.14), rgba(138,43,226,0.16));`}">
+        <div class="campaign-badges">
+          <span class="badge ${isLive?'live':''}">${isLive?'ACTIV':'ÎNCHEIAT'}</span>
+          <span class="badge">${kindLabel}</span>
+          ${isHot?`<span class="badge hot">🔥 Ultimele 24h</span>`:''}
+          ${(!isHot && isSoon)?`<span class="badge soon">⏳ Se închide curând</span>`:''}
+        </div>
+        ${banner?`<img class="campaign-banner" src="${escapeHtmlAttr(banner)}" alt="banner" loading="lazy">`:''}
+
+        <div class="campaign-body">
+          <div class="campaign-title">${escapeHtml(p.title||'Campanie')}</div>
+          ${p.hook?`<div class="campaign-hook">✨ ${escapeHtml(p.hook)}</div>`:''}
+
+          <div class="campaign-meta">
+            <div class="meta-pill">⏰ <span class="countdown" data-countdown="${escapeHtmlAttr(p.id)}">--:--:--</span></div>
+            ${p.maxParticipants?`<div class="meta-pill">👥 Limită: <b>${escapeHtml(p.maxParticipants)}</b></div>`:''}
+            ${p.points?`<div class="meta-pill">🎯 Bonus: <b>${escapeHtml(p.points)}p</b></div>`:''}
+          </div>
+
+          <div style="opacity:.9; font-size:13px; line-height:1.45;">
+            ${escapeHtml(p.desc||'')}
+          </div>
+
+          <div class="campaign-section">
+            <div style="font-weight:900; opacity:.95;">🏆 Premii</div>
+            <div class="prize-grid">
+              <div class="prize-box"><h4>Premiul I</h4><p>${escapeHtml((p.prize1||'—'))}</p></div>
+              <div class="prize-box"><h4>Premiul II</h4><p>${escapeHtml((p.prize2||'—'))}</p></div>
+              <div class="prize-box"><h4>Premiul III</h4><p>${escapeHtml((p.prize3||'—'))}</p></div>
+            </div>
+
+            <div class="tiers">
+              ${p.prizeTop5?`<div class="tier"><strong>Top 5 după premii:</strong> ${escapeHtml(p.prizeTop5)}</div>`:''}
+              ${p.prizeNext10?`<div class="tier"><strong>Următoarele 10 locuri:</strong> ${escapeHtml(p.prizeNext10)}</div>`:''}
+              ${p.prizeBonus?`<div class="tier"><strong>Bonus surpriză:</strong> ${escapeHtml(p.prizeBonus)}</div>`:''}
+            </div>
+          </div>
+
+          ${(p.howTo || p.rules || p.terms) ? `
+            <details class="details">
+              <summary>📜 Detalii & regulament</summary>
+              <div class="details-inner">
+                ${p.howTo?`<div><b>Pași “Cum participi”:</b><br>${nl2br(escapeHtml(p.howTo))}</div>`:''}
+                ${p.rules?`<div style="margin-top:10px;"><b>Regulament:</b><br>${nl2br(escapeHtml(p.rules))}</div>`:''}
+                ${p.terms?`<div style="margin-top:10px;"><b>Condiții:</b><br>${nl2br(escapeHtml(p.terms))}</div>`:''}
+              </div>
+            </details>
+          `:''}
+
+          <div class="campaign-actions">
+            <button class="btn-primary" onclick="openJoin('${escapeJs(p.id)}')">🎟️ ${escapeHtml(ctaLabel)}</button>
+            ${p.link?`<button class="btn-secondary" onclick="window.open('${escapeJs(p.link)}','_blank')">🔗 Link</button>`:''}
+            ${window.__SBYT_ADMIN?`<button class="btn-danger" onclick="deletePromo('${escapeJs(p.id)}')">🗑️ Șterge</button>`:''}
+          </div>
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  // start/update countdowns
+  startCountdownTicker();
+}
+
 
         function renderLeaderboard() {
             const lb = $('leaderboard');
@@ -5397,4 +5507,62 @@ async function savePromo() {
 
 // Ensure onclick bindings hit the right function
 window.savePromo = savePromo;
+
+
+
+function openJoin(promoId){
+  const p = getPromos().find(x=> String(x.id)===String(promoId));
+  if (!p) return;
+  $('joinCampaignId').value = String(p.id);
+  $('joinResult').innerHTML = `<span style="opacity:.9;">Te înscrii la:</span> <b>${escapeHtml(p.title||'Campanie')}</b>`;
+  document.getElementById('joinPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
+  $('joinName')?.focus();
+}
+function clearJoin(){
+  $('joinCampaignId').value = '';
+  $('joinName').value = '';
+  $('joinEmail').value = '';
+  $('joinReferral').value = '';
+  $('joinResult').textContent = '';
+}
+function submitJoin(){
+  const promoId = ($('joinCampaignId')?.value || '').trim();
+  const name = ($('joinName')?.value || '').trim();
+  const email = ($('joinEmail')?.value || '').trim();
+  const referral = ($('joinReferral')?.value || '').trim();
+
+  if (!promoId) { alert('Alege o campanie (apasă „Participă acum” din card).'); return; }
+  if (!name || !email) { alert('Completează numele și emailul.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Email invalid.'); return; }
+
+  const p = getPromos().find(x=> String(x.id)===String(promoId));
+  if (!p) { alert('Campania nu mai există.'); return; }
+  const endMs = new Date(p.endDate).getTime();
+  if (Date.now() > endMs) { alert('Campania este încheiată.'); return; }
+
+  const key = `sbyt_participants_${promoId}`;
+  const arr = JSON.parse(localStorage.getItem(key) || '[]');
+
+  // prevent duplicate by email
+  if (arr.some(x => String(x.email).toLowerCase() === email.toLowerCase())) {
+    $('joinResult').innerHTML = `✅ Ești deja înscris. Codul tău rămâne același.`;
+    return;
+  }
+
+  const code = `SBYT-${Math.random().toString(36).slice(2,7).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+  const item = {name, email, referral, code, ts: Date.now()};
+  arr.push(item);
+  localStorage.setItem(key, JSON.stringify(arr));
+
+  $('joinResult').innerHTML = `
+    <div style="margin-top:10px;">
+      🎉 <b>Înscriere reușită!</b><br>
+      Codul tău: <span style="font-weight:900;">${escapeHtml(code)}</span><br>
+      <span style="opacity:.8;">Păstrează codul. Îl poți folosi ca referral pentru prieteni.</span>
+    </div>
+  `;
+  $('joinReferral').value = code; // convenience for sharing
+}
+
+
 </script>
