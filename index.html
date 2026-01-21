@@ -5074,7 +5074,7 @@ service cloud.firestore {
     }
     // --- robust end date parsing (datetime-local / text) ---
     let endsAt = NaN;
-    const endsEl = document.getElementById("promoEnds") || document.getElementById("promoEndDate") || document.getElementById("promoEndDateTime");
+    const endsEl = document.getElementById("promoEnds") || document.getElementById("promoEnds") || document.getElementById("promoEndDateTime");
     if(endsEl){
       // Some browsers expose valueAsNumber for date/time inputs; use it if valid
       if(Number.isFinite(endsEl.valueAsNumber) && endsEl.valueAsNumber>0) endsAt = endsEl.valueAsNumber;
@@ -5307,7 +5307,7 @@ async function savePromo() {
   const rules = (document.getElementById('promoRules')?.value || '').trim();
   const terms = (document.getElementById('promoTerms')?.value || '').trim();
 
-  const endsRaw = (document.getElementById('promoEndDate')?.value || '').trim();
+  const endsRaw = (document.getElementById('promoEnds')?.value || '').trim();
   const ends = window.parseDateSafe ? window.parseDateSafe(endsRaw) : new Date(endsRaw);
 
   const prizes = {
