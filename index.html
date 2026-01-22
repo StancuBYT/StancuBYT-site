@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StancuBYT | Giveaway & Promoții</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StancuBYT | Giveaway & Promoții (Firestore)</title>
 
 <style>
 :root{
@@ -36,7 +36,6 @@ textarea{min-height:90px;resize:vertical}
 .card{background:var(--card);padding:20px;border-radius:18px;margin-bottom:18px;border:1px solid rgba(255,255,255,.08)}
 .admin-only{display:none}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
-
 .badge{
   display:inline-block;padding:4px 10px;border-radius:999px;
   background:rgba(0,255,136,.15);color:var(--accent);font-size:13px;font-weight:800;
@@ -45,23 +44,9 @@ textarea{min-height:90px;resize:vertical}
 .badge.expired{background:rgba(255,77,77,.15);color:#ff7a7a;border-color:rgba(255,77,77,.22)}
 .small{font-size:12px;color:var(--muted)}
 hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
-
-.table{
-  width:100%;
-  border-collapse:collapse;
-  overflow:hidden;
-  border-radius:14px;
-}
-.table th,.table td{
-  padding:10px 10px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-  text-align:left;
-  font-size:14px;
-}
-.table th{
-  background:rgba(255,255,255,.06);
-  color:#fff;
-}
+.table{width:100%;border-collapse:collapse;border-radius:14px;overflow:hidden}
+.table th,.table td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;font-size:14px}
+.table th{background:rgba(255,255,255,.06);color:#fff}
 .top1{background:var(--gold)}
 .top2{background:var(--silver)}
 .top3{background:var(--bronze)}
@@ -69,19 +54,30 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
 .row{display:flex;gap:12px;flex-wrap:wrap}
 .row > *{flex:1;min-width:180px}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
+.err{color:#ff7a7a;font-weight:800}
+.ok{color:#00ff88;font-weight:800}
 </style>
 
-<!-- Firebase -->
+<!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-  authDomain: "stancubyt-fc2b9.firebaseapp.com",
-  projectId: "stancubyt-fc2b9",
-};
-firebase.initializeApp(firebaseConfig);
+  // CONFIG - din proiectul tău
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ✅ Pune aici email-urile care au voie să adauge/șteargă promoții
+  const ADMIN_EMAILS = ["stancubyt@gmail.com"];
 </script>
 </head>
 
@@ -89,11 +85,13 @@ firebase.initializeApp(firebaseConfig);
 
 <div class="section">
   <h1>🎁 Giveaway & Promoții StancuBYT</h1>
-  <p class="small">Promoții active, înscrieri și clasamente separate pentru fiecare promoție.</p>
+  <p class="small">🔥 Real-time (Firestore). Promoțiile și clasamentele apar pe toate dispozitivele.</p>
+
+  <div id="dbStatus" class="small"></div>
 
   <div class="actions" style="margin:14px 0 6px">
     <button class="admin-only" onclick="showPromoForm()">➕ Adaugă promoție / concurs</button>
-    <button class="admin-only secondary" onclick="clearPromos()">🧹 Șterge toate</button>
+    <button class="admin-only secondary" onclick="deleteAllPromosConfirm()">🧹 Șterge toate</button>
   </div>
 
   <!-- FORM ADMIN -->
@@ -112,10 +110,12 @@ firebase.initializeApp(firebaseConfig);
     </div>
 
     <div class="actions" style="margin-top:12px">
-      <button onclick="savePromo()">💾 Salvează</button>
+      <button onclick="savePromo()">💾 Salvează în Firestore</button>
       <button class="danger" onclick="cancelPromo()">❌ Anulează</button>
     </div>
-    <div class="small" style="margin-top:10px">* În această versiune, datele se salvează local (localStorage).</div>
+    <div class="small" style="margin-top:10px">
+      * Doar admin poate crea/șterge promoții. Participanții se salvează per promoție.
+    </div>
   </div>
 
   <!-- LISTA PROMO -->
@@ -124,7 +124,7 @@ firebase.initializeApp(firebaseConfig);
   <!-- CLASAMENTE PE PROMOȚII -->
   <div class="card">
     <h3>🏆 Clasamente pe promoții</h3>
-    <div class="small">Top participanți pentru fiecare promoție (separat).</div>
+    <div class="small">Top participanți pentru fiecare promoție (real-time).</div>
     <div id="allLeaderboards" style="margin-top:12px"></div>
   </div>
 </div>
@@ -144,29 +144,47 @@ firebase.initializeApp(firebaseConfig);
 </div>
 
 <script>
-/* ===================== STORAGE ===================== */
-const LS_PROMOS = "sbyt_promos_v2";
-
-function getPromos(){
-  try { return JSON.parse(localStorage.getItem(LS_PROMOS) || "[]"); }
-  catch { return []; }
+/* ===================== HELPERS ===================== */
+function escapeHtml(str){
+  return String(str).replace(/[&<>"'`=\/]/g, s => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
+  }[s]));
 }
-function savePromos(promos){
-  localStorage.setItem(LS_PROMOS, JSON.stringify(promos));
+function maskWallet(w){
+  const s = String(w||"");
+  if(s.length <= 12) return s;
+  return s.slice(0,6) + "..." + s.slice(-4);
+}
+function isAdminUser(user){
+  if(!user || !user.email) return false;
+  return ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(user.email.toLowerCase());
+}
+function setDbStatus(ok, msg){
+  const el = document.getElementById("dbStatus");
+  if(!el) return;
+  el.innerHTML = ok ? `<span class="ok">✔ ${escapeHtml(msg)}</span>` : `<span class="err">✖ ${escapeHtml(msg)}</span>`;
 }
 
 /* ===================== AUTH ===================== */
-firebase.auth().onAuthStateChanged(user=>{
-  document.querySelectorAll('.admin-only')
-    .forEach(e=>e.style.display = user ? 'block' : 'none');
+window.IS_ADMIN = false;
 
-  // butoanele în rând să nu rupă layout-ul
+auth.onAuthStateChanged(user=>{
+  const adminOk = isAdminUser(user);
+  window.IS_ADMIN = !!adminOk;
+
+  // show/hide admin elements
+  document.querySelectorAll('.admin-only')
+    .forEach(e=>e.style.display = adminOk ? 'block' : 'none');
   document.querySelectorAll('.actions .admin-only')
-    .forEach(e=>e.style.display = user ? 'inline-flex' : 'none');
+    .forEach(e=>e.style.display = adminOk ? 'inline-flex' : 'none');
 
   document.getElementById('logoutBtn').style.display = user ? 'inline-flex' : 'none';
-  document.getElementById('adminMsg').textContent = user ? `Logat: ${user.email}` : 'Neautentificat';
-  window.IS_ADMIN = !!user;
+  document.getElementById('adminMsg').textContent = user
+    ? (adminOk ? `Logat admin: ${user.email}` : `Logat (NU admin): ${user.email}`)
+    : 'Neautentificat';
+
+  // Firestore read test
+  setDbStatus(true, "Conectat. Încarc promoțiile din Firestore...");
 });
 
 /* ===================== LOGIN ===================== */
@@ -175,11 +193,11 @@ function adminSignIn(){
   const pass = adminPass.value;
   if(!email || !pass){ alert("Completează email și parolă"); return; }
 
-  firebase.auth().signInWithEmailAndPassword(email, pass)
+  auth.signInWithEmailAndPassword(email, pass)
     .then(()=>{ adminPass.value = ""; })
-    .catch(e=>alert(e.message));
+    .catch(e=>alert("Autentificare eșuată: " + e.message));
 }
-function adminSignOut(){ firebase.auth().signOut(); }
+function adminSignOut(){ auth.signOut(); }
 
 /* ===================== ADMIN FORM ===================== */
 function showPromoForm(){ promoForm.style.display="block"; }
@@ -189,7 +207,19 @@ function cancelPromo(){
   pPointsDefault.value = 10;
 }
 
-function savePromo(){
+/* ===================== FIRESTORE STRUCTURA =====================
+
+Collection: promos
+  doc promoId:
+    title, end (YYYY-MM-DD), desc, prize, pointsDefault, createdAt, createdBy
+
+Subcollection: promos/{promoId}/participants
+  doc participantId (walletLower):
+    name, wallet, points, joinedAt
+
+===================================================== */
+
+async function savePromo(){
   if(!window.IS_ADMIN){ alert("Doar admin poate adăuga."); return; }
 
   const title = (pTitle.value || "").trim();
@@ -203,97 +233,185 @@ function savePromo(){
     return;
   }
 
-  const promos = getPromos();
-  promos.push({
-    id: Date.now(),
-    title,
-    end,
-    desc,
-    prize,
-    pointsDefault,
-    createdAt: new Date().toISOString(),
-    participants: [] // {name, wallet, points, joinedAt}
-  });
-
-  savePromos(promos);
-  cancelPromo();
-  render();
+  try{
+    await db.collection("promos").add({
+      title, end, desc, prize,
+      pointsDefault,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdBy: auth.currentUser ? auth.currentUser.email : null
+    });
+    cancelPromo();
+  }catch(e){
+    console.error(e);
+    alert("Eroare la salvare în Firestore: " + (e.message || e));
+  }
 }
 
-/* ===================== CRUD ===================== */
-function clearPromos(){
+async function deletePromo(promoId){
   if(!window.IS_ADMIN){ alert("Doar admin."); return; }
-  if(!confirm("Ștergi toate promoțiile?")) return;
-  localStorage.removeItem(LS_PROMOS);
-  render();
+  if(!confirm("Ștergi această promoție? (participanții rămân în subcolecție dacă nu ștergem din backend)")) return;
+
+  try{
+    await db.collection("promos").doc(promoId).delete();
+  }catch(e){
+    console.error(e);
+    alert("Eroare la ștergere: " + (e.message || e));
+  }
 }
 
-function deletePromo(id){
+async function deleteAllPromosConfirm(){
   if(!window.IS_ADMIN){ alert("Doar admin."); return; }
-  if(!confirm("Ștergi această promoție?")) return;
-  const promos = getPromos().filter(p=>p.id!==id);
-  savePromos(promos);
-  render();
+  if(!confirm("Sigur ștergi TOATE promoțiile?")) return;
+
+  try{
+    const snap = await db.collection("promos").get();
+    const batch = db.batch();
+    snap.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    alert("Promoțiile au fost șterse (doar documentele promos).");
+  }catch(e){
+    console.error(e);
+    alert("Eroare la ștergere: " + (e.message || e));
+  }
 }
 
 /* ===================== PARTICIPARE ===================== */
-function joinPromo(id){
-  const promos = getPromos();
-  const p = promos.find(x=>x.id===id);
-  if(!p) return;
-
-  const name = (document.getElementById("jn_"+id).value || "").trim();
-  const wallet = (document.getElementById("jw_"+id).value || "").trim();
-  const ptsRaw = (document.getElementById("jp_"+id).value || "").trim();
-  const points = Math.max(0, parseInt(ptsRaw || String(p.pointsDefault || 0), 10) || 0);
+async function joinPromo(promoId){
+  const name = (document.getElementById("jn_"+promoId).value || "").trim();
+  const wallet = (document.getElementById("jw_"+promoId).value || "").trim();
+  const ptsRaw = (document.getElementById("jp_"+promoId).value || "").trim();
 
   if(!name || !wallet){
     alert("Completează nume și wallet.");
     return;
   }
+  const walletLower = wallet.toLowerCase();
 
-  // expirare
-  const expired = new Date() > new Date(p.end + "T23:59:59");
-  if(expired){
-    alert("Această promoție este expirată.");
-    return;
+  try{
+    const promoRef = db.collection("promos").doc(promoId);
+    const promoDoc = await promoRef.get();
+    if(!promoDoc.exists){
+      alert("Promoția nu mai există.");
+      return;
+    }
+
+    const promo = promoDoc.data();
+    const expired = new Date() > new Date((promo.end || "") + "T23:59:59");
+    if(expired){
+      alert("Această promoție este expirată.");
+      return;
+    }
+
+    const pointsDefault = Number(promo.pointsDefault || 0);
+    const points = Math.max(0, parseInt(ptsRaw || String(pointsDefault), 10) || 0);
+
+    const partRef = promoRef.collection("participants").doc(walletLower);
+
+    // upsert participant
+    await partRef.set({
+      name,
+      wallet,
+      points,
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    alert("Înscriere salvată în Firestore ✅");
+  }catch(e){
+    console.error(e);
+    alert("Eroare înscriere (Firestore Rules?): " + (e.message || e));
   }
-
-  p.participants = p.participants || [];
-  const found = p.participants.find(u => (u.wallet || "").toLowerCase() === wallet.toLowerCase());
-  if(found){
-    // actualizează max puncte
-    found.name = name;
-    found.points = Math.max(Number(found.points)||0, points);
-  } else {
-    p.participants.push({name, wallet, points, joinedAt: new Date().toISOString()});
-  }
-
-  savePromos(promos);
-  render();
 }
 
-/* ===================== LEADERBOARD HELPERS ===================== */
-function sortParticipants(participants){
-  return [...(participants || [])].sort((a,b)=>{
+/* ===================== REAL-TIME RENDER ===================== */
+const promoListEl = document.getElementById("promoList");
+const allLBEl = document.getElementById("allLeaderboards");
+
+const promoUnsubs = new Map(); // promoId -> unsubscribe participants
+let promosUnsub = null;
+
+function cleanupParticipantsListeners(){
+  for (const [id, unsub] of promoUnsubs.entries()){
+    try{ unsub(); }catch(e){}
+  }
+  promoUnsubs.clear();
+}
+
+function sortParticipantsLocal(arr){
+  return [...arr].sort((a,b)=>{
     const pa = Number(a.points)||0;
     const pb = Number(b.points)||0;
     if(pb !== pa) return pb - pa;
-    // tie-break: joinedAt mai vechi înainte
-    return new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0);
+    const ta = (a.joinedAtMs||0);
+    const tb = (b.joinedAtMs||0);
+    return ta - tb;
   });
 }
 
-function maskWallet(w){
-  const s = String(w||"");
-  if(s.length <= 12) return s;
-  return s.slice(0,6) + "..." + s.slice(-4);
+function renderOnePromoCard(promoId, promoData){
+  const expired = new Date() > new Date((promoData.end || "") + "T23:59:59");
+  const title = escapeHtml(promoData.title || "");
+  const desc  = escapeHtml(promoData.desc || "");
+  const prize = promoData.prize ? escapeHtml(promoData.prize) : "";
+  const pointsDefault = Number(promoData.pointsDefault || 0);
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.setAttribute("data-promo-id", promoId);
+
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+      <div>
+        <span class="badge ${expired?'expired':''}">${expired?'Expirat':'Activ'}</span>
+        <h3 style="margin-top:10px">${title}</h3>
+        ${prize ? `<div class="small">🎁 Premiu: <b>${prize}</b></div>` : ``}
+        <div class="small">📅 Expiră: ${promoData.end ? new Date(promoData.end).toLocaleDateString("ro-RO") : "-"}</div>
+      </div>
+      <div class="actions" style="justify-content:flex-end">
+        <button class="admin-only danger" onclick="deletePromo('${promoId}')">🗑️ Șterge</button>
+      </div>
+    </div>
+
+    <p style="margin-top:10px">${desc}</p>
+
+    <hr>
+
+    <h4 style="margin-bottom:8px;color:var(--accent2)">Înscriere în această promoție</h4>
+    <div class="row">
+      <input id="jn_${promoId}" placeholder="Nume">
+      <input id="jw_${promoId}" placeholder="Wallet (0x...)">
+    </div>
+    <div class="row" style="margin-top:10px">
+      <input id="jp_${promoId}" type="number" min="0" step="1" placeholder="Puncte (ex: promovări)">
+      <div class="small" style="align-self:center">
+        Dacă lași gol, puncte implicite: <b>${pointsDefault}</b>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:12px">
+      <button onclick="joinPromo('${promoId}')">✅ Înscrie-te</button>
+    </div>
+
+    <hr>
+
+    <h4 style="color:var(--accent2)">🏆 Clasament pentru: ${title}</h4>
+    <div id="lb_${promoId}" class="small">Se încarcă...</div>
+  `;
+
+  // apply admin visibility
+  card.querySelectorAll(".admin-only").forEach(btn=>{
+    btn.style.display = window.IS_ADMIN ? "inline-flex" : "none";
+  });
+
+  return card;
 }
 
-function renderPromoLeaderboard(promo){
-  const sorted = sortParticipants(promo.participants);
+function renderParticipantsLeaderboard(promoId, participants){
+  const lbEl = document.getElementById("lb_"+promoId);
+  if(!lbEl) return;
+
+  const sorted = sortParticipantsLocal(participants);
   if(!sorted.length){
-    return `<div class="small">Încă nu există participanți.</div>`;
+    lbEl.innerHTML = `<div class="small">Încă nu există participanți.</div>`;
+    return;
   }
 
   let rows = "";
@@ -308,136 +426,131 @@ function renderPromoLeaderboard(promo){
       </tr>`;
   });
 
-  return `
-    <div class="table-wrap" style="margin-top:10px">
-      <table class="table">
-        <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
-        ${rows}
-      </table>
-    </div>`;
+  lbEl.innerHTML = `
+    <table class="table">
+      <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
+      ${rows}
+    </table>`;
 }
 
-function escapeHtml(str){
-  return String(str).replace(/[&<>"'`=\/]/g, s => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
-  }[s]));
-}
+function renderAllLeaderboards(promosMap, participantsMap){
+  // promosMap: promoId -> promoData
+  // participantsMap: promoId -> participants[]
+  allLBEl.innerHTML = "";
 
-/* ===================== RENDER UI ===================== */
-function render(){
-  const list = document.getElementById("promoList");
-  const allLB = document.getElementById("allLeaderboards");
+  const promoEntries = Array.from(promosMap.entries())
+    .sort((a,b)=> new Date(a[1].end || "2100-01-01") - new Date(b[1].end || "2100-01-01"));
 
-  const promos = getPromos()
-    .sort((a,b)=> new Date(a.end) - new Date(b.end));
-
-  // LISTĂ PROMO
-  list.innerHTML = "";
-  if(!promos.length){
-    list.innerHTML = `<div class="card"><h3>Nu există promoții încă.</h3><p class="small">Admin: autentifică-te și apasă „Adaugă promoție”.</p></div>`;
-  } else {
-    promos.forEach(p=>{
-      const expired = new Date() > new Date(p.end + "T23:59:59");
-
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const promoLBHtml = renderPromoLeaderboard(p);
-
-      card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-          <div>
-            <span class="badge ${expired?'expired':''}">${expired?'Expirat':'Activ'}</span>
-            <h3 style="margin-top:10px">${escapeHtml(p.title)}</h3>
-            ${p.prize ? `<div class="small">🎁 Premiu: <b>${escapeHtml(p.prize)}</b></div>` : ``}
-            <div class="small">📅 Expiră: ${new Date(p.end).toLocaleDateString("ro-RO")}</div>
-          </div>
-          <div class="actions" style="justify-content:flex-end">
-            <button class="admin-only danger" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
-          </div>
-        </div>
-
-        <p style="margin-top:10px">${escapeHtml(p.desc)}</p>
-
-        <hr>
-
-        <h4 style="margin-bottom:8px;color:var(--accent2)">Înscriere în această promoție</h4>
-        <div class="row">
-          <input id="jn_${p.id}" placeholder="Nume">
-          <input id="jw_${p.id}" placeholder="Wallet (0x...)">
-        </div>
-        <div class="row" style="margin-top:10px">
-          <input id="jp_${p.id}" type="number" min="0" step="1" placeholder="Puncte (ex: promovări)">
-          <div class="small" style="align-self:center">Dacă lași gol, se folosesc punctele implicite: <b>${Number(p.pointsDefault||0)}</b></div>
-        </div>
-
-        <div class="actions" style="margin-top:12px">
-          <button onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
-        </div>
-
-        <hr>
-
-        <h4 style="color:var(--accent2)">🏆 Clasament pentru: ${escapeHtml(p.title)}</h4>
-        ${promoLBHtml}
-      `;
-
-      list.appendChild(card);
-
-      // asigură admin-only din interior
-      card.querySelectorAll('.admin-only').forEach(e=>{
-        e.style.display = window.IS_ADMIN ? 'inline-flex' : 'none';
-      });
-    });
+  if(!promoEntries.length){
+    allLBEl.innerHTML = `<div class="small">Nu există promoții.</div>`;
+    return;
   }
 
-  // CLASAMENTE PE TOATE PROMOȚIILE (rezumat)
-  allLB.innerHTML = "";
-  if(!promos.length){
-    allLB.innerHTML = `<div class="small">Nu există promoții.</div>`;
-  } else {
-    promos.forEach(p=>{
-      const sorted = sortParticipants(p.participants);
-      const top = sorted.slice(0, 10);
+  for (const [promoId, promo] of promoEntries){
+    const participants = participantsMap.get(promoId) || [];
+    const sorted = sortParticipantsLocal(participants).slice(0, 10);
 
-      let rows = "";
-      if(!top.length){
-        rows = `<tr><td colspan="4" class="small">Fără participanți.</td></tr>`;
-      } else {
-        top.forEach((u,i)=>{
-          const cls = i===0 ? "top1" : i===1 ? "top2" : i===2 ? "top3" : "";
-          rows += `
-            <tr class="${cls}">
-              <td>${i+1}</td>
-              <td>${escapeHtml(u.name || "Anonim")}</td>
-              <td class="mono">${escapeHtml(maskWallet(u.wallet))}</td>
-              <td>${Number(u.points||0).toLocaleString("ro-RO")}</td>
-            </tr>`;
-        });
+    let rows = "";
+    if(!sorted.length){
+      rows = `<tr><td colspan="4" class="small">Fără participanți.</td></tr>`;
+    } else {
+      sorted.forEach((u,i)=>{
+        const cls = i===0 ? "top1" : i===1 ? "top2" : i===2 ? "top3" : "";
+        rows += `
+          <tr class="${cls}">
+            <td>${i+1}</td>
+            <td>${escapeHtml(u.name || "Anonim")}</td>
+            <td class="mono">${escapeHtml(maskWallet(u.wallet))}</td>
+            <td>${Number(u.points||0).toLocaleString("ro-RO")}</td>
+          </tr>`;
+      });
+    }
+
+    const wrap = document.createElement("div");
+    wrap.className = "card";
+    wrap.innerHTML = `
+      <h4 style="margin-bottom:6px">${escapeHtml(promo.title || "")}</h4>
+      <div class="small">📅 ${promo.end ? new Date(promo.end).toLocaleDateString("ro-RO") : "-"} • participanți: <b>${participants.length}</b></div>
+      <div style="margin-top:10px">
+        <table class="table">
+          <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
+          ${rows}
+        </table>
+      </div>
+    `;
+    allLBEl.appendChild(wrap);
+  }
+}
+
+function startRealtime(){
+  // oprește vechiul listener
+  if (promosUnsub) { try{ promosUnsub(); }catch(e){} }
+  cleanupParticipantsListeners();
+
+  const promosMap = new Map();        // promoId -> promoData
+  const participantsMap = new Map();  // promoId -> participants[]
+
+  promosUnsub = db.collection("promos")
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snap=>{
+      promoListEl.innerHTML = "";
+      promosMap.clear();
+
+      if(snap.empty){
+        promoListEl.innerHTML = `<div class="card"><h3>Nu există promoții încă.</h3><p class="small">Admin: autentifică-te și apasă „Adaugă promoție”.</p></div>`;
+        allLBEl.innerHTML = `<div class="small">Nu există promoții.</div>`;
+        setDbStatus(true, "Firestore OK. Nu există promoții încă.");
+        cleanupParticipantsListeners();
+        return;
       }
 
-      const wrap = document.createElement("div");
-      wrap.className = "card";
-      wrap.innerHTML = `
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-          <div>
-            <h4 style="margin-bottom:6px">${escapeHtml(p.title)}</h4>
-            <div class="small">📅 ${new Date(p.end).toLocaleDateString("ro-RO")} • participanți: <b>${(p.participants||[]).length}</b></div>
-          </div>
-        </div>
-        <div style="margin-top:10px">
-          <table class="table">
-            <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
-            ${rows}
-          </table>
-        </div>
-      `;
-      allLB.appendChild(wrap);
+      setDbStatus(true, "Firestore OK. Promoțiile sunt sincronizate.");
+
+      // refacem lista promoții
+      snap.forEach(doc=>{
+        const promoId = doc.id;
+        const promoData = doc.data() || {};
+        promosMap.set(promoId, promoData);
+
+        // card
+        const card = renderOnePromoCard(promoId, promoData);
+        promoListEl.appendChild(card);
+
+        // subscribe la participanți (real-time)
+        if(!promoUnsubs.has(promoId)){
+          const unsub = db.collection("promos").doc(promoId)
+            .collection("participants")
+            .onSnapshot(psnap=>{
+              const arr = [];
+              psnap.forEach(pdoc=>{
+                const d = pdoc.data() || {};
+                arr.push({
+                  name: d.name || "",
+                  wallet: d.wallet || pdoc.id,
+                  points: Number(d.points)||0,
+                  joinedAtMs: d.joinedAt && d.joinedAt.toMillis ? d.joinedAt.toMillis() : 0
+                });
+              });
+              participantsMap.set(promoId, arr);
+              renderParticipantsLeaderboard(promoId, arr);
+              renderAllLeaderboards(promosMap, participantsMap);
+            }, err=>{
+              console.error("participants onSnapshot error:", err);
+            });
+
+          promoUnsubs.set(promoId, unsub);
+        }
+      });
+
+      renderAllLeaderboards(promosMap, participantsMap);
+    }, err=>{
+      console.error("promos onSnapshot error:", err);
+      setDbStatus(false, "Eroare Firestore: " + (err.message || err));
     });
-  }
 }
 
-// first render
-render();
+// start
+startRealtime();
 </script>
 
 </body>
