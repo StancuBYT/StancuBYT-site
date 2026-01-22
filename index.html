@@ -8,7 +8,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
     <style>
         /* Variabile culori conform psihologiei marketingului */
-        :root {
+        :root{
+            --promo-card-height: 560px;
+            --promo-card-radius: 22px;
+            --promo-card-pad: 18px;
+            --promo-media-blur: 0px;
+
             --blue-tech: #0066ff;
             --green-growth: #00ff88;
             --purple-innov: #8a2be2;
@@ -1218,6 +1223,77 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+        /* === Standard Card Sizing (configurable) === */
+        .news-card{
+            height: var(--promo-card-height);
+            border-radius: var(--promo-card-radius) !important;
+            padding: var(--promo-card-pad) !important;
+            display:flex;
+            flex-direction:column;
+            position:relative;
+            overflow:hidden;
+        }
+        .news-card .card-content{
+            display:flex;
+            flex-direction:column;
+            height:100%;
+            position:relative;
+            z-index:2;
+        }
+        .news-card .card-body{
+            flex:1 1 auto;
+        }
+        .news-card .card-footer{
+            margin-top:auto;
+        }
+        .news-card.has-bg{
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+        }
+        .news-card.has-bg::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            z-index:1;
+            background: linear-gradient(180deg,
+              rgba(0,0,0,0.62) 0%,
+              rgba(0,0,0,0.25) 45%,
+              rgba(0,0,0,0.78) 100%);
+        }
+        .news-card.has-bg::after{
+            content:"";
+            position:absolute;
+            inset:-10px;
+            z-index:0;
+            background: inherit;
+            filter: blur(var(--promo-media-blur));
+            transform: scale(1.05);
+            opacity: 0;
+            pointer-events:none;
+        }
+        .news-card.has-bg h4,
+        .news-card.has-bg p,
+        .news-card.has-bg .news-date{
+            text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+        }
+        .promo-overlay-text{
+            margin-top:10px;
+            padding:10px 12px;
+            border-radius:14px;
+            border:1px solid rgba(255,255,255,0.14);
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(6px);
+            color:#fff;
+            font-weight:700;
+            line-height:1.35;
+        }
+
+
+<style>
+.promo-lb{margin-top:12px}
+</style>
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1309,6 +1385,12 @@
 
     <div class="form-row">
         <textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
+
+                    <div style="margin-top:10px;">
+                        <label style="display:block; font-size:12px; opacity:.85; margin-bottom:6px;">Text peste imagine (opțional)</label>
+                        <textarea id="promoOverlayText" placeholder="Scrie text care va apărea peste imagine (ex: -50% doar azi, reguli, slogan)"></textarea>
+                    </div>
+
     </div>
 
     <div class="form-row">
@@ -1491,6 +1573,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
                 {
                     id: 1,
                     title: 'Lansare Oficială StancuBYT!',
+      overlayText: (document.getElementById("promoOverlayText")?.value || "").trim(),
                     content: 'Tokenul StancuBYT a fost lansat oficial pe Ethereum. Contract verificat pe Etherscan.',
                     type: 'announcement',
                     date: new Date().toISOString(),
@@ -1535,6 +1618,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
 
                     card.innerHTML = `
       <div class="card-content">
+        <div class="card-body">
       <div class="news-badge ${badgeClass}">${badgeText}</div>
                         <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title)}</h4>
                         <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content)}</p>
@@ -2748,6 +2832,7 @@ function renderPromos(promos) {
       <h4 style="margin-bottom:0.5rem; color:white;">${_escapeHtml(p.title||'')}</h4>
       ${p.prize ? `<p style="opacity:0.9;"><strong>Premiu:</strong> ${_escapeHtml(p.prize)}</p>` : ''}
       <p style="opacity:0.9; line-height:1.5;">${_escapeHtml(p.desc||'')}</p>
+        ${p.overlayText ? `<div class="promo-overlay-text">${_escapeHtml(p.overlayText)}</div>` : ``}
       <div class="news-date" style="margin-top:0.8rem;"><span>⏳</span> Expira: ${p.endsAt ? new Date(p.endsAt).toLocaleString('ro-RO') : '-'}</div>
       ${mediaHtml}
 
@@ -5733,6 +5818,20 @@ service cloud.firestore {
   });
 
 })();
+
+    // === Card display settings (UI only) ===
+    function applyCardSettings(){
+      const h = parseInt(document.getElementById('cardHeightInput')?.value || '560', 10);
+      const r = parseInt(document.getElementById('cardRadiusInput')?.value || '22', 10);
+      const p = parseInt(document.getElementById('cardPadInput')?.value || '18', 10);
+      const b = parseInt(document.getElementById('cardBlurInput')?.value || '0', 10);
+
+      document.documentElement.style.setProperty('--promo-card-height', Math.max(360, h) + 'px');
+      document.documentElement.style.setProperty('--promo-card-radius', Math.max(10, r) + 'px');
+      document.documentElement.style.setProperty('--promo-card-pad', Math.max(8, p) + 'px');
+      document.documentElement.style.setProperty('--promo-media-blur', Math.max(0, b) + 'px');
+    }
+
 </script>
 
 </body>
