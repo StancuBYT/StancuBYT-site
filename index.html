@@ -2586,7 +2586,7 @@ async function cancelPromo() {
 async function uploadPromoMedia(promoId, file) {
   if (!storage || !file) return null;
   const safeName = String(file.name || 'file').replace(/[^\w.\-]+/g, '_');
-  const path = `promos/${promoId}/${Date.now()}_${safeName}`;
+  const path = `news/news/promos/${promoId}/${Date.now()}_${safeName}`;
   const ref = storage.ref().child(path);
   await ref.put(file);
   const url = await ref.getDownloadURL();
@@ -4526,7 +4526,7 @@ service cloud.firestore {
       // SAU: request.auth.token.admin == true (custom claim)
     }
 
-    match /promos/{promoId} {
+    match /news/promos/{promoId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
 
@@ -5191,7 +5191,7 @@ service cloud.firestore {
     if (!storage) { alert("Firebase Storage nu este incarcat."); return null; }
 
     const ext = (file.name || "file").split(".").pop();
-    const path = `promos/${promoId}/${Date.now()}_${Math.random().toString(16).slice(2)}.${ext}`;
+    const path = `news/news/promos/${promoId}/${Date.now()}_${Math.random().toString(16).slice(2)}.${ext}`;
     const ref = storage.ref().child(path);
 
     await ref.put(file);
@@ -5746,7 +5746,7 @@ service cloud.firestore {
     if (!auth || !auth.currentUser) throw new Error("Not authenticated for storage");
 
     const safeName = (file.name || 'media').replace(/[^\w.\-]+/g,'_').slice(0,80);
-    const path = `promos/${promoId}/${Date.now()}_${safeName}`;
+    const path = `news/news/promos/${promoId}/${Date.now()}_${safeName}`;
     const ref = storage.ref().child(path);
 
     const snap = await ref.put(file, { contentType: file.type || undefined });
