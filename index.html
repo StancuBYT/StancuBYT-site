@@ -1149,7 +1149,7 @@
 .admin-pill.off{
   background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
 }
-.admin-only{ display:none !important; }
+.admin-only{ display:none; }
 
 /* ====== TROPHY BUTTON (Giveaway add) ====== */
 .trophy-btn{
@@ -1237,8 +1237,8 @@
             <p style="opacity: 0.8;">Promoții active, înscrieri și clasamente</p>
 
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-                <button class="news-btn admin-only" onclick="requestPassword('promoAdd')">➕ Adaugă promoție</button>
-                <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+                <button class="news-btn admin-only" onclick="requestPassword('promoAdd')" data-admin-display="inline-flex">➕ Adaugă promoție</button>
+                <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway" data-admin-display="inline-flex"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
                 </div>
         </div>
 
@@ -2318,7 +2318,8 @@ function setAdminUI(isAdmin, user) {
 
   // arata/ascunde elemente admin-only daca exista
   document.querySelectorAll('.admin-only').forEach(el => {
-    el.style.display = isAdmin ? 'block' : 'none';
+    const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : 'block';
+    el.style.display = isAdmin ? d : 'none';
   });
 }
 
