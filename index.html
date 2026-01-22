@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>StancuBYT | Giveaway & Promoții (Firestore)</title>
+<title>StancuBYT | Giveaway & Promoții (Firestore /news)</title>
 
 <style>
 :root{
@@ -50,7 +50,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
 .top1{background:var(--gold)}
 .top2{background:var(--silver)}
 .top3{background:var(--bronze)}
-.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace}
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","CourierNew", monospace}
 .row{display:flex;gap:12px;flex-wrap:wrap}
 .row > *{flex:1;min-width:180px}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
@@ -64,7 +64,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-  // CONFIG - din proiectul tău
+  // Firebase config (din proiectul tău)
   const firebaseConfig = {
     apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
     authDomain: "stancubyt-fc2b9.firebaseapp.com",
@@ -76,7 +76,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // ✅ Pune aici email-urile care au voie să adauge/șteargă promoții
+  // Admin UI gate (DOAR UI, rules-urile tale permit orice user logat să scrie în /news)
   const ADMIN_EMAILS = ["stancubyt@gmail.com"];
 </script>
 </head>
@@ -85,13 +85,14 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
 
 <div class="section">
   <h1>🎁 Giveaway & Promoții StancuBYT</h1>
-  <p class="small">🔥 Real-time (Firestore). Promoțiile și clasamentele apar pe toate dispozitivele.</p>
+  <p class="small">✅ Sincronizare pe toate dispozitivele folosind Firestore în colecția <b>/news</b> (compatibil cu rules-urile tale).</p>
 
+  <div id="visitBox" class="small"></div>
   <div id="dbStatus" class="small"></div>
 
   <div class="actions" style="margin:14px 0 6px">
     <button class="admin-only" onclick="showPromoForm()">➕ Adaugă promoție / concurs</button>
-    <button class="admin-only secondary" onclick="deleteAllPromosConfirm()">🧹 Șterge toate</button>
+    <button class="admin-only secondary" onclick="deleteAllPromosConfirm()">🧹 Șterge toate promoțiile</button>
   </div>
 
   <!-- FORM ADMIN -->
@@ -110,11 +111,11 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
     </div>
 
     <div class="actions" style="margin-top:12px">
-      <button onclick="savePromo()">💾 Salvează în Firestore</button>
+      <button onclick="savePromo()">💾 Salvează</button>
       <button class="danger" onclick="cancelPromo()">❌ Anulează</button>
     </div>
     <div class="small" style="margin-top:10px">
-      * Doar admin poate crea/șterge promoții. Participanții se salvează per promoție.
+      * Promoțiile + înscrierile se salvează în colecția <b>/news</b>.
     </div>
   </div>
 
@@ -164,6 +165,23 @@ function setDbStatus(ok, msg){
   if(!el) return;
   el.innerHTML = ok ? `<span class="ok">✔ ${escapeHtml(msg)}</span>` : `<span class="err">✖ ${escapeHtml(msg)}</span>`;
 }
+function nowMs(){ return Date.now(); }
+
+/* ===================== VISITS (stats/visits) ===================== */
+async function bumpVisits(){
+  try{
+    const ref = db.collection("stats").doc("visits");
+    await ref.set({ count: firebase.firestore.FieldValue.increment(1), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+    ref.onSnapshot(s=>{
+      const d = s.data() || {};
+      const c = Number(d.count||0);
+      document.getElementById("visitBox").innerHTML = `👁️ Vizite: <b>${c.toLocaleString("ro-RO")}</b>`;
+    });
+  }catch(e){
+    console.warn("visits error:", e);
+  }
+}
+bumpVisits();
 
 /* ===================== AUTH ===================== */
 window.IS_ADMIN = false;
@@ -183,8 +201,7 @@ auth.onAuthStateChanged(user=>{
     ? (adminOk ? `Logat admin: ${user.email}` : `Logat (NU admin): ${user.email}`)
     : 'Neautentificat';
 
-  // Firestore read test
-  setDbStatus(true, "Conectat. Încarc promoțiile din Firestore...");
+  setDbStatus(true, "Conectat. Încarc promoțiile din /news ...");
 });
 
 /* ===================== LOGIN ===================== */
@@ -207,20 +224,24 @@ function cancelPromo(){
   pPointsDefault.value = 10;
 }
 
-/* ===================== FIRESTORE STRUCTURA =====================
+/* ===================== MODEL (în /news) =====================
 
-Collection: promos
-  doc promoId:
-    title, end (YYYY-MM-DD), desc, prize, pointsDefault, createdAt, createdBy
+/news/{id} pentru promoții:
+  type: "promo"
+  title, end, desc, prize, pointsDefault
+  createdAt, createdBy
 
-Subcollection: promos/{promoId}/participants
-  doc participantId (walletLower):
-    name, wallet, points, joinedAt
+/news/{id} pentru înscrieri:
+  type: "entry"
+  promoId: "<id promo>"
+  name, wallet, walletLower, points
+  joinedAt
 
 ===================================================== */
 
 async function savePromo(){
   if(!window.IS_ADMIN){ alert("Doar admin poate adăuga."); return; }
+  if(!auth.currentUser){ alert("Trebuie să fii logat (rules)."); return; }
 
   const title = (pTitle.value || "").trim();
   const end = (pEnd.value || "").trim();
@@ -234,25 +255,27 @@ async function savePromo(){
   }
 
   try{
-    await db.collection("promos").add({
-      title, end, desc, prize,
-      pointsDefault,
+    await db.collection("news").add({
+      type: "promo",
+      title, end, desc, prize, pointsDefault,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy: auth.currentUser ? auth.currentUser.email : null
+      createdBy: auth.currentUser.email || null
     });
     cancelPromo();
   }catch(e){
     console.error(e);
-    alert("Eroare la salvare în Firestore: " + (e.message || e));
+    alert("Eroare la salvare (rules?): " + (e.message || e));
   }
 }
 
 async function deletePromo(promoId){
-  if(!window.IS_ADMIN){ alert("Doar admin."); return; }
-  if(!confirm("Ștergi această promoție? (participanții rămân în subcolecție dacă nu ștergem din backend)")) return;
+  if(!window.IS_ADMIN){ alert("Doar admin (UI)."); return; }
+  if(!auth.currentUser){ alert("Trebuie să fii logat."); return; }
+
+  if(!confirm("Ștergi această promoție? (Înscrierile rămân în /news ca entry. Pot să le șterg și pe ele dacă vrei.)")) return;
 
   try{
-    await db.collection("promos").doc(promoId).delete();
+    await db.collection("news").doc(promoId).delete();
   }catch(e){
     console.error(e);
     alert("Eroare la ștergere: " + (e.message || e));
@@ -260,18 +283,19 @@ async function deletePromo(promoId){
 }
 
 async function deleteAllPromosConfirm(){
-  if(!window.IS_ADMIN){ alert("Doar admin."); return; }
+  if(!window.IS_ADMIN){ alert("Doar admin (UI)."); return; }
+  if(!auth.currentUser){ alert("Trebuie să fii logat."); return; }
   if(!confirm("Sigur ștergi TOATE promoțiile?")) return;
 
   try{
-    const snap = await db.collection("promos").get();
+    const snap = await db.collection("news").where("type","==","promo").get();
     const batch = db.batch();
     snap.forEach(doc => batch.delete(doc.ref));
     await batch.commit();
-    alert("Promoțiile au fost șterse (doar documentele promos).");
+    alert("Promoțiile au fost șterse (doar type=promo).");
   }catch(e){
     console.error(e);
-    alert("Eroare la ștergere: " + (e.message || e));
+    alert("Eroare: " + (e.message || e));
   }
 }
 
@@ -285,274 +309,11 @@ async function joinPromo(promoId){
     alert("Completează nume și wallet.");
     return;
   }
+
+  if(!auth.currentUser){
+    alert("Pentru înscriere trebuie autentificare (rules: news write doar auth != null).");
+    return;
+  }
+
   const walletLower = wallet.toLowerCase();
-
-  try{
-    const promoRef = db.collection("promos").doc(promoId);
-    const promoDoc = await promoRef.get();
-    if(!promoDoc.exists){
-      alert("Promoția nu mai există.");
-      return;
-    }
-
-    const promo = promoDoc.data();
-    const expired = new Date() > new Date((promo.end || "") + "T23:59:59");
-    if(expired){
-      alert("Această promoție este expirată.");
-      return;
-    }
-
-    const pointsDefault = Number(promo.pointsDefault || 0);
-    const points = Math.max(0, parseInt(ptsRaw || String(pointsDefault), 10) || 0);
-
-    const partRef = promoRef.collection("participants").doc(walletLower);
-
-    // upsert participant
-    await partRef.set({
-      name,
-      wallet,
-      points,
-      joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    alert("Înscriere salvată în Firestore ✅");
-  }catch(e){
-    console.error(e);
-    alert("Eroare înscriere (Firestore Rules?): " + (e.message || e));
-  }
-}
-
-/* ===================== REAL-TIME RENDER ===================== */
-const promoListEl = document.getElementById("promoList");
-const allLBEl = document.getElementById("allLeaderboards");
-
-const promoUnsubs = new Map(); // promoId -> unsubscribe participants
-let promosUnsub = null;
-
-function cleanupParticipantsListeners(){
-  for (const [id, unsub] of promoUnsubs.entries()){
-    try{ unsub(); }catch(e){}
-  }
-  promoUnsubs.clear();
-}
-
-function sortParticipantsLocal(arr){
-  return [...arr].sort((a,b)=>{
-    const pa = Number(a.points)||0;
-    const pb = Number(b.points)||0;
-    if(pb !== pa) return pb - pa;
-    const ta = (a.joinedAtMs||0);
-    const tb = (b.joinedAtMs||0);
-    return ta - tb;
-  });
-}
-
-function renderOnePromoCard(promoId, promoData){
-  const expired = new Date() > new Date((promoData.end || "") + "T23:59:59");
-  const title = escapeHtml(promoData.title || "");
-  const desc  = escapeHtml(promoData.desc || "");
-  const prize = promoData.prize ? escapeHtml(promoData.prize) : "";
-  const pointsDefault = Number(promoData.pointsDefault || 0);
-
-  const card = document.createElement("div");
-  card.className = "card";
-  card.setAttribute("data-promo-id", promoId);
-
-  card.innerHTML = `
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-      <div>
-        <span class="badge ${expired?'expired':''}">${expired?'Expirat':'Activ'}</span>
-        <h3 style="margin-top:10px">${title}</h3>
-        ${prize ? `<div class="small">🎁 Premiu: <b>${prize}</b></div>` : ``}
-        <div class="small">📅 Expiră: ${promoData.end ? new Date(promoData.end).toLocaleDateString("ro-RO") : "-"}</div>
-      </div>
-      <div class="actions" style="justify-content:flex-end">
-        <button class="admin-only danger" onclick="deletePromo('${promoId}')">🗑️ Șterge</button>
-      </div>
-    </div>
-
-    <p style="margin-top:10px">${desc}</p>
-
-    <hr>
-
-    <h4 style="margin-bottom:8px;color:var(--accent2)">Înscriere în această promoție</h4>
-    <div class="row">
-      <input id="jn_${promoId}" placeholder="Nume">
-      <input id="jw_${promoId}" placeholder="Wallet (0x...)">
-    </div>
-    <div class="row" style="margin-top:10px">
-      <input id="jp_${promoId}" type="number" min="0" step="1" placeholder="Puncte (ex: promovări)">
-      <div class="small" style="align-self:center">
-        Dacă lași gol, puncte implicite: <b>${pointsDefault}</b>
-      </div>
-    </div>
-    <div class="actions" style="margin-top:12px">
-      <button onclick="joinPromo('${promoId}')">✅ Înscrie-te</button>
-    </div>
-
-    <hr>
-
-    <h4 style="color:var(--accent2)">🏆 Clasament pentru: ${title}</h4>
-    <div id="lb_${promoId}" class="small">Se încarcă...</div>
-  `;
-
-  // apply admin visibility
-  card.querySelectorAll(".admin-only").forEach(btn=>{
-    btn.style.display = window.IS_ADMIN ? "inline-flex" : "none";
-  });
-
-  return card;
-}
-
-function renderParticipantsLeaderboard(promoId, participants){
-  const lbEl = document.getElementById("lb_"+promoId);
-  if(!lbEl) return;
-
-  const sorted = sortParticipantsLocal(participants);
-  if(!sorted.length){
-    lbEl.innerHTML = `<div class="small">Încă nu există participanți.</div>`;
-    return;
-  }
-
-  let rows = "";
-  sorted.slice(0, 50).forEach((u,i)=>{
-    const cls = i===0 ? "top1" : i===1 ? "top2" : i===2 ? "top3" : "";
-    rows += `
-      <tr class="${cls}">
-        <td>${i+1}</td>
-        <td>${escapeHtml(u.name || "Anonim")}</td>
-        <td class="mono">${escapeHtml(maskWallet(u.wallet))}</td>
-        <td>${Number(u.points||0).toLocaleString("ro-RO")}</td>
-      </tr>`;
-  });
-
-  lbEl.innerHTML = `
-    <table class="table">
-      <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
-      ${rows}
-    </table>`;
-}
-
-function renderAllLeaderboards(promosMap, participantsMap){
-  // promosMap: promoId -> promoData
-  // participantsMap: promoId -> participants[]
-  allLBEl.innerHTML = "";
-
-  const promoEntries = Array.from(promosMap.entries())
-    .sort((a,b)=> new Date(a[1].end || "2100-01-01") - new Date(b[1].end || "2100-01-01"));
-
-  if(!promoEntries.length){
-    allLBEl.innerHTML = `<div class="small">Nu există promoții.</div>`;
-    return;
-  }
-
-  for (const [promoId, promo] of promoEntries){
-    const participants = participantsMap.get(promoId) || [];
-    const sorted = sortParticipantsLocal(participants).slice(0, 10);
-
-    let rows = "";
-    if(!sorted.length){
-      rows = `<tr><td colspan="4" class="small">Fără participanți.</td></tr>`;
-    } else {
-      sorted.forEach((u,i)=>{
-        const cls = i===0 ? "top1" : i===1 ? "top2" : i===2 ? "top3" : "";
-        rows += `
-          <tr class="${cls}">
-            <td>${i+1}</td>
-            <td>${escapeHtml(u.name || "Anonim")}</td>
-            <td class="mono">${escapeHtml(maskWallet(u.wallet))}</td>
-            <td>${Number(u.points||0).toLocaleString("ro-RO")}</td>
-          </tr>`;
-      });
-    }
-
-    const wrap = document.createElement("div");
-    wrap.className = "card";
-    wrap.innerHTML = `
-      <h4 style="margin-bottom:6px">${escapeHtml(promo.title || "")}</h4>
-      <div class="small">📅 ${promo.end ? new Date(promo.end).toLocaleDateString("ro-RO") : "-"} • participanți: <b>${participants.length}</b></div>
-      <div style="margin-top:10px">
-        <table class="table">
-          <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
-          ${rows}
-        </table>
-      </div>
-    `;
-    allLBEl.appendChild(wrap);
-  }
-}
-
-function startRealtime(){
-  // oprește vechiul listener
-  if (promosUnsub) { try{ promosUnsub(); }catch(e){} }
-  cleanupParticipantsListeners();
-
-  const promosMap = new Map();        // promoId -> promoData
-  const participantsMap = new Map();  // promoId -> participants[]
-
-  promosUnsub = db.collection("promos")
-    .orderBy("createdAt", "desc")
-    .onSnapshot(snap=>{
-      promoListEl.innerHTML = "";
-      promosMap.clear();
-
-      if(snap.empty){
-        promoListEl.innerHTML = `<div class="card"><h3>Nu există promoții încă.</h3><p class="small">Admin: autentifică-te și apasă „Adaugă promoție”.</p></div>`;
-        allLBEl.innerHTML = `<div class="small">Nu există promoții.</div>`;
-        setDbStatus(true, "Firestore OK. Nu există promoții încă.");
-        cleanupParticipantsListeners();
-        return;
-      }
-
-      setDbStatus(true, "Firestore OK. Promoțiile sunt sincronizate.");
-
-      // refacem lista promoții
-      snap.forEach(doc=>{
-        const promoId = doc.id;
-        const promoData = doc.data() || {};
-        promosMap.set(promoId, promoData);
-
-        // card
-        const card = renderOnePromoCard(promoId, promoData);
-        promoListEl.appendChild(card);
-
-        // subscribe la participanți (real-time)
-        if(!promoUnsubs.has(promoId)){
-          const unsub = db.collection("promos").doc(promoId)
-            .collection("participants")
-            .onSnapshot(psnap=>{
-              const arr = [];
-              psnap.forEach(pdoc=>{
-                const d = pdoc.data() || {};
-                arr.push({
-                  name: d.name || "",
-                  wallet: d.wallet || pdoc.id,
-                  points: Number(d.points)||0,
-                  joinedAtMs: d.joinedAt && d.joinedAt.toMillis ? d.joinedAt.toMillis() : 0
-                });
-              });
-              participantsMap.set(promoId, arr);
-              renderParticipantsLeaderboard(promoId, arr);
-              renderAllLeaderboards(promosMap, participantsMap);
-            }, err=>{
-              console.error("participants onSnapshot error:", err);
-            });
-
-          promoUnsubs.set(promoId, unsub);
-        }
-      });
-
-      renderAllLeaderboards(promosMap, participantsMap);
-    }, err=>{
-      console.error("promos onSnapshot error:", err);
-      setDbStatus(false, "Eroare Firestore: " + (err.message || err));
-    });
-}
-
-// start
-startRealtime();
-</script>
-
-</body>
-</html>
 
