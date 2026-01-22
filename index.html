@@ -412,6 +412,54 @@
             transition: all 0.3s ease;
         }
 
+
+        .news-card {
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Content wrapper so text stays above background overlays */
+        .news-card .card-content{
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Background image mode */
+        .news-card.has-bg{
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+        }
+        .news-card.has-bg::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            z-index:1;
+            background: linear-gradient(180deg,
+              rgba(0,0,0,0.60) 0%,
+              rgba(0,0,0,0.25) 40%,
+              rgba(0,0,0,0.70) 100%);
+        }
+        .news-card.has-bg h4,
+        .news-card.has-bg p,
+        .news-card.has-bg .news-date{
+            text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+        }
+        .news-card.has-bg .news-badge{
+            backdrop-filter: blur(6px);
+            background: rgba(0,0,0,0.35) !important;
+            border: 1px solid rgba(255,255,255,0.14);
+        }
+        .news-card.has-bg .news-btn{
+            backdrop-filter: blur(6px);
+        }
+
         .news-card:hover {
             transform: translateY(-5px);
             border-color: var(--green-growth);
@@ -1486,7 +1534,8 @@ async function etherscanProxyRequest(module, action, params = {}) {
                     card.className = cardClass;
 
                     card.innerHTML = `
-                        <div class="news-badge ${badgeClass}">${badgeText}</div>
+      <div class="card-content">
+      <div class="news-badge ${badgeClass}">${badgeText}</div>
                         <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title)}</h4>
                         <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content)}</p>
                         <div class="news-date">
@@ -1720,7 +1769,10 @@ async function etherscanProxyRequest(module, action, params = {}) {
                 const expired = new Date() > end;
 
                 const card = document.createElement('div');
-                card.className = 'news-card';
+                card.className = 'news-card' + (isImageBg ? ' has-bg' : '');
+    if (isImageBg) {
+      card.style.backgroundImage = `url('${'${p.media.url}'}')`;
+    }
                 card.innerHTML = `
                     <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
                     <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
@@ -2681,12 +2733,12 @@ function renderPromos(promos) {
     const expired = p.endsAt && p.endsAt <= now;
     const badge = expired ? 'Expirat' : 'Activ';
 
-    const mediaHtml = p.media?.url
-      ? (String(p.media.contentType||'').startsWith('video/')
-          ? `<video controls style="width:100%; border-radius:12px; margin-top:10px;">
-               <source src="${p.media.url}" type="${p.media.contentType}">
-             </video>`
-          : `<img src="${p.media.url}" alt="" style="width:100%; border-radius:12px; margin-top:10px;">`)
+    const isVideo = !!(p.media?.url && String(p.media.contentType||'').startsWith('video/'));
+    const isImageBg = !!(p.media?.url && !isVideo);
+    const mediaHtml = isVideo
+      ? `<video controls style="width:100%; border-radius:12px; margin-top:10px;">
+           <source src="${p.media.url}" type="${p.media.contentType}">
+         </video>`
       : '';
 
     const card = document.createElement('div');
@@ -2702,6 +2754,8 @@ function renderPromos(promos) {
       <div style="margin-top:1rem; display:flex; gap:10px; flex-wrap:wrap;">
         <button class="news-btn" onclick="openPromo('${p._id}')">🎯 Detalii / Inscriere</button>
         <button class="news-btn" onclick="deletePromo('${p._id}')">🗑️ Sterge</button>
+      </div>
+    
       </div>
     `;
     promoList.appendChild(card);
