@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StancuBYT | Giveaway & Promoții</title>
+
+<style>
+:root{
+  --bg:#0a0a1f;
+  --card:#14142b;
+  --muted:#9aa0b4;
+  --accent:#00ff88;
+  --accent2:#00ffff;
+  --danger:#ff4d4d;
+  --gold: rgba(255,215,0,.18);
+  --silver: rgba(192,192,192,.16);
+  --bronze: rgba(205,127,50,.16);
+}
+*{box-sizing:border-box;font-family:Arial}
+body{margin:0;background:var(--bg);color:#fff}
+h1,h2,h3,h4{margin:0 0 10px}
+p{margin:0 0 10px;color:rgba(255,255,255,.86)}
+button{
+  padding:10px 14px;border:none;border-radius:10px;cursor:pointer;
+  background:var(--accent);font-weight:800;color:#001b12;
+}
+button.secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.12)}
+button.danger{background:var(--danger);color:#fff}
+input,textarea{
+  width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);
+  background:#0f0f25;color:#fff;
+}
+textarea{min-height:90px;resize:vertical}
+.section{max-width:1100px;margin:auto;padding:30px 20px}
+.card{background:var(--card);padding:20px;border-radius:18px;margin-bottom:18px;border:1px solid rgba(255,255,255,.08)}
+.admin-only{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
+
+.badge{
+  display:inline-block;padding:4px 10px;border-radius:999px;
+  background:rgba(0,255,136,.15);color:var(--accent);font-size:13px;font-weight:800;
+  border:1px solid rgba(0,255,136,.18);
+}
+.badge.expired{background:rgba(255,77,77,.15);color:#ff7a7a;border-color:rgba(255,77,77,.22)}
+.small{font-size:12px;color:var(--muted)}
+hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:14px 0}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  overflow:hidden;
+  border-radius:14px;
+}
+.table th,.table td{
+  padding:10px 10px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  text-align:left;
+  font-size:14px;
+}
+.table th{
+  background:rgba(255,255,255,.06);
+  color:#fff;
+}
+.top1{background:var(--gold)}
+.top2{background:var(--silver)}
+.top3{background:var(--bronze)}
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row > *{flex:1;min-width:180px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+</style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+  authDomain: "stancubyt-fc2b9.firebaseapp.com",
+  projectId: "stancubyt-fc2b9",
+};
+firebase.initializeApp(firebaseConfig);
+</script>
+</head>
+
+<body>
+
+<div class="section">
+  <h1>🎁 Giveaway & Promoții StancuBYT</h1>
+  <p class="small">Promoții active, înscrieri și clasamente separate pentru fiecare promoție.</p>
+
+  <div class="actions" style="margin:14px 0 6px">
+    <button class="admin-only" onclick="showPromoForm()">➕ Adaugă promoție / concurs</button>
+    <button class="admin-only secondary" onclick="clearPromos()">🧹 Șterge toate</button>
+  </div>
+
+  <!-- FORM ADMIN -->
+  <div id="promoForm" class="card admin-only" style="display:none">
+    <h3>Adaugă promoție / concurs</h3>
+    <div class="row">
+      <input id="pTitle" placeholder="Titlu (ex: Giveaway SBYT)">
+      <input type="date" id="pEnd">
+    </div>
+    <div class="row" style="margin-top:10px">
+      <input id="pPrize" placeholder="Premiu (opțional)">
+      <input id="pPointsDefault" type="number" min="0" step="1" value="10" placeholder="Puncte implicite">
+    </div>
+    <div style="margin-top:10px">
+      <textarea id="pDesc" placeholder="Descriere / reguli"></textarea>
+    </div>
+
+    <div class="actions" style="margin-top:12px">
+      <button onclick="savePromo()">💾 Salvează</button>
+      <button class="danger" onclick="cancelPromo()">❌ Anulează</button>
+    </div>
+    <div class="small" style="margin-top:10px">* În această versiune, datele se salvează local (localStorage).</div>
+  </div>
+
+  <!-- LISTA PROMO -->
+  <div id="promoList" class="grid"></div>
+
+  <!-- CLASAMENTE PE PROMOȚII -->
+  <div class="card">
+    <h3>🏆 Clasamente pe promoții</h3>
+    <div class="small">Top participanți pentru fiecare promoție (separat).</div>
+    <div id="allLeaderboards" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="section card">
+  <h2>🔐 Administrator</h2>
+  <div class="row">
+    <input id="adminEmail" placeholder="Email admin" autocomplete="username">
+    <input id="adminPass" type="password" placeholder="Parolă" autocomplete="current-password">
+  </div>
+  <div class="actions" style="margin-top:12px">
+    <button onclick="adminSignIn()">Autentificare</button>
+    <button onclick="adminSignOut()" id="logoutBtn" class="secondary" style="display:none">Delogare</button>
+  </div>
+  <p id="adminMsg" class="small" style="margin-top:10px"></p>
+</div>
+
+<script>
+/* ===================== STORAGE ===================== */
+const LS_PROMOS = "sbyt_promos_v2";
+
+function getPromos(){
+  try { return JSON.parse(localStorage.getItem(LS_PROMOS) || "[]"); }
+  catch { return []; }
+}
+function savePromos(promos){
+  localStorage.setItem(LS_PROMOS, JSON.stringify(promos));
+}
+
+/* ===================== AUTH ===================== */
+firebase.auth().onAuthStateChanged(user=>{
+  document.querySelectorAll('.admin-only')
+    .forEach(e=>e.style.display = user ? 'block' : 'none');
+
+  // butoanele în rând să nu rupă layout-ul
+  document.querySelectorAll('.actions .admin-only')
+    .forEach(e=>e.style.display = user ? 'inline-flex' : 'none');
+
+  document.getElementById('logoutBtn').style.display = user ? 'inline-flex' : 'none';
+  document.getElementById('adminMsg').textContent = user ? `Logat: ${user.email}` : 'Neautentificat';
+  window.IS_ADMIN = !!user;
+});
+
+/* ===================== LOGIN ===================== */
+function adminSignIn(){
+  const email = adminEmail.value.trim();
+  const pass = adminPass.value;
+  if(!email || !pass){ alert("Completează email și parolă"); return; }
+
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then(()=>{ adminPass.value = ""; })
+    .catch(e=>alert(e.message));
+}
+function adminSignOut(){ firebase.auth().signOut(); }
+
+/* ===================== ADMIN FORM ===================== */
+function showPromoForm(){ promoForm.style.display="block"; }
+function cancelPromo(){
+  promoForm.style.display="none";
+  pTitle.value=""; pEnd.value=""; pDesc.value=""; pPrize.value="";
+  pPointsDefault.value = 10;
+}
+
+function savePromo(){
+  if(!window.IS_ADMIN){ alert("Doar admin poate adăuga."); return; }
+
+  const title = (pTitle.value || "").trim();
+  const end = (pEnd.value || "").trim();
+  const desc = (pDesc.value || "").trim();
+  const prize = (pPrize.value || "").trim();
+  const pointsDefault = Math.max(0, parseInt(pPointsDefault.value || "0", 10) || 0);
+
+  if(!title || !end || !desc){
+    alert("Completează titlu, data și descriere.");
+    return;
+  }
+
+  const promos = getPromos();
+  promos.push({
+    id: Date.now(),
+    title,
+    end,
+    desc,
+    prize,
+    pointsDefault,
+    createdAt: new Date().toISOString(),
+    participants: [] // {name, wallet, points, joinedAt}
+  });
+
+  savePromos(promos);
+  cancelPromo();
+  render();
+}
+
+/* ===================== CRUD ===================== */
+function clearPromos(){
+  if(!window.IS_ADMIN){ alert("Doar admin."); return; }
+  if(!confirm("Ștergi toate promoțiile?")) return;
+  localStorage.removeItem(LS_PROMOS);
+  render();
+}
+
+function deletePromo(id){
+  if(!window.IS_ADMIN){ alert("Doar admin."); return; }
+  if(!confirm("Ștergi această promoție?")) return;
+  const promos = getPromos().filter(p=>p.id!==id);
+  savePromos(promos);
+  render();
+}
+
+/* ===================== PARTICIPARE ===================== */
+function joinPromo(id){
+  const promos = getPromos();
+  const p = promos.find(x=>x.id===id);
+  if(!p) return;
+
+  const name = (document.getElementById("jn_"+id).value || "").trim();
+  const wallet = (document.getElementById("jw_"+id).value || "").trim();
+  const ptsRaw = (document.getElementById("jp_"+id).value || "").trim();
+  const points = Math.max(0, parseInt(ptsRaw || String(p.pointsDefault || 0), 10) || 0);
+
+  if(!name || !wallet){
+    alert("Completează nume și wallet.");
+    return;
+  }
+
+  // expirare
+  const expired = new Date() > new Date(p.end + "T23:59:59");
+  if(expired){
+    alert("Această promoție este expirată.");
+    return;
+  }
+
+  p.participants = p.participants || [];
+  const found = p.participants.find(u => (u.wallet || "").toLowerCase() === wallet.toLowerCase());
+  if(found){
+    // actualizează max puncte
+    found.name = name;
+    found.points = Math.max(Number(found.points)||0, points);
+  } else {
+    p.participants.push({name, wallet, points, joinedAt: new Date().toISOString()});
+  }
+
+  savePromos(promos);
+  render();
+}
+
+/* ===================== LEADERBOARD HELPERS ===================== */
+function sortParticipants(participants){
+  return [...(participants || [])].sort((a,b)=>{
+    const pa = Number(a.points)||0;
+    const pb = Number(b.points)||0;
+    if(pb !== pa) return pb - pa;
+    // tie-break: joinedAt mai vechi înainte
+    return new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0);
+  });
+}
+
+function maskWallet(w){
+  const s = String(w||"");
+  if(s.length <= 12) return s;
+  return s.slice(0,6) + "..." + s.slice(-4);
+}
+
+function renderPromoLeaderboard(promo){
+  const sorted = sortParticipants(promo.participants);
+  if(!sorted.length){
+    return `<div class="small">Încă nu există participanți.</div>`;
+  }
+
+  let rows = "";
+  sorted.slice(0, 50).forEach((u,i)=>{
+    const cls = i===0 ? "top1" : i===1 ? "top2" : i===2 ? "top3" : "";
+    rows += `
+      <tr class="${cls}">
+        <td>${i+1}</td>
+        <td>${escapeHtml(u.name || "Anonim")}</td>
+        <td class="mono">${escapeHtml(maskWallet(u.wallet))}</td>
+        <td>${Number(u.points||0).toLocaleString("ro-RO")}</td>
+      </tr>`;
+  });
+
+  return `
+    <div class="table-wrap" style="margin-top:10px">
+      <table class="table">
+        <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
+        ${rows}
+      </table>
+    </div>`;
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"'`=\/]/g, s => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;'
+  }[s]));
+}
+
+/* ===================== RENDER UI ===================== */
+function render(){
+  const list = document.getElementById("promoList");
+  const allLB = document.getElementById("allLeaderboards");
+
+  const promos = getPromos()
+    .sort((a,b)=> new Date(a.end) - new Date(b.end));
+
+  // LISTĂ PROMO
+  list.innerHTML = "";
+  if(!promos.length){
+    list.innerHTML = `<div class="card"><h3>Nu există promoții încă.</h3><p class="small">Admin: autentifică-te și apasă „Adaugă promoție”.</p></div>`;
+  } else {
+    promos.forEach(p=>{
+      const expired = new Date() > new Date(p.end + "T23:59:59");
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const promoLBHtml = renderPromoLeaderboard(p);
+
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+          <div>
+            <span class="badge ${expired?'expired':''}">${expired?'Expirat':'Activ'}</span>
+            <h3 style="margin-top:10px">${escapeHtml(p.title)}</h3>
+            ${p.prize ? `<div class="small">🎁 Premiu: <b>${escapeHtml(p.prize)}</b></div>` : ``}
+            <div class="small">📅 Expiră: ${new Date(p.end).toLocaleDateString("ro-RO")}</div>
+          </div>
+          <div class="actions" style="justify-content:flex-end">
+            <button class="admin-only danger" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
+          </div>
+        </div>
+
+        <p style="margin-top:10px">${escapeHtml(p.desc)}</p>
+
+        <hr>
+
+        <h4 style="margin-bottom:8px;color:var(--accent2)">Înscriere în această promoție</h4>
+        <div class="row">
+          <input id="jn_${p.id}" placeholder="Nume">
+          <input id="jw_${p.id}" placeholder="Wallet (0x...)">
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="jp_${p.id}" type="number" min="0" step="1" placeholder="Puncte (ex: promovări)">
+          <div class="small" style="align-self:center">Dacă lași gol, se folosesc punctele implicite: <b>${Number(p.pointsDefault||0)}</b></div>
+        </div>
+
+        <div class="actions" style="margin-top:12px">
+          <button onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
+        </div>
+
+        <hr>
+
+        <h4 style="color:var(--accent2)">🏆 Clasament pentru: ${escapeHtml(p.title)}</h4>
+        ${promoLBHtml}
+      `;
+
+      list.appendChild(card);
+
+      // asigură admin-only din interior
+      card.querySelectorAll('.admin-only').forEach(e=>{
+        e.style.display = window.IS_ADMIN ? 'inline-flex' : 'none';
+      });
+    });
+  }
+
+  // CLASAMENTE PE TOATE PROMOȚIILE (rezumat)
+  allLB.innerHTML = "";
+  if(!promos.length){
+    allLB.innerHTML = `<div class="small">Nu există promoții.</div>`;
+  } else {
+    promos.forEach(p=>{
+      const sorted = sortParticipants(p.participants);
+      const top = sorted.slice(0, 10);
+
+      let rows = "";
+      if(!top.length){
+        rows = `<tr><td colspan="4" class="small">Fără participanți.</td></tr>`;
+      } else {
+        top.forEach((u,i)=>{
+          const cls = i===0 ? "top1" : i===1 ? "top2" : i===2 ? "top3" : "";
+          rows += `
+            <tr class="${cls}">
+              <td>${i+1}</td>
+              <td>${escapeHtml(u.name || "Anonim")}</td>
+              <td class="mono">${escapeHtml(maskWallet(u.wallet))}</td>
+              <td>${Number(u.points||0).toLocaleString("ro-RO")}</td>
+            </tr>`;
+        });
+      }
+
+      const wrap = document.createElement("div");
+      wrap.className = "card";
+      wrap.innerHTML = `
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+          <div>
+            <h4 style="margin-bottom:6px">${escapeHtml(p.title)}</h4>
+            <div class="small">📅 ${new Date(p.end).toLocaleDateString("ro-RO")} • participanți: <b>${(p.participants||[]).length}</b></div>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <table class="table">
+            <tr><th>#</th><th>Nume</th><th>Wallet</th><th>Puncte</th></tr>
+            ${rows}
+          </table>
+        </div>
+      `;
+      allLB.appendChild(wrap);
+    });
+  }
+}
+
+// first render
+render();
+</script>
+
+</body>
+</html>
+
