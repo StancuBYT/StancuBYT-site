@@ -4249,8 +4249,8 @@ try{
                 return `<tr ${cls}>
                   <td>${i+1}</td>
                   <td>${escapeHtml(maskEmail(u.email||''))}</td>
-                  <td><code>${escapeHtml(u.code||'')}</code></td>
-                  <td><code>${escapeHtml((u.referral||'').trim() || '-')}</code></td>
+                  <td><code>${escapeHtml(maskRefCode(u.code||''))}</code></td>
+                  <td><code>${escapeHtml(maskRefCode(((u.referral||'').trim()||'-')))}</code></td>
                   <td><b>${Number(u.points||0)}</b></td>
                 </tr>`;
               }).join('')}
@@ -5681,6 +5681,309 @@ service cloud.firestore {
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   PROMO/GIVEAWAY STORAGE COMPAT (NO RULES CHANGE)
+   - Uses ONLY: /stats/visits (allowed write:true in your rules)
+   - Keeps Firebase Auth + Storage upload like your working page
+   - Data model stored inside stats/visits.promos map
+   ============================================================ */
+
+(function(){
+  if (typeof firebase === 'undefined' || !firebase.firestore) return;
+
+  const db = firebase.firestore();
+  const auth = firebase.auth ? firebase.auth() : null;
+  const storage = firebase.storage ? firebase.storage() : null;
+
+  const VISITS_REF = db.collection('stats').doc('visits');
+
+  // show only first 2 chars of referral codes
+  window.maskRefCode = function(code){
+    const s = String(code||'').trim();
+    if (!s || s === '-') return '-';
+    const a = s.slice(0,2);
+    return a + '••••';
+  };
+
+  function isAdmin(){
+    try { return !!window.__SBYT_ADMIN; } catch(e){ return false; }
+  }
+
+  // Load whole promo map
+  async function loadAll(){
+    const doc = await VISITS_REF.get();
+    const data = doc.exists ? (doc.data()||{}) : {};
+    const promos = data.promos || {};
+    return { data, promos };
+  }
+
+  // Real-time listener to re-render promos & leaderboard
+  let __promoRtUnsub = null;
+  function startPromoRealtime(){
+    if (__promoRtUnsub) { try{__promoRtUnsub();}catch(e){} __promoRtUnsub=null; }
+    __promoRtUnsub = VISITS_REF.onSnapshot((snap)=>{
+      const d = snap.exists ? (snap.data()||{}) : {};
+      window.__PROMO_CACHE = d.promos || {};
+      try{ if (typeof window.renderPromos === 'function') window.renderPromos(normalizePromos(window.__PROMO_CACHE)); }catch(e){}
+      try{ if (typeof window.renderLeaderboard === 'function') window.renderLeaderboard(); }catch(e){}
+    }, (err)=>{
+      console.error("Promo realtime error:", err);
+    });
+  }
+
+  function normalizePromos(map){
+    const arr = Object.entries(map||{}).map(([id, p])=>({ _id:id, id, ...(p||{}) }));
+    // sort by createdAt desc
+    arr.sort((a,b)=> (Number(b.createdAt||0) - Number(a.createdAt||0)));
+    return arr;
+  }
+
+  // Upload media to Storage (same style as your working file)
+  async function uploadPromoMedia(promoId, file){
+    if (!storage) return null;
+    if (!auth || !auth.currentUser) throw new Error("Not authenticated for storage");
+
+    const safeName = (file.name || 'media').replace(/[^\w.\-]+/g,'_').slice(0,80);
+    const path = `promos/${promoId}/${Date.now()}_${safeName}`;
+    const ref = storage.ref().child(path);
+
+    const snap = await ref.put(file, { contentType: file.type || undefined });
+    const url = await snap.ref.getDownloadURL();
+
+    return { url, path, contentType: file.type || null, name: file.name || null };
+  }
+
+  // Override savePromo to write inside stats/visits.promos
+  window.savePromo = async function(){
+    try{
+      if (!isAdmin()){
+        alert('Actiune permisa doar administratorului. Autentifica-te.');
+        return;
+      }
+      if (!auth || !auth.currentUser){
+        alert('Trebuie sa fii autentificat (Firebase Auth).');
+        return;
+      }
+
+      const title = (document.getElementById('promoTitle')?.value || '').trim();
+      const prize = (document.getElementById('promoPrize')?.value || '').trim();
+      const desc  = (document.getElementById('promoDesc')?.value || '').trim();
+      const ends  = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
+      const points = parseInt(document.getElementById('promoPoints')?.value || '10', 10) || 10;
+      const type = (document.getElementById('promoType')?.value || 'promo').trim(); // optional
+      const file = document.getElementById('promoMedia')?.files?.[0] || null;
+
+      if (!title || !ends || !desc){
+        alert('Completeaza titlul, data si descrierea.');
+        return;
+      }
+      const endsAt = new Date(ends).getTime();
+      if (!endsAt || endsAt <= Date.now()){
+        alert('Data expirarii trebuie sa fie in viitor.');
+        return;
+      }
+
+      const promoId = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+
+      // create promo
+      const promoObj = {
+        type: type || 'promo',
+        title,
+        prize: prize || null,
+        desc,
+        endsAt,
+        pointsPerPromotion: points,
+        createdAt: Date.now(),
+        createdBy: auth.currentUser.email || null,
+        media: null,
+        participants: {} // pid -> participant
+      };
+
+      await VISITS_REF.set({
+        promos: { [promoId]: promoObj }
+      }, { merge:true });
+
+      // upload media
+      if (file){
+        const media = await uploadPromoMedia(promoId, file);
+        await VISITS_REF.set({ promos: { [promoId]: { media } } }, { merge:true });
+      }
+
+      if (typeof window.cancelPromo === 'function') window.cancelPromo();
+      alert('Promotie/concurs adaugat!');
+    }catch(e){
+      console.error("savePromo (stats/visits) error:", e);
+      const msg = String(e && e.message ? e.message : e);
+      alert('Eroare la salvare promotie/concurs: ' + msg);
+    }
+  };
+
+  // Override deletePromo to remove promo from map
+  window.deletePromo = async function(promoId){
+    try{
+      if (!isAdmin()){
+        alert('Actiune permisa doar administratorului.');
+        return;
+      }
+      if (!confirm('Stergi aceasta promotie/giveaway?')) return;
+
+      // Firestore field delete needs dot path
+      await VISITS_REF.update({ ['promos.' + promoId]: firebase.firestore.FieldValue.delete() });
+    }catch(e){
+      console.error("deletePromo error:", e);
+      alert('Eroare la stergere: ' + (e?.message || e));
+    }
+  };
+
+  // Override joinPromo: public (rules allow write:true on stats/visits)
+  window.joinPromo = async function(promoId){
+    try{
+      const name = (document.getElementById('joinName_' + promoId)?.value || '').trim();
+      const email = (document.getElementById('joinEmail_' + promoId)?.value || '').trim().toLowerCase();
+      const wallet = (document.getElementById('joinWallet_' + promoId)?.value || '').trim();
+      const referral = (document.getElementById('joinReferral_' + promoId)?.value || '').trim().toUpperCase();
+
+      if (!name || !email || !wallet){
+        alert('Completeaza nume, email si wallet.');
+        return;
+      }
+
+      const { promos } = await loadAll();
+      const p = promos[promoId];
+      if (!p){ alert('Promotia nu mai exista.'); return; }
+
+      // expiry check
+      if (Number(p.endsAt||0) <= Date.now()){
+        alert('Aceasta promotie/giveaway este expirata.');
+        return;
+      }
+
+      const participants = p.participants || {};
+      const existingCodes = new Set(Object.values(participants).map(x => String(x.code||'').toUpperCase()).filter(Boolean));
+
+      if (referral){
+        if (!existingCodes.has(referral)){
+          alert('Codul Referal nu este valid. Trebuie sa fie un cod generat anterior.');
+          return;
+        }
+      }
+
+      const pid = email.replace(/[^\w.\-@]+/g, '_').slice(0,120);
+      const prev = participants[pid] || null;
+
+      // generate stable code for participant (keep old if exists)
+      const code = prev?.code || (Math.random().toString(36).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8) || ('SB'+Date.now().toString(36).toUpperCase().slice(-6)));
+
+      const newObj = {
+        name, email, wallet,
+        code,
+        referral: referral || '',
+        points: prev?.points || 0,
+        promotions: prev?.promotions || 0,
+        createdAt: prev?.createdAt || Date.now(),
+        updatedAt: Date.now()
+      };
+
+      // write participant into map
+      await VISITS_REF.set({
+        promos: { [promoId]: { participants: { [pid]: newObj } } }
+      }, { merge:true });
+
+      // clear inputs
+      ['joinName_','joinEmail_','joinWallet_','joinReferral_'].forEach(pref=>{
+        const el = document.getElementById(pref + promoId); if (el) el.value='';
+      });
+
+      alert('Inscriere reusita! Cod: ' + code);
+    }catch(e){
+      console.error("joinPromo error:", e);
+      alert('Eroare inscriere: ' + (e?.message || e));
+    }
+  };
+
+  // Override leaderboard renderer (referral ranking per promo)
+  window.renderLeaderboard = function(){
+    try{
+      const lb = document.getElementById('leaderboard');
+      if (!lb) return;
+
+      const map = window.__PROMO_CACHE || {};
+      const promos = normalizePromos(map);
+
+      if (!promos.length){
+        lb.innerHTML = '<div style="opacity:0.85;">Nu exista clasamente inca.</div>';
+        return;
+      }
+
+      // sort by end date
+      promos.sort((a,b)=> (Number(a.endsAt||0) - Number(b.endsAt||0)));
+
+      let out = '';
+      for (const p of promos){
+        const title = p.title || 'Fara titlu';
+        const type = p.type || 'promo';
+        const endDate = p.endsAt ? new Date(Number(p.endsAt)).toLocaleString('ro-RO') : '-';
+        const partObj = p.participants || {};
+        const part = Object.values(partObj);
+
+        // referral counts by code
+        const counts = {};
+        part.forEach(u=>{ counts[String(u.code||'').toUpperCase()] = 0; });
+        part.forEach(u=>{
+          const ref = String(u.referral||'').toUpperCase();
+          if (ref && typeof counts[ref] === 'number') counts[ref] += 1;
+        });
+
+        const rows = part.map(u=>({
+          email: u.email||'',
+          code: u.code||'',
+          referral: u.referral||'',
+          points: counts[String(u.code||'').toUpperCase()] || 0
+        })).sort((a,b)=> b.points - a.points);
+
+        out += `<div class="data-visualization neon-glow" style="margin-top:1rem; padding:1rem;">
+          <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:800; font-size:1.05rem;">${type === 'giveaway' ? '🏆 Giveaway' : '🎁 Promotie'}: ${escapeHtml(title)}</div>
+              <div style="opacity:0.8; font-size:0.9rem;">Expira: <b>${escapeHtml(endDate)}</b></div>
+            </div>
+          </div>
+
+          ${rows.length ? `
+            <div class="table-container" style="margin-top:0.8rem;">
+              <table class="whitepaper-table">
+                <tr><th>#</th><th>Email</th><th>Cod</th><th>Referral folosit</th><th>Puncte</th></tr>
+                ${rows.map((u, i)=>{
+                  const cls = (i===0) ? 'style="background:rgba(255,215,0,0.15); font-weight:800;"'
+                            : (i===1) ? 'style="background:rgba(192,192,192,0.12); font-weight:800;"'
+                            : (i===2) ? 'style="background:rgba(205,127,50,0.12); font-weight:800;"'
+                            : '';
+                  return `<tr ${cls}>
+                    <td>${i+1}</td>
+                    <td>${escapeHtml(maskEmail(u.email||''))}</td>
+                    <td><code>${escapeHtml(maskRefCode(u.code||''))}</code></td>
+                    <td><code>${escapeHtml(maskRefCode((u.referral||'').trim() || '-'))}</code></td>
+                    <td><b>${Number(u.points||0)}</b></td>
+                  </tr>`;
+                }).join('')}
+              </table>
+            </div>
+          ` : `<div style="margin-top:0.8rem; opacity:0.85;">Nu exista participanti inca.</div>`}
+        </div>`;
+      }
+
+      lb.innerHTML = out;
+    }catch(e){
+      console.error("renderLeaderboard override error:", e);
+    }
+  };
+
+  // kick realtime
+  startPromoRealtime();
+})();
+</script>
 </body>
 </html>
 
