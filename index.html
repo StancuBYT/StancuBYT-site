@@ -2618,7 +2618,8 @@ service cloud.firestore {
   function setAdminUI(isAdmin){
     window.__STBYT_IS_ADMIN__ = !!isAdmin;
     document.querySelectorAll(".admin-only").forEach(el=>{
-      el.style.display = isAdmin ? "" : "none";
+      const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : "block";
+      el.style.display = isAdmin ? d : "none";
     });
     const badge = $("adminStatusBadge");
     if(badge){
@@ -3122,7 +3123,8 @@ service cloud.firestore {
 
       // admin-only blocks
       document.querySelectorAll(".admin-only").forEach(el=>{
-        el.style.display = isAdmin ? "" : "none";
+        const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : "block";
+        el.style.display = isAdmin ? d : "none";
       });
       // in unele pagini aveai box separat:
       const promoAdmin = $("promoAdminBox") || $("promoAdmin") || $("promoForm");
