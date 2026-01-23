@@ -1612,6 +1612,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
 
                     card.innerHTML = `
                         <div class="news-badge ${badgeClass}">${badgeText}</div>
+                    ${p.overlayText ? `<div class=\"promo-overlay-text\" style=\"${escapeHtml(_overlayStyleFrom(p.overlayPos||'top-left', p.overlayFont||22))}\">${escapeHtml(p.overlayText)}</div>` : ``}
                         <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title)}</h4>
                         <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content)}</p>
                         <div class="news-date">
@@ -1728,8 +1729,12 @@ async function etherscanProxyRequest(module, action, params = {}) {
 
         async function showPromoForm() {
             if (!verifyPassword()) return;
+            try{ if (typeof showSection === 'function') showSection('giveaway'); }catch(e){}
             const f = $('promoForm');
-            if (f) f.style.display = 'block';
+            if (f) {
+              f.style.display = 'block';
+              try{ f.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){}
+            }
         }
 
         async function cancelPromo() {
@@ -1788,7 +1793,32 @@ async function etherscanProxyRequest(module, action, params = {}) {
             renderLeaderboard();
         }
 
-        function joinPromo(promoId) {
+        
+
+        function editPromo(promoId){
+            if (!verifyPassword()) return;
+            const promos = getPromos();
+            const p = promos.find(x => Number(x.id) === Number(promoId));
+            if (!p){ alert('Promoția nu a fost găsită.'); return; }
+            $('promoEditId')?.setAttribute('value', String(p.id));
+            if ($('promoEditId')) $('promoEditId').value = String(p.id);
+            $('promoTitle').value = p.title || '';
+            $('promoDesc').value = p.desc || '';
+            $('promoPrize') && ($('promoPrize').value = p.prize || '');
+            $('promoEnds').value = p.endDate || '';
+            $('promoPoints') && ($('promoPoints').value = p.pointsPerPromotion || 10);
+
+            // overlay fields if present
+            if ($('promoOverlayText')) $('promoOverlayText').value = p.overlayText || '';
+            if ($('promoOverlayFont')) $('promoOverlayFont').value = String(p.overlayFont || 22);
+            if ($('promoOverlayPos')) $('promoOverlayPos').value = p.overlayPos || 'top-left';
+            if ($('promoCardHeight')) $('promoCardHeight').value = String(p.cardHeight || 640);
+            if ($('promoMediaHeight')) $('promoMediaHeight').value = String(p.mediaHeight || 220);
+
+            showPromoForm();
+        }
+
+function joinPromo(promoId) {
             const name = ($('joinName_' + promoId)?.value || '').trim();
             const wallet = ($('joinWallet_' + promoId)?.value || '').trim();
             const pointsStr = ($('joinPoints_' + promoId)?.value || '').trim();
@@ -1845,7 +1875,14 @@ async function etherscanProxyRequest(module, action, params = {}) {
                 const expired = new Date() > end;
 
                 const card = document.createElement('div');
-                card.className = 'news-card';
+                card.className = 'news-card promo-card';
+                if (p.mediaUrl) {
+                    card.style.backgroundImage = `url('${p.mediaUrl}')`;
+                    card.style.backgroundSize = 'cover';
+                    card.style.backgroundPosition = 'center';
+                }
+
+                if (p.cardHeight) card.style.height = String(p.cardHeight) + 'px';
                 card.innerHTML = `
                     <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
                     <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
@@ -1865,7 +1902,8 @@ async function etherscanProxyRequest(module, action, params = {}) {
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
                             <button class="news-btn" onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
-                            <button class="news-btn" onclick="deletePromo(${p.id})" class="admin-only" data-admin-display="inline-flex">🗑️ Șterge</button>
+                            <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="editPromo(${p.id})">✏️ Editează</button>
+                            <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
                         </div>
                         <small style="display:block; margin-top:0.6rem; opacity:0.75;">
                             În varianta B, înscrierile/clasamentul sunt salvate doar pe device-ul tău.
