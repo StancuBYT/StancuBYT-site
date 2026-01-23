@@ -5873,7 +5873,21 @@ service cloud.firestore {
 
     const file = $('promoMedia')?.files?.[0] || null;
 
-    if (!title || !desc || !ends) return alert('Completează titlul, descrierea și data de final.');
+    const missing=[];
+    if (!title) missing.push('Titlu');
+    if (!desc) missing.push('Descriere');
+    if (!ends) missing.push('Data expirării');
+    if (missing.length){
+      alert('Completează: ' + missing.join(', '));
+      if (!title) $('promoTitle')?.focus();
+      else if (!desc) $('promoDesc')?.focus();
+      else $('promoEnds')?.focus();
+      return;
+    }
+    // accept ends as date-only (YYYY-MM-DD) and set 23:59
+    if (/^\d{4}-\d{2}-\d{2}$/.test(ends)) {
+      $('promoEnds').value = ends + 'T23:59';
+    }
     const endsAt = new Date(ends).getTime();
     if (!endsAt || endsAt <= Date.now()) return alert('Data expirării trebuie să fie în viitor.');
 
