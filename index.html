@@ -1261,7 +1261,15 @@
         .promo-leaderboard::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.18); border-radius: 999px; }
 
         /* admin buttons only when logged as admin */
-        </style>
+        
+        @media (max-width: 520px){
+            :root{ --promo-card-height: auto; --promo-media-height: 200px; }
+            .promo-card{ height:auto !important; }
+            .promo-content{ height:auto !important; }
+            .promo-leaderboard{ max-height: none; }
+        }
+
+</style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -5900,37 +5908,6 @@ service cloud.firestore {
 })();
 </script>
 
-
-<script>
-/* === ADMIN UI FIX (force show/hide admin-only buttons) === */
-(function(){
-  function applyAdminOnly(isAdmin){
-    document.querySelectorAll('.admin-only').forEach(el=>{
-      const disp = el.getAttribute('data-admin-display') || (el.tagName==='BUTTON' ? 'inline-flex' : 'block');
-      el.style.display = isAdmin ? disp : 'none';
-    });
-  }
-
-  // Wrap existing setAdminUI if present
-  const prev = window.setAdminUI;
-  window.setAdminUI = function(isAdmin, user){
-    try{ if (typeof prev === 'function') prev(isAdmin, user); }catch(e){}
-    try{ applyAdminOnly(!!isAdmin); }catch(e){}
-  };
-
-  // also listen auth state here as fallback (in case another init missed it)
-  try{
-    if (typeof firebase !== 'undefined' && firebase.auth){
-      firebase.auth().onAuthStateChanged((u)=>{
-        const isAdmin = !!u && String(u.email||'').toLowerCase()==='stancubyt@gmail.com';
-        window.__SBYT_ADMIN = isAdmin;
-        try{ window.setAdminUI(isAdmin, u); }catch(e){}
-      });
-    }
-  }catch(e){}
-})();
-</script>
-
 </body>
 </html>
 
@@ -5939,35 +5916,35 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 </script>
 
 
-<script>
-/* === ADMIN UI FIX (force show/hide admin-only buttons) === */
-(function(){
-  function applyAdminOnly(isAdmin){
-    document.querySelectorAll('.admin-only').forEach(el=>{
-      const disp = el.getAttribute('data-admin-display') || (el.tagName==='BUTTON' ? 'inline-flex' : 'block');
-      el.style.display = isAdmin ? disp : 'none';
-    });
-  }
-
-  // Wrap existing setAdminUI if present
-  const prev = window.setAdminUI;
-  window.setAdminUI = function(isAdmin, user){
-    try{ if (typeof prev === 'function') prev(isAdmin, user); }catch(e){}
-    try{ applyAdminOnly(!!isAdmin); }catch(e){}
-  };
-
-  // also listen auth state here as fallback (in case another init missed it)
+/* === HARD ADMIN UI FIX (last resort) ===
+   Prevent any earlier hideAdminOnly()/CSS from keeping admin buttons hidden.
+   Runs after DOM is ready and after Firebase auth settles.
+*/
+function __applyAdminOnlyDisplay(isAdmin){
   try{
-    if (typeof firebase !== 'undefined' && firebase.auth){
-      firebase.auth().onAuthStateChanged((u)=>{
-        const isAdmin = !!u && String(u.email||'').toLowerCase()==='stancubyt@gmail.com';
-        window.__SBYT_ADMIN = isAdmin;
-        try{ window.setAdminUI(isAdmin, u); }catch(e){}
-      });
-    }
+    window.__SBYT_ADMIN = !!isAdmin;
+    document.querySelectorAll('.admin-only').forEach(el=>{
+      const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : 'inline-flex';
+      el.style.display = isAdmin ? d : 'none';
+    });
   }catch(e){}
-})();
-</script>
+}
+
+async function __forceAdminRefresh(){
+  try{
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    const user = firebase.auth().currentUser;
+    const isAdmin = await (typeof computeIsAdmin === 'function' ? computeIsAdmin(user) : Promise.resolve(!!user));
+    if (typeof setAdminUI === 'function') setAdminUI(isAdmin, user);
+    __applyAdminOnlyDisplay(isAdmin);
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  __forceAdminRefresh();
+  setTimeout(__forceAdminRefresh, 350);
+  setTimeout(__forceAdminRefresh, 1200);
+});
 
 </body>
 </html>
