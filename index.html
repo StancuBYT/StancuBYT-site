@@ -1922,7 +1922,22 @@ async function etherscanProxyRequest(module, action, params = {}) {
                     </div>
                 `;
                 list.appendChild(card);
-            });
+            
+    // add delete button (admin only) if missing
+    try{
+      const actions = card.querySelector('.promo-actions') || card.querySelector('.admin-actions') || null;
+      if (actions && !actions.querySelector('[data-action="delete-promo"]')){
+        const b = document.createElement('button');
+        b.className = 'news-btn admin-only';
+        b.dataset.adminDisplay = 'inline-flex';
+        b.dataset.action = 'delete-promo';
+        b.textContent = '🗑️ Șterge';
+        b.onclick = () => deletePromo(p.id || p._id || promoId);
+        actions.appendChild(b);
+      }
+    }catch(e){}
+
+});
         }
 
         function renderLeaderboard() {
