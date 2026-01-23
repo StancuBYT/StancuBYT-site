@@ -12,7 +12,7 @@
             --promo-card-height: 560px;
             --promo-card-radius: 22px;
             --promo-card-pad: 18px;
-            --promo-media-blur: 0px;
+            --promo-media-overlay: 0.65;
 
             --blue-tech: #0066ff;
             --green-growth: #00ff88;
@@ -415,54 +415,6 @@
             padding: 1.5rem;
             border: 1px solid rgba(0, 102, 255, 0.2);
             transition: all 0.3s ease;
-        }
-
-
-        .news-card {
-            min-height: 520px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Content wrapper so text stays above background overlays */
-        .news-card .card-content{
-            position: relative;
-            z-index: 2;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Background image mode */
-        .news-card.has-bg{
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-        }
-        .news-card.has-bg::before{
-            content:"";
-            position:absolute;
-            inset:0;
-            z-index:1;
-            background: linear-gradient(180deg,
-              rgba(0,0,0,0.60) 0%,
-              rgba(0,0,0,0.25) 40%,
-              rgba(0,0,0,0.70) 100%);
-        }
-        .news-card.has-bg h4,
-        .news-card.has-bg p,
-        .news-card.has-bg .news-date{
-            text-shadow: 0 2px 14px rgba(0,0,0,0.85);
-        }
-        .news-card.has-bg .news-badge{
-            backdrop-filter: blur(6px);
-            background: rgba(0,0,0,0.35) !important;
-            border: 1px solid rgba(255,255,255,0.14);
-        }
-        .news-card.has-bg .news-btn{
-            backdrop-filter: blur(6px);
         }
 
         .news-card:hover {
@@ -1224,77 +1176,51 @@
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
 
-        /* === Standard Card Sizing (configurable) === */
+        /* === Standard promo card sizing (configurable) === */
         .news-card{
             height: var(--promo-card-height);
-            border-radius: var(--promo-card-radius) !important;
-            padding: var(--promo-card-pad) !important;
+            border-radius: var(--promo-card-radius);
+            padding: var(--promo-card-pad);
             display:flex;
             flex-direction:column;
             position:relative;
             overflow:hidden;
         }
-        .news-card .card-content{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            position:relative;
-            z-index:2;
-        }
-        .news-card .card-body{
-            flex:1 1 auto;
-        }
-        .news-card .card-footer{
-            margin-top:auto;
-        }
-        .news-card.has-bg{
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-        }
+        .news-card .card-content{position:relative; z-index:2; height:100%; display:flex; flex-direction:column;}
+        .news-card .card-body{flex:1 1 auto; overflow:auto; padding-right:4px;}
+        .news-card .card-body::-webkit-scrollbar{width:8px;}
+        .news-card .card-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15); border-radius:999px;}
+        .news-card .card-footer{margin-top:auto;}
+
+        .news-card.has-bg{background-size:cover; background-position:center; background-repeat:no-repeat;}
         .news-card.has-bg::before{
-            content:"";
-            position:absolute;
-            inset:0;
-            z-index:1;
+            content:""; position:absolute; inset:0; z-index:1;
             background: linear-gradient(180deg,
-              rgba(0,0,0,0.62) 0%,
-              rgba(0,0,0,0.25) 45%,
-              rgba(0,0,0,0.78) 100%);
-        }
-        .news-card.has-bg::after{
-            content:"";
-            position:absolute;
-            inset:-10px;
-            z-index:0;
-            background: inherit;
-            filter: blur(var(--promo-media-blur));
-            transform: scale(1.05);
-            opacity: 0;
-            pointer-events:none;
+              rgba(0,0,0, calc(var(--promo-media-overlay))) 0%,
+              rgba(0,0,0, 0.25) 45%,
+              rgba(0,0,0, 0.78) 100%);
         }
         .news-card.has-bg h4,
         .news-card.has-bg p,
-        .news-card.has-bg .news-date{
-            text-shadow: 0 2px 14px rgba(0,0,0,0.85);
-        }
+        .news-card.has-bg .news-date{ text-shadow: 0 2px 14px rgba(0,0,0,0.85); }
+
         .promo-overlay-text{
-            margin-top:10px;
-            padding:10px 12px;
-            border-radius:14px;
+            margin-top:10px; padding:10px 12px; border-radius:14px;
             border:1px solid rgba(255,255,255,0.14);
             background: rgba(0,0,0,0.35);
             backdrop-filter: blur(6px);
-            color:#fff;
-            font-weight:700;
-            line-height:1.35;
+            color:#fff; font-weight:700; line-height:1.35;
         }
-
-
-<style>
-.promo-lb{margin-top:12px}
-</style>
-</style>
+        .promo-lb{
+            margin-top:12px; padding-top:12px;
+            border-top:1px solid rgba(255,255,255,0.12);
+        }
+        .promo-lb-row{
+            display:flex; justify-content:space-between; gap:10px;
+            background:rgba(255,255,255,0.04);
+            padding:8px 10px; border-radius:10px;
+        }
+    </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1363,6 +1289,31 @@
             <div style="margin-top: 1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
                 <button class="news-btn admin-only" onclick="requestPassword('promoAdd')" data-admin-display="inline-flex">➕ Adaugă promoție</button>
                 <button class="news-btn trophy-btn admin-only" onclick="requestPassword('giveawayAdd')" title="Adauga giveaway" data-admin-display="inline-flex"><span class="trophy-wrap">🏆</span><img class="trophy-logo" src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" /></button>
+
+                <!-- Card Settings (Admin only) -->
+                <div class="admin-only" data-admin-display="block" id="cardSettingsBox" style="margin: 12px 0 18px; display:none;">
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
+                        <div style="min-width:180px; flex:1;">
+                            <div style="font-size:12px; opacity:.85; margin-bottom:6px;">Înălțime card (px)</div>
+                            <input id="cardHeightInput" type="number" min="360" step="10" value="560" />
+                        </div>
+                        <div style="min-width:180px; flex:1;">
+                            <div style="font-size:12px; opacity:.85; margin-bottom:6px;">Rotunjire colțuri (px)</div>
+                            <input id="cardRadiusInput" type="number" min="10" step="1" value="22" />
+                        </div>
+                        <div style="min-width:180px; flex:1;">
+                            <div style="font-size:12px; opacity:.85; margin-bottom:6px;">Padding card (px)</div>
+                            <input id="cardPadInput" type="number" min="8" step="1" value="18" />
+                        </div>
+                        <div style="min-width:220px; flex:1;">
+                            <div style="font-size:12px; opacity:.85; margin-bottom:6px;">Intensitate overlay imagine (0.2 - 0.9)</div>
+                            <input id="cardOverlayInput" type="number" min="0.2" max="0.9" step="0.05" value="0.65" />
+                        </div>
+                        <button class="news-btn" style="height:44px;" onclick="applyCardSettings()">Aplică</button>
+                    </div>
+                    <div class="small" style="margin-top:8px;">Setările sunt doar pentru afișare. Imaginile sunt încadrate automat (cover) în cardul standard.</div>
+                </div>
+
                 </div>
         </div>
 
@@ -1388,9 +1339,9 @@
 
                     <div style="margin-top:10px;">
                         <label style="display:block; font-size:12px; opacity:.85; margin-bottom:6px;">Text peste imagine (opțional)</label>
-                        <textarea id="promoOverlayText" placeholder="Scrie text care va apărea peste imagine (ex: -50% doar azi, reguli, slogan)"></textarea>
+                        <textarea id="promoOverlayText" placeholder="Text afișat peste imagine (ex: -50% doar azi, slogan, reguli scurte)"></textarea>
                     </div>
-
+                  
     </div>
 
     <div class="form-row">
@@ -1411,7 +1362,7 @@
         <div class="data-visualization neon-glow">
             <h3>🏆 Clasament participanți</h3>
             
-            <div id="leaderboard" style="margin-top:1rem;"></div>
+            <div id="leaderboard" style="margin-top:1rem;" style="display:none;"></div>
         </div>
     </section>
 
@@ -1573,7 +1524,6 @@ async function etherscanProxyRequest(module, action, params = {}) {
                 {
                     id: 1,
                     title: 'Lansare Oficială StancuBYT!',
-      overlayText: (document.getElementById("promoOverlayText")?.value || "").trim(),
                     content: 'Tokenul StancuBYT a fost lansat oficial pe Ethereum. Contract verificat pe Etherscan.',
                     type: 'announcement',
                     date: new Date().toISOString(),
@@ -1619,7 +1569,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
                     card.innerHTML = `
       <div class="card-content">
         <div class="card-body">
-      <div class="news-badge ${badgeClass}">${badgeText}</div>
+<div class="news-badge ${badgeClass}">${badgeText}</div>
                         <h4 style="margin-bottom: 0.5rem; color: white;">${escapeHtml(item.title)}</h4>
                         <p style="opacity: 0.9; line-height: 1.5;">${escapeHtml(item.content)}</p>
                         <div class="news-date">
@@ -1854,9 +1804,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
 
                 const card = document.createElement('div');
                 card.className = 'news-card' + (isImageBg ? ' has-bg' : '');
-    if (isImageBg) {
-      card.style.backgroundImage = `url('${'${p.media.url}'}')`;
-    }
+    if (isImageBg) card.style.backgroundImage = `url('${p.media.url}')`;
                 card.innerHTML = `
                     <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
                     <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
@@ -2542,6 +2490,8 @@ async function ensureAdminAuth() {
 }
 
 // --- Helpers
+function _maskCode2(s){ s = String(s||''); return s ? (s.slice(0,2) + '••••') : ''; }
+
 function _escapeHtml(str) {
   return String(str).replace(/[&<>"'`=\/]/g, s => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;','\\':'&#92;'
@@ -2756,6 +2706,7 @@ async function savePromo() {
       title,
       prize: prize || null,
       desc,
+      overlayText: (document.getElementById('promoOverlayText')?.value || '').trim() || null,
       endsAt,
       pointsPerPromotion: points,
       createdAt: Date.now(),
@@ -2832,7 +2783,6 @@ function renderPromos(promos) {
       <h4 style="margin-bottom:0.5rem; color:white;">${_escapeHtml(p.title||'')}</h4>
       ${p.prize ? `<p style="opacity:0.9;"><strong>Premiu:</strong> ${_escapeHtml(p.prize)}</p>` : ''}
       <p style="opacity:0.9; line-height:1.5;">${_escapeHtml(p.desc||'')}</p>
-        ${p.overlayText ? `<div class="promo-overlay-text">${_escapeHtml(p.overlayText)}</div>` : ``}
       <div class="news-date" style="margin-top:0.8rem;"><span>⏳</span> Expira: ${p.endsAt ? new Date(p.endsAt).toLocaleString('ro-RO') : '-'}</div>
       ${mediaHtml}
 
@@ -2840,22 +2790,29 @@ function renderPromos(promos) {
         <button class="news-btn" onclick="openPromo('${p._id}')">🎯 Detalii / Inscriere</button>
         <button class="news-btn" onclick="deletePromo('${p._id}')">🗑️ Sterge</button>
       </div>
-    
+          ${p.overlayText ? `<div class="promo-overlay-text">${_escapeHtml(p.overlayText)}</div>` : ``}
+        </div>
+        <div class="card-footer">
+          <div class="promo-lb" id="lb_${p._id}">
+            <div style="opacity:0.75;">Se încarcă clasamentul...</div>
+          </div>
+        </div>
       </div>
     `;
     promoList.appendChild(card);
+    listenLeaderboard(p._id, `lb_${p._id}`);
+
   });
 }
 
 function openPromo(promoId) {
   window.__activePromoId = promoId;
 
-  // Scroll to leaderboard area if exists
-  const el = document.getElementById('leaderboard');
-  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
-
-  listenLeaderboard(promoId);
+  function openPromo(promoId) {
+  window.__activePromoId = promoId;
+  // optional: keep old behavior disabled (leaderboard is now in card)
 }
+
 
 async function _genParticipantId() {
   // STBYT-XXXXXX
@@ -2938,8 +2895,8 @@ async function promoteMe() {
   }
 }
 
-function listenLeaderboard(promoId) {
-  const el = document.getElementById('leaderboard');
+function listenLeaderboard(promoId, targetElId){
+  const el = document.getElementById(targetElId || 'leaderboard');
   if (!el || !db) return;
 
   if (__leaderUnsub) { try { __leaderUnsub(); } catch(_) {} __leaderUnsub = null; }
@@ -5819,21 +5776,20 @@ service cloud.firestore {
 
 })();
 
-    // === Card display settings (UI only) ===
-    function applyCardSettings(){
-      const h = parseInt(document.getElementById('cardHeightInput')?.value || '560', 10);
-      const r = parseInt(document.getElementById('cardRadiusInput')?.value || '22', 10);
-      const p = parseInt(document.getElementById('cardPadInput')?.value || '18', 10);
-      const b = parseInt(document.getElementById('cardBlurInput')?.value || '0', 10);
+<script>
+function applyCardSettings(){
+  const h = parseInt(document.getElementById('cardHeightInput')?.value || '560', 10);
+  const r = parseInt(document.getElementById('cardRadiusInput')?.value || '22', 10);
+  const p = parseInt(document.getElementById('cardPadInput')?.value || '18', 10);
+  const o = parseFloat(document.getElementById('cardOverlayInput')?.value || '0.65');
 
-      document.documentElement.style.setProperty('--promo-card-height', Math.max(360, h) + 'px');
-      document.documentElement.style.setProperty('--promo-card-radius', Math.max(10, r) + 'px');
-      document.documentElement.style.setProperty('--promo-card-pad', Math.max(8, p) + 'px');
-      document.documentElement.style.setProperty('--promo-media-blur', Math.max(0, b) + 'px');
-    }
-
+  document.documentElement.style.setProperty('--promo-card-height', Math.max(360, h) + 'px');
+  document.documentElement.style.setProperty('--promo-card-radius', Math.max(10, r) + 'px');
+  document.documentElement.style.setProperty('--promo-card-pad', Math.max(8, p) + 'px');
+  const ov = Math.min(0.9, Math.max(0.2, isFinite(o) ? o : 0.65));
+  document.documentElement.style.setProperty('--promo-media-overlay', String(ov));
+}
 </script>
-
 </body>
 </html>
 
