@@ -1249,6 +1249,23 @@
   .promo-leaderboard{ max-height:none; }
 }
 
+
+/* === RESET CONTROLAT: fix form overflow in cards === */
+.promo-content { padding: 0 12px 14px 12px; box-sizing: border-box; }
+.promo-card * { box-sizing: border-box; }
+.promo-join .form-row { display:flex; gap:10px; flex-wrap:wrap; }
+.promo-join .form-row input,
+.promo-join .form-row select,
+.promo-join .form-row textarea,
+.promo-join .form-row button{
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.promo-join .form-row button{ flex: 0 0 auto; }
+@media (max-width: 520px){
+  .promo-join .form-row button{ width: 100%; }
+}
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -6178,6 +6195,66 @@ service cloud.firestore {
     return card;
   }
 
+  
+  // ---- LocalStorage fallback (vechile promoții) ----
+  const LS_PROMOS_KEY = (typeof LS_PROMOS !== 'undefined' && LS_PROMOS) ? LS_PROMOS : 'stancubyt_promos';
+
+  function loadLocalPromos(){
+    try{
+      const raw = localStorage.getItem(LS_PROMOS_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+
+  function renderLocalPromoCard(p){
+    const card = document.createElement('div');
+    card.className = 'news-card promo-card';
+    const endsStr = p.endDate ? String(p.endDate) : '-';
+    const overlayText = p.overlayText || '';
+    const ov = p.overlay || {};
+    const x = (p.overlayX ?? ov.x ?? 6), y = (p.overlayY ?? ov.y ?? 6);
+    const f = (p.overlayFont ?? ov.font ?? 22), a = (p.overlayAlign ?? ov.align ?? 'left');
+    const mediaStyle = p.mediaUrl ? `background-image:url('${p.mediaUrl}')` : '';
+
+    const overlayHtml = overlayText ? `
+      <div class="promo-overlay-text" style="left:${x}%; top:${y}%; font-size:${f}px; text-align:${a};">
+        ${esc(overlayText)}
+      </div>` : '';
+
+    card.innerHTML = `
+      <div class="promo-media" style="${mediaStyle}">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px;">
+          <div style="font-weight:900; color:#fff; font-size:1.05rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(p.title||'')}</div>
+          <div style="padding:6px 10px; border-radius:999px; background:rgba(0,0,0,0.30); border:1px solid rgba(255,255,255,0.14); font-size:0.85rem; color:#fff;">LOCAL</div>
+        </div>
+        ${overlayHtml}
+      </div>
+
+      <div class="promo-content">
+        <div style="opacity:0.85;">⏳ Expiră: <strong>${esc(endsStr)}</strong></div>
+        ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${esc(p.prize)}</strong></div>` : ''}
+
+        <div class="promo-desc" style="opacity:0.92; margin-top:10px; line-height:1.5;">
+          ${esc(p.desc||'')}
+        </div>
+
+        <div class="promo-join" style="padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
+          <div style="opacity:0.75; font-size:0.9rem;">Promoție din localStorage (nu e în Firestore). Dacă vrei să fie vizibilă pe alte dispozitive, recreeaz-o din admin.</div>
+        </div>
+
+        <div class="promo-leaderboard">
+          <div style="opacity:.75;">Clasamentul pentru promoțiile vechi locale nu e disponibil.</div>
+        </div>
+      </div>
+    `;
+    // sizing if present
+    if (p.cardHeight) card.style.height = String(p.cardHeight) + 'px';
+    const mediaEl = card.querySelector('.promo-media');
+    if (mediaEl && p.mediaHeight) mediaEl.style.height = String(p.mediaHeight) + 'px';
+    return card;
+  }
+
   function mountPromos(){
     const list = $('promoList');
     if (!list) return;
@@ -6188,10 +6265,26 @@ service cloud.firestore {
       snap.forEach(doc=>{
         list.appendChild(renderPromoCard(doc));
       });
-      if (snap.empty) list.innerHTML = '<div style="opacity:.8;">Nu există promoții încă.</div>';
+      if (snap.empty) {
+        list.innerHTML = '';
+      }
+      // append local promos (vechi) if any
+      const locals = loadLocalPromos();
+      if (locals.length){
+        locals.forEach(lp=> list.appendChild(renderLocalPromoCard(lp)));
+      }
+      if (snap.empty && !locals.length) {
+        list.innerHTML = '<div style="opacity:.8;">Nu există promoții încă.</div>';
+      }">Nu există promoții încă.</div>';
     }, (err)=>{
       console.error('promos listen:', err);
-      list.innerHTML = '<div style="opacity:.8;">Eroare la încărcarea promoțiilor.</div>';
+      list.innerHTML = '';
+      const locals = loadLocalPromos();
+      if (locals.length){
+        locals.forEach(lp=> list.appendChild(renderLocalPromoCard(lp)));
+      } else {
+        list.innerHTML = '<div style="opacity:.8;">Eroare la încărcarea promoțiilor (Rules). Și nu există promoții locale.</div>';
+      }
     });
   }
 
