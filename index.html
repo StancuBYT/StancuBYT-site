@@ -1261,9 +1261,7 @@
         .promo-leaderboard::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.18); border-radius: 999px; }
 
         /* admin buttons only when logged as admin */
-        .promo-actions .admin-only{ display:none; }
-
-</style>
+        </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -5902,11 +5900,73 @@ service cloud.firestore {
 })();
 </script>
 
+
+<script>
+/* === ADMIN UI FIX (force show/hide admin-only buttons) === */
+(function(){
+  function applyAdminOnly(isAdmin){
+    document.querySelectorAll('.admin-only').forEach(el=>{
+      const disp = el.getAttribute('data-admin-display') || (el.tagName==='BUTTON' ? 'inline-flex' : 'block');
+      el.style.display = isAdmin ? disp : 'none';
+    });
+  }
+
+  // Wrap existing setAdminUI if present
+  const prev = window.setAdminUI;
+  window.setAdminUI = function(isAdmin, user){
+    try{ if (typeof prev === 'function') prev(isAdmin, user); }catch(e){}
+    try{ applyAdminOnly(!!isAdmin); }catch(e){}
+  };
+
+  // also listen auth state here as fallback (in case another init missed it)
+  try{
+    if (typeof firebase !== 'undefined' && firebase.auth){
+      firebase.auth().onAuthStateChanged((u)=>{
+        const isAdmin = !!u && String(u.email||'').toLowerCase()==='stancubyt@gmail.com';
+        window.__SBYT_ADMIN = isAdmin;
+        try{ window.setAdminUI(isAdmin, u); }catch(e){}
+      });
+    }
+  }catch(e){}
+})();
+</script>
+
 </body>
 </html>
 
 <script>
 function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
+</script>
+
+
+<script>
+/* === ADMIN UI FIX (force show/hide admin-only buttons) === */
+(function(){
+  function applyAdminOnly(isAdmin){
+    document.querySelectorAll('.admin-only').forEach(el=>{
+      const disp = el.getAttribute('data-admin-display') || (el.tagName==='BUTTON' ? 'inline-flex' : 'block');
+      el.style.display = isAdmin ? disp : 'none';
+    });
+  }
+
+  // Wrap existing setAdminUI if present
+  const prev = window.setAdminUI;
+  window.setAdminUI = function(isAdmin, user){
+    try{ if (typeof prev === 'function') prev(isAdmin, user); }catch(e){}
+    try{ applyAdminOnly(!!isAdmin); }catch(e){}
+  };
+
+  // also listen auth state here as fallback (in case another init missed it)
+  try{
+    if (typeof firebase !== 'undefined' && firebase.auth){
+      firebase.auth().onAuthStateChanged((u)=>{
+        const isAdmin = !!u && String(u.email||'').toLowerCase()==='stancubyt@gmail.com';
+        window.__SBYT_ADMIN = isAdmin;
+        try{ window.setAdminUI(isAdmin, u); }catch(e){}
+      });
+    }
+  }catch(e){}
+})();
 </script>
 
 </body>
