@@ -1236,6 +1236,33 @@
             border-top: 1px solid rgba(255,255,255,0.12);
         }
 
+
+        /* === Keep join/actions/leaderboard visible in fixed card height === */
+        .promo-content{
+            display:flex;
+            flex-direction:column;
+            height: calc(var(--promo-card-height) - var(--promo-media-height) - 24px);
+            overflow:hidden;
+        }
+        .promo-desc{
+            flex: 1 1 auto;
+            overflow:auto;
+            margin-top:10px;
+            padding-right:6px;
+        }
+        .promo-desc::-webkit-scrollbar{ width: 8px; }
+        .promo-desc::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.18); border-radius: 999px; }
+        .promo-join, .promo-actions, .promo-leaderboard{ flex: 0 0 auto; }
+        .promo-leaderboard{
+            max-height: 170px;
+            overflow:auto;
+        }
+        .promo-leaderboard::-webkit-scrollbar{ width: 8px; }
+        .promo-leaderboard::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.18); border-radius: 999px; }
+
+        /* admin buttons only when logged as admin */
+        .promo-actions .admin-only{ display:none; }
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -2415,7 +2442,7 @@ function setAdminUI(isAdmin, user) {
   });
 }
 
-async function computeIsAdmin(user) {
+async async function computeIsAdmin(user) {
   if (!user) return false;
   try {
     // 1) custom claim admin
@@ -3491,9 +3518,9 @@ window.addEventListener('load', () => {
         <div class="promo-content">
           <div style="opacity:0.85;">⏳ Expiră: <strong>${_escape(endsStr)}</strong></div>
           ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${_escape(p.prize)}</strong></div>`:''}
-          <div style="opacity:0.92; margin-top:10px; line-height:1.5;">${_escape(p.desc||'')}</div>
+          <div class="promo-desc" style="opacity:0.92; line-height:1.5;">${_escape(p.desc||'')}</div>
 
-          <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
+          <div class="promo-join" style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
             <div style="font-weight:800; margin-bottom:8px;">Înscriere</div>
             <div class="form-row">
               <input type="text" id="joinName_${_escape(p._id)}" placeholder="Nume" maxlength="80">
@@ -3505,8 +3532,8 @@ window.addEventListener('load', () => {
             </div>
             <div style="opacity:0.75; font-size:0.85rem; margin-top:6px;">După înscriere primești un cod (ID) și se deschide emailul de confirmare.</div>
             <div class="promo-actions" style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
-              <button class="news-btn" onclick="editPromo('${_escape(p._id)}')">✏️ Editează</button>
-              <button class="news-btn" onclick="deletePromo('${_escape(p._id)}')">🗑️ Șterge</button>
+              <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="editPromo('${_escape(p._id)}')">✏️ Editează</button>
+              <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="deletePromo('${_escape(p._id)}')">🗑️ Șterge</button>
             </div>
           </div>
 
