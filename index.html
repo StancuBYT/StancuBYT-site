@@ -1266,6 +1266,11 @@
   .promo-join .form-row button{ width: 100%; }
 }
 
+
+/* === ADMIN VISIBILITY (strong) === */
+.admin-only{ display:none; }
+body.is-admin .admin-only{ display: inline-flex !important; }
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -5830,10 +5835,15 @@ service cloud.firestore {
 
   function setAdminUI(isAdmin){
     window.__SBYT_ADMIN = !!isAdmin;
-    document.querySelectorAll('.admin-only').forEach(el=>{
-      const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : 'inline-flex';
-      el.style.display = isAdmin ? d : 'none';
-    });
+    try{
+      document.body && document.body.classList.toggle('is-admin', !!isAdmin);
+    }catch(e){}
+    try{
+      document.querySelectorAll('.admin-only').forEach(el=>{
+        const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : 'inline-flex';
+        el.style.display = isAdmin ? d : 'none';
+      });
+    }catch(e){}
   }
   window.setAdminUI = setAdminUI;
 
@@ -6265,6 +6275,8 @@ service cloud.firestore {
       snap.forEach(doc=>{
         list.appendChild(renderPromoCard(doc));
       });
+      // ensure admin buttons visibility after rendering
+      setAdminUI(window.__SBYT_ADMIN);
       if (snap.empty) {
         list.innerHTML = '';
       }
@@ -6273,6 +6285,7 @@ service cloud.firestore {
       if (locals.length){
         locals.forEach(lp=> list.appendChild(renderLocalPromoCard(lp)));
       }
+      setAdminUI(window.__SBYT_ADMIN);
       if (snap.empty && !locals.length) {
         list.innerHTML = '<div style="opacity:.8;">Nu există promoții încă.</div>';
       }">Nu există promoții încă.</div>';
@@ -6282,7 +6295,8 @@ service cloud.firestore {
       const locals = loadLocalPromos();
       if (locals.length){
         locals.forEach(lp=> list.appendChild(renderLocalPromoCard(lp)));
-      } else {
+      }
+      setAdminUI(window.__SBYT_ADMIN); else {
         list.innerHTML = '<div style="opacity:.8;">Eroare la încărcarea promoțiilor (Rules). Și nu există promoții locale.</div>';
       }
     });
