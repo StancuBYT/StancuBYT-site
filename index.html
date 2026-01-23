@@ -1619,7 +1619,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
                             ${new Date(item.date).toLocaleDateString('ro-RO', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}
                         </div>
                         <div style="display:flex; gap:10px; margin-top: 1rem; flex-wrap:wrap;">
-                            <button class="news-btn" onclick="deleteNews(${Number(item.id)})">🗑️ Șterge</button>
+                            <button class="news-btn" onclick="deleteNews(${Number(item.id)})" class="admin-only" data-admin-display="inline-flex">🗑️ Șterge</button>
                         </div>
                     `;
                     container.appendChild(card);
@@ -1865,7 +1865,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
                             <button class="news-btn" onclick="joinPromo(${p.id})">✅ Înscrie-te</button>
-                            <button class="news-btn" onclick="deletePromo(${p.id})">🗑️ Șterge</button>
+                            <button class="news-btn" onclick="deletePromo(${p.id})" class="admin-only" data-admin-display="inline-flex">🗑️ Șterge</button>
                         </div>
                         <small style="display:block; margin-top:0.6rem; opacity:0.75;">
                             În varianta B, înscrierile/clasamentul sunt salvate doar pe device-ul tău.
@@ -3181,7 +3181,7 @@ window.addEventListener('load', () => {
         <p style="opacity:0.9; line-height:1.5;">${_escape(item.content||'')}</p>
         <div class="news-date"><span>📅</span> ${d.toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
         <div style="display:flex; gap:10px; margin-top:1rem; flex-wrap:wrap;">
-          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')">🗑️ Șterge</button>
+          <button class="news-btn" onclick="deleteNewsDoc('${_escape(item._id||'')}')" class="admin-only" data-admin-display="inline-flex">🗑️ Șterge</button>
         </div>
       `;
       container.appendChild(card);
@@ -3356,7 +3356,7 @@ window.addEventListener('load', () => {
           </div>
         </div>
         <div style="display:flex; justify-content:flex-end; margin-top:12px;">
-          <button class="news-btn" onclick="deleteTeamMember('${_escape(m._id||'')}')">🗑️ Șterge</button>
+          <button class="news-btn" onclick="deleteTeamMember('${_escape(m._id||'')}')" class="admin-only" data-admin-display="inline-flex">🗑️ Șterge</button>
         </div>
       `;
       list.appendChild(card);
@@ -3539,7 +3539,7 @@ window.addEventListener('load', () => {
             <div style="opacity:0.75; font-size:0.85rem; margin-top:6px;">După înscriere primești un cod (ID) și se deschide emailul de confirmare.</div>
             <div class="promo-actions" style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
               <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="editPromo('${_escape(p._id)}')">✏️ Editează</button>
-              <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="deletePromo('${_escape(p._id)}')">🗑️ Șterge</button>
+              <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="deletePromo('${_escape(p._id)}')" class="admin-only" data-admin-display="inline-flex">🗑️ Șterge</button>
             </div>
           </div>
 
@@ -5530,7 +5530,7 @@ service cloud.firestore {
       const adminBtns = isAdmin ? `
         <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
           <button class="news-btn" onclick="window.__SBYT_EDIT_PROMO && window.__SBYT_EDIT_PROMO('${pid}')">✏️ Editează</button>
-          <button class="news-btn" onclick="window.__SBYT_DELETE_PROMO && window.__SBYT_DELETE_PROMO('${pid}')">🗑️ Șterge</button>
+          <button class="news-btn" onclick="window.__SBYT_DELETE_PROMO && window.__SBYT_DELETE_PROMO('${pid}')" class="admin-only" data-admin-display="inline-flex">🗑️ Șterge</button>
         </div>
       ` : "";
 
@@ -5908,6 +5908,38 @@ service cloud.firestore {
 })();
 </script>
 
+
+<script>
+/* === ADMIN UI (reliable) === */
+const __ADMIN_EMAILS__ = (typeof ADMIN_EMAILS !== 'undefined' && Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length)
+  ? ADMIN_EMAILS.map(x=>String(x).toLowerCase())
+  : ["stancubyt@gmail.com"];
+
+function __isAdminUser(user){
+  return !!(user && user.email && __ADMIN_EMAILS__.includes(String(user.email).toLowerCase()));
+}
+
+function __applyAdminOnly(isAdmin){
+  try{
+    document.querySelectorAll('.admin-only').forEach(el=>{
+      const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : 'inline-flex';
+      el.style.display = isAdmin ? d : 'none';
+    });
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  try{
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    firebase.auth().onAuthStateChanged((user)=>{
+      const isAdmin = __isAdminUser(user) || !!user; // if you want only email admin, remove "|| !!user"
+      window.__SBYT_ADMIN = isAdmin;
+      __applyAdminOnly(isAdmin);
+    });
+  }catch(e){}
+});
+</script>
+
 </body>
 </html>
 
@@ -5916,33 +5948,7 @@ function updateLivePriceAndStats(){ return updateLivePriceAndChart(); }
 </script>
 
 
-/* === HARD ADMIN UI FIX (last resort) ===
-   Prevent any earlier hideAdminOnly()/CSS from keeping admin buttons hidden.
-   Runs after DOM is ready and after Firebase auth settles.
-*/
-function __applyAdminOnlyDisplay(isAdmin){
-  try{
-    window.__SBYT_ADMIN = !!isAdmin;
-    document.querySelectorAll('.admin-only').forEach(el=>{
-      const d = (el.dataset && el.dataset.adminDisplay) ? el.dataset.adminDisplay : 'inline-flex';
-      el.style.display = isAdmin ? d : 'none';
-    });
-  }catch(e){}
-}
-
-async function __forceAdminRefresh(){
-  try{
-    if (typeof firebase === 'undefined' || !firebase.auth) return;
-    const user = firebase.auth().currentUser;
-    const isAdmin = await (typeof computeIsAdmin === 'function' ? computeIsAdmin(user) : Promise.resolve(!!user));
-    if (typeof setAdminUI === 'function') setAdminUI(isAdmin, user);
-    __applyAdminOnlyDisplay(isAdmin);
-  }catch(e){}
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  __forceAdminRefresh();
-  setTimeout(__forceAdminRefresh, 350);
+setTimeout(__forceAdminRefresh, 350);
   setTimeout(__forceAdminRefresh, 1200);
 });
 
