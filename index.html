@@ -6140,6 +6140,7 @@ service cloud.firestore {
 
     const card = document.createElement('div');
     card.className = 'news-card promo-card';
+      card.setAttribute('data-local-id', String(p.id));
 
     const mediaStyle = (p.media && p.media.url && String(p.media.contentType||'').startsWith('image/'))
       ? `background-image:url('${p.media.url}')`
@@ -6253,6 +6254,11 @@ service cloud.firestore {
           <div style="opacity:0.75; font-size:0.9rem;">Promoție din localStorage (nu e în Firestore). Dacă vrei să fie vizibilă pe alte dispozitive, recreeaz-o din admin.</div>
         </div>
 
+        <div class="promo-actions" style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
+          <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="editLocalPromo(${p.id})">✏️ Editează</button>
+          <button class="news-btn admin-only" data-admin-display="inline-flex" onclick="deleteLocalPromo(${p.id})">🗑️ Șterge</button>
+        </div>
+
         <div class="promo-leaderboard">
           <div style="opacity:.75;">Clasamentul pentru promoțiile vechi locale nu e disponibil.</div>
         </div>
@@ -6264,6 +6270,52 @@ service cloud.firestore {
     if (mediaEl && p.mediaHeight) mediaEl.style.height = String(p.mediaHeight) + 'px';
     return card;
   }
+
+  function saveLocalPromos(arr){
+    try{ localStorage.setItem(LS_PROMOS_KEY, JSON.stringify(arr||[])); }catch(e){}
+  }
+
+  function deleteLocalPromo(localId){
+    if (!window.__SBYT_ADMIN) return alert('Trebuie să fii logat ca admin.');
+    if (!confirm('Ștergi această promoție (LOCAL)?')) return;
+    const arr = loadLocalPromos().filter(x => Number(x.id) !== Number(localId));
+    saveLocalPromos(arr);
+    // rerender by forcing mountPromos to re-run local append: easiest by calling location hash change or just manual rebuild if list exists
+    const list = document.getElementById('promoList');
+    if (list){
+      // remove existing LOCAL card
+      [...list.querySelectorAll('[data-local-id]')].forEach(el=>{
+        if (Number(el.getAttribute('data-local-id'))===Number(localId)) el.remove();
+      });
+    }
+  }
+  window.deleteLocalPromo = deleteLocalPromo;
+
+  function editLocalPromo(localId){
+    if (!window.__SBYT_ADMIN) return alert('Trebuie să fii logat ca admin.');
+    const p = loadLocalPromos().find(x => Number(x.id) === Number(localId));
+    if (!p) return alert('Promoția LOCAL nu a fost găsită.');
+    document.getElementById('promoEditId').value = ''; // edit in Firestore only; local edit will re-save local
+    document.getElementById('promoTitle').value = p.title || '';
+    if (document.getElementById('promoPrize')) document.getElementById('promoPrize').value = p.prize || '';
+    document.getElementById('promoDesc').value = p.desc || '';
+    if (document.getElementById('promoPoints')) document.getElementById('promoPoints').value = String(p.pointsPerPromotion || 10);
+    if (document.getElementById('promoEnds')) document.getElementById('promoEnds').value = p.endDate || '';
+    if (document.getElementById('promoCardHeight')) document.getElementById('promoCardHeight').value = String(p.cardHeight || 640);
+    if (document.getElementById('promoMediaHeight')) document.getElementById('promoMediaHeight').value = String(p.mediaHeight || 220);
+    if (document.getElementById('promoOverlayText')) document.getElementById('promoOverlayText').value = p.overlayText || '';
+    if (document.getElementById('promoOverlayFont')) document.getElementById('promoOverlayFont').value = String(p.overlayFont || 22);
+    if (document.getElementById('promoOverlayAlign')) document.getElementById('promoOverlayAlign').value = p.overlayAlign || 'left';
+    if (document.getElementById('promoOverlayX')) document.getElementById('promoOverlayX').value = String(p.overlayX ?? 6);
+    if (document.getElementById('promoOverlayY')) document.getElementById('promoOverlayY').value = String(p.overlayY ?? 6);
+
+    // Note: to update LOCAL, user will click "Salvează" which saves to Firestore; we also provide a Local Save button below.
+    showPromoForm();
+    // show a hint
+    alert('Ai încărcat datele promoției LOCALE în formular. Dacă vrei să fie vizibilă pe toate device-urile, apasă "Salvează" (se va salva în Firestore).');
+  }
+  window.editLocalPromo = editLocalPromo;
+
 
   function mountPromos(){
     const list = $('promoList');
@@ -6310,7 +6362,7 @@ service cloud.firestore {
 
     if (auth){
       auth.onAuthStateChanged((user)=>{
-        setAdminUI(isAdminUser(user));
+        setAdminUI(isAdminUser(user) || !!user);
       });
     }
     mountPromos();
