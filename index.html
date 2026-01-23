@@ -1171,14 +1171,15 @@
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
 
-        /* === Promo Card Standard Settings === */
+        /* === PROMO CARD STANDARD LAYOUT (added) === */
         :root{
-            --promo-card-height: 560px;
-            --promo-card-minw: 320px;
-            --promo-overlay-opacity: 0.55;
+            --promo-card-height: 640px;
+            --promo-media-height: 220px;
         }
         #promoList{
-            grid-template-columns: repeat(auto-fit, minmax(var(--promo-card-minw), 1fr)) !important;
+            display:grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+            gap:1.5rem !important;
         }
         .promo-card{
             height: var(--promo-card-height);
@@ -1187,121 +1188,53 @@
             position:relative;
             overflow:hidden;
         }
-        .promo-card .promo-content{
+        .promo-media{
+            height: var(--promo-media-height);
+            flex:0 0 auto;
             position:relative;
-            z-index:2;
-            height:100%;
-            display:flex;
-            flex-direction:column;
+            border-radius:18px;
+            overflow:hidden;
+            background-size: cover;
+            background-position:center;
+            background-repeat:no-repeat;
         }
-        .promo-card.has-bg{
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-        }
-        .promo-card.has-bg::before{
+        .promo-media::before{
             content:"";
             position:absolute;
             inset:0;
-            z-index:1;
-            background: linear-gradient(180deg,
-              rgba(0,0,0,var(--promo-overlay-opacity)) 0%,
-              rgba(0,0,0,0.18) 45%,
-              rgba(0,0,0,0.78) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.18) 45%, rgba(0,0,0,.70) 100%);
         }
+        .promo-media > *{ position:relative; z-index:1; }
+        .promo-content{
+            flex:1 1 auto;
+            overflow:auto;
+            margin-top:12px;
+            padding-right:6px;
+        }
+        .promo-content::-webkit-scrollbar{ width: 8px; }
+        .promo-content::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.18); border-radius: 999px; }
         .promo-overlay-text{
             position:absolute;
-            z-index:3;
-            padding:10px 12px;
-            border-radius:14px;
-            border:1px solid rgba(255,255,255,0.14);
+            max-width: calc(100% - 24px);
+            left: 12px;
+            top: 12px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.14);
             background: rgba(0,0,0,0.35);
             backdrop-filter: blur(6px);
-            max-width: calc(100% - 24px);
-            word-break: break-word;
+            color:#fff;
+            font-weight:800;
+            line-height:1.25;
             text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+            pointer-events:none;
+            white-space:pre-wrap;
         }
-        .promo-lb{
-            margin-top:auto;
-            padding-top:10px;
-            border-top:1px solid rgba(255,255,255,0.10);
+        .promo-leaderboard{
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.12);
         }
-        .promo-lb .lb-mini{
-            width:100%;
-            border-collapse: collapse;
-            font-size:0.92rem;
-        }
-        .promo-lb .lb-mini th,
-        .promo-lb .lb-mini td{
-            padding:8px 10px;
-            border-bottom:1px solid rgba(255,255,255,0.08);
-        }
-        .promo-lb .lb-mini th{ opacity:0.85; text-align:left; }
-        .promo-lb .lb-mini tr:nth-child(1){ background: rgba(255,215,0,0.14); font-weight:800; }
-        .promo-lb .lb-mini tr:nth-child(2){ background: rgba(192,192,192,0.10); font-weight:800; }
-        .promo-lb .lb-mini tr:nth-child(3){ background: rgba(205,127,50,0.10); font-weight:800; }
-
-    
-/* === STANDARD CARD LAYOUT FIX (media header + content) === */
-:root{
-  --promo-card-height: 640px;
-  --promo-card-minw: 320px;
-  --promo-media-height: 220px;
-}
-.promo-grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--promo-card-minw), 1fr));
-  gap: 16px;
-}
-.promo-card{
-  height: var(--promo-card-height);
-  display:flex;
-  flex-direction:column;
-  position:relative;
-  overflow:hidden;
-}
-.promo-media{
-  height: var(--promo-media-height);
-  flex: 0 0 auto;
-  position:relative;
-  background-size: cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  border-radius: 18px;
-  overflow:hidden;
-}
-.promo-media::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.15) 45%, rgba(0,0,0,.65) 100%);
-  z-index:0;
-}
-.promo-media > *{ position:relative; z-index:1; }
-.promo-overlay{
-  position:absolute;
-  left:12px; right:12px;
-  pointer-events:none;
-}
-.promo-overlay.text{
-  pointer-events:none;
-}
-.promo-content{
-  flex: 1 1 auto;
-  margin-top: 12px;
-  overflow:auto;
-  padding-right: 6px;
-}
-.promo-content::-webkit-scrollbar{ width: 8px; }
-.promo-content::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.18); border-radius: 999px; }
-.promo-actions, .promo-join, .promo-leaderboard{
-  margin-top: 12px;
-}
-.promo-leaderboard{
-  margin-top:auto;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,.12);
-}
 
 </style>
 <!-- Firebase (compat) -->
@@ -1396,18 +1329,11 @@
         <textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
     </div>
 
+    
+    <input type="hidden" id="promoEditId" value="">
     <div class="form-row">
-        <input type="file" id="promoMedia" accept="image/*,video/*">
-    </div>
-
-    <div class="form-row" style="margin-top:0.5rem;">
-        <input type="number" id="cardHeightInput" min="360" step="10" value="560" placeholder="Înălțime card (px)">
-        <input type="number" id="cardMinWInput" min="260" step="10" value="320" placeholder="Lățime minimă card (px)">
-    </div>
-
-    <div class="form-row">
-        <input type="number" id="imgResizeW" min="400" step="50" value="1200" placeholder="Resize imagine W (px)">
-        <input type="number" id="imgResizeH" min="300" step="50" value="675" placeholder="Resize imagine H (px)">
+        <input type="number" id="promoCardHeight" min="420" step="10" value="640" placeholder="Înălțime cartelă (px)">
+        <input type="number" id="promoMediaHeight" min="140" step="10" value="220" placeholder="Înălțime imagine (px)">
     </div>
 
     <div class="form-row">
@@ -1415,30 +1341,23 @@
     </div>
 
     <div class="form-row">
-        <input type="number" id="promoOverlayFont" min="10" step="1" value="26" placeholder="Mărime font (px)">
-        <select id="promoOverlayAlign">
-            <option value="center" selected>Aliniere: centru</option>
-            <option value="left">Aliniere: stânga</option>
-            <option value="right">Aliniere: dreapta</option>
+        <input type="number" id="promoOverlayFont" min="10" max="64" step="1" value="22" placeholder="Mărime font (px)">
+        <select id="promoOverlayPos">
+            <option value="top-left">Sus stânga</option>
+            <option value="top-center">Sus centru</option>
+            <option value="top-right">Sus dreapta</option>
+            <option value="middle-left">Mijloc stânga</option>
+            <option value="middle-center">Mijloc centru</option>
+            <option value="middle-right">Mijloc dreapta</option>
+            <option value="bottom-left">Jos stânga</option>
+            <option value="bottom-center">Jos centru</option>
+            <option value="bottom-right">Jos dreapta</option>
         </select>
     </div>
 
     <div class="form-row">
-        <div style="flex:1; min-width:240px;">
-            <div style="font-size:12px; opacity:.85; margin-bottom:6px;">Poziție X (%)</div>
-            <input type="range" id="promoOverlayX" min="0" max="100" value="50" style="width:100%;">
-        </div>
-        <div style="flex:1; min-width:240px;">
-            <div style="font-size:12px; opacity:.85; margin-bottom:6px;">Poziție Y (%)</div>
-            <input type="range" id="promoOverlayY" min="0" max="100" value="18" style="width:100%;">
-        </div>
+        <input type="file" id="promoMedia" accept="image/*,video/*">
     </div>
-
-    <div class="form-row">
-        <input type="number" id="promoOverlayOpacity" min="0" max="1" step="0.05" value="0.55" placeholder="Opacitate overlay (0-1)">
-        <button class="news-btn" type="button" onclick="applyCardSettings()" style="max-width:220px;">✅ Aplică setări card</button>
-    </div>
-
 
     <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
         <button class="news-btn" onclick="savePromo()">💾 Salveaza</button>
@@ -1454,7 +1373,7 @@
         <div class="data-visualization neon-glow">
             <h3>🏆 Clasament participanți</h3>
             
-            <div id="leaderboard" style="margin-top:1rem; display:none;"></div>
+            <div id="leaderboard" style="margin-top:1rem;"></div>
         </div>
     </section>
 
@@ -1788,7 +1707,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
             if ($('promoDesc')) $('promoDesc').value = '';
         }
 
-        function savePromo() {
+        async function savePromo() {
             if (!verifyPassword()) return;
 
             const title = ($('promoTitle')?.value || '').trim();
@@ -1893,8 +1812,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
                 const expired = new Date() > end;
 
                 const card = document.createElement('div');
-                card.className = 'news-card promo-card' + ((!isVideo && p.media?.url) ? ' has-bg' : '');
-    if (!isVideo && p.media?.url){ card.style.backgroundImage = `url('${p.media.url}')`; }
+                card.className = 'news-card';
                 card.innerHTML = `
                     <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${expired ? 'Expirat' : 'Activ'}</div>
                     <h4 style="margin-bottom:0.5rem; color:white;">${escapeHtml(p.title)}</h4>
@@ -1922,22 +1840,7 @@ async function etherscanProxyRequest(module, action, params = {}) {
                     </div>
                 `;
                 list.appendChild(card);
-            
-    // add delete button (admin only) if missing
-    try{
-      const actions = card.querySelector('.promo-actions') || card.querySelector('.admin-actions') || null;
-      if (actions && !actions.querySelector('[data-action="delete-promo"]')){
-        const b = document.createElement('button');
-        b.className = 'news-btn admin-only';
-        b.dataset.adminDisplay = 'inline-flex';
-        b.dataset.action = 'delete-promo';
-        b.textContent = '🗑️ Șterge';
-        b.onclick = () => deletePromo(p.id || p._id || promoId);
-        actions.appendChild(b);
-      }
-    }catch(e){}
-
-});
+            });
         }
 
         function renderLeaderboard() {
@@ -2764,7 +2667,7 @@ async function showPromoForm() {
 async function cancelPromo() {
   const f = document.getElementById('promoForm');
   if (f) f.style.display = 'none';
-  ['promoTitle','promoPrize','promoDesc','promoEnds','promoPoints'].forEach(id => {
+  ['promoTitle','promoPrize','promoDesc','promoEnds','promoPoints','promoOverlayText','promoOverlayFont','promoOverlayPos','promoCardHeight','promoMediaHeight','promoEditId'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -2777,21 +2680,12 @@ async function uploadPromoMedia(promoId, file) {
   const safeName = String(file.name || 'file').replace(/[^\w.\-]+/g, '_');
   const path = `news/promos/${promoId}/${Date.now()}_${safeName}`;
   const ref = storage.ref().child(path);
-  // resize images to standard size (optional)
-  try{
-    const settings = loadCardSettings() || {};
-    const rw = Math.max(400, parseInt(settings.resizeW || document.getElementById("imgResizeW")?.value || "1200", 10));
-    const rh = Math.max(300, parseInt(settings.resizeH || document.getElementById("imgResizeH")?.value || "675", 10));
-    if ((file.type||"").startsWith("image/")){
-      file = await _resizeImageFile(file, rw, rh, 0.9);
-    }
-  }catch(e){}
   await ref.put(file);
   const url = await ref.getDownloadURL();
   return { url, path, contentType: file.type || 'application/octet-stream', name: safeName };
 }
 
-async function savePromo() {
+async async function savePromo() {
   const ok = await ensureAdminAuth();
   if (!ok) return;
 
@@ -2801,12 +2695,13 @@ async function savePromo() {
   const ends = (document.getElementById('promoEnds')?.value || '').trim(); // datetime-local
   const points = parseInt(document.getElementById('promoPoints')?.value || '10', 10) || 10;
   const file = document.getElementById('promoMedia')?.files?.[0] || null;
-  const oText = (document.getElementById('promoOverlayText')?.value || '').trim();
-  const oFont = Math.max(10, parseInt(document.getElementById('promoOverlayFont')?.value || '26', 10));
-  const oX = Math.min(100, Math.max(0, parseInt(document.getElementById('promoOverlayX')?.value || '50', 10)));
-  const oY = Math.min(100, Math.max(0, parseInt(document.getElementById('promoOverlayY')?.value || '18', 10)));
-  const oAlign = (document.getElementById('promoOverlayAlign')?.value || 'center');
-  try{ applyCardSettings(false); }catch(e){}
+
+  const editId = (document.getElementById('promoEditId')?.value || '').trim();
+  const cardH = parseInt(document.getElementById('promoCardHeight')?.value || '640', 10) || 640;
+  const mediaH = parseInt(document.getElementById('promoMediaHeight')?.value || '220', 10) || 220;
+  const overlayText = (document.getElementById('promoOverlayText')?.value || '').trim();
+  const overlayFont = parseInt(document.getElementById('promoOverlayFont')?.value || '22', 10) || 22;
+  const overlayPos = (document.getElementById('promoOverlayPos')?.value || 'top-left');
 
   if (!title || !ends || !desc) {
     alert('Completeaza titlul, data de final si descrierea.');
@@ -2820,17 +2715,39 @@ async function savePromo() {
   }
 
   try {
-    const ref = await db.collection('promos').add({
-      title,
+    let ref;
+    if (editId) {
+      ref = db.collection('promos').doc(editId);
+      await ref.set({
+        title,
       prize: prize || null,
       desc,
       endsAt,
       pointsPerPromotion: points,
       createdAt: Date.now(),
       status: 'active',
-      overlay: oText ? { text:oText, fontSize:oFont, x:oX, y:oY, align:oAlign } : null,
-      media: null
-    });
+      cardHeight: cardH,
+      mediaHeight: mediaH,
+      overlayText: overlayText || null,
+      overlayFont: overlayFont,
+      overlayPos: overlayPos,
+      overlayStyle: _overlayStyleFrom(overlayPos, overlayFont),
+      media: (editId ? undefined : null)
+    
+      }, { merge: true });
+    } else {
+      ref = await db.collection('promos').add({
+        title,
+      prize: prize || null,
+      desc,
+      endsAt,
+      pointsPerPromotion: points,
+      createdAt: Date.now(),
+      status: 'active',
+      media: (editId ? undefined : null)
+    
+      });
+    }
 
     if (file) {
       const media = await uploadPromoMedia(ref.id, file);
@@ -2886,24 +2803,18 @@ function renderPromos(promos) {
     const expired = p.endsAt && p.endsAt <= now;
     const badge = expired ? 'Expirat' : 'Activ';
 
-    const isVideo = !!(p.media?.url && String(p.media.contentType||'').startsWith('video/'));
-
-    const mediaHtml = isVideo
-      ? `<video controls style="width:100%; border-radius:12px; margin-top:10px;">
-           <source src="${p.media.url}" type="${p.media.contentType}">
-         </video>`
+    const mediaHtml = p.media?.url
+      ? (String(p.media.contentType||'').startsWith('video/')
+          ? `<video controls style="width:100%; border-radius:12px; margin-top:10px;">
+               <source src="${p.media.url}" type="${p.media.contentType}">
+             </video>`
+          : `<img src="${p.media.url}" alt="" style="width:100%; border-radius:12px; margin-top:10px;">`)
       : '';
 
     const card = document.createElement('div');
-    card.card.className = 'news-card promo-card' + (isImageBg ? ' has-bg' : '');
-    const ov = p.overlay || null;
-    const ovHtml = (ov && ov.text) ? `
-      <div class="promo-overlay-text" style="left:${(ov.x ?? 50)}%; top:${(ov.y ?? 18)}%; transform:translate(-50%,-50%); font-size:${(ov.fontSize ?? 26)}px; text-align:${(ov.align || 'center')};">${_escapeHtml(ov.text)}</div>` : '';
-
+    card.className = 'news-card';
     card.innerHTML = `
-      <div class="promo-content">
       <div class="news-badge ${expired ? 'badge-announcement' : 'badge-event'}">${badge}</div>
-      ${ovHtml}
       <h4 style="margin-bottom:0.5rem; color:white;">${_escapeHtml(p.title||'')}</h4>
       ${p.prize ? `<p style="opacity:0.9;"><strong>Premiu:</strong> ${_escapeHtml(p.prize)}</p>` : ''}
       <p style="opacity:0.9; line-height:1.5;">${_escapeHtml(p.desc||'')}</p>
@@ -2914,15 +2825,9 @@ function renderPromos(promos) {
         <button class="news-btn" onclick="openPromo('${p._id}')">🎯 Detalii / Inscriere</button>
         <button class="news-btn" onclick="deletePromo('${p._id}')">🗑️ Sterge</button>
       </div>
-      <div class="promo-lb" id="lb_${_escapeHtml(p._id)}"><div style="opacity:0.75;">🏆 Clasament: se încarcă…</div></div>
-      </div>
     `;
     promoList.appendChild(card);
   });
-
-  // atașează clasamentul în fiecare cartelă
-  try{ renderLeaderboardsIntoCards(promos); }catch(e){}
-
 }
 
 function openPromo(promoId) {
@@ -3406,7 +3311,7 @@ window.addEventListener('load', () => {
       const avatar = m.avatar ? `<img src="${_escape(m.avatar)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">`
                               : `<div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);font-size:1.6rem;">👤</div>`;
       const card = document.createElement('div');
-      card.card.className = 'news-card promo-card' + (isImageBg ? ' has-bg' : '');
+      card.className = 'news-card';
       card.style.margin = '0';
       card.innerHTML = `
         <div style="display:flex; gap:12px; align-items:center;">
@@ -3554,7 +3459,7 @@ window.addEventListener('load', () => {
       const badge = expired ? 'Expirat' : (p.kind==='giveaway' ? 'Giveaway' : 'Promoție');
 
       const card = document.createElement('div');
-      card.card.className = 'news-card promo-card' + (isImageBg ? ' has-bg' : '');
+      card.className = 'news-card promo-card';
       card.style.margin = '0';
 
       const endsStr = p.endsAt ? new Date(p.endsAt).toLocaleString('ro-RO') : '-';
@@ -3569,46 +3474,75 @@ window.addEventListener('load', () => {
                      <div style="font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${_escape(x.name||'')}</div>
                      <div style="opacity:0.8; font-size:0.85rem;">${_escape(x.email||'')} • ${_escape(x.wallet||'')}</div>
                    </div>
-                   <div style="opacity:0.85; font-size:0.85rem;">ID: <strong>${_escape(x.code||'')}</strong></div>
+                   <div style="opacity:0.85; font-size:0.85rem;">ID: <strong>${_escape((x.code||'').slice(0,2))}••••</strong></div>
                  </div>`).join('')}
              </div>
            </div>`
         : `<div style="margin-top:10px; opacity:0.8;">Niciun participant încă.</div>`;
 
       card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-          <div style="font-weight:800; color:#fff;">${_escape(p.title||'')}</div>
-          <div style="padding:6px 10px; border-radius:999px; background:rgba(0,255,136,0.12); border:1px solid rgba(0,255,136,0.25); font-size:0.85rem;">${badge}</div>
+        <div class="promo-media" style="${p.media && p.media.url && String(p.media.contentType||'').startsWith('image/') ? `background-image:url('${p.media.url}')` : ''}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px; padding:12px;">
+            <div style="font-weight:900; color:#fff; font-size:1.05rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${_escape(p.title||'')}</div>
+            <div style="padding:6px 10px; border-radius:999px; background:rgba(0,255,136,0.12); border:1px solid rgba(0,255,136,0.25); font-size:0.85rem;">${badge}</div>
+          </div>
+          ${p.overlayText ? `<div class="promo-overlay-text" style="${_escape(p.overlayStyle || _overlayStyleFrom(p.overlayPos||'top-left', p.overlayFont||22))}">${_escape(p.overlayText)}</div>` : ``}
         </div>
-        <div style="opacity:0.85; margin-top:6px;">⏳ Expiră: <strong>${_escape(endsStr)}</strong></div>
-        ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${_escape(p.prize)}</strong></div>`:''}
-        <div style="opacity:0.92; margin-top:10px; line-height:1.5;">${_escape(p.desc||'')}</div>
+        <div class="promo-content">
+          <div style="opacity:0.85;">⏳ Expiră: <strong>${_escape(endsStr)}</strong></div>
+          ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${_escape(p.prize)}</strong></div>`:''}
+          <div style="opacity:0.92; margin-top:10px; line-height:1.5;">${_escape(p.desc||'')}</div>
 
-        <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
-          <div style="font-weight:700; margin-bottom:8px;">Înscriere</div>
-          <div class="form-row">
-            <input type="text" id="joinName_${_escape(p._id)}" placeholder="Nume" maxlength="80">
-            <input type="email" id="joinEmail_${_escape(p._id)}" placeholder="Email" maxlength="120">
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
+            <div style="font-weight:800; margin-bottom:8px;">Înscriere</div>
+            <div class="form-row">
+              <input type="text" id="joinName_${_escape(p._id)}" placeholder="Nume" maxlength="80">
+              <input type="email" id="joinEmail_${_escape(p._id)}" placeholder="Email" maxlength="120">
+            </div>
+            <div class="form-row">
+              <input type="text" id="joinWallet_${_escape(p._id)}" placeholder="Wallet (0x...)" maxlength="64">
+              <button class="news-btn" onclick="joinPromo('${_escape(p._id)}')" ${expired?'disabled':''} style="min-width:160px;">✅ Înscrie-te</button>
+            </div>
+            <div style="opacity:0.75; font-size:0.85rem; margin-top:6px;">După înscriere primești un cod (ID) și se deschide emailul de confirmare.</div>
+            <div class="promo-actions" style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
+              <button class="news-btn" onclick="editPromo('${_escape(p._id)}')">✏️ Editează</button>
+              <button class="news-btn" onclick="deletePromo('${_escape(p._id)}')">🗑️ Șterge</button>
+            </div>
           </div>
-          <div class="form-row">
-            <input type="text" id="joinWallet_${_escape(p._id)}" placeholder="Wallet (0x...)" maxlength="64">
-            <button class="news-btn" onclick="joinPromo('${_escape(p._id)}')" ${expired?'disabled':''} style="min-width:160px;">✅ Înscrie-te</button>
+
+          <div class="promo-leaderboard" id="lb_${_escape(p._id)}">
+            ${participantsHtml}
           </div>
-          <div style="opacity:0.75; font-size:0.85rem; margin-top:6px;">
-            După înscriere primești un cod (ID) și se deschide emailul de confirmare.
-          </div>
-          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
-            <button class="news-btn" onclick="deletePromo('${_escape(p._id)}')">🗑️ Șterge</button>
-          </div>
-          ${participantsHtml}
         </div>
       `;
+      // apply per-promo sizing if present
+      if (p.cardHeight) card.style.height = String(p.cardHeight) + 'px';
+      const mediaEl = card.querySelector('.promo-media');
+      if (mediaEl && p.mediaHeight) mediaEl.style.height = String(p.mediaHeight) + 'px';
       list.appendChild(card);
     }
   }
   window.renderPromos = renderPromos;
 
-  window.deletePromo = async function(promoId){
+  
+function _overlayStyleFrom(pos, fontPx){
+  const f = Math.max(10, parseInt(fontPx||'22',10) || 22);
+  const base = `font-size:${f}px;`;
+  const map = {
+    'top-left':    'top:12px; left:12px; right:auto; transform:none; text-align:left;',
+    'top-center':  'top:12px; left:50%; transform:translateX(-50%); text-align:center;',
+    'top-right':   'top:12px; right:12px; left:auto; transform:none; text-align:right;',
+    'middle-left': 'top:50%; left:12px; transform:translateY(-50%); text-align:left;',
+    'middle-center':'top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;',
+    'middle-right':'top:50%; right:12px; left:auto; transform:translateY(-50%); text-align:right;',
+    'bottom-left': 'bottom:12px; left:12px; top:auto; transform:none; text-align:left;',
+    'bottom-center':'bottom:12px; left:50%; top:auto; transform:translateX(-50%); text-align:center;',
+    'bottom-right':'bottom:12px; right:12px; left:auto; top:auto; transform:none; text-align:right;'
+  };
+  return base + (map[pos] || map['top-left']);
+}
+
+window.deletePromo = async function(promoId){
     const ok = await _ensureAdmin();
     if (!ok) return;
     if (!db) return;
@@ -3626,7 +3560,50 @@ window.addEventListener('load', () => {
     }
   };
 
-  async function listenPromos(){
+  
+
+window.editPromo = async function(promoId){
+  const ok = await _ensureAdmin();
+  if (!ok) return;
+  if (!db) return;
+
+  try{
+    const doc = await db.collection('promos').doc(promoId).get();
+    if (!doc.exists) { alert('Promoția nu mai există.'); return; }
+    const p = doc.data() || {};
+    document.getElementById('promoEditId').value = promoId;
+    document.getElementById('promoTitle').value = p.title || '';
+    document.getElementById('promoPrize').value = p.prize || '';
+    document.getElementById('promoDesc').value = p.desc || '';
+    document.getElementById('promoPoints').value = String(p.pointsPerPromotion || 10);
+    if (p.endsAt) {
+      const d = new Date(p.endsAt);
+      const pad = n => String(n).padStart(2,'0');
+      const val = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      document.getElementById('promoEnds').value = val;
+    } else {
+      document.getElementById('promoEnds').value = '';
+    }
+    document.getElementById('promoCardHeight').value = String(p.cardHeight || 640);
+    document.getElementById('promoMediaHeight').value = String(p.mediaHeight || 220);
+    document.getElementById('promoOverlayText').value = p.overlayText || '';
+    document.getElementById('promoOverlayFont').value = String(p.overlayFont || 22);
+    document.getElementById('promoOverlayPos').value = p.overlayPos || 'top-left';
+
+    // apply display vars immediately
+    document.documentElement.style.setProperty('--promo-card-height', (p.cardHeight || 640) + 'px');
+    document.documentElement.style.setProperty('--promo-media-height', (p.mediaHeight || 220) + 'px');
+
+    const form = document.getElementById('promoForm');
+    if (form) form.style.display = 'block';
+    form?.scrollIntoView({behavior:'smooth', block:'start'});
+  }catch(e){
+    console.error('editPromo:', e);
+    alert('Eroare la editare.');
+  }
+};
+
+async function listenPromos(){
     if (!db) return;
     if (__promosUnsub) { try{__promosUnsub();}catch(e){} __promosUnsub=null; }
     __promosUnsub = db.collection('promos').orderBy('createdAt','desc').onSnapshot(async snap=>{
@@ -3981,7 +3958,7 @@ window.addEventListener('load', () => {
         </div>`;
 
       const card = document.createElement('div');
-      card.card.className = 'news-card promo-card' + (isImageBg ? ' has-bg' : '');
+      card.className = 'news-card neon-glow';
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
           <div>
@@ -4154,7 +4131,7 @@ window.addEventListener('load', () => {
     list.innerHTML = '';
     team.forEach(m=>{
       const card = document.createElement('div');
-      card.card.className = 'news-card promo-card' + (isImageBg ? ' has-bg' : '');
+      card.className = 'news-card neon-glow';
       card.innerHTML = `
         <div style="display:flex; gap:14px; align-items:flex-start;">
           <div style="width:64px; height:64px; border-radius:14px; overflow:hidden; background:rgba(255,255,255,.05); flex:0 0 auto;">
@@ -5896,137 +5873,6 @@ service cloud.firestore {
   });
 
 })();
-</script>
-
-
-<script>
-// === Card settings (UI) ===
-const SBYT_CARD_SETTINGS_KEY = 'sbyt_promo_card_settings_v1';
-
-function loadCardSettings(){
-  try{
-    const raw = localStorage.getItem(SBYT_CARD_SETTINGS_KEY);
-    if(!raw) return null;
-    return JSON.parse(raw);
-  }catch(e){ return null; }
-}
-
-function applyCardSettings(save=true){
-  const h = Math.max(360, parseInt(document.getElementById('cardHeightInput')?.value || '560', 10));
-  const w = Math.max(260, parseInt(document.getElementById('cardMinWInput')?.value || '320', 10));
-  const ov = Math.min(1, Math.max(0, parseFloat(document.getElementById('promoOverlayOpacity')?.value || '0.55')));
-  document.documentElement.style.setProperty('--promo-card-height', h + 'px');
-  document.documentElement.style.setProperty('--promo-card-minw', w + 'px');
-  document.documentElement.style.setProperty('--promo-overlay-opacity', String(ov));
-  const settings = {
-    cardHeight: h, cardMinW: w, overlayOpacity: ov,
-    resizeW: Math.max(400, parseInt(document.getElementById('imgResizeW')?.value || '1200', 10)),
-    resizeH: Math.max(300, parseInt(document.getElementById('imgResizeH')?.value || '675', 10))
-  };
-  if(save){
-    try{ localStorage.setItem(SBYT_CARD_SETTINGS_KEY, JSON.stringify(settings)); }catch(e){}
-  }
-  return settings;
-}
-
-(function initCardSettings(){
-  const s = loadCardSettings();
-  if(!s) return;
-  try{
-    if(document.getElementById('cardHeightInput')) document.getElementById('cardHeightInput').value = s.cardHeight || 560;
-    if(document.getElementById('cardMinWInput')) document.getElementById('cardMinWInput').value = s.cardMinW || 320;
-    if(document.getElementById('promoOverlayOpacity')) document.getElementById('promoOverlayOpacity').value = (typeof s.overlayOpacity === 'number' ? s.overlayOpacity : 0.55);
-    if(document.getElementById('imgResizeW')) document.getElementById('imgResizeW').value = s.resizeW || 1200;
-    if(document.getElementById('imgResizeH')) document.getElementById('imgResizeH').value = s.resizeH || 675;
-    document.documentElement.style.setProperty('--promo-card-height', (s.cardHeight || 560) + 'px');
-    document.documentElement.style.setProperty('--promo-card-minw', (s.cardMinW || 320) + 'px');
-    document.documentElement.style.setProperty('--promo-overlay-opacity', String(typeof s.overlayOpacity==='number' ? s.overlayOpacity : 0.55));
-  }catch(e){}
-})();
-
-// === Image resize (client-side) ===
-async function _resizeImageFile(file, targetW, targetH, quality=0.9){
-  try{
-    const bmp = await createImageBitmap(file);
-    const canvas = document.createElement('canvas');
-    canvas.width = targetW;
-    canvas.height = targetH;
-    const ctx = canvas.getContext('2d');
-    const srcW = bmp.width, srcH = bmp.height;
-    const srcAR = srcW / srcH;
-    const dstAR = targetW / targetH;
-    let sx=0, sy=0, sw=srcW, sh=srcH;
-    if (srcAR > dstAR){
-      sw = Math.round(srcH * dstAR);
-      sx = Math.round((srcW - sw)/2);
-    } else {
-      sh = Math.round(srcW / dstAR);
-      sy = Math.round((srcH - sh)/2);
-    }
-    ctx.drawImage(bmp, sx, sy, sw, sh, 0, 0, targetW, targetH);
-    const mime = 'image/jpeg';
-    const blob = await new Promise(res => canvas.toBlob(res, mime, quality));
-    if(!blob) return file;
-    return new File([blob], (file.name||'image').replace(/\.\w+$/,'') + '.jpg', { type: mime });
-  }catch(e){
-    return file;
-  }
-}
-
-// === Leaderboard inside cards ===
-async function _loadParticipantsForPromoCard(promoId){
-  try{
-    const snap = await db.collection('promos').doc(String(promoId)).collection('participants').orderBy('createdAt','asc').get();
-    const arr=[]; snap.forEach(d=>arr.push({ id:d.id, ...(d.data()||{}) }));
-    return arr;
-  }catch(e){ return []; }
-}
-function _maskEmail(email){
-  const s = String(email||'');
-  const at = s.indexOf('@');
-  if(at<=1) return s ? (s[0] + '***') : '';
-  return s.slice(0,2) + '***' + s.slice(at);
-}
-function _maskCode(code){
-  const s = String(code||'');
-  if (s.length <= 2) return s;
-  return s.slice(0,2) + '••••';
-}
-async function renderLeaderboardsIntoCards(promos){
-  try{
-    const items = Array.isArray(promos) ? promos.slice() : [];
-    for (const p of items){
-      const pid = String(p._id || p.id || '');
-      if(!pid) continue;
-      const host = document.getElementById('lb_'+pid);
-      if(!host) continue;
-
-      const parts = await _loadParticipantsForPromoCard(pid);
-      const rank = (typeof buildRanking === 'function') ? buildRanking(parts) : parts;
-
-      const top = rank.slice(0, 10);
-      const rows = top.map((u,i)=>`
-        <tr>
-          <td>${i+1}</td>
-          <td>${_escapeHtml(u.name||'-')}</td>
-          <td>${_escapeHtml(_maskEmail(u.email||''))}</td>
-          <td>${_escapeHtml(_maskCode(u.code||''))}</td>
-          <td>${Number(u.points||0)}</td>
-        </tr>`).join('');
-
-      host.innerHTML = `
-        <div style="font-weight:800; margin-bottom:8px;">🏆 Clasament (Top 10)</div>
-        <div style="opacity:0.75; margin-bottom:10px;">Puncte = câte înscrieri au folosit codul tău ca referal.</div>
-        <div style="max-height:190px; overflow:auto;">
-          <table class="lb-mini">
-            <thead><tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Puncte</th></tr></thead>
-            <tbody>${rows || `<tr><td colspan="5" style="opacity:0.8;">Nu există participanți încă.</td></tr>`}</tbody>
-          </table>
-        </div>
-      `;
-    }
-  }catch(e){}
-}
 </script>
 
 </body>
