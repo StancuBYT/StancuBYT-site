@@ -1170,6 +1170,34 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+/* === PROMO CARDS (stats/visits storage) === */
+#promoList{
+  display:grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 16px !important;
+}
+.promo-card{ height: 640px; display:flex; flex-direction:column; overflow:hidden; }
+.promo-media{ height: 220px; position:relative; border-radius:18px; overflow:hidden; background-size:cover; background-position:center; }
+.promo-media::before{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.18) 45%, rgba(0,0,0,.72) 100%); }
+.promo-overlay-text{ position:absolute; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.35); backdrop-filter:blur(6px); color:#fff; font-weight:800; line-height:1.25; text-shadow:0 2px 14px rgba(0,0,0,.85); max-width:calc(100% - 24px); }
+.promo-content{ flex:1 1 auto; display:flex; flex-direction:column; overflow:hidden; padding: 0 12px 14px 12px; box-sizing:border-box; margin-top: 12px; }
+.promo-desc{ flex:1 1 auto; overflow:auto; padding-right:6px; }
+.promo-join .form-row{ display:flex; gap:10px; flex-wrap:wrap; }
+.promo-join .form-row input, .promo-join .form-row button{ flex:1 1 180px; min-width:0; }
+.promo-join .form-row button{ flex:0 0 auto; }
+.promo-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap; }
+.promo-leaderboard{ margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12); max-height: 170px; overflow:auto; }
+.admin-only{ display:none; }
+body.is-admin .admin-only{ display:inline-flex !important; }
+
+@media (max-width:520px){
+  .promo-card{ height:auto !important; }
+  .promo-media{ height:190px !important; }
+  .promo-leaderboard{ max-height:none; }
+  .promo-join .form-row button{ width:100%; }
+}
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1198,6 +1226,11 @@
 </head>
 
 <body>
+
+<div style="display:flex; justify-content:flex-end; margin:10px 0 18px;">
+  <button id="promoAddBtn" class="news-btn admin-only" data-admin-display="inline-flex">➕ Adaugă promoție/concurs</button>
+</div>
+
     <div id="particles-js"></div>
 
     <div class="visit-counter" id="visitCounter">
@@ -1261,6 +1294,32 @@
 
     <div class="form-row">
         <textarea id="promoDesc" placeholder="Descriere (reguli, pasi, detalii, conditii)" rows="4" style="width:100%;"></textarea>
+
+<div class="form-row">
+  <input type="hidden" id="promoEditId" value="">
+  <input type="number" id="promoCardHeight" min="420" step="10" value="640" placeholder="Înălțime cartelă (px)">
+  <input type="number" id="promoMediaHeight" min="140" step="10" value="220" placeholder="Înălțime zonă imagine (px)">
+</div>
+<div class="form-row">
+  <input type="number" id="promoImgW" min="400" step="50" value="1200" placeholder="Resize imagine lățime (px)">
+  <input type="number" id="promoImgH" min="200" step="50" value="600" placeholder="Resize imagine înălțime (px)">
+</div>
+<div class="form-row">
+  <textarea id="promoOverlayText" placeholder="Text peste imagine (opțional)" rows="2" style="width:100%;"></textarea>
+</div>
+<div class="form-row">
+  <input type="number" id="promoOverlayFont" min="10" max="72" step="1" value="22" placeholder="Mărime font (px)">
+  <select id="promoOverlayAlign">
+    <option value="left">Aliniere stânga</option>
+    <option value="center">Aliniere centru</option>
+    <option value="right">Aliniere dreapta</option>
+  </select>
+</div>
+<div class="form-row">
+  <input type="number" id="promoOverlayX" min="0" max="100" step="1" value="6" placeholder="Poziție X (%)">
+  <input type="number" id="promoOverlayY" min="0" max="100" step="1" value="6" placeholder="Poziție Y (%)">
+</div>
+
     </div>
 
     <div class="form-row">
@@ -1268,8 +1327,8 @@
     </div>
 
     <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
-        <button class="news-btn" onclick="savePromo()">💾 Salveaza</button>
-        <button class="news-btn" onclick="cancelPromo()">❌ Anuleaza</button>
+        <button class="news-btn" onclick="promoSavePromo()">💾 Salveaza</button>
+        <button class="news-btn" onclick="promoCancelPromo()">❌ Anuleaza</button>
     </div>
 
     <small style="display:block; margin-top:0.8rem; opacity:0.75;">
@@ -5678,6 +5737,424 @@ service cloud.firestore {
     }catch(e){}
   });
 
+})();
+</script>
+
+
+<script>
+/* ===========================
+   PROMO ENGINE (stats/visits)
+   Uses your existing Firestore rules:
+   - /stats/visits allow read/write true
+   - Storage uploads stay under /news/** (auth required)
+   =========================== */
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const esc = (s)=>String(s??'').replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const mask2 = (s)=>{ s=String(s||''); return (s.slice(0,2) || '') + '••••'; };
+
+  const auth = (typeof firebase!=='undefined' && firebase.auth) ? firebase.auth() : null;
+  const db = (typeof firebase!=='undefined' && firebase.firestore) ? firebase.firestore() : null;
+  const storage = (typeof firebase!=='undefined' && firebase.storage) ? firebase.storage() : null;
+
+  const ADMIN_EMAILS = ["stancubyt@gmail.com"].map(x=>x.toLowerCase());
+
+  function setAdminUI(isAdmin){
+    window.__SBYT_ADMIN = !!isAdmin;
+    try{ document.body.classList.toggle('is-admin', !!isAdmin); }catch(e){}
+  }
+  window.setAdminUI = setAdminUI;
+
+  function isAdminUser(user){
+    return !!(user && user.email && ADMIN_EMAILS.includes(String(user.email).toLowerCase()));
+  }
+
+  // ---- Image resize (cover crop) ----
+  async function resizeImageTo(file, targetW, targetH){
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    try{
+      await new Promise((res, rej)=>{ img.onload=res; img.onerror=rej; img.src=url; });
+      const canvas = document.createElement('canvas');
+      canvas.width = targetW; canvas.height = targetH;
+      const ctx = canvas.getContext('2d');
+
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.max(targetW/iw, targetH/ih);
+      const sw = Math.round(targetW/scale);
+      const sh = Math.round(targetH/scale);
+      const sx = Math.max(0, Math.round((iw - sw)/2));
+      const sy = Math.max(0, Math.round((ih - sh)/2));
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
+
+      const blob = await new Promise(res=>canvas.toBlob(res, 'image/jpeg', 0.86));
+      return new File([blob], (file.name||'promo').replace(/\.[^/.]+$/, '') + '.jpg', {type:'image/jpeg'});
+    } finally { URL.revokeObjectURL(url); }
+  }
+
+  async function uploadPromoMedia(promoId, file, imgW, imgH){
+    if (!storage) throw new Error('Storage unavailable');
+    const isVideo = String(file.type||'').startsWith('video/');
+    let upFile = file;
+    let contentType = file.type || (isVideo?'video/mp4':'image/jpeg');
+
+    if (!isVideo && String(file.type||'').startsWith('image/')){
+      const w = Math.max(400, parseInt(imgW||'1200',10)||1200);
+      const h = Math.max(200, parseInt(imgH||'600',10)||600);
+      upFile = await resizeImageTo(file, w, h);
+      contentType = upFile.type;
+    }
+    // storage rules allow only /news/** write when auth != null
+    const path = `news/promos/${promoId}/${Date.now()}_${upFile.name}`;
+    const ref = storage.ref().child(path);
+    await ref.put(upFile, { contentType });
+    const url = await ref.getDownloadURL();
+    return { url, contentType, path };
+  }
+
+  // ---- Firestore container doc ----
+  function visitsRef(){
+    return db.collection('stats').doc('visits');
+  }
+
+  function normalizeState(data){
+    const promos = Array.isArray(data?.promos) ? data.promos : [];
+    const participants = (data?.participants && typeof data.participants === 'object') ? data.participants : {};
+    return { promos, participants };
+  }
+
+  // ---- UI helpers ----
+  function promoShowPromoForm(){
+    if (!window.__SBYT_ADMIN) return alert('Doar admin poate adăuga/edita promoții.');
+    const f = $('promoForm');
+    if (f){ f.style.display='block'; try{ f.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){} }
+  }
+  window.promoShowPromoForm = promoShowPromoForm;
+
+  function promoCancelPromo(){
+    ['promoEditId','promoTitle','promoPrize','promoDesc','promoEnds','promoPoints','promoCardHeight','promoMediaHeight','promoImgW','promoImgH','promoOverlayText','promoOverlayFont','promoOverlayAlign','promoOverlayX','promoOverlayY'].forEach(id=>{
+      const el=$(id); if(!el) return;
+      if (el.tagName==='SELECT') el.selectedIndex=0;
+      else el.value='';
+    });
+    if ($('promoCardHeight')) $('promoCardHeight').value='640';
+    if ($('promoMediaHeight')) $('promoMediaHeight').value='220';
+    if ($('promoImgW')) $('promoImgW').value='1200';
+    if ($('promoImgH')) $('promoImgH').value='600';
+    if ($('promoOverlayFont')) $('promoOverlayFont').value='22';
+    if ($('promoOverlayX')) $('promoOverlayX').value='6';
+    if ($('promoOverlayY')) $('promoOverlayY').value='6';
+    const f = $('promoForm'); if (f) f.style.display='none';
+  }
+  window.promoCancelPromo = promoCancelPromo;
+
+  // ---- CRUD (promos stored inside stats/visits) ----
+  async function promoSavePromo(){
+    if (!window.__SBYT_ADMIN) return alert('Doar admin poate salva.');
+    if (!db) return alert('Firestore indisponibil.');
+
+    const editId = ($('promoEditId')?.value || '').trim();
+    const title = ($('promoTitle')?.value || '').trim();
+    const prize = ($('promoPrize')?.value || '').trim();
+    const desc  = ($('promoDesc')?.value || '').trim();
+    const ends  = ($('promoEnds')?.value || '').trim();
+    const points = parseInt($('promoPoints')?.value || '10',10) || 10;
+
+    const cardHeight = parseInt($('promoCardHeight')?.value || '640',10) || 640;
+    const mediaHeight = parseInt($('promoMediaHeight')?.value || '220',10) || 220;
+    const imgW = parseInt($('promoImgW')?.value || '1200',10) || 1200;
+    const imgH = parseInt($('promoImgH')?.value || '600',10) || 600;
+
+    const overlayText = ($('promoOverlayText')?.value || '').trim();
+    const overlayFont = parseInt($('promoOverlayFont')?.value || '22',10) || 22;
+    const overlayAlign = ($('promoOverlayAlign')?.value || 'left');
+    const overlayX = Math.min(100, Math.max(0, parseInt($('promoOverlayX')?.value || '6',10)||6));
+    const overlayY = Math.min(100, Math.max(0, parseInt($('promoOverlayY')?.value || '6',10)||6));
+
+    const file = $('promoMedia')?.files?.[0] || null;
+
+    const missing=[];
+    if (!title) missing.push('Titlu');
+    if (!desc) missing.push('Descriere');
+    if (!ends) missing.push('Data expirării');
+    if (missing.length){
+      alert('Completează: ' + missing.join(', '));
+      if (!title) $('promoTitle')?.focus();
+      else if (!desc) $('promoDesc')?.focus();
+      else $('promoEnds')?.focus();
+      return;
+    }
+    // accept ends as date-only (YYYY-MM-DD) and set 23:59
+    if (/^\d{4}-\d{2}-\d{2}$/.test(ends)) {
+      $('promoEnds').value = ends + 'T23:59';
+    }
+    const endsAt = new Date(ends).getTime();
+    if (!endsAt || endsAt <= Date.now()) return alert('Data expirării trebuie să fie în viitor.');
+
+    if (file && (!auth || !auth.currentUser)) return alert('Pentru upload media trebuie să fii autentificat în Firebase.');
+
+    const id = editId || ('p_' + Math.random().toString(36).slice(2,9) + '_' + Date.now().toString(36).slice(2,6));
+
+    try{
+      let media = null;
+      if (file){
+        media = await uploadPromoMedia(id, file, imgW, imgH);
+      }
+
+      await db.runTransaction(async (tx)=>{
+        const ref = visitsRef();
+        const snap = await tx.get(ref);
+        const state = normalizeState(snap.exists ? snap.data() : {});
+        const promos = state.promos.slice();
+
+        const promo = {
+          id,
+          title,
+          prize: prize || null,
+          desc,
+          endsAt,
+          pointsPerPromotion: points,
+          cardHeight,
+          mediaHeight,
+          overlayText: overlayText || null,
+          overlayFont,
+          overlayAlign,
+          overlayX,
+          overlayY,
+          updatedAt: Date.now()
+        };
+
+        const idx = promos.findIndex(x=>x && x.id===id);
+        if (idx >= 0){
+          promos[idx] = {...promos[idx], ...promo};
+          if (media) promos[idx].media = media;
+        } else {
+          promos.unshift({ ...promo, media: media || null, createdAt: Date.now(), status:'active' });
+        }
+        tx.set(ref, { promos }, { merge:true });
+      });
+
+      promoCancelPromo();
+      alert(editId ? 'Promoție actualizată!' : 'Promoție adăugată!');
+    }catch(e){
+      console.error('promoSavePromo:', e);
+      alert('Eroare la salvare.');
+    }
+  }
+  window.promoSavePromo = promoSavePromo;
+
+  async function promoDeletePromo(id){
+    if (!window.__SBYT_ADMIN) return alert('Doar admin poate șterge.');
+    if (!confirm('Ștergi această promoție?')) return;
+    try{
+      await db.runTransaction(async (tx)=>{
+        const ref = visitsRef();
+        const snap = await tx.get(ref);
+        const state = normalizeState(snap.exists ? snap.data() : {});
+        const promos = state.promos.filter(x=>x && x.id!==id);
+        const participants = {...state.participants};
+        delete participants[id];
+        tx.set(ref, { promos, participants }, { merge:true });
+      });
+      alert('Promoție ștearsă.');
+    }catch(e){
+      console.error('promoDeletePromo:', e);
+      alert('Eroare la ștergere.');
+    }
+  }
+  window.promoDeletePromo = promoDeletePromo;
+
+  async function promoEditPromo(id){
+    if (!window.__SBYT_ADMIN) return alert('Doar admin poate edita.');
+    // find promo from current cache
+    const p = (window.__PROMO_CACHE__||[]).find(x=>x && x.id===id);
+    if (!p) return alert('Promoția nu a fost găsită.');
+    $('promoEditId').value = id;
+    $('promoTitle').value = p.title || '';
+    if ($('promoPrize')) $('promoPrize').value = p.prize || '';
+    $('promoDesc').value = p.desc || '';
+    if ($('promoPoints')) $('promoPoints').value = String(p.pointsPerPromotion || 10);
+
+    const d = new Date(p.endsAt || Date.now());
+    const pad = n=>String(n).padStart(2,'0');
+    $('promoEnds').value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    $('promoCardHeight').value = String(p.cardHeight || 640);
+    $('promoMediaHeight').value = String(p.mediaHeight || 220);
+
+    $('promoOverlayText').value = p.overlayText || '';
+    $('promoOverlayFont').value = String(p.overlayFont || 22);
+    $('promoOverlayAlign').value = p.overlayAlign || 'left';
+    $('promoOverlayX').value = String(p.overlayX ?? 6);
+    $('promoOverlayY').value = String(p.overlayY ?? 6);
+
+    promoShowPromoForm();
+  }
+  window.promoEditPromo = promoEditPromo;
+
+  // ---- Participants ----
+  function genParticipantId(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let out='';
+    for(let i=0;i<8;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return out;
+  }
+
+  async function promoJoinPromo(promoId){
+    if (!db) return alert('Firestore indisponibil.');
+    const name = ($(`joinName_${promoId}`)?.value || '').trim();
+    const email = ($(`joinEmail_${promoId}`)?.value || '').trim().toLowerCase();
+    const wallet = ($(`joinWallet_${promoId}`)?.value || '').trim();
+    if (!name || !email) return alert('Completează nume și email.');
+
+    const key = email.replace(/[^\w.\-@]+/g,'_');
+
+    try{
+      await db.runTransaction(async (tx)=>{
+        const ref = visitsRef();
+        const snap = await tx.get(ref);
+        const state = normalizeState(snap.exists ? snap.data() : {});
+        const participants = {...state.participants};
+        const byPromo = (participants[promoId] && typeof participants[promoId]==='object') ? {...participants[promoId]} : {};
+        const existing = byPromo[key] || {};
+        const participantId = existing.participantId || genParticipantId();
+
+        byPromo[key] = {
+          participantId,
+          name,
+          email,
+          wallet: wallet || null,
+          joinedAt: existing.joinedAt || Date.now(),
+          promotions: existing.promotions || 0
+        };
+        participants[promoId] = byPromo;
+        tx.set(ref, { participants }, { merge:true });
+      });
+
+      alert('Înscriere reușită!');
+    }catch(e){
+      console.error('promoJoinPromo:', e);
+      alert('Eroare înscriere.');
+    }
+  }
+  window.promoJoinPromo = promoJoinPromo;
+
+  function renderLeaderboard(promoId, participants){
+    const obj = participants && participants[promoId] ? participants[promoId] : {};
+    const rows = Object.values(obj || {});
+    if (!rows.length) return `<div style="opacity:.75;">Niciun participant încă.</div>`;
+    rows.sort((a,b)=>(b.promotions||0)-(a.promotions||0));
+    return `
+      <div style="font-weight:800; margin-bottom:8px;">🏆 Clasament</div>
+      ${rows.slice(0,20).map((r,i)=>`
+        <div style="display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+          <div style="font-weight:800;">#${i+1}</div>
+          <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(r.name||'')}</div>
+          <div style="opacity:.85;">${mask2(r.participantId||'')}</div>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  function renderPromos(promos, participants){
+    window.__PROMO_CACHE__ = promos || [];
+    const list = $('promoList');
+    if (!list) return;
+    list.innerHTML = '';
+
+    promos.forEach(p=>{
+      const now = Date.now();
+      const expired = !!p.endsAt && p.endsAt <= now;
+      const badge = expired ? 'Expirat' : 'Activ';
+      const endsStr = p.endsAt ? new Date(p.endsAt).toLocaleString('ro-RO') : '-';
+
+      const card = document.createElement('div');
+      card.className = 'news-card promo-card';
+      if (p.cardHeight) card.style.height = String(p.cardHeight) + 'px';
+
+      const mediaStyle = (p.media && p.media.url && String(p.media.contentType||'').startsWith('image/'))
+        ? `background-image:url('${p.media.url}')` : '';
+
+      const overlayHtml = p.overlayText ? `
+        <div class="promo-overlay-text" style="left:${p.overlayX ?? 6}%; top:${p.overlayY ?? 6}%; font-size:${p.overlayFont || 22}px; text-align:${p.overlayAlign || 'left'};">
+          ${esc(p.overlayText)}
+        </div>` : '';
+
+      card.innerHTML = `
+        <div class="promo-media" style="${mediaStyle}">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px; position:relative; z-index:1;">
+            <div style="font-weight:900; color:#fff; font-size:1.05rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(p.title||'')}</div>
+            <div style="padding:6px 10px; border-radius:999px; background:rgba(0,0,0,0.30); border:1px solid rgba(255,255,255,0.14); font-size:0.85rem; color:#fff;">${badge}</div>
+          </div>
+          ${overlayHtml}
+        </div>
+
+        <div class="promo-content">
+          <div style="opacity:0.85;">⏳ Expiră: <strong>${esc(endsStr)}</strong></div>
+          ${p.prize ? `<div style="opacity:0.9; margin-top:6px;">🏆 Premiu: <strong>${esc(p.prize)}</strong></div>` : ''}
+
+          <div class="promo-desc" style="opacity:0.92; margin-top:10px; line-height:1.5;">${esc(p.desc||'')}</div>
+
+          <div class="promo-join" style="padding-top:12px; border-top:1px solid rgba(255,255,255,0.12);">
+            <div style="font-weight:800; margin-bottom:8px;">Înscriere</div>
+            <div class="form-row">
+              <input type="text" id="joinName_${p.id}" placeholder="Nume" maxlength="80">
+              <input type="email" id="joinEmail_${p.id}" placeholder="Email" maxlength="120">
+            </div>
+            <div class="form-row">
+              <input type="text" id="joinWallet_${p.id}" placeholder="Wallet (0x...)" maxlength="64">
+              <button class="news-btn" onclick="promoJoinPromo('${p.id}')" ${expired?'disabled':''} style="min-width:160px;">✅ Înscrie-te</button>
+            </div>
+
+            <div class="promo-actions">
+              <button class="news-btn admin-only" onclick="promoEditPromo('${p.id}')">✏️ Editează</button>
+              <button class="news-btn admin-only" onclick="promoDeletePromo('${p.id}')">🗑️ Șterge</button>
+            </div>
+          </div>
+
+          <div class="promo-leaderboard" id="lb_${p.id}">
+            ${renderLeaderboard(p.id, participants)}
+          </div>
+        </div>
+      `;
+      const mediaEl = card.querySelector('.promo-media');
+      if (mediaEl && p.mediaHeight) mediaEl.style.height = String(p.mediaHeight) + 'px';
+
+      list.appendChild(card);
+    });
+
+    if (!promos.length){
+      list.innerHTML = '<div style="opacity:.8;">Nu există promoții încă.</div>';
+    }
+  }
+
+  function mount(){
+    if (!db) return;
+
+    // add button
+    const addBtn = $('promoAddBtn');
+    if (addBtn) addBtn.addEventListener('click', promoShowPromoForm);
+
+    // auth -> admin
+    setAdminUI(false);
+    if (auth){
+      auth.onAuthStateChanged((user)=>{
+        setAdminUI(isAdminUser(user));
+      });
+    }
+
+    // live data from stats/visits
+    visitsRef().onSnapshot((snap)=>{
+      const state = normalizeState(snap.exists ? snap.data() : {});
+      renderPromos(state.promos, state.participants);
+    }, (err)=>{
+      console.error('visits snapshot:', err);
+      const list = $('promoList');
+      if (list) list.innerHTML = '<div style="opacity:.8;">Eroare la încărcare promoții.</div>';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', mount);
 })();
 </script>
 
