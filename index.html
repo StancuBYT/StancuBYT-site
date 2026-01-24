@@ -417,7 +417,7 @@
 
 /* === FIX: ensure Join section fits after Premii === */
 .promo-card{
-  min-height: 980px !important;
+  min-height: 1180px !important;
 }
 .promo-content{
   overflow: visible !important;
@@ -1149,6 +1149,24 @@ Notă: o singură înscriere per wallet."></textarea>
     <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
     <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
   </div>
+
+<div class="divider"></div>
+<div class="kicker">📜 Reguli</div>
+<div class="promo-desc" style="max-height:140px;">${esc(p.rules || '—')}</div>
+
+<div class="divider"></div>
+<div class="kicker">✅ Înscriere</div>
+<div class="join-row">
+  <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80">
+  <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120">
+</div>
+<div class="join-row">
+  <input id="wallet_${esc(p.id)}" type="text" placeholder="Wallet (0x...)" maxlength="80">
+  <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
+</div>
+<div class="join-row one">
+  <button class="btn" type="button" onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-te</button>
+</div>
 </div>
 
       `;
