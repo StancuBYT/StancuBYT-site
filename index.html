@@ -323,21 +323,41 @@
 }
 
 
-/* === Neon gradient border wrapper for promo + leaderboard === */
+/* === Neon gradient border wrapper for promo + leaderboard (border only) === */
 .promo-block{
   margin: 14px 0;
   border-radius: 24px;
   padding: 12px;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.22)) padding-box,
-    linear-gradient(135deg, rgba(0,255,255,0.95), rgba(138,43,226,0.95), rgba(0,255,136,0.95), rgba(0,102,255,0.95)) border-box;
+  background: transparent;          /* no fill over cards */
+  border: 2px solid transparent;    /* gradient border only */
+  border-image: linear-gradient(135deg,
+    rgba(0,255,255,0.95),
+    rgba(138,43,226,0.95),
+    rgba(0,255,136,0.95),
+    rgba(0,102,255,0.95)
+  ) 1;
   box-shadow:
-    0 0 18px rgba(0,255,255,0.14),
-    0 0 26px rgba(138,43,226,0.12);
+    0 0 18px rgba(0,255,255,0.10),
+    0 0 26px rgba(138,43,226,0.08);
+  display:flex;
+  gap: 14px;
+  align-items: stretch;
 }
-.promo-block .promo-leaderboard-out{
-  margin: 10px 0 0 0;
+.promo-block > .news-card{
+  flex: 1 1 0;
+  min-width: 0;
+}
+.promo-leaderboard-out{
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 22px;
+  padding: 14px 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(6px);
+}
+@media (max-width: 980px){
+  .promo-block{ flex-direction: column; }
 }
 
 </style>
@@ -1039,12 +1059,27 @@ Notă: o singură înscriere per wallet."></textarea>
             <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
             <span class="pill">⏳ ${esc(formatEnds(p.ends))}</span>
             <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
-            ${prizes.length ? prizes.map(pr => `<span class=\"pill\">🏆 ${esc(pr)}</span>`).join('') : ''}
+            
           </div>
 
           <div style="font-weight:800; font-size:1.05rem;">${esc(p.title||'')}</div>
           ${p.hook ? `<div style="opacity:.95; font-weight:700;">${esc(p.hook)}</div>` : ''}
-          <div class="promo-desc">${esc(p.desc||'')}</div>
+          
+          ${prizes.length ? `
+            <div class="divider"></div>
+            <div style="margin-top:10px;">
+              <div style="font-weight:900; margin-bottom:8px;">🏆 Premii</div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                ${prizes.map((pr,i)=>{
+                  const t = String(pr||'').trim();
+                  const hasRank = /locul\s*\d|place\s*\d|#\d/i.test(t);
+                  const label = hasRank ? '' : `Locul ${i+1}: `;
+                  return `<div class="pill" style="display:block; width:100%; white-space:pre-wrap;">${esc(label + t)}</div>`;
+                }).join('')}
+              </div>
+            </div>
+          ` : ``}
+<div class="promo-desc">${esc(p.desc||'')}</div>
 
           
 
