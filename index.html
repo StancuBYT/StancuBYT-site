@@ -1125,41 +1125,28 @@ Notă: o singură înscriere per wallet."></textarea>
           <div style="font-weight:800; font-size:1.05rem;">${esc(p.title||'')}</div>
           ${p.hook ? `<div style="opacity:.95; font-weight:700;">${esc(p.hook)}</div>` : ''}
           
-          ${prizes.length ? `
-            <div class="divider"></div>
-            <div style="margin-top:10px;">
-              <div style="font-weight:900; margin-bottom:8px;">🏆 Premii</div>
-              <div style="display:flex; flex-direction:column; gap:8px;">
-                ${prizes.map((pr,i)=>{
-                  const t = String(pr||'').trim();
-                  const hasRank = /locul\s*\d|place\s*\d|#\d/i.test(t);
-                  const label = hasRank ? '' : `Locul ${i+1}: `;
-                  return `<div class="pill" style="display:block; width:100%; white-space:pre-wrap;">${esc(label + t)}</div>`;
-                }).join('')}
-              </div>
-            </div>
-          ` : ``}
-<div class="promo-desc">${esc(p.desc||'')}</div>
+          <div class="promo-desc">${esc(p.desc||'')}</div>
+
 
 <div class="divider"></div>
 <div style="margin-top:10px;">
   <div style="font-weight:900; margin-bottom:8px;">🏆 Premii</div>
+
+  <div class="prize-subtitle">Podium</div>
   <div style="display:flex; flex-direction:column; gap:8px;">
-    ${[
-      (p.prizes && p.prizes.p1) ? `Premiul I: ${p.prizes.p1}` : '',
-      (p.prizes && p.prizes.p2) ? `Premiul II: ${p.prizes.p2}` : '',
-      (p.prizes && p.prizes.p3) ? `Premiul III: ${p.prizes.p3}` : '',
-      (p.prizes && p.prizes.top5) ? `Primele 5 locuri după podium: ${p.prizes.top5}` : '',
-      (p.prizes && p.prizes.next10) ? `Următoarele 10 locuri: ${p.prizes.next10}` : '',
-      (p.prizes && p.prizes.bonus) ? `Bonus participare / surpriză random: ${p.prizes.bonus}` : ''
-    ].filter(Boolean).map(line => `
-      <div class="pill" style="display:block; width:100%; white-space:pre-wrap;">${esc(line)}</div>
-    `).join('')}
+    ${(p.prizes && p.prizes.p1) ? `<div class="prize-item prize-gold"><b>Premiul I:</b> ${esc(p.prizes.p1)}</div>` : ''}
+    ${(p.prizes && p.prizes.p2) ? `<div class="prize-item prize-silver"><b>Premiul II:</b> ${esc(p.prizes.p2)}</div>` : ''}
+    ${(p.prizes && p.prizes.p3) ? `<div class="prize-item prize-bronze"><b>Premiul III:</b> ${esc(p.prizes.p3)}</div>` : ''}
+  </div>
+
+  <div class="prize-subtitle">Restul premiilor</div>
+  <div style="display:flex; flex-direction:column; gap:8px;">
+    ${(p.prizes && p.prizes.top5) ? `<div class="prize-item prize-tierA"><b>Primele 5 locuri după podium:</b> ${esc(p.prizes.top5)}</div>` : ''}
+    ${(p.prizes && p.prizes.next10) ? `<div class="prize-item prize-tierB"><b>Următoarele 10 locuri:</b> ${esc(p.prizes.next10)}</div>` : ''}
+    ${(p.prizes && p.prizes.bonus) ? `<div class="prize-item prize-tierC"><b>Bonus participare / surpriză random:</b> ${esc(p.prizes.bonus)}</div>` : ''}
   </div>
 </div>
 
-
-          
 
           ${p.rules ? `<div class="divider"></div><div style="white-space:pre-wrap; opacity:.92;"><b>Reguli:</b>\n${esc(p.rules)}</div>` : ''}
         </div>
