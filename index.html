@@ -1129,43 +1129,19 @@ Notă: o singură înscriere per wallet."></textarea>
 
 
 <div class="divider"></div>
-<div style="margin-top:10px;">
-  <div style="font-weight:900; margin-bottom:8px;">🏆 Premii</div>
 
-  
-<div class="prize-subtitle">Podium</div>
-<div style="display:flex; flex-direction:column; gap:8px;">
-  ${(p.prizes && p.prizes.p1) ? `<div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes.p1)}</div>` : ''}
-  ${(p.prizes && p.prizes.p2) ? `<div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes.p2)}</div>` : ''}
-  ${(p.prizes && p.prizes.p3) ? `<div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes.p3)}</div>` : ''}
+<div style="margin-top:14px;">
+  <div style="font-weight:900; margin-bottom:10px;">🏆 Premii</div>
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
+    <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
+    <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
+    <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
+    <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
+    <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
+  </div>
 </div>
 
-<div class="prize-subtitle">Restul premiilor</div>
-<div style="display:flex; flex-direction:column; gap:8px;">
-  ${(p.prizes && p.prizes.top5) ? `<div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes.top5)}</div>` : ''}
-  ${(p.prizes && p.prizes.next10) ? `<div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes.next10)}</div>` : ''}
-  ${(p.prizes && p.prizes.bonus) ? `<div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes.bonus)}</div>` : ''}
-</div>
-
-
-
-          ${p.rules ? `<div class="divider"></div><div style="white-space:pre-wrap; opacity:.92;"><b>Reguli:</b>\n${esc(p.rules)}</div>` : ''}
-        </div>
-
-        <div class="promo-footer">
-          <div style="font-weight:800;">Înscriere</div>
-          <div class="join-row">
-            <input id="name_${esc(p.id)}" placeholder="Nume">
-            <input id="email_${esc(p.id)}" placeholder="Email">
-          </div>
-          <div class="join-row">
-            <input id="wallet_${esc(p.id)}" placeholder="Wallet (opțional)">
-            <input id="ref_${esc(p.id)}" placeholder="Referral (opțional)">
-          </div>
-          <div class="join-row one">
-            <button class="btn" type="button" onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-mă</button>
-          </div>
-        </div>
       `;
 
       const block = document.createElement('div');
