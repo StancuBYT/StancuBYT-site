@@ -322,6 +322,24 @@
   backdrop-filter: blur(6px);
 }
 
+
+/* === Neon gradient border wrapper for promo + leaderboard === */
+.promo-block{
+  margin: 14px 0;
+  border-radius: 24px;
+  padding: 12px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.22)) padding-box,
+    linear-gradient(135deg, rgba(0,255,255,0.95), rgba(138,43,226,0.95), rgba(0,255,136,0.95), rgba(0,102,255,0.95)) border-box;
+  box-shadow:
+    0 0 18px rgba(0,255,255,0.14),
+    0 0 26px rgba(138,43,226,0.12);
+}
+.promo-block .promo-leaderboard-out{
+  margin: 10px 0 0 0;
+}
+
 </style>
 
   <!-- Firebase (compat) -->
@@ -1021,13 +1039,14 @@ Notă: o singură înscriere per wallet."></textarea>
             <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
             <span class="pill">⏳ ${esc(formatEnds(p.ends))}</span>
             <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
+            ${prizes.length ? prizes.map(pr => `<span class=\"pill\">🏆 ${esc(pr)}</span>`).join('') : ''}
           </div>
 
           <div style="font-weight:800; font-size:1.05rem;">${esc(p.title||'')}</div>
           ${p.hook ? `<div style="opacity:.95; font-weight:700;">${esc(p.hook)}</div>` : ''}
           <div class="promo-desc">${esc(p.desc||'')}</div>
 
-          ${prizes.length ? `<div class="divider"></div><div style="white-space:pre-wrap;">${esc(prizes.join('\n'))}</div>` : ''}
+          
 
           ${p.rules ? `<div class="divider"></div><div style="white-space:pre-wrap; opacity:.92;"><b>Reguli:</b>\n${esc(p.rules)}</div>` : ''}
         </div>
@@ -1048,12 +1067,15 @@ Notă: o singură înscriere per wallet."></textarea>
         </div>
       `;
 
-      list.appendChild(wrap);
+      const block = document.createElement('div');
+      block.className = 'promo-block';
+      block.appendChild(wrap);
       const lbOut = document.createElement('div');
       lbOut.className = 'promo-leaderboard-out';
       lbOut.innerHTML = `<div style="font-weight:800; margin-bottom:8px;">🏆 Clasament</div>` +
         `<div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p.id)}</div>`;
-      list.appendChild(lbOut);
+      block.appendChild(lbOut);
+      list.appendChild(block);
     });
 
     // reapply admin-only after render
