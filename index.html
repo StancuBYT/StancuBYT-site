@@ -297,7 +297,32 @@
       max-width: calc(100% - 10%);
     }
   }
-  </style>
+  
+/* === Admin buttons placement + leaderboard outside card === */
+.promo-media { position: relative; }
+.promo-media .admin-actions{
+  position:absolute;
+  top:10px; right:10px;
+  z-index:4;
+  display:flex;
+  gap:8px;
+}
+.promo-media .admin-actions .btn{
+  padding:10px 12px;
+  font-size:0.9rem;
+  border-radius:999px;
+}
+.promo-leaderboard-out{
+  margin-top: 10px;
+  margin-bottom: 14px;
+  padding: 14px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(6px);
+}
+
+</style>
 
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -979,6 +1004,12 @@ Notă: o singură înscriere per wallet."></textarea>
       wrap.style.setProperty('--mediaH', mediaH + 'px');
       wrap.innerHTML = `
         <div class="promo-media" style="${mediaUrl ? `background-image:url('${esc(mediaUrl)}')` : ''}">
+
+          <div class="admin-actions admin-only">
+            <button class="btn secondary" type="button" onclick="editPromo('${esc(p.id)}')">✏️ Editează</button>
+            <button class="btn" type="button" onclick="deletePromo('${esc(p.id)}')">🗑️ Șterge</button>
+          </div>
+
           ${overlayText ? `
             <div class="promo-overlay" data-align="${esc(overlayAlign)}" style="color:${esc(overlayColor)}; font-size:${overlaySize}px; --overlayX:${overlayX}; --overlayY:${overlayY};">
               ${esc(overlayText)}
@@ -999,11 +1030,6 @@ Notă: o singură înscriere per wallet."></textarea>
           ${prizes.length ? `<div class="divider"></div><div style="white-space:pre-wrap;">${esc(prizes.join('\n'))}</div>` : ''}
 
           ${p.rules ? `<div class="divider"></div><div style="white-space:pre-wrap; opacity:.92;"><b>Reguli:</b>\n${esc(p.rules)}</div>` : ''}
-
-          <div class="admin-actions admin-only" style="display:none;">
-            <button class="btn secondary" type="button" onclick="editPromo('${esc(p.id)}')">✏️ Editează</button>
-            <button class="btn" type="button" onclick="deletePromo('${esc(p.id)}')">🗑️ Șterge</button>
-          </div>
         </div>
 
         <div class="promo-footer">
@@ -1019,13 +1045,15 @@ Notă: o singură înscriere per wallet."></textarea>
           <div class="join-row one">
             <button class="btn" type="button" onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-mă</button>
           </div>
-
-          <div style="font-weight:800;">🏆 Clasament</div>
-          <div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p.id)}</div>
         </div>
       `;
 
       list.appendChild(wrap);
+      const lbOut = document.createElement('div');
+      lbOut.className = 'promo-leaderboard-out';
+      lbOut.innerHTML = `<div style="font-weight:800; margin-bottom:8px;">🏆 Clasament</div>` +
+        `<div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p.id)}</div>`;
+      list.appendChild(lbOut);
     });
 
     // reapply admin-only after render
