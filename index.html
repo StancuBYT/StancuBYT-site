@@ -417,7 +417,7 @@
 
 /* === FIX: ensure Join section fits after Premii === */
 .promo-card{
-  min-height: 1180px !important;
+  min-height: 1320px !important;
 }
 .promo-content{
   overflow: visible !important;
@@ -551,12 +551,17 @@
         <div class="row one">
           <div>
             <label>Regulament (clar, pe pași)</label>
-            <textarea id="promoRules" placeholder="Ex:
-1) Intră pe Telegram
-2) Urmărește Twitter
-3) Trimite wallet-ul
-4) Fiecare share = +10 puncte
-Notă: o singură înscriere per wallet."></textarea>
+            
+<div class="form-row" style="flex-direction:column; gap:10px;">
+  <div style="font-weight:900;">📜 Reguli (5 puncte + text)</div>
+  <input id="rule1" type="text" placeholder="Regula 1 (ex: Urmărește contul / Subscribe)" maxlength="120">
+  <input id="rule2" type="text" placeholder="Regula 2" maxlength="120">
+  <input id="rule3" type="text" placeholder="Regula 3" maxlength="120">
+  <input id="rule4" type="text" placeholder="Regula 4" maxlength="120">
+  <input id="rule5" type="text" placeholder="Regula 5" maxlength="120">
+  <textarea id="rulesText" placeholder="Text reguli (opțional, 5-6 rânduri)" rows="6" style="width:100%;"></textarea>
+</div>
+
           </div>
         </div>
 
@@ -816,6 +821,16 @@ Notă: o singură înscriere per wallet."></textarea>
     const points = Number(($('promoPoints')?.value || '10'));
     const hook = ($('promoHook')?.value || '').trim();
     const desc = ($('promoDesc')?.value || '').trim();
+
+    const rulesObj = {
+      r1: (document.getElementById('rule1')?.value || '').trim(),
+      r2: (document.getElementById('rule2')?.value || '').trim(),
+      r3: (document.getElementById('rule3')?.value || '').trim(),
+      r4: (document.getElementById('rule4')?.value || '').trim(),
+      r5: (document.getElementById('rule5')?.value || '').trim(),
+      text: (document.getElementById('rulesText')?.value || '').trim()
+    };
+    const rulesLegacy = [rulesObj.r1, rulesObj.r2, rulesObj.r3, rulesObj.r4, rulesObj.r5, rulesObj.text].filter(Boolean).join('\n');
     const rules = ($('promoRules')?.value || '').trim();
 
     // IMPORTANT: fara validari "fantoma" - verificam exact ce trebuie
@@ -1152,7 +1167,14 @@ Notă: o singură înscriere per wallet."></textarea>
 
 <div class="divider"></div>
 <div class="kicker">📜 Reguli</div>
-<div class="promo-desc" style="max-height:320px;">${esc(p.rules || '—')}</div>
+<div style="display:flex; flex-direction:column; gap:8px;">
+  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>1.</b> ${esc((p.rulesObj&&p.rulesObj.r1)||'—')}</div>
+  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>2.</b> ${esc((p.rulesObj&&p.rulesObj.r2)||'—')}</div>
+  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>3.</b> ${esc((p.rulesObj&&p.rulesObj.r3)||'—')}</div>
+  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>4.</b> ${esc((p.rulesObj&&p.rulesObj.r4)||'—')}</div>
+  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>5.</b> ${esc((p.rulesObj&&p.rulesObj.r5)||'—')}</div>
+  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>Text:</b> ${esc((p.rulesObj&&p.rulesObj.text)||'—')}</div>
+</div>
 
 <div class="divider"></div>
 <div class="kicker">✅ Înscriere</div>
