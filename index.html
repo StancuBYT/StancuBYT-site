@@ -1358,5 +1358,31 @@
   document.addEventListener('DOMContentLoaded', boot);
 })();
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
+
+  const firebaseConfig = {
+    // config-ul tău Firebase
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  const functions = getFunctions(app, "europe-west1");
+  const sendPromoSignupEmail = httpsCallable(functions, "sendPromoSignupEmail");
+
+  // test
+  sendPromoSignupEmail({
+    toEmail: "emailul_tau@gmail.com",
+    name: "Marian",
+    referralCode: "SBYTTEST123",
+    promoTitle: "Test Promoție",
+    promoEndsAt: new Date().toISOString(),
+    promoUrl: window.location.href
+  })
+  .then(r => console.log("EMAIL TRIMIS:", r.data))
+  .catch(e => console.error("EROARE:", e));
+</script>
+
 </body>
 </html>
