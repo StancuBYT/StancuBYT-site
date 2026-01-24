@@ -449,6 +449,36 @@
       console.warn("Firebase init warning:", e);
     }
   </script>
+
+<!-- === Added: Firebase v9 Functions (callable) - SAFE PATCH === -->
+<script type="module">
+  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
+
+  // Reuse the SAME config already defined for compat
+  const cfg = window.firebaseConfig;
+  if (!cfg || !cfg.projectId) {
+    console.error("Firebase config missing projectId; cannot init Functions.");
+  } else {
+    // Init modular app ONLY if not already created
+    let app;
+    if (!getApps().length) {
+      app = initializeApp(cfg);
+    } else {
+      app = getApps()[0];
+    }
+
+    // IMPORTANT: region must match the deployed function
+    const functions = getFunctions(app, "europe-west1");
+
+    // Expose callable globally without breaking existing code
+    window.sendPromoSignupEmail = httpsCallable(functions, "sendPromoSignupEmail");
+
+    console.log("Functions callable ready:", { projectId: cfg.projectId, region: "europe-west1" });
+  }
+</script>
+<!-- === End patch === -->
+
 </head>
 
 <body>
@@ -1358,31 +1388,5 @@
   document.addEventListener('DOMContentLoaded', boot);
 })();
 </script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
-
-  const firebaseConfig = {
-    // config-ul tău Firebase
-  };
-
-  const app = initializeApp(firebaseConfig);
-
-  const functions = getFunctions(app, "europe-west1");
-  const sendPromoSignupEmail = httpsCallable(functions, "sendPromoSignupEmail");
-
-  // test
-  sendPromoSignupEmail({
-    toEmail: "stancubyt@gmail.com",
-    name: "Marian",
-    referralCode: "SBYTTEST123",
-    promoTitle: "Test Promoție",
-    promoEndsAt: new Date().toISOString(),
-    promoUrl: window.location.href
-  })
-  .then(r => console.log("EMAIL TRIMIS:", r.data))
-  .catch(e => console.error("EROARE:", e));
-</script>
-
 </body>
 </html>
