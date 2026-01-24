@@ -1118,20 +1118,34 @@ Notă: o singură înscriere per wallet."></textarea>
             <div style="margin-top:10px;">
               <div style="font-weight:900; margin-bottom:8px;">🏆 Premii</div>
               <div style="display:flex; flex-direction:column; gap:8px;">
-                ${[
-                  p.prize1 ? `Premiul I: ${p.prize1}` : '',
-                  p.prize2 ? `Premiul II: ${p.prize2}` : '',
-                  p.prize3 ? `Premiul III: ${p.prize3}` : '',
-                  p.prizeTop5 ? `Primele 5 locuri după podium: ${p.prizeTop5}` : '',
-                  p.prizeNext10 ? `Următoarele 10 locuri: ${p.prizeNext10}` : '',
-                  p.prizeBonus ? `Bonus participare / surpriză random: ${p.prizeBonus}` : ''
-                ].filter(Boolean).map(line => `
-                  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;">${esc(line)}</div>
-                `).join('')}
+                ${prizes.map((pr,i)=>{
+                  const t = String(pr||'').trim();
+                  const hasRank = /locul\s*\d|place\s*\d|#\d/i.test(t);
+                  const label = hasRank ? '' : `Locul ${i+1}: `;
+                  return `<div class="pill" style="display:block; width:100%; white-space:pre-wrap;">${esc(label + t)}</div>`;
+                }).join('')}
               </div>
             </div>
           ` : ``}
 <div class="promo-desc">${esc(p.desc||'')}</div>
+
+<div class="divider"></div>
+<div style="margin-top:10px;">
+  <div style="font-weight:900; margin-bottom:8px;">🏆 Premii</div>
+  <div style="display:flex; flex-direction:column; gap:8px;">
+    ${[
+      (p.prizes && p.prizes.p1) ? `Premiul I: ${p.prizes.p1}` : '',
+      (p.prizes && p.prizes.p2) ? `Premiul II: ${p.prizes.p2}` : '',
+      (p.prizes && p.prizes.p3) ? `Premiul III: ${p.prizes.p3}` : '',
+      (p.prizes && p.prizes.top5) ? `Primele 5 locuri după podium: ${p.prizes.top5}` : '',
+      (p.prizes && p.prizes.next10) ? `Următoarele 10 locuri: ${p.prizes.next10}` : '',
+      (p.prizes && p.prizes.bonus) ? `Bonus participare / surpriză random: ${p.prizes.bonus}` : ''
+    ].filter(Boolean).map(line => `
+      <div class="pill" style="display:block; width:100%; white-space:pre-wrap;">${esc(line)}</div>
+    `).join('')}
+  </div>
+</div>
+
 
           
 
