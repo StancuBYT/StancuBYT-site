@@ -831,7 +831,7 @@
       text: (document.getElementById('rulesText')?.value || '').trim()
     };
     const rulesLegacy = [rulesObj.r1, rulesObj.r2, rulesObj.r3, rulesObj.r4, rulesObj.r5, rulesObj.text].filter(Boolean).join('\n');
-    const rules = ($('promoRules')?.value || '').trim();
+    const rules = rulesLegacy; // compat (text concatenat)
 
     // IMPORTANT: fara validari "fantoma" - verificam exact ce trebuie
     if(!title) return alert('Completează: Titlu');
@@ -901,6 +901,7 @@
         points: Number.isFinite(points) ? points : 10,
         hook,
         desc,
+        rulesObj,
         rules,
         prizes,
         ui,
