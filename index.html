@@ -1124,7 +1124,7 @@
     const promoId = (p && p.id!=null) ? p.id : p;
     const promo = (p && typeof p === 'object') ? p : (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId)) || {};
 
-    const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
+    const arr = Array.isArray(CACHE.participants?.[String(promoId)]) ? CACHE.participants[String(promoId)] : [];
     if(!arr.length) {
       return `<div style="opacity:.85;">Nu există participanți încă.</div>`;
     }
@@ -1563,7 +1563,8 @@
     const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
     const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
 
-    const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+    const CACHE = (window.__statsCache || __statsCache || {promos:[], participants:{}});
+    const promo = (CACHE.promos||[]).find(p=>String(p.id)===String(promoId));
     if(!promo) throw new Error("Promoția nu a fost găsită.");
 
     const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
@@ -1694,9 +1695,12 @@
 
   async function previewWinners(promoId){
     try{
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+      const CACHE2 = (window.__statsCache || __statsCache || {promos:[], participants:{}});
+      const promo = (CACHE2.promos||[]).find(p=>String(p.id)===String(promoId));
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(!box) return;
+      const C = (window.__statsCache || __statsCache || {promos:[]});
+      if(!(C.promos||[]).length) throw new Error('Datele promoțiilor nu sunt încă încărcate. Reîncearcă în 2-3 secunde.');
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
       box.innerHTML = buildWinnersHtml(w);
       // scroll to winners preview
@@ -1720,7 +1724,7 @@
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
 
       // persist into promos array (stats/visits)
-      const promos = (__statsCache.promos||[]).slice();
+      const promos = ((window.__statsCache||__statsCache).promos||[]).slice();
       const idx = promos.findIndex(p=>String(p.id)===String(promoId));
       promos[idx] = { ...promos[idx], winners: w, winnersFinalizedAt: new Date().toISOString() };
       await writeStats({ promos });
