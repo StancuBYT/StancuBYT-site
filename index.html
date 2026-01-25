@@ -1336,7 +1336,8 @@ window.__statsCache = __statsCache;
 
   window.joinPromo = async function joinPromo(promoId){
     try{
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+      const C = (window.__statsCache || __statsCache || {promos:[],participants:{}});
+      const promo = (C.promos||[]).find(p=>String(p.id)===pid);
       if(promo && promo.ends){
         const endsMs = new Date(promo.ends).getTime();
         if(Number.isFinite(endsMs) && Date.now() >= endsMs){
@@ -1576,7 +1577,8 @@ window.__statsCache = __statsCache;
     const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
     const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
 
-    const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+      const C = (window.__statsCache || __statsCache || {promos:[],participants:{}});
+      const promo = (C.promos||[]).find(p=>String(p.id)===pid);
     if(!promo) throw new Error("Promoția nu a fost găsită.");
 
     const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
@@ -1778,7 +1780,8 @@ window.__statsCache = __statsCache;
   async function previewWinners(promoId){
     try{
       const pid = String(promoId);
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===pid);
+      const C = (window.__statsCache || __statsCache || {promos:[],participants:{}});
+      const promo = (C.promos||[]).find(p=>String(p.id)===pid);
       if(!promo) throw new Error("Promoția nu a fost găsită.");
       const box = document.getElementById(`winners_preview_${pid}`);
       if(!box) return;
@@ -1788,11 +1791,13 @@ window.__statsCache = __statsCache;
     }catch(e){
       alert("Eroare la preview: " + (e?.message || e));
     }
+  }
 
   async function finalizeWinners(promoId){
     try{
       if(!(window.__SBYT_ADMIN===true)) return alert("Doar admin.");
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+      const C = (window.__statsCache || __statsCache || {promos:[],participants:{}});
+      const promo = (C.promos||[]).find(p=>String(p.id)===pid);
       if(!promo) return alert("Promoția nu a fost găsită.");
 
       const endsMs = promo.ends ? new Date(promo.ends).getTime() : NaN;
