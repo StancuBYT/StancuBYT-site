@@ -491,7 +491,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script>
 
-  // === Expiry helpers (local time, robust parsing) ===
+  // === Expiry helpers (local time + robust parsing) ===
   function parseEndsMs(ends){
     try{
       if(!ends) return NaN;
@@ -503,10 +503,10 @@
       // number (ms)
       if(typeof ends === "number") return ends;
       const s = String(ends).trim();
-      // ISO or RFC
+      // ISO / RFC (includes datetime-local "YYYY-MM-DDTHH:MM")
       const d1 = new Date(s);
       if(!isNaN(d1.getTime())) return d1.getTime();
-      // Romanian format: DD.MM.YYYY, HH:MM:SS  or DD.MM.YYYY HH:MM
+      // Romanian: DD.MM.YYYY, HH:MM[:SS]  (comma optional)
       const m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
       if(m){
         const dd = parseInt(m[1],10);
@@ -515,8 +515,7 @@
         const hh = m[4] ? parseInt(m[4],10) : 0;
         const mi = m[5] ? parseInt(m[5],10) : 0;
         const ss = m[6] ? parseInt(m[6],10) : 0;
-        // local time on device (Europe/Bucharest for you)
-        return new Date(yy, mm-1, dd, hh, mi, ss).getTime();
+        return new Date(yy, mm-1, dd, hh, mi, ss).getTime(); // local time on device
       }
       return NaN;
     }catch(e){ return NaN; }
@@ -531,7 +530,6 @@
     return new Date(ms).toLocaleString("ro-RO");
   }
   // === end helpers ===
-
 
     // Firebase init (preluat din "salvare stergere.html")
     window.firebaseConfig = {
@@ -1306,7 +1304,7 @@
         <div class="promo-body">
           <div class="promo-meta">
             <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
-            <span class="pill">⏳ ${esc(formatEnds(p.ends))}</span>
+            <span class="pill">⏳ ${ isExpiredPromo(p) ? (p.kind==='giveaway' ? 'Giveaway încheiat' : 'Promoție încheiată') : formatEndsLocal(p.ends) }</span>
             <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
             
           </div>
@@ -1352,7 +1350,7 @@
   <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
 </div>
 <div class="join-row one">
-  <button class="btn" type="button" ${ (p.ends && isExpiredPromo(p)) ? 'disabled title=\"Înscrieri închise\"' : '' } onclick=\"joinPromo('${esc(p.id)}')\">✅ Înscrie-te</button>
+  <button class="btn" type="button" ${ (p.ends && Date.now() >= new Date(p.ends).getTime()) ? 'disabled title=\"Înscrieri închise\"' : '' } onclick=\"joinPromo('${esc(p.id)}')\">✅ Înscrie-te</button>
 </div>
 </div>
 
@@ -1377,21 +1375,20 @@
   }
 
   window.joinPromo = async function joinPromo(promoId){
+    
+    // blocare înscriere după expirare (local time)
     try{
-      const C = (window.__statsCache || __statsCache || {promos:[]});
-      const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
-      if(promo && promo.ends){
-        const endsMs = parseEndsMs(promo.ends);
-        if(Number.isFinite(endsMs) && Date.now() >= endsMs){
-          return alert(promo.kind==='giveaway' ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
-        }
+      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+      const ms = parseEndsMs(promo && promo.ends);
+      if(Number.isFinite(ms) && Date.now() >= ms){
+        return alert((promo && promo.kind==='giveaway') ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
       }
     }catch(e){}
 try{
       const C = (window.__statsCache || __statsCache || {promos:[]});
       const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
       if(promo && promo.ends){
-        const endsMs = parseEndsMs(promo.ends);
+        const endsMs = new Date(promo.ends).getTime();
         if(Number.isFinite(endsMs) && Date.now() >= endsMs){
           return alert(promo.kind==='giveaway' ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
         }
@@ -1561,13 +1558,11 @@ try{
   }
 
   document.addEventListener('DOMContentLoaded', boot);
-}
 
-  // refresh UI periodically so expiry locks apply without page refresh
   if(!window.__expiryUiTimer){
     window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 20000);
   }
-)();
+})();
 
   // =======================
   // WINNERS: Variant 3 (Top + Weighted Lucky Draw)
