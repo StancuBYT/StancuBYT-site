@@ -774,6 +774,9 @@
   function setAdminUI(isAdmin, user){
     __isAdmin = !!isAdmin;
     __user = user || null;
+    // expose admin state globally (used by winners preview)
+    window.__SBYT_ADMIN = __isAdmin;
+    window.__SBYT_USER_EMAIL = (__user && __user.email) ? __user.email : "";
 
     document.querySelectorAll('.admin-only').forEach(el=>{
       // preserve original display type if needed
@@ -1756,8 +1759,22 @@ try{
   }
 
 
-  async function previewWinners(promoId){
-    if(!(window.__SBYT_ADMIN===true)) { return alert('Trebuie să fii logat ca admin.'); }
+  async function __isAdminNow(){
+    try{
+      if (window.__SBYT_ADMIN === true) return true;
+      // fallback to local flag
+      if (typeof __isAdmin !== "undefined" && __isAdmin === true) return true;
+      // fallback to auth currentUser email
+      if (window.firebase && firebase.auth) {
+        const u = firebase.auth().currentUser;
+        if (u && u.email && String(u.email).toLowerCase() === "stancubyt@gmail.com") return true;
+      }
+    }catch(e){}
+    return false;
+  }
+
+  function previewWinners(promoId){
+    if(!__isAdminNow()) { return alert('Trebuie să fii logat ca admin.'); }
 
     try{
       const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
