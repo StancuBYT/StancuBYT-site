@@ -1124,7 +1124,7 @@
     const promoId = (p && p.id!=null) ? p.id : p;
     const promo = (p && typeof p === 'object') ? p : (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId)) || {};
 
-    const arr = Array.isArray(CACHE.participants?.[String(promoId)]) ? CACHE.participants[String(promoId)] : [];
+    const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
     if(!arr.length) {
       return `<div style="opacity:.85;">Nu există participanți încă.</div>`;
     }
@@ -1387,12 +1387,11 @@
     __statsUnsub = ref.onSnapshot(snap=>{
       const data = snap.exists ? snap.data() : {};
       __statsCache = normalizeStats(data);
-      window.__statsCache = __statsCache;
-      try{ renderPromos(); }catch(e){ console.error('renderPromos error:', e); }
+      renderPromos();
     }, err=>{
       console.warn('stats onSnapshot error:', err);
       // fallback one-time read
-      readStatsOnce().then(x=>{ __statsCache=x; window.__statsCache=__statsCache; try{renderPromos();}catch(e){console.error('renderPromos error:',e);} }).catch(()=>{});
+      readStatsOnce().then(x=>{ __statsCache=x; renderPromos(); }).catch(()=>{});
     });
   }
 
@@ -1483,8 +1482,8 @@
 
   // ===== Boot =====
   function boot(){
-    try{ injectExtraFields(); }catch(e){ console.warn('injectExtraFields failed:', e); }
-    try{ startStatsListener(); }catch(e){ console.error('startStatsListener failed:', e); }
+    injectExtraFields();
+    startStatsListener();
 
     const a = auth();
     if(a) {
@@ -1564,8 +1563,7 @@
     const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
     const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
 
-    const CACHE = (window.__statsCache || __statsCache || {promos:[], participants:{}});
-    const promo = (CACHE.promos||[]).find(p=>String(p.id)===String(promoId));
+    const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
     if(!promo) throw new Error("Promoția nu a fost găsită.");
 
     const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
@@ -1696,12 +1694,9 @@
 
   async function previewWinners(promoId){
     try{
-      const CACHE2 = (window.__statsCache || __statsCache || {promos:[], participants:{}});
-      const promo = (CACHE2.promos||[]).find(p=>String(p.id)===String(promoId));
+      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(!box) return;
-      const C = (window.__statsCache || __statsCache || {promos:[]});
-      if(!(C.promos||[]).length) throw new Error('Datele promoțiilor nu sunt încă încărcate. Reîncearcă în 2-3 secunde.');
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
       box.innerHTML = buildWinnersHtml(w);
       // scroll to winners preview
@@ -1725,7 +1720,7 @@
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
 
       // persist into promos array (stats/visits)
-      const promos = ((window.__statsCache||__statsCache).promos||[]).slice();
+      const promos = (__statsCache.promos||[]).slice();
       const idx = promos.findIndex(p=>String(p.id)===String(promoId));
       promos[idx] = { ...promos[idx], winners: w, winnersFinalizedAt: new Date().toISOString() };
       await writeStats({ promos });
