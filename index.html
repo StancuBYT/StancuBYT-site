@@ -1523,8 +1523,8 @@
 
   // ===== Boot =====
   function boot(){
-    injectExtraFields();
-    startStatsListener();
+    try{ injectExtraFields(); }catch(e){ console.warn('injectExtraFields error:', e); }
+    try{ startStatsListener(); }catch(e){ console.warn('startStatsListener error:', e); }
 
     const a = auth();
     if(a) {
