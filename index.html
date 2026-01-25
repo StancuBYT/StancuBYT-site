@@ -1387,11 +1387,12 @@
     __statsUnsub = ref.onSnapshot(snap=>{
       const data = snap.exists ? snap.data() : {};
       __statsCache = normalizeStats(data);
-      renderPromos();
+      window.__statsCache = __statsCache;
+      try{ renderPromos(); }catch(e){ console.error('renderPromos error:', e); }
     }, err=>{
       console.warn('stats onSnapshot error:', err);
       // fallback one-time read
-      readStatsOnce().then(x=>{ __statsCache=x; renderPromos(); }).catch(()=>{});
+      readStatsOnce().then(x=>{ __statsCache=x; window.__statsCache=__statsCache; try{renderPromos();}catch(e){console.error('renderPromos error:',e);} }).catch(()=>{});
     });
   }
 
@@ -1482,8 +1483,8 @@
 
   // ===== Boot =====
   function boot(){
-    injectExtraFields();
-    startStatsListener();
+    try{ injectExtraFields(); }catch(e){ console.warn('injectExtraFields failed:', e); }
+    try{ startStatsListener(); }catch(e){ console.error('startStatsListener failed:', e); }
 
     const a = auth();
     if(a) {
