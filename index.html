@@ -1631,10 +1631,11 @@ try{
     const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
     const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
 
-    const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+    // Căutăm promoția în cache-ul global - corectat aici
+    const promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
     if(!promo) throw new Error("Promoția nu a fost găsită.");
 
-    const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
+    const arr = Array.isArray(window.__statsCache.participants?.[String(promoId)]) ? window.__statsCache.participants[String(promoId)] : [];
     const participants = arr.slice();
 
     const { scoreByCode, tieTimeByCode } = __buildScores(participants);
@@ -1647,7 +1648,7 @@ try{
           code,
           user: u,
           score: scoreByCode.get(code) || 0,
-          tieTime: tieTimeByCode.get(code) || (u.createdAt || Date.now())
+          tieTime: tieTimeByCode.get(code) || (u.joinedAt || Date.now())
         };
       })
       .sort((a,b)=> (b.score-a.score) || ((a.tieTime||0)-(b.tieTime||0)));
@@ -1778,14 +1779,25 @@ try{
     if(!__isAdminNow()) { return alert('Trebuie să fii logat ca admin.'); }
 
     try{
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+      // Folosim window.__statsCache în loc de __statsCache local
+      const promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
+      if(!promo) {
+        alert("Promoția nu a fost găsită în cache.");
+        return;
+      }
+      
       const box = document.getElementById(`winners_preview_${promoId}`);
-      if(!box) return;
+      if(!box) {
+        alert("Containerul pentru preview nu a fost găsit.");
+        return;
+      }
+      
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
       box.innerHTML = buildWinnersHtml(w);
       // scroll to winners preview
       box.scrollIntoView({ behavior:"smooth", block:"nearest" });
     }catch(e){
+      console.error("Eroare la preview:", e);
       alert("Eroare la preview: " + (e?.message || e));
     }
   }
@@ -1793,7 +1805,7 @@ try{
   window.finalizeWinners = async function finalizeWinners(promoId){
     try{
       if(!(window.__SBYT_ADMIN===true)) return alert("Doar admin.");
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
+      const promo = (window.__statsCache && window.__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
       if(!promo) return alert("Promoția nu a fost găsită.");
 
       const endsMs = promo.ends ? new Date(promo.ends).getTime() : NaN;
@@ -1804,12 +1816,12 @@ try{
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
 
       // persist into promos array (stats/visits)
-      const promos = (__statsCache.promos||[]).slice();
+      const promos = (window.__statsCache.promos||[]).slice();
       const idx = promos.findIndex(p=>String(p.id)===String(promoId));
       promos[idx] = { ...promos[idx], winners: w, winnersFinalizedAt: new Date().toISOString() };
       await writeStats({ promos });
 
-      __statsCache.promos = promos;
+      window.__statsCache.promos = promos;
 
       // refresh leaderboard area
       const lb = document.getElementById(`lb_${promoId}`);
