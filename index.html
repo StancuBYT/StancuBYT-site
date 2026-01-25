@@ -1230,8 +1230,7 @@
         <div class="winners-wrap">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
             <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
-            ${expired ? `<button class="btn small admin-only" data-admin-display="inline-flex" onclick="finalizeWinners('${esc(promoId)}')">✅ Finalizează</button>` : `<span style="opacity:.75;font-size:12px">Finalizează disponibil după expirare.</span>`}
-          </div>
+</div>
           <div id="winners_preview_${esc(promoId)}"></div>
         </div>
       ${winnersHtml}`;
@@ -1758,6 +1757,8 @@ try{
 
 
   async function previewWinners(promoId){
+    if(!(window.__SBYT_ADMIN===true)) { return alert('Trebuie să fii logat ca admin.'); }
+
     try{
       const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
       const box = document.getElementById(`winners_preview_${promoId}`);
