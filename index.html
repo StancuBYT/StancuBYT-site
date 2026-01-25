@@ -4,535 +4,578 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StancuBYT | Promoții & Concursuri</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary: #0066ff;
+      --secondary: #00ff88;
+      --accent: #8a2be2;
+      --neon: #00ffff;
+      --dark-bg: #0a0a1f;
+      --darker-bg: #050510;
+      --danger: #ff4d4d;
+      --warning: #ff9500;
+      --success: #00cc66;
+      --card-bg: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.12);
+      --text-light: rgba(255, 255, 255, 0.9);
+      --text-muted: rgba(255, 255, 255, 0.7);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      --transition: all 0.3s ease;
+    }
 
-    :root{
-      --blue-tech:#0066ff;
-      --green-growth:#00ff88;
-      --purple-innov:#8a2be2;
-      --neon-cyan:#00ffff;
-      --dark-bg:#0a0a1f;
-      --darker-bg:#050510;
-      --orange-alert:#ff9500;
-      --danger:#ff4d4d;
-      --card: rgba(255,255,255,0.06);
-      --card2: rgba(255,255,255,0.09);
-      --border: rgba(255,255,255,0.12);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    *{box-sizing:border-box;margin:0;padding:0;font-family: Arial, sans-serif;}
-    body{
-      min-height:100vh;
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(0,102,255,0.18), transparent 55%),
-        radial-gradient(900px 500px at 80% 20%, rgba(0,255,136,0.14), transparent 55%),
-        radial-gradient(700px 500px at 50% 90%, rgba(138,43,226,0.12), transparent 60%),
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: 
+        radial-gradient(1200px 600px at 10% 10%, rgba(0, 102, 255, 0.15), transparent 55%),
+        radial-gradient(900px 500px at 80% 20%, rgba(0, 255, 136, 0.12), transparent 55%),
+        radial-gradient(700px 500px at 50% 90%, rgba(138, 43, 226, 0.1), transparent 60%),
         linear-gradient(180deg, var(--darker-bg), var(--dark-bg));
-      color:#fff;
-      padding: 26px 14px;
+      color: var(--text-light);
+      min-height: 100vh;
+      line-height: 1.6;
     }
-    .wrap{max-width:1100px;margin:0 auto;}
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      padding:16px 16px;border:1px solid var(--border);border-radius:18px;
-      background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
-      box-shadow:0 12px 40px rgba(0,0,0,0.35);
-      position:sticky;top:12px;backdrop-filter: blur(8px);
-      z-index:10;
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    .brand{display:flex;align-items:center;gap:12px;}
-    .brand img{width:40px;height:40px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4);}
-    .brand .t1{font-weight:900;letter-spacing:0.5px;}
-    .brand .t2{font-size:12px;opacity:0.8;margin-top:2px;}
-    .chip{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;border:1px solid var(--border);
-      background:rgba(0,0,0,0.25);
-      font-size:12px;opacity:0.92;
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 25px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(10px);
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
     }
-    .chip b{font-weight:800;}
-    .btn{
-      cursor:pointer;border:none;
-      padding:11px 14px;border-radius:12px;
-      background:linear-gradient(45deg, var(--blue-tech), var(--green-growth));
-      color:#001018;font-weight:900;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
-      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .btn:hover{transform: translateY(-1px);filter:brightness(1.05);}
-    .btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
-    .btn.secondary{
-      background:rgba(255,255,255,0.08);
-      border:1px solid var(--border);
-      color:#fff;font-weight:800;
+
+    .logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
-    .btn.danger{
-      background:rgba(255,77,77,0.14);
-      border:1px solid rgba(255,77,77,0.35);
-      color:#fff;
-    }
-    .hero{
-      text-align:center;
-      padding: 28px 10px 10px;
-    }
-    h1{
-      font-size: 2.3rem;
-      background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan), var(--purple-innov));
-      -webkit-background-clip:text;
+
+    .logo-text h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(45deg, var(--secondary), var(--neon));
+      -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    .logo-text p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+    }
+
+    .status-badge.live {
+      background: rgba(0, 255, 136, 0.1);
+      border-color: rgba(0, 255, 136, 0.3);
+      color: var(--secondary);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--text-light);
+    }
+
+    .btn-danger {
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      color: var(--danger);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+      margin-bottom: 30px;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      background: linear-gradient(45deg, var(--secondary), var(--neon), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto 25px;
+    }
+
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .feature-tag {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    /* Promo Grid */
+    .promo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .promo-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .promo-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .promo-media {
+      position: relative;
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .promo-overlay {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      right: 15px;
+      padding: 10px 15px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      border-radius: var(--radius-md);
+    }
+
+    .promo-overlay h3 {
+      font-size: 1.3rem;
+      margin-bottom: 5px;
+    }
+
+    .promo-badges {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .promo-body {
+      padding: 20px;
+    }
+
+    .promo-meta {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .promo-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .promo-description {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .prizes-section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prize-item {
+      padding: 10px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .prize-item.gold {
+      border-color: rgba(255, 215, 0, 0.5);
+      background: rgba(255, 215, 0, 0.05);
+    }
+
+    .prize-item.silver {
+      border-color: rgba(192, 192, 192, 0.5);
+      background: rgba(192, 192, 192, 0.05);
+    }
+
+    .prize-item.bronze {
+      border-color: rgba(205, 127, 50, 0.5);
+      background: rgba(205, 127, 50, 0.05);
+    }
+
+    /* Join Form */
+    .join-form {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius-md);
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       margin-bottom: 10px;
     }
-    .subtitle{opacity:0.85;line-height:1.5;max-width:860px;margin:0 auto;}
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap:16px;
-      margin-top: 18px;
+
+    .form-group {
+      margin-bottom: 10px;
     }
-    .card{
-      border:1px solid var(--border);
-      border-radius:18px;
-      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-      box-shadow:0 12px 40px rgba(0,0,0,0.35);
-      padding:16px;
-      overflow:hidden;
-      position:relative;
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
     }
-    .card.has-bg::before{
-      content:"";
-      position:absolute;inset:0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.80));
-      z-index:0;
-    }
-    .card > *{position:relative;z-index:1;}
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      font-size:12px;font-weight:900;
-      padding:7px 10px;border-radius:999px;
-      border:1px solid var(--border);
-      background: rgba(0,0,0,0.25);
-      margin-bottom:10px;
-    }
-    .badge.live{border-color:rgba(0,255,136,0.35);background:rgba(0,255,136,0.10);}
-    .badge.dead{border-color:rgba(255,77,77,0.35);background:rgba(255,77,77,0.10);}
-    .meta{display:flex;flex-wrap:wrap;gap:10px;opacity:0.9;margin-top:10px;font-size:13px;}
-    .meta span{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--border);}
-    .kicker{font-weight:900;color:var(--neon-cyan);margin-bottom:8px;}
-    .title{font-weight:950;font-size:1.2rem;margin-bottom:6px;}
-    .text{opacity:0.9;line-height:1.5;white-space:pre-wrap;}
-    .divider{height:1px;background:rgba(255,255,255,0.12);margin:12px 0;}
-    .form{
-      margin-top:14px;
-      border:1px solid var(--border);
-      border-radius:18px;
-      background:rgba(255,255,255,0.05);
-      padding:16px;
-    }
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
-    .row.one{grid-template-columns:1fr;}
-    input, textarea, select{
-      width:100%;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.25);
-      color:#fff;
-      outline:none;
-    }
-    textarea{min-height:110px;resize:vertical;}
-    label{font-size:12px;opacity:0.85;}
-    small.help{display:block;margin-top:8px;opacity:0.75;line-height:1.35;}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-    .admin-login{
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 18px;
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 0, 0, 0.3);
       border: 1px solid var(--border);
-      background: rgba(0,0,0,0.28);
+      color: var(--text-light);
+      font-size: 0.95rem;
+      transition: var(--transition);
     }
-    .admin-login h2{font-size:1.2rem;margin-bottom:8px;}
-    .admin-desc{opacity:0.85;line-height:1.4;margin-bottom:10px;}
-    .admin-login-box{display:flex;gap:10px;flex-wrap:wrap;}
-    .admin-login-box input{flex:1;min-width:230px;}
-    .admin-status-row{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap;}
-    .admin-badge{padding:6px 10px;border-radius:999px;border:1px solid var(--border);font-weight:900;font-size:12px;}
-    .admin-badge-on{background:rgba(0,255,156,0.12);border-color:rgba(0,255,156,0.35);}
-    .admin-badge-off{background:rgba(255,77,77,0.10);border-color:rgba(255,77,77,0.35);}
-    .admin-user-label{opacity:0.85;font-size:12px;}
-    .admin-msg{margin-top:10px;font-size:13px;}
-    .admin-only{display:none;}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
-      border:1px solid var(--border);
-      background:rgba(0,0,0,0.22);
-      font-size:12px;opacity:0.9;
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.2);
     }
-    .img-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-    .img-strip img{height:44px;width:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);opacity:0.95;}
-    .rulebox{padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:rgba(0,0,0,0.22);opacity:0.92;}
-  
 
-  /* === Extra layout fixes (standard cards + mobile) === */
-  :root {
-    --promo-card-h: 560px;
-    --promo-media-h: 200px;
-  }
-  .grid {
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-    gap: 14px;
-  }
-  .promo-card {
-    height: var(--cardH, var(--promo-card-h));
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-    position:relative;
-  }
-  .promo-media {
-    height: var(--mediaH, var(--promo-media-h));
-    background: rgba(255,255,255,0.05);
-    background-size: cover;
-    background-position: center;
-    position:relative;
-    flex: 0 0 auto;
-  }
-  .promo-overlay {
-    position:absolute;
-    left: calc(var(--overlayX, 6) * 1%);
-    top:  calc(var(--overlayY, 8) * 1%);
-    transform: translate(0,0);
-    max-width: calc(100% - 12%);
-    padding: 8px 10px;
-    border-radius: 12px;
-    backdrop-filter: blur(6px);
-    background: rgba(0,0,0,0.35);
-    line-height: 1.15;
-    font-weight: 700;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.55);
-    white-space: pre-wrap;
-    overflow-wrap:anywhere;
-  }
-  .promo-overlay[data-align="center"] { text-align:center; }
-  .promo-overlay[data-align="right"] { text-align:right; }
-  .promo-body {
-    padding: 12px 12px 10px;
-    display:flex;
-    flex-direction:column;
-    gap: 10px;
-    flex: 1 1 auto;
-    min-height: 0; /* important for internal scroll */
-  }
-  .promo-desc {
-    opacity: 0.92;
-    font-size: 0.98rem;
-    overflow:auto;
-    padding-right: 4px;
-  }
-  .promo-meta {
-    display:flex;
-    gap: 8px;
-    flex-wrap:wrap;
-    align-items:center;
-  }
-  .promo-footer {
-    padding: 10px 12px 12px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    display:flex;
-    flex-direction:column;
-    gap: 10px;
-    flex: 0 0 auto;
-    background: rgba(0,0,0,0.12);
-  }
-  .join-row {
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .join-row.one { grid-template-columns: 1fr; }
-  .join-row input, .join-row button {
-    width:100%;
-  }
-  .leaderboard-mini {
-    max-height: 160px;
-    overflow:auto;
-    border-radius: 14px;
-    background: rgba(0,0,0,0.18);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 8px;
-  }
-  .leaderboard-mini table {
-    width:100%;
-    border-collapse: collapse;
-    font-size: 0.92rem;
-  }
-  .leaderboard-mini th, .leaderboard-mini td {
-    padding: 6px 6px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    text-align:left;
-    vertical-align: top;
-  }
-  .leaderboard-mini tr:last-child td { border-bottom:none; }
-
-  .admin-actions {
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
-  .admin-actions .btn {
-    padding: 10px 12px;
-    border-radius: 14px;
-  }
-
-  @media (max-width: 520px) {
-    :root {
-      --promo-card-h: 620px;
-      --promo-media-h: 190px;
+    /* Leaderboard */
+    .leaderboard {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 30px;
+      border: 1px solid var(--border);
     }
-    .join-row { grid-template-columns: 1fr; }
-    .promo-overlay {
-      left: calc(var(--overlayX, 6) * 1%);
-      top: calc(var(--overlayY, 6) * 1%);
-      max-width: calc(100% - 10%);
+
+    .leaderboard table {
+      width: 100%;
+      border-collapse: collapse;
     }
-  }
-  
-/* === Admin buttons placement + leaderboard outside card === */
-.promo-media { position: relative; }
-.promo-media .admin-actions{
-  position:absolute;
-  top:10px; right:10px;
-  z-index:4;
-  display:flex;
-  gap:8px;
-}
-.promo-media .admin-actions .btn{
-  padding:10px 12px;
-  font-size:0.9rem;
-  border-radius:999px;
-}
-.promo-leaderboard-out{
-  margin-top: 10px;
-  margin-bottom: 14px;
-  padding: 14px 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.18);
-  backdrop-filter: blur(6px);
-}
 
+    .leaderboard th {
+      text-align: left;
+      padding: 12px 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
 
-/* === Neon gradient border wrapper for promo + leaderboard (border only) === */
-.promo-block{
-  margin: 14px 0;
-  border-radius: 24px;
-  padding: 12px;
-  background: transparent;          /* no fill over cards */
-  border: 2px solid transparent;    /* gradient border only */
-  border-image: linear-gradient(135deg,
-    rgba(0,255,255,0.95),
-    rgba(138,43,226,0.95),
-    rgba(0,255,136,0.95),
-    rgba(0,102,255,0.95)
-  ) 1;
-  box-shadow:
-    0 0 18px rgba(0,255,255,0.10),
-    0 0 26px rgba(138,43,226,0.08);
-  display:flex;
-  gap: 14px;
-  align-items: stretch;
-}
-.promo-block > .news-card{
-  flex: 1 1 0;
-  min-width: 0;
-}
-.promo-leaderboard-out{
-  flex: 1 1 0;
-  min-width: 0;
-  border-radius: 22px;
-  padding: 14px 14px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.18);
-  backdrop-filter: blur(6px);
-}
-@media (max-width: 980px){
-  .promo-block{ flex-direction: column; }
-}
+    .leaderboard td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
+    .leaderboard tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
 
-/* === LAYOUT FIX: each promo+leaderboard on one row, next promo on next row === */
-#promoList{ display:flex !important; flex-direction:column !important; gap: 16px !important; }
-.promo-block{ width:100%; }
+    .rank-1 {
+      color: gold;
+      font-weight: 800;
+    }
 
-/* === CARD SIZE + SPACING FIX (no text overlap) === */
-.promo-card{
-  height: auto !important;
-  min-height: 760px;
-}
-.promo-content{
-  overflow: visible !important;
-  gap: 10px;
-}
-.promo-desc{
-  max-height: 180px;
-  overflow:auto;
-  padding-right: 6px;
-}
-.divider{ margin: 10px 0; }
+    .rank-2 {
+      color: silver;
+      font-weight: 700;
+    }
 
-/* Join form: prevent button overlapping inputs */
-.promo-join .form-row{
-  align-items: stretch;
-}
-.promo-join .form-row input{
-  width: 100%;
-}
-.promo-join .form-row button{
-  width: 100%;
-  min-width: 0 !important;
-}
-@media (min-width: 720px){
-  .promo-join .form-row{
-    flex-wrap: nowrap;
-  }
-  .promo-join .form-row button{
-    width: auto;
-    min-width: 160px !important;
-  }
-}
+    .rank-3 {
+      color: #cd7f32;
+      font-weight: 700;
+    }
 
+    /* Admin Panel */
+    .admin-panel {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 25px;
+      margin-top: 40px;
+      border: 1px solid var(--border);
+    }
 
-/* === Prize emphasis tiers === */
-.prize-item{ display:block; width:100%; white-space:pre-wrap; padding:10px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.14); background: rgba(0,0,0,0.18); }
-.prize-item b{ font-weight:900; }
-.prize-gold{ border-color: rgba(255,215,0,0.55); box-shadow: 0 0 18px rgba(255,215,0,0.10); }
-.prize-silver{ border-color: rgba(192,192,192,0.55); box-shadow: 0 0 18px rgba(192,192,192,0.08); }
-.prize-bronze{ border-color: rgba(205,127,50,0.55); box-shadow: 0 0 18px rgba(205,127,50,0.08); }
-.prize-tierA{ border-color: rgba(0,255,255,0.45); box-shadow: 0 0 18px rgba(0,255,255,0.08); }
-.prize-tierB{ border-color: rgba(0,255,136,0.40); box-shadow: 0 0 18px rgba(0,255,136,0.06); }
-.prize-tierC{ border-color: rgba(138,43,226,0.40); box-shadow: 0 0 18px rgba(138,43,226,0.06); }
-.prize-subtitle{ font-weight:900; margin: 10px 0 8px; opacity:0.95; }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
+    .admin-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-/* === FIX: ensure Join section fits after Premii === */
-.promo-card{
-  min-height: 1320px !important;
-}
-.promo-content{
-  overflow: visible !important;
-}
+    /* Login Form */
+    .login-form {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
 
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      margin-top: 50px;
+    }
 
-/* === Winners UI === */
-.winners-wrap{
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255,255,255,0.10);
-}
-.winners-title{
-  font-weight: 900;
-  margin: 2px 0 8px 0;
-}
-.winners-grid{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-.winner-row{
-  padding: 10px 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(0,0,0,0.18);
-}
-.winner-row b{ font-weight: 900; }
-.winner-pill{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:4px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.20);
-  font-size: 12px;
-  font-weight: 800;
-}
+    /* Utilities */
+    .hidden {
+      display: none !important;
+    }
 
+    .text-center {
+      text-align: center;
+    }
 
-/* === OVERRIDE: leaderboard split half list / half winners === */
-.promo-leaderboard-out{
-  display:flex;
-  flex-direction:column;
-}
-.promo-leaderboard-out .leaderboard-mini{
-  flex: 1 1 50%;
-  min-height: 260px;
-  max-height: none;
-  overflow: auto;
-}
-.promo-leaderboard-out .winners-wrap{
-  flex: 1 1 50%;
-  min-height: 260px;
-  max-height: none;
-  overflow: auto;
-}
-@media (max-width: 980px){
-  .promo-leaderboard-out .leaderboard-mini{ min-height: 240px; }
-  .promo-leaderboard-out .winners-wrap{ min-height: 240px; }
-}
-/* === END OVERRIDE === */
+    .mt-1 { margin-top: 10px; }
+    .mt-2 { margin-top: 20px; }
+    .mt-3 { margin-top: 30px; }
+    .mb-1 { margin-bottom: 10px; }
+    .mb-2 { margin-bottom: 20px; }
+    .mb-3 { margin-bottom: 30px; }
 
-</style>
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      
+      .hero h2 {
+        font-size: 2rem;
+      }
+      
+      .promo-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .admin-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <img src="https://via.placeholder.com/48" alt="Logo" class="logo-img">
+        <div class="logo-text">
+          <h1>StancuBYT</h1>
+          <p>Promoții & Concursuri</p>
+        </div>
+      </div>
+      <div class="status-badge live">
+        <i class="fas fa-circle"></i> LIVE
+      </div>
+    </header>
 
-  <!-- Firebase (compat) -->
+    <!-- Hero Section -->
+    <section class="hero">
+      <h2>Participă și Câștigă</h2>
+      <p>Intră în lumea promoțiilor și concursurilor exclusive. Participă, acumulează puncte și câștigă premii fantastice!</p>
+      <div class="features">
+        <span class="feature-tag"><i class="fas fa-gift"></i> Premii Zilnice</span>
+        <span class="feature-tag"><i class="fas fa-trophy"></i> Competiții</span>
+        <span class="feature-tag"><i class="fas fa-chart-line"></i> Clasamente Live</span>
+        <span class="feature-tag"><i class="fas fa-shield-alt"></i> Securitate Maximă</span>
+      </div>
+    </section>
+
+    <!-- Promotions Grid -->
+    <section id="promotions-container">
+      <div class="promo-grid" id="promo-grid">
+        <!-- Promo cards will be dynamically inserted here -->
+      </div>
+    </section>
+
+    <!-- Admin Login -->
+    <section class="admin-panel" id="admin-panel">
+      <div class="admin-header">
+        <h3><i class="fas fa-user-shield"></i> Panou Administrator</h3>
+        <div class="admin-actions">
+          <button class="btn btn-secondary" id="login-toggle">
+            <i class="fas fa-sign-in-alt"></i> Autentificare
+          </button>
+          <button class="btn btn-primary hidden" id="add-promo-btn">
+            <i class="fas fa-plus"></i> Adaugă Promoție
+          </button>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <div class="login-form" id="login-form">
+        <h4 class="text-center mb-2">Autentificare Admin</h4>
+        <div class="form-group">
+          <label for="admin-email"><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="admin-email" class="form-control" placeholder="admin@example.com">
+        </div>
+        <div class="form-group">
+          <label for="admin-password"><i class="fas fa-lock"></i> Parolă</label>
+          <input type="password" id="admin-password" class="form-control" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary" id="login-btn" style="width: 100%;">
+            <i class="fas fa-sign-in-alt"></i> Conectează-te
+          </button>
+        </div>
+        <div id="login-message" class="text-center mt-2"></div>
+      </div>
+
+      <!-- Add Promo Form (Hidden by default) -->
+      <div class="hidden" id="promo-form-container">
+        <!-- Form content will be inserted here -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2024 StancuBYT. Toate drepturile rezervate.</p>
+      <p class="mt-1">Platformă de promoții și concursuri</p>
+    </footer>
+  </div>
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
   <script>
-
-  // === Expiry helpers (local time + robust parsing) ===
-  function parseEndsMs(ends){
-    try{
-      if(!ends) return NaN;
-      // Firestore Timestamp
-      if(typeof ends === "object"){
-        if(typeof ends.toDate === "function") return ends.toDate().getTime();
-        if(typeof ends.seconds === "number") return ends.seconds*1000;
-      }
-      // number (ms)
-      if(typeof ends === "number") return ends;
-      const s = String(ends).trim();
-      // ISO / RFC (includes datetime-local "YYYY-MM-DDTHH:MM")
-      const d1 = new Date(s);
-      if(!isNaN(d1.getTime())) return d1.getTime();
-      // Romanian: DD.MM.YYYY, HH:MM[:SS]  (comma optional)
-      const m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
-      if(m){
-        const dd = parseInt(m[1],10);
-        const mm = parseInt(m[2],10);
-        const yy = parseInt(m[3],10);
-        const hh = m[4] ? parseInt(m[4],10) : 0;
-        const mi = m[5] ? parseInt(m[5],10) : 0;
-        const ss = m[6] ? parseInt(m[6],10) : 0;
-        return new Date(yy, mm-1, dd, hh, mi, ss).getTime(); // local time on device
-      }
-      return NaN;
-    }catch(e){ return NaN; }
-  }
-  function isExpiredPromo(p){
-    const ms = parseEndsMs(p && p.ends);
-    return Number.isFinite(ms) ? (Date.now() >= ms) : false;
-  }
-  function formatEndsLocal(ends){
-    const ms = parseEndsMs(ends);
-    if(!Number.isFinite(ms)) return "—";
-    return new Date(ms).toLocaleString("ro-RO");
-  }
-  // === end helpers ===
-
-    // Firebase init (preluat din "salvare stergere.html")
-    window.firebaseConfig = {
+    // Firebase Configuration
+    const firebaseConfig = {
       apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
       authDomain: "stancubyt-fc2b9.firebaseapp.com",
       projectId: "stancubyt-fc2b9",
@@ -541,1336 +584,403 @@
       appId: "1:263244200492:web:28adf253b726cfdafaaf89",
       measurementId: "G-272S9HSY3K"
     };
+
+    // Initialize Firebase
     try {
       if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
-        firebase.initializeApp(window.firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
       }
-    } catch (e) {
-      console.warn("Firebase init warning:", e);
-    }
-  </script>
-
-<!-- === Added: Firebase v9 Functions (callable) - SAFE PATCH === -->
-<script type="module">
-  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
-
-  // Reuse the SAME config already defined for compat
-  const cfg = window.firebaseConfig;
-  if (!cfg || !cfg.projectId) {
-    console.error("Firebase config missing projectId; cannot init Functions.");
-  } else {
-    // Init modular app ONLY if not already created
-    let app;
-    if (!getApps().length) {
-      app = initializeApp(cfg);
-    } else {
-      app = getApps()[0];
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
     }
 
-    // IMPORTANT: region must match the deployed function
-    const functions = getFunctions(app, "europe-west1");
-
-    // Expose callable globally without breaking existing code
-    window.sendPromoSignupEmail = httpsCallable(functions, "sendPromoSignupEmail");
-    window.sendPromoWinnerEmail = httpsCallable(functions, "sendPromoWinnerEmail");
-
-    console.log("Functions callable ready:", { projectId: cfg.projectId, region: "europe-west1" });
-  }
-</script>
-<!-- === End patch === -->
-
-</head>
-
-<body>
-  <div class="wrap">
-    <div class="hero">
-      <div class="title">🎁 Promoții & Concursuri — StancuBYT</div>
-      <div class="subtitle">Carduri standard, imagini redimensionate automat, text peste imagine + clasament în fiecare card.</div>
-
-      <div class="actions admin-only" style="justify-content:center; margin-top:14px; display:none;">
-        <button class="btn" type="button" onclick="openPromoForm('promo')">➕ Adaugă Promoție</button>
-        <button class="btn secondary" type="button" onclick="openPromoForm('giveaway')">🏆 Adaugă Concurs / Giveaway</button>
-      </div>
-      <div style="margin-top:10px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-        <span class="pill">📱 Mobile-first</span>
-        <span class="pill">🖼️ Auto-resize imagini</span>
-        <span class="pill">🏆 Clasament per card</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="kicker">📌 Promoții / Giveaway-uri</div>
-      <div id="promoList" class="grid"></div>
-
-      <div id="promoForm" class="form admin-only" style="display:none;">
-        <div class="kicker">✨ Creează promoție / concurs</div>
-
-        <div class="row">
-          <div>
-            <label>Tip</label>
-            <select id="promoKind">
-              <option value="promo">📣 Promoție</option>
-              <option value="giveaway">🎁 Concurs / Giveaway</option>
-            </select>
-          </div>
-          <div>
-            <label>Data & ora expirării</label>
-            <input id="promoEnds" type="datetime-local">
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <label>Titlu</label>
-            <input id="promoTitle" type="text" maxlength="120" placeholder="Ex: Giveaway SBYT — 7 zile + premii pe niveluri">
-          </div>
-          <div>
-            <label>Puncte / acțiune (gamification)</label>
-            <input id="promoPoints" type="number" min="1" step="1" value="10" placeholder="Ex: 10">
-          </div>
-        </div>
-
-        <div class="row one">
-          <div>
-            <label>Hook (1–2 fraze, mesaj scurt de impact)</label>
-            <textarea id="promoHook" rows="2" placeholder="Ex: Intră în TOP 5 și câștigă bonusuri! Fiecare share = +10 puncte."></textarea>
-          </div>
-        </div>
-
-        <div class="row one">
-          <div>
-            <label>Descriere (beneficiu + cum funcționează)</label>
-            <textarea id="promoDesc" placeholder="Ex: Participă, strânge puncte și intră în clasament. La final, primele locuri primesc premii, iar participanții activi primesc bonusuri."></textarea>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="kicker">🎨 Vizual (banner + imagini de fundal)</div>
-        <div class="row">
-          <div>
-            <label>Banner (recomandat)</label>
-            <input id="promoBanner" type="file" accept="image/*">
-          </div>
-          <div>
-            <label>Imagini fundal (max 3 recomandat)</label>
-            <input id="promoBg" type="file" accept="image/*" multiple>
-          </div>
-        </div>
-        <small class="help">Salvează în Firestore: <b>stats/visits</b> (câmpuri <b>promos</b> + <b>participants</b>). Upload imagini în Storage: <b>/news/**</b>.</small>
-
-        <div class="divider"></div>
-
-        <div class="kicker">🏆 Premii (distribuție atractivă)</div>
-        <div class="row">
-          <div><label>Premiul I</label><input id="prize1" type="text" maxlength="180" placeholder="Ex: 10.000 SBYT + rol VIP"></div>
-          <div><label>Premiul II</label><input id="prize2" type="text" maxlength="180" placeholder="Ex: 5.000 SBYT"></div>
-        </div>
-        <div class="row">
-          <div><label>Premiul III</label><input id="prize3" type="text" maxlength="180" placeholder="Ex: 2.500 SBYT"></div>
-          <div><label>Primele 5 locuri (după podium)</label><input id="prizeTop5" type="text" maxlength="180" placeholder="Ex: 500 SBYT fiecare"></div>
-        </div>
-        <div class="row">
-          <div><label>Următoarele 10 locuri</label><input id="prizeNext10" type="text" maxlength="180" placeholder="Ex: 200 SBYT fiecare"></div>
-          <div><label>Bonus participare / surpriză</label><input id="prizeBonus" type="text" maxlength="180" placeholder="Ex: 50 SBYT pentru cei cu min. 3 acțiuni"></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="kicker">📜 Regulament & condiții</div>
-        <div class="row one">
-          <div>
-            <label>Regulament (clar, pe pași)</label>
-            
-<div class="form-row" style="flex-direction:column; gap:10px;">
-  <div style="font-weight:900;">📜 Reguli (5 puncte + text)</div>
-  <input id="rule1" type="text" placeholder="Regula 1 (ex: Urmărește contul / Subscribe)" maxlength="120">
-  <input id="rule2" type="text" placeholder="Regula 2" maxlength="120">
-  <input id="rule3" type="text" placeholder="Regula 3" maxlength="120">
-  <input id="rule4" type="text" placeholder="Regula 4" maxlength="120">
-  <input id="rule5" type="text" placeholder="Regula 5" maxlength="120">
-  <textarea id="rulesText" placeholder="Text reguli (opțional, 5-6 rânduri)" rows="6" style="width:100%;"></textarea>
-</div>
-
-          </div>
-        </div>
-
-        <div class="actions">
-          <button id="promoSaveBtn" class="btn" type="button" onclick="savePromo()">💾 Salvează</button>
-          <button class="btn secondary" type="button" onclick="cancelPromo()">❌ Anulează</button>
-        </div>
-
-        <small class="help">
-          Salvează în Firestore: <b>promos</b> (și subcolecție <b>participants</b>). Scrierea necesită autentificare admin.
-        </small>
-      </div>
-    </div>
-
-    <div class="admin-login" id="admin-login">
-      <h2>🔐 Administrator Login</h2>
-      <p class="admin-desc">
-        Autentificare (Firebase Auth) necesară pentru adăugare/ștergere concursuri și promoții.
-        Pentru ca salvarea în Firestore să funcționeze, contul logat trebuie să fie permis de Firestore Rules (de obicei <b>stancubyt@gmail.com</b>).
-      </p>
-
-      <div class="admin-login-box">
-        <input type="email" id="adminEmail" placeholder="Email administrator" autocomplete="username">
-        <input type="password" id="adminPass" placeholder="Parola administrator" autocomplete="current-password">
-        <button class="btn" type="button" onclick="adminSignIn()">Autentificare</button>
-        <button class="btn secondary" type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Delogare</button>
-      </div>
-
-      <div class="admin-status-row">
-        <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
-        <span id="adminUserLabel" class="admin-user-label"></span>
-      </div>
-
-      <p id="adminLoginMsg" class="admin-msg"></p>
-    </div>
-
-    <div class="footer">
-      <div class="footer-inner">
-        <span style="opacity:.8;">© StancuBYT</span>
-      </div>
-    </div>
-  </div>
-
-<script>
-(function(){
-  // ===== Helpers =====
-  const $ = (id)=>document.getElementById(id);
-  const esc = (s)=>String(s??"").replace(/[&<>"'`=\/]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;','\\':'&#92;'}[ch]||ch));
-  const clamp = (n,min,max)=>Math.min(max,Math.max(min,n));
-
-  const ADMIN_EMAIL = "stancubyt@gmail.com";
-  const auth = ()=> (window.firebase && firebase.auth) ? firebase.auth() : null;
-  const fs = ()=> (window.firebase && firebase.firestore) ? firebase.firestore() : null;
-  const st = ()=> (window.firebase && firebase.storage) ? firebase.storage() : null;
-
-  // ===== State =====
-  let __isAdmin = false;
-  let __user = null;
-  let __editingPromoId = null;
-  let __statsUnsub = null;
-  let __statsCache = { promos: [], participants: {} };
-  // expose for onclick/global helpers
-  window.__statsCache = __statsCache;
-
-
-  // IMPORTANT: folosim stats/visits (conform rules trimise de tine)
-  function statsRef(){
-    const d = fs();
-    if(!d) return null;
-    return d.collection('stats').doc('visits');
-  }
-
-  function normalizeStats(data){
-    const promos = Array.isArray(data?.promos) ? data.promos : [];
-    const participants = (data?.participants && typeof data.participants === 'object') ? data.participants : {};
-    return { promos, participants };
-  }
-
-  function setAdminUI(isAdmin, user){
-    __isAdmin = !!isAdmin;
-    __user = user || null;
-    // expose admin state globally (used by winners preview)
-    window.__SBYT_ADMIN = __isAdmin;
-    window.__SBYT_USER_EMAIL = (__user && __user.email) ? __user.email : "";
-
-    document.querySelectorAll('.admin-only').forEach(el=>{
-      // preserve original display type if needed
-      const d = el.dataset && el.dataset.adminDisplay ? el.dataset.adminDisplay : (el.classList.contains('actions') ? 'flex' : 'block');
-      el.style.display = __isAdmin ? d : 'none';
-    });
-
-    const badge = $('adminStatusBadge');
-    const label = $('adminUserLabel');
-    const logoutBtn = $('adminLogoutBtn');
-    if (badge) {
-      badge.textContent = __isAdmin ? 'Autentificat' : 'Neautentificat';
-      badge.className = __isAdmin ? 'admin-badge admin-badge-on' : 'admin-badge admin-badge-off';
-    }
-    if (label) label.textContent = __isAdmin && user ? user.email : '';
-    if (logoutBtn) logoutBtn.style.display = __isAdmin ? 'inline-flex' : 'none';
-  }
-
-  async function computeIsAdmin(user){
-    return !!(user && (user.email||'').toLowerCase() === ADMIN_EMAIL.toLowerCase());
-  }
-
-  // ===== Admin auth (same as your working files) =====
-  window.adminSignIn = async function adminSignIn(){
-    const a = auth();
-    const msg = $('adminLoginMsg');
-    if(!a) {
-      if(msg) msg.textContent = 'Firebase Auth nu este disponibil.';
-      return;
-    }
-    const email = ($('adminEmail')?.value||'').trim();
-    const pass  = ($('adminPass')?.value||'').trim();
-    if(!email || !pass) {
-      if(msg) msg.textContent = 'Completează email + parolă.';
-      return;
-    }
-    try {
-      await a.signInWithEmailAndPassword(email, pass);
-      if(msg) msg.textContent = '';
-    } catch(e) {
-      console.error('adminSignIn:', e);
-      if(msg) msg.textContent = 'Eroare autentificare. Verifică datele.';
-    }
-  };
-
-  window.adminSignOut = async function adminSignOut(){
-    const a = auth();
-    if(!a) return;
-    try { await a.signOut(); } catch(e) { console.warn(e); }
-  };
-
-  // ===== Promo form open/close =====
-  window.openPromoForm = function openPromoForm(kind, promoId){
-    const f = $('promoForm');
-    if(!f) return;
-    __editingPromoId = promoId || null;
-
-    // reset
-    f.style.display = 'block';
-    $('promoSaveBtn')?.setAttribute('data-mode', promoId ? 'edit' : 'add');
-
-    // set kind
-    if ($('promoKind')) $('promoKind').value = kind || 'promo';
-
-    // defaults
-    if(!promoId){
-      // clear fields
-      ['promoEnds','promoTitle','promoPoints','promoHook','promoDesc','prize1','prize2','prize3','promoRules','cardHeight','mediaHeight','overlayText','overlayFontSize','overlayX','overlayY','overlayAlign','overlayColor'].forEach(id=>{ if($(id)) $(id).value=''; });
-      if($('promoPoints')) $('promoPoints').value = 10;
-      if($('cardHeight')) $('cardHeight').value = 560;
-      if($('mediaHeight')) $('mediaHeight').value = 200;
-      if($('overlayFontSize')) $('overlayFontSize').value = 22;
-      if($('overlayX')) $('overlayX').value = 6;
-      if($('overlayY')) $('overlayY').value = 8;
-      if($('overlayAlign')) $('overlayAlign').value = 'left';
-      if($('overlayColor')) $('overlayColor').value = '#ffffff';
-      if($('promoBanner')) $('promoBanner').value = '';
-      if($('promoBg')) $('promoBg').value = '';
-      return;
-    }
-
-    // fill for edit
-    const p = (__statsCache.promos || []).find(x=>String(x.id)===String(promoId));
-    if(!p) return;
-    if($('promoKind')) $('promoKind').value = p.kind || kind || 'promo';
-    if($('promoEnds')) $('promoEnds').value = p.ends || '';
-    if($('promoTitle')) $('promoTitle').value = p.title || '';
-    if($('promoPoints')) $('promoPoints').value = Number(p.points||10);
-    if($('promoHook')) $('promoHook').value = p.hook || '';
-    if($('promoDesc')) $('promoDesc').value = p.desc || '';
-    if($('prize1')) $('prize1').value = (p.prizes && p.prizes.p1) ? p.prizes.p1 : '';
-    if($('prize2')) $('prize2').value = (p.prizes && p.prizes.p2) ? p.prizes.p2 : '';
-    if($('prize3')) $('prize3').value = (p.prizes && p.prizes.p3) ? p.prizes.p3 : '';
-    if($('prizeTop5')) $('prizeTop5').value = (p.prizes && p.prizes.top5) ? p.prizes.top5 : '';
-    if($('prizeNext10')) $('prizeNext10').value = (p.prizes && p.prizes.next10) ? p.prizes.next10 : '';
-    if($('prizeBonus')) $('prizeBonus').value = (p.prizes && p.prizes.bonus) ? p.prizes.bonus : '';
-    if($('promoRules')) $('promoRules').value = p.rules || '';
-
-    if($('cardHeight')) $('cardHeight').value = p.ui?.cardH ?? 560;
-    if($('mediaHeight')) $('mediaHeight').value = p.ui?.mediaH ?? 200;
-    if($('overlayText')) $('overlayText').value = p.ui?.overlay?.text ?? '';
-    if($('overlayFontSize')) $('overlayFontSize').value = p.ui?.overlay?.size ?? 22;
-    if($('overlayX')) $('overlayX').value = p.ui?.overlay?.x ?? 6;
-    if($('overlayY')) $('overlayY').value = p.ui?.overlay?.y ?? 8;
-    if($('overlayAlign')) $('overlayAlign').value = p.ui?.overlay?.align ?? 'left';
-    if($('overlayColor')) $('overlayColor').value = p.ui?.overlay?.color ?? '#ffffff';
-
-    // files remain empty unless replaced
-    if($('promoBanner')) $('promoBanner').value = '';
-    if($('promoBg')) $('promoBg').value = '';
-  };
-
-  window.cancelPromo = function cancelPromo(){
-    const f = $('promoForm');
-    if(f) f.style.display = 'none';
-    __editingPromoId = null;
-  };
-
-  // ===== Image resize + upload =====
-  async function resizeImageFile(file, opts={}){
-    const maxW = Number(opts.maxW || 1600);
-    const maxH = Number(opts.maxH || 1600);
-    const quality = clamp(Number(opts.quality || 0.86), 0.4, 0.92);
-
-    const bmp = await createImageBitmap(file);
-    let w = bmp.width, h = bmp.height;
-    const ratio = Math.min(maxW / w, maxH / h, 1);
-    w = Math.round(w * ratio);
-    h = Math.round(h * ratio);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    ctx.drawImage(bmp, 0, 0, w, h);
-
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', quality));
-    const name = (file.name || 'image').replace(/\.[^.]+$/, '') + '_resized.jpg';
-    return new File([blob], name, { type: 'image/jpeg' });
-  }
-
-  async function uploadResizedImage(file, storagePath){
-    const storage = st();
-    if(!storage) throw new Error('Storage indisponibil');
-    const ref = storage.ref().child(storagePath);
-    const resized = await resizeImageFile(file, { maxW: 1600, maxH: 1600, quality: 0.86 });
-    const snap = await ref.put(resized, { contentType: 'image/jpeg' });
-    const url = await snap.ref.getDownloadURL();
-    return { url, path: storagePath };
-  }
-
-  // ===== CRUD promos in stats/visits =====
-  function makeId(prefix='p'){
-    return prefix + '_' + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(3);
-  }
-
-  async function readStatsOnce(){
-    const ref = statsRef();
-    if(!ref) return { promos: [], participants: {} };
-    const doc = await ref.get();
-    return normalizeStats(doc.exists ? doc.data() : {});
-  }
-
-  async function writeStats(next){
-    const ref = statsRef();
-    if(!ref) throw new Error('statsRef null');
-    await ref.set(next, { merge: true });
-  }
-
-  window.savePromo = async function savePromo(){
-    if(!__isAdmin) {
-      alert('Trebuie să fii logat ca admin.');
-      return;
-    }
-
-    const kind = ($('promoKind')?.value || 'promo').trim();
-    const ends = ($('promoEnds')?.value || '').trim();
-    const title = ($('promoTitle')?.value || '').trim();
-    const points = Number(($('promoPoints')?.value || '10'));
-    const hook = ($('promoHook')?.value || '').trim();
-    const desc = ($('promoDesc')?.value || '').trim();
-
-    const rulesObj = {
-      r1: (document.getElementById('rule1')?.value || '').trim(),
-      r2: (document.getElementById('rule2')?.value || '').trim(),
-      r3: (document.getElementById('rule3')?.value || '').trim(),
-      r4: (document.getElementById('rule4')?.value || '').trim(),
-      r5: (document.getElementById('rule5')?.value || '').trim(),
-      text: (document.getElementById('rulesText')?.value || '').trim()
-    };
-    const rulesLegacy = [rulesObj.r1, rulesObj.r2, rulesObj.r3, rulesObj.r4, rulesObj.r5, rulesObj.text].filter(Boolean).join('\n');
-    const rules = rulesLegacy; // compat (text concatenat)
-
-    // IMPORTANT: fara validari "fantoma" - verificam exact ce trebuie
-    if(!title) return alert('Completează: Titlu');
-    if(!desc) return alert('Completează: Descriere');
-    if(!ends) return alert('Completează: Data & ora expirării');
-
-    const ui = {
-      cardH: clamp(Number($('cardHeight')?.value || 560), 360, 1200),
-      mediaH: clamp(Number($('mediaHeight')?.value || 200), 120, 520),
-      overlay: {
-        text: ($('overlayText')?.value || '').trim(),
-        size: clamp(Number($('overlayFontSize')?.value || 22), 10, 72),
-        x: clamp(Number($('overlayX')?.value || 6), 0, 90),
-        y: clamp(Number($('overlayY')?.value || 8), 0, 90),
-        align: ($('overlayAlign')?.value || 'left'),
-        color: ($('overlayColor')?.value || '#ffffff')
-      }
+    // App State
+    const AppState = {
+      currentUser: null,
+      isAdmin: false,
+      promotions: [],
+      participants: {},
+      listeners: []
     };
 
-    const prizes = {
-      p1: ($('prize1')?.value || '').trim(),
-      p2: ($('prize2')?.value || '').trim(),
-      p3: ($('prize3')?.value || '').trim(),
-      top5: ($('prizeTop5')?.value || '').trim(),
-      next10: ($('prizeNext10')?.value || '').trim(),
-      bonus: ($('prizeBonus')?.value || '').trim()
-    };
-
-    const bannerFile = $('promoBanner')?.files?.[0] || null;
-    const bgFiles = Array.from($('promoBg')?.files || []).slice(0, 3);
-
-    try {
-      const stats = await readStatsOnce();
-      const promos = Array.isArray(stats.promos) ? stats.promos.slice() : [];
-      const participants = (stats.participants && typeof stats.participants === 'object') ? stats.participants : {};
-
-      const now = Date.now();
-      const id = __editingPromoId || makeId(kind==='giveaway' ? 'g' : 'p');
-
-      const idx = promos.findIndex(p => String(p.id) === String(id));
-      const prev = idx >= 0 ? promos[idx] : null;
-
-      let banner = prev?.banner || null;
-      let bgs = Array.isArray(prev?.bgs) ? prev.bgs : [];
-
-      // Upload in /news/** (respectă storage rules pe care le-ai trimis)
-      // banner
-      if (bannerFile) {
-        const storagePath = `news/promos/${id}/banner_${Date.now()}_${bannerFile.name}`.replace(/\s+/g,'_');
-        banner = await uploadResizedImage(bannerFile, storagePath);
-      }
-      // backgrounds
-      if (bgFiles.length) {
-        const uploads = [];
-        for (const f of bgFiles) {
-          const storagePath = `news/promos/${id}/bg_${Date.now()}_${f.name}`.replace(/\s+/g,'_');
-          uploads.push(uploadResizedImage(f, storagePath));
-        }
-        bgs = await Promise.all(uploads);
-      }
-
-      const promoObj = {
-        id,
-        kind,
-        ends,
-        title,
-        points: Number.isFinite(points) ? points : 10,
-        hook,
-        desc,
-        rulesObj,
-        rules,
-        prizes,
-        ui,
-        banner,
-        bgs,
-        createdAt: prev?.createdAt || now,
-        updatedAt: now
-      };
-
-      if (idx >= 0) promos[idx] = promoObj;
-      else promos.unshift(promoObj);
-
-      // ensure participants map key exists
-      if (!participants[String(id)]) participants[String(id)] = participants[String(id)] || [];
-
-      await writeStats({ promos, participants });
-      __editingPromoId = null;
-      cancelPromo();
-      alert('Salvat ✔️');
-    } catch(e) {
-      console.error('savePromo:', e);
-      alert('Eroare la salvare (verifică Auth/Storage).');
-    }
-  };
-
-  // ===== Delete / Edit promo =====
-  window.editPromo = function editPromo(promoId){
-    if(!__isAdmin) return;
-    const p = (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId));
-    if(!p) return;
-    openPromoForm(p.kind || 'promo', promoId);
-    // scroll to form
-    $('promoForm')?.scrollIntoView({ behavior:'smooth', block:'start' });
-  };
-
-  async function tryDeleteStorageFiles(promo){
-    try {
-      if(!__isAdmin) return;
-      const storage = st();
-      if(!storage) return;
-      const paths = [];
-      if(promo?.banner?.path) paths.push(promo.banner.path);
-      if(Array.isArray(promo?.bgs)) promo.bgs.forEach(x=>x?.path && paths.push(x.path));
-      for (const p of paths) {
-        try { await storage.ref().child(p).delete(); } catch(e) { /* ignore */ }
-      }
-    } catch(e){}
-  }
-
-  window.deletePromo = async function deletePromo(promoId){
-    if(!__isAdmin) return alert('Doar admin poate șterge.');
-    if(!confirm('Sigur vrei să ștergi această promoție/concurs?')) return;
-
-    try {
-      const stats = await readStatsOnce();
-      const promos = (stats.promos||[]).slice();
-      const participants = (stats.participants && typeof stats.participants==='object') ? stats.participants : {};
-
-      const idx = promos.findIndex(p=>String(p.id)===String(promoId));
-      const promo = idx>=0 ? promos[idx] : null;
-      if(idx>=0) promos.splice(idx,1);
-      delete participants[String(promoId)];
-
-      await writeStats({ promos, participants });
-      await tryDeleteStorageFiles(promo);
-    } catch(e) {
-      console.error('deletePromo:', e);
-      alert('Eroare la ștergere.');
-    }
-  };
-
-  // ===== Participants / referral =====
-  function maskEmail(em){
-    const s = String(em||'');
-    const at = s.indexOf('@');
-    if(at<=1) return s ? (s[0] + '***') : '';
-    const name = s.slice(0, at);
-    const dom = s.slice(at);
-    return name.slice(0,2) + '***' + dom;
-  }
-  function maskCode(code){
-    const s = String(code||'');
-    if(s.length<=2) return s;
-    return s.slice(0,2) + '•'.repeat(Math.min(12, s.length-2));
-  }
-  function genCode(){
-    return Math.random().toString(36).slice(2, 10).toUpperCase();
-  }
-
-  async function addParticipant(promoId, payload){
-    const stats = await readStatsOnce();
-    const participants = (stats.participants && typeof stats.participants==='object') ? stats.participants : {};
-    const arr = Array.isArray(participants[String(promoId)]) ? participants[String(promoId)].slice() : [];
-
-    // one per wallet
-    const walletKey = String(payload.wallet||'').toLowerCase();
-    if(walletKey && arr.some(x => String(x.wallet||'').toLowerCase() === walletKey)) {
-      throw new Error('Acest wallet este deja înscris.');
-    }
-
-    // one per email (optional)
-    const emailKey = String(payload.email||'').toLowerCase();
-    if(emailKey && arr.some(x => String(x.email||'').toLowerCase() === emailKey)) {
-      throw new Error('Acest email este deja înscris.');
-    }
-
-    const id = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
-    const code = genCode();
-    const participant = {
-      id,
-      name: payload.name || 'Anonim',
-      email: payload.email || '',
-      wallet: payload.wallet || '',
-      code,
-      referral: (payload.referral||'').trim(),
-      joinedAt: Date.now()
-    };
-    arr.push(participant);
-    participants[String(promoId)] = arr;
-
-    // keep promos intact
-    await writeStats({ participants });
-    return participant;
-  }
-
-  function buildLeaderboard(p){
-    const promoId = (p && p.id!=null) ? p.id : p;
-    const promo = (p && typeof p === 'object') ? p : (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId)) || {};
-
-    const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
-    if(!arr.length) {
-      return `<div style="opacity:.85;">Nu există participanți încă.</div>`;
-    }
-
-    // referral counts
-    const counts = new Map();
-    const codeToUser = new Map();
-    arr.forEach(u=> {
-      const c = String(u.code||'').trim().toUpperCase();
-      if(c) codeToUser.set(c, u);
-      counts.set(u.id, 0);
-    });
-    arr.forEach(u=> {
-      const ref = String(u.referral||'').trim().toUpperCase();
-      if(!ref) return;
-      const owner = codeToUser.get(ref);
-      if(owner && owner.id !== u.id) {
-        counts.set(owner.id, (counts.get(owner.id)||0) + 1);
-      }
-    });
-
-    const rows = arr.map(u=> {
-      const referrals = counts.get(u.id)||0;
-      return {
-        name: u.name||'Anonim',
-        email: u.email||'',
-        wallet: u.wallet||'',
-        code: u.code||'',
-        referrals,
-        joinedAt: Number(u.joinedAt||0)
-      };
-    }).sort((a,b)=> b.referrals - a.referrals || a.joinedAt - b.joinedAt);
-
-    let html = `<table>
-      <tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Invitări</th></tr>`;
-    rows.slice(0, 20).forEach((r,i)=> {
-      const top = i===0 ? 'style="font-weight:800;"' : '';
-      html += `<tr ${top}>
-        <td>${i+1}</td>
-        <td>${esc(r.name)}</td>
-        <td>${esc(maskEmail(r.email))}</td>
-        <td style="font-family:monospace;">${esc(maskCode(r.code))}</td>
-        <td><span class="pill">${r.referrals}</span></td>
-      </tr>`;
-    });
-    html += `</table>`;
-    // ===== Winners section (auto show after expiry) =====
-    const now = Date.now();
-    const endsMs = promo && promo.ends ? new Date(promo.ends).getTime() : NaN;
-    const expired = Number.isFinite(endsMs) && now >= endsMs;
-
-    let winnersHtml = "";
-    if (expired && promo.winners) {
-      winnersHtml = buildWinnersHtml(promo.winners);
-    }
-
-    if (winnersHtml) {
-      html += `<div class="winners-wrap">${winnersHtml}</div>`;
-    } else if (__isAdmin) {
-      // Admin preview / finalize buttons + preview container
-      html += `
-        <div class="winners-wrap">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
-            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
-          </div>
-          <div id="winners_preview_${esc(promoId)}"></div>
-        </div>
-      `;
-    }
-
-    return html;
-  }
-
-  // ===== Render promos =====
-  function formatEnds(ends){
-    if(!ends) return '';
-    try {
-      const d = new Date(ends);
-      if(Number.isNaN(d.getTime())) return ends;
-      return d.toLocaleString('ro-RO');
-    } catch { return ends; }
-  }
-
-  function pickMediaUrl(p){
-    return p?.banner?.url || (Array.isArray(p?.bgs) && p.bgs[0]?.url) || '';
-  }
-
-  function renderPromos(){
-    const list = $('promoList');
-    if(!list) return;
-    const promos = Array.isArray(__statsCache.promos) ? __statsCache.promos : [];
-    list.innerHTML = '';
-
-    if(!promos.length){
-      list.innerHTML = `<div style="opacity:.85; padding:10px;">Nu există promoții/concursuri încă.</div>`;
-      return;
-    }
-
-    promos.forEach(p=> {
-      const mediaUrl = pickMediaUrl(p);
-      const ui = p.ui || {};
-      const cardH = clamp(Number(ui.cardH ?? 560), 360, 1200);
-      const mediaH = clamp(Number(ui.mediaH ?? 200), 120, 520);
-      const overlay = ui.overlay || {};
-      const overlayText = (overlay.text||'').trim();
-      const overlaySize = clamp(Number(overlay.size ?? 22), 10, 72);
-      const overlayX = clamp(Number(overlay.x ?? 6), 0, 90);
-      const overlayY = clamp(Number(overlay.y ?? 8), 0, 90);
-      const overlayAlign = (overlay.align || 'left');
-      const overlayColor = (overlay.color || '#ffffff');
-
-      const prizes = [];
-      if(p.prizes?.p1) prizes.push('🥇 ' + p.prizes.p1);
-      if(p.prizes?.p2) prizes.push('🥈 ' + p.prizes.p2);
-      if(p.prizes?.p3) prizes.push('🥉 ' + p.prizes.p3);
-
-      const wrap = document.createElement('div');
-      wrap.className = 'card promo-card';
-      wrap.style.setProperty('--cardH', cardH + 'px');
-      wrap.style.setProperty('--mediaH', mediaH + 'px');
-      wrap.innerHTML = `
-        <div class="promo-media" style="${mediaUrl ? `background-image:url('${esc(mediaUrl)}')` : ''}">
-
-          <div class="admin-actions admin-only">
-            <button class="btn secondary" type="button" onclick="editPromo('${esc(p.id)}')">✏️ Editează</button>
-            <button class="btn" type="button" onclick="deletePromo('${esc(p.id)}')">🗑️ Șterge</button>
-          </div>
-
-          ${overlayText ? `
-            <div class="promo-overlay" data-align="${esc(overlayAlign)}" style="color:${esc(overlayColor)}; font-size:${overlaySize}px; --overlayX:${overlayX}; --overlayY:${overlayY};">
-              ${esc(overlayText)}
-            </div>` : ''}
-        </div>
-
-        <div class="promo-body">
-          <div class="promo-meta">
-            <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
-            <span class="pill">⏳ ${ isExpiredPromo(p) ? (p.kind==='giveaway' ? 'Giveaway încheiat' : 'Promoție încheiată') : formatEndsLocal(p.ends) }</span>
-            <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
-            
-          </div>
-
-          <div style="font-weight:800; font-size:1.05rem;">${esc(p.title||'')}</div>
-          ${p.hook ? `<div style="opacity:.95; font-weight:700;">${esc(p.hook)}</div>` : ''}
-          
-          <div class="promo-desc">${esc(p.desc||'')}</div>
-
-
-<div class="divider"></div>
-
-<div style="margin-top:14px;">
-  <div style="font-weight:900; margin-bottom:10px;">🏆 Premii</div>
-  <div style="display:flex; flex-direction:column; gap:10px;">
-    <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
-    <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
-    <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
-    <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
-    <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
-    <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
-  </div>
-
-<div class="divider"></div>
-<div class="kicker">📜 Reguli</div>
-<div style="display:flex; flex-direction:column; gap:8px;">
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>1.</b> ${esc((p.rulesObj&&p.rulesObj.r1)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>2.</b> ${esc((p.rulesObj&&p.rulesObj.r2)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>3.</b> ${esc((p.rulesObj&&p.rulesObj.r3)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>4.</b> ${esc((p.rulesObj&&p.rulesObj.r4)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>5.</b> ${esc((p.rulesObj&&p.rulesObj.r5)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>Text:</b> ${esc((p.rulesObj&&p.rulesObj.text)||'—')}</div>
-</div>
-
-<div class="divider"></div>
-<div class="kicker">✅ Înscriere</div>
-<div class="join-row">
-  <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80">
-  <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120">
-</div>
-<div class="join-row">
-  <input id="wallet_${esc(p.id)}" type="text" placeholder="Wallet (0x...)" maxlength="80">
-  <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
-</div>
-<div class="join-row one">
-  <button class="btn" type="button" ${ (p.ends && Date.now() >= new Date(p.ends).getTime()) ? 'disabled title=\"Înscrieri închise\"' : '' } onclick=\"joinPromo('${esc(p.id)}')\">✅ Înscrie-te</button>
-</div>
-</div>
-
-      `;
-
-      const block = document.createElement('div');
-      block.className = 'promo-block';
-      block.appendChild(wrap);
-      const lbOut = document.createElement('div');
-      lbOut.className = 'promo-leaderboard-out';
-      lbOut.innerHTML = `<div style="font-weight:800; margin-bottom:8px;">🏆 Clasament</div>` +
-        `<div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p)}</div>`;
-      block.appendChild(lbOut);
-      list.appendChild(block);
-    });
-
-    // reapply admin-only after render
-    document.querySelectorAll('.admin-only').forEach(el=>{
-      const d = el.dataset && el.dataset.adminDisplay ? el.dataset.adminDisplay : (el.classList.contains('actions') ? 'flex' : 'block');
-      el.style.display = __isAdmin ? d : 'none';
-    });
-  }
-
-  window.joinPromo = async function joinPromo(promoId){
-    
-    // blocare înscriere după expirare (local time)
-    try{
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-      const ms = parseEndsMs(promo && promo.ends);
-      if(Number.isFinite(ms) && Date.now() >= ms){
-        return alert((promo && promo.kind==='giveaway') ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
-      }
-    }catch(e){}
-try{
-      const C = (window.__statsCache || __statsCache || {promos:[]});
-      const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
-      if(promo && promo.ends){
-        const endsMs = new Date(promo.ends).getTime();
-        if(Number.isFinite(endsMs) && Date.now() >= endsMs){
-          return alert(promo.kind==='giveaway' ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
-        }
-      }
-    }catch(e){}
-
-    const name = ($(`name_${promoId}`)?.value || '').trim();
-    const email = ($(`email_${promoId}`)?.value || '').trim();
-    const wallet = ($(`wallet_${promoId}`)?.value || '').trim();
-    const referral = ($(`ref_${promoId}`)?.value || '').trim();
-
-    if(!name) return alert('Completează numele.');
-    if(!email) return alert('Completează email.');
-
-    try {
-      const u = await addParticipant(promoId, { name, email, wallet, referral });
-      // clear inputs
-      $(`name_${promoId}`).value = '';
-      $(`email_${promoId}`).value = '';
-      $(`wallet_${promoId}`).value = '';
-      $(`ref_${promoId}`).value = '';
-
-      alert(`Înscriere reușită!\nCodul tău: ${u.code}`);
-      // === AUTO EMAIL (SendGrid via Firebase Callable) ===
-      // Uses the participant's generated code as referralCode
-      try {
-        if (typeof window.sendPromoSignupEmail === 'function') {
-          const promo = (__statsCache.promos || []).find(x => String(x.id) === String(promoId)) || {};
-          await window.sendPromoSignupEmail({
-            toEmail: email,
-            name: name,
-            referralCode: u.code,
-            promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-            promoEndsAt: promo.ends || null,
-            promoUrl: window.location.href
-          });
-        } else {
-          console.warn('sendPromoSignupEmail callable is not ready on this page.');
-        }
-      } catch (mailErr) {
-        console.warn('Email send failed (non-blocking):', mailErr);
-      }
-
-    } catch(e) {
-      console.error('joinPromo:', e);
-      alert(e?.message || 'Eroare la înscriere.');
-    }
-  };
-
-  // ===== Stats listener =====
-  function startStatsListener(){
-    const ref = statsRef();
-    if(!ref) return;
-
-    if(__statsUnsub) { try{__statsUnsub();}catch(e){} __statsUnsub=null; }
-
-    __statsUnsub = ref.onSnapshot(snap=>{
-      const data = snap.exists ? snap.data() : {};
-      __statsCache = normalizeStats(data);
-      renderPromos();
-    }, err=>{
-      console.warn('stats onSnapshot error:', err);
-      // fallback one-time read
-      readStatsOnce().then(x=>{ __statsCache=x; renderPromos(); }).catch(()=>{});
-    });
-  }
-
-  // ===== Inject the extra form fields into the existing promoForm (from adaugare.html) =====
-  function injectExtraFields(){
-    const form = $('promoForm');
-    if(!form) return;
-
-    // prevent double insert
-    if ($('cardHeight')) return;
-
-    const divider = document.createElement('div');
-    divider.className = 'divider';
-
-    const block = document.createElement('div');
-    block.innerHTML = `
-      <div class="divider"></div>
-      <div class="kicker">📐 Dimensiuni card & text peste imagine</div>
-
-      <div class="row">
-        <div>
-          <label>Înălțime card (px)</label>
-          <input id="cardHeight" type="number" min="360" max="1200" step="10" value="560" placeholder="Ex: 560">
-        </div>
-        <div>
-          <label>Înălțime imagine (px)</label>
-          <input id="mediaHeight" type="number" min="120" max="520" step="10" value="200" placeholder="Ex: 200">
-        </div>
-      </div>
-
-      <div class="row one">
-        <div>
-          <label>Text peste imagine (opțional)</label>
-          <textarea id="overlayText" rows="2" placeholder="Ex: 🔥 Ultimele 48h — Intră în TOP 5!"></textarea>
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Mărime font (px)</label>
-          <input id="overlayFontSize" type="number" min="10" max="72" step="1" value="22">
-        </div>
-        <div>
-          <label>Culoare text</label>
-          <input id="overlayColor" type="color" value="#ffffff">
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Poziție X (0-90%)</label>
-          <input id="overlayX" type="number" min="0" max="90" step="1" value="6">
-        </div>
-        <div>
-          <label>Poziție Y (0-90%)</label>
-          <input id="overlayY" type="number" min="0" max="90" step="1" value="8">
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Aliniere</label>
-          <select id="overlayAlign">
-            <option value="left">Stânga</option>
-            <option value="center">Centru</option>
-            <option value="right">Dreapta</option>
-          </select>
-        </div>
-        <div>
-          <label>Preview rapid</label>
-          <button class="btn secondary" type="button" onclick="previewOverlay()">👁️ Preview</button>
-        </div>
-      </div>
-    `;
-
-    // insert BEFORE the final action buttons
-    const actions = form.querySelector('.actions');
-    if(actions) form.insertBefore(block, actions);
-    else form.appendChild(block);
-  }
-
-  window.previewOverlay = function previewOverlay(){
-    // quick preview in first card if any, else just ok
-    const txt = ($('overlayText')?.value||'').trim();
-    if(!txt) return alert('Completează mai întâi "Text peste imagine".');
-    alert('Textul va apărea peste imagine în card după salvare.');
-  };
-
-  // ===== Boot =====
-  function boot(){
-    injectExtraFields();
-    startStatsListener();
-
-    const a = auth();
-    if(a) {
-      a.onAuthStateChanged(async (user)=>{
-        const isAdmin = await computeIsAdmin(user);
-        setAdminUI(isAdmin, user);
-      });
-    } else {
-      setAdminUI(false, null);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', boot);
-
-  if(!window.__expiryUiTimer){
-    window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 120000); // 2 minute = 120000 ms
-  }
-})();
-
-  // =======================
-  // WINNERS: Variant 3 (Top + Weighted Lucky Draw)
-  // =======================
-  function __hash32(str){
-    str = String(str || "");
-    let h = 2166136261 >>> 0; // FNV-1a
-    for (let i=0;i<str.length;i++){
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-  function __mulberry32(seed){
-    let a = seed >>> 0;
-    return function(){
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-
-  function __maskEmail(email){
-    email = String(email||"");
-    const at = email.indexOf("@");
-    if(at<=1) return email ? (email[0] + "***") : "";
-    return email.slice(0,2) + "***" + email.slice(at);
-  }
-
-  function __buildScores(arr){
-    const codeToUser = new Map();
-    arr.forEach(u=>{
-      const c = String(u?.code||"").trim();
-      if(c) codeToUser.set(c, u);
-    });
-
-    const scoreByCode = new Map();
-    const tieTimeByCode = new Map();
-
-    arr.forEach(u=>{
-      const ref = String(u?.referral||"").trim();
-      if(!ref) return;
-      const own = String(u?.code||"").trim();
-      if(own && own === ref) return; // no self-referral
-
-      const owner = codeToUser.get(ref);
-      if(!owner) return;
-
-      const ownerCode = String(owner.code);
-      scoreByCode.set(ownerCode, (scoreByCode.get(ownerCode)||0)+1);
-
-      const t = u?.createdAt || u?.ts || u?.time || Date.now();
-      const prev = tieTimeByCode.get(ownerCode);
-      // earliest referral timestamp used as tie-break (who started earlier)
-      if(!prev || t < prev) tieTimeByCode.set(ownerCode, t);
-    });
-
-    return { codeToUser, scoreByCode, tieTimeByCode };
-  }
-
-  // Funcție pentru a obține promoția și participanții din Firestore direct
-  async function getPromoDataFromFirestore(promoId){
-    try {
-      const db = fs();
-      if(!db) throw new Error("Firestore nu este disponibil");
-      
-      // Citește documentul stats/visits
-      const statsDoc = await db.collection('stats').doc('visits').get();
-      if(!statsDoc.exists) throw new Error("Documentul stats/visits nu există");
-      
-      const data = statsDoc.data();
-      const promos = Array.isArray(data?.promos) ? data.promos : [];
-      const participants = (data?.participants && typeof data.participants === 'object') ? data.participants : {};
-      
-      const promo = promos.find(p => String(p.id) === String(promoId));
-      if(!promo) throw new Error("Promoția nu a fost găsită");
-      
-      const promoParticipants = Array.isArray(participants[String(promoId)]) ? participants[String(promoId)] : [];
-      
-      return { promo, participants: promoParticipants };
-    } catch(error) {
-      console.error("Eroare la citirea din Firestore:", error);
-      throw error;
-    }
-  }
-
-  function computeWinnersVariant3(promoId, opts={}){
-    const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
-    const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
-
-    // Obținem datele din cache pentru calcul local rapid
-    const promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
-    if(!promo) throw new Error("Promoția nu a fost găsită.");
-
-    const arr = Array.isArray(window.__statsCache.participants?.[String(promoId)]) ? window.__statsCache.participants[String(promoId)] : [];
-    const participants = arr.slice();
-
-    const { scoreByCode, tieTimeByCode } = __buildScores(participants);
-
-    const ranking = participants
-      .filter(u=>u && u.code)
-      .map(u=>{
-        const code = String(u.code);
-        return {
-          code,
-          user: u,
-          score: scoreByCode.get(code) || 0,
-          tieTime: tieTimeByCode.get(code) || (u.joinedAt || Date.now())
+    // Firebase Services
+    const auth = firebase.auth ? firebase.auth() : null;
+    const db = firebase.firestore ? firebase.firestore() : null;
+    const storage = firebase.storage ? firebase.storage() : null;
+
+    // Utility Functions
+    const Utils = {
+      escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      },
+
+      formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ro-RO', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      },
+
+      debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
         };
-      })
-      .sort((a,b)=> (b.score-a.score) || ((a.tieTime||0)-(b.tieTime||0)));
+      },
 
-    const podium = ranking.filter(x=>x.score>0).slice(0,3);
-
-    const seed = `${promoId}|${promo.ends||""}|${participants.length}`;
-    const rng = __mulberry32(__hash32(seed));
-
-    const exclude = new Set();
-    if(excludePodiumFromLucky){
-      podium.forEach(p=>exclude.add(String(p.code)));
-    }
-
-    // weighted draw without replacement
-    const pool = participants
-      .filter(u=>u && u.code)
-      .map(u=>{
-        const code = String(u.code);
-        const score = scoreByCode.get(code) || 0;
-        const tickets = 1 + score;
-        return { u, code, score, tickets };
-      })
-      .filter(x=>!exclude.has(x.code));
-
-    const lucky = [];
-    const pool2 = pool.slice();
-    for(let k=0;k<luckyCount && pool2.length;k++){
-      let total = 0;
-      pool2.forEach(x=> total += x.tickets);
-      let r = rng()*total;
-      let pick = 0;
-      for(let i=0;i<pool2.length;i++){
-        r -= pool2[i].tickets;
-        if(r<=0){ pick=i; break; }
+      generateId(prefix = 'promo') {
+        return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       }
-      lucky.push(pool2[pick].u);
-      pool2.splice(pick,1);
-    }
-
-    return {
-      seed,
-      generatedAt: new Date().toISOString(),
-      podium: podium.map((p,idx)=>({
-        place: idx+1,
-        code: p.code,
-        name: p.user.name || "",
-        email: p.user.email || "",
-        score: p.score
-      })),
-      afterPodium5: lucky.slice(0,5).map(u=>{
-        const code = String(u.code||"");
-        return { code, name: u.name||"", email: u.email||"", score: scoreByCode.get(code)||0 };
-      }),
-      next10: lucky.slice(5,15).map(u=>{
-        const code = String(u.code||"");
-        return { code, name: u.name||"", email: u.email||"", score: scoreByCode.get(code)||0 };
-      }),
-      bonus: lucky.slice(15,16).map(u=>{
-        const code = String(u.code||"");
-        return { code, name: u.name||"", email: u.email||"", score: scoreByCode.get(code)||0 };
-      })
     };
-  }
 
-  
-  function buildWinnersHtml(w){
-    if(!w) return "";
-    const podium = Array.isArray(w.podium) ? w.podium : [];
-    const afterPodium5 = Array.isArray(w.afterPodium5) ? w.afterPodium5 : [];
-    const next10 = Array.isArray(w.next10) ? w.next10 : [];
-    const bonus = Array.isArray(w.bonus) ? w.bonus : [];
-
-    const row = (label, item, icon) => `
-      <div class="winner-row">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span class="winner-pill">${icon} ${label}</span>
-          <span style="opacity:.85;font-size:12px;">Referrals: <b>${item.score ?? 0}</b></span>
-        </div>
-        <div style="margin-top:6px;font-weight:800;">${esc(item.name || __maskEmail(item.email) || "Participant")}</div>
-        <div style="opacity:.75;font-size:12px;margin-top:2px;">${esc(__maskEmail(item.email))}</div>
-      </div>
-    `;
-
-    let html = `<div class="winners-title">🏁 Câștigători (Preview)</div><div class="winners-grid">`;
-
-    // Podium
-    podium.forEach((p)=>{
-      const icon = p.place===1 ? "🥇" : (p.place===2 ? "🥈" : "🥉");
-      html += row(`Locul ${p.place}`, p, icon);
-    });
-
-    if(afterPodium5.length){
-      html += `<div class="winner-row" style="opacity:.9"><b>🎖️ Primele 5 locuri după podium</b></div>`;
-      afterPodium5.forEach((u, idx)=> html += row(`Locul ${4+idx}`, u, "🎖️"));
-    }
-
-    if(next10.length){
-      html += `<div class="winner-row" style="opacity:.9"><b>🏅 Următoarele 10 locuri</b></div>`;
-      next10.forEach((u, idx)=> html += row(`Locul ${9+idx}`, u, "🏅"));
-    }
-
-    if(bonus.length){
-      html += `<div class="winner-row" style="opacity:.9"><b>🎁 Bonus participare / surpriză random</b></div>`;
-      bonus.forEach((u, idx)=> html += row(`Bonus ${idx+1}`, u, "🎁"));
-    }
-
-    html += `</div><div style="opacity:.55;font-size:11px;margin-top:8px;">Seed: ${esc(String(w.seed||""))}<br>Preview generat: ${new Date(w.generatedAt).toLocaleString("ro-RO")}</div>`;
-    return html;
-  }
-
-
-  async function __isAdminNow(){
-    try{
-      if (window.__SBYT_ADMIN === true) return true;
-      // fallback to local flag
-      if (typeof __isAdmin !== "undefined" && __isAdmin === true) return true;
-      // fallback to auth currentUser email
-      if (window.firebase && firebase.auth) {
-        const u = firebase.auth().currentUser;
-        if (u && u.email && String(u.email).toLowerCase() === "stancubyt@gmail.com") return true;
-      }
-    }catch(e){}
-    return false;
-  }
-
-  window.previewWinners = async function previewWinners(promoId){
-    if(!__isAdminNow()) { 
-      alert('Trebuie să fii logat ca admin.');
-      return;
-    }
-
-    try{
-      const box = document.getElementById(`winners_preview_${promoId}`);
-      if(!box) {
-        alert("Containerul pentru preview nu a fost găsit.");
-        return;
-      }
-      
-      // Afișează mesaj de încărcare
-      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Se calculează câștigătorii...</div>`;
-      
-      // Încearcă mai întâi din cache pentru rapiditate
-      let promo, participants;
-      
-      try {
-        // Folosim Firestore direct pentru a obține cele mai recente date
-        const data = await getPromoDataFromFirestore(promoId);
-        promo = data.promo;
-        participants = data.participants;
-        
-        // Actualizează cache-ul cu datele proaspete
-        const idx = (window.__statsCache.promos || []).findIndex(p => String(p.id) === String(promoId));
-        if(idx >= 0) {
-          window.__statsCache.promos[idx] = promo;
+    // Auth Manager
+    const AuthManager = {
+      async login(email, password) {
+        try {
+          const userCredential = await auth.signInWithEmailAndPassword(email, password);
+          AppState.currentUser = userCredential.user;
+          AppState.isAdmin = email === 'stancubyt@gmail.com';
+          this.updateUI();
+          return { success: true, user: userCredential.user };
+        } catch (error) {
+          console.error('Login error:', error);
+          return { success: false, error: error.message };
         }
-        window.__statsCache.participants[String(promoId)] = participants;
+      },
+
+      async logout() {
+        try {
+          await auth.signOut();
+          AppState.currentUser = null;
+          AppState.isAdmin = false;
+          this.updateUI();
+        } catch (error) {
+          console.error('Logout error:', error);
+        }
+      },
+
+      updateUI() {
+        const loginBtn = document.getElementById('login-toggle');
+        const addPromoBtn = document.getElementById('add-promo-btn');
+        const loginForm = document.getElementById('login-form');
+
+        if (AppState.isAdmin) {
+          loginBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Delogare';
+          loginBtn.classList.remove('btn-secondary');
+          loginBtn.classList.add('btn-danger');
+          addPromoBtn.classList.remove('hidden');
+          loginForm.classList.add('hidden');
+        } else {
+          loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Autentificare';
+          loginBtn.classList.remove('btn-danger');
+          loginBtn.classList.add('btn-secondary');
+          addPromoBtn.classList.add('hidden');
+          loginForm.classList.remove('hidden');
+        }
+      }
+    };
+
+    // Promotions Manager
+    const PromoManager = {
+      async loadPromotions() {
+        if (!db) return;
         
-      } catch(firestoreError) {
-        console.warn("Nu s-au putut obține datele din Firestore, folosim cache:", firestoreError);
-        
-        // Fallback la cache dacă Firestore eșuează
-        promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
-        participants = Array.isArray(window.__statsCache.participants?.[String(promoId)]) ? window.__statsCache.participants[String(promoId)] : [];
-        
-        if(!promo) {
-          box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promoția nu a fost găsită. Încarcă din nou pagina.</div>`;
+        try {
+          const snapshot = await db.collection('stats').doc('visits').get();
+          if (snapshot.exists) {
+            const data = snapshot.data();
+            AppState.promotions = data.promos || [];
+            AppState.participants = data.participants || {};
+            this.renderPromotions();
+          }
+        } catch (error) {
+          console.error('Error loading promotions:', error);
+        }
+      },
+
+      renderPromotions() {
+        const grid = document.getElementById('promo-grid');
+        if (!grid) return;
+
+        if (AppState.promotions.length === 0) {
+          grid.innerHTML = `
+            <div class="text-center" style="grid-column: 1/-1; padding: 40px;">
+              <i class="fas fa-gift" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
+              <h3>Nicio promoție disponibilă</h3>
+              <p>Momentan nu există promoții active. Revino mai târziu!</p>
+            </div>
+          `;
           return;
         }
-      }
-      
-      // Verifică dacă există participanți
-      if(!participants || participants.length === 0) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 Nu există participanți încă.</div>`;
-        return;
-      }
-      
-      // Calculează câștigătorii
-      const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
-      box.innerHTML = buildWinnersHtml(w);
-      
-      // scroll to winners preview
-      box.scrollIntoView({ behavior:"smooth", block:"nearest" });
-      
-    }catch(e){
-      console.error("Eroare la preview:", e);
-      const box = document.getElementById(`winners_preview_${promoId}`);
-      if(box) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
-      }
-    }
-  }
 
-  // Am scos funcția finalizeWinners deoarece nu o vrei
-  // window.finalizeWinners = async function finalizeWinners(promoId){ ... }
+        grid.innerHTML = AppState.promotions.map(promo => this.createPromoCard(promo)).join('');
+      },
 
+      createPromoCard(promo) {
+        const isExpired = new Date(promo.ends) < new Date();
+        const participants = AppState.participants[promo.id] || [];
+        
+        return `
+          <div class="promo-card" data-id="${promo.id}">
+            <div class="promo-media" style="background-image: url('${promo.banner?.url || 'https://via.placeholder.com/350x200'}')">
+              <div class="promo-overlay">
+                <h3>${Utils.escapeHtml(promo.title)}</h3>
+                <p>${promo.hook || ''}</p>
+              </div>
+              <div class="promo-badges">
+                <span class="status-badge ${isExpired ? '' : 'live'}">
+                  <i class="fas fa-${isExpired ? 'clock' : 'bolt'}"></i>
+                  ${isExpired ? 'EXPIRAT' : 'LIVE'}
+                </span>
+                <span class="status-badge">
+                  <i class="fas fa-users"></i> ${participants.length}
+                </span>
+              </div>
+            </div>
+            
+            <div class="promo-body">
+              <div class="promo-meta">
+                <span class="promo-meta-item">
+                  <i class="fas fa-${promo.kind === 'giveaway' ? 'gift' : 'bullhorn'}"></i>
+                  ${promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'}
+                </span>
+                <span class="promo-meta-item">
+                  <i class="fas fa-clock"></i>
+                  ${Utils.formatDate(promo.ends)}
+                </span>
+                <span class="promo-meta-item">
+                  <i class="fas fa-star"></i>
+                  +${promo.points || 10} puncte
+                </span>
+              </div>
+              
+              <p class="promo-description">${Utils.escapeHtml(promo.desc || '')}</p>
+              
+              ${this.renderPrizes(promo.prizes)}
+              ${this.renderJoinForm(promo, isExpired)}
+            </div>
+            
+            ${this.renderLeaderboard(promo.id)}
+          </div>
+        `;
+      },
 
+      renderPrizes(prizes) {
+        if (!prizes) return '';
+        
+        return `
+          <div class="prizes-section">
+            <h4 class="section-title"><i class="fas fa-trophy"></i> Premii</h4>
+            ${prizes.p1 ? `<div class="prize-item gold">🥇 ${Utils.escapeHtml(prizes.p1)}</div>` : ''}
+            ${prizes.p2 ? `<div class="prize-item silver">🥈 ${Utils.escapeHtml(prizes.p2)}</div>` : ''}
+            ${prizes.p3 ? `<div class="prize-item bronze">🥉 ${Utils.escapeHtml(prizes.p3)}</div>` : ''}
+          </div>
+        `;
+      },
+
+      renderJoinForm(promo, isExpired) {
+        if (isExpired) {
+          return `<div class="join-form text-center">
+            <p><i class="fas fa-ban"></i> Înscrierile s-au încheiat</p>
+          </div>`;
+        }
+
+        return `
+          <div class="join-form">
+            <h4 class="section-title"><i class="fas fa-user-plus"></i> Înscrie-te</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <input type="text" class="form-control" 
+                  placeholder="Nume" 
+                  data-promo-id="${promo.id}"
+                  data-field="name">
+              </div>
+              <div class="form-group">
+                <input type="email" class="form-control" 
+                  placeholder="Email" 
+                  data-promo-id="${promo.id}"
+                  data-field="email">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <input type="text" class="form-control" 
+                  placeholder="Wallet (opțional)" 
+                  data-promo-id="${promo.id}"
+                  data-field="wallet">
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" 
+                  placeholder="Cod referral (opțional)" 
+                  data-promo-id="${promo.id}"
+                  data-field="referral">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="PromoManager.joinPromo('${promo.id}')" style="width: 100%;">
+              <i class="fas fa-check"></i> Participă acum
+            </button>
+          </div>
+        `;
+      },
+
+      renderLeaderboard(promoId) {
+        const participants = AppState.participants[promoId] || [];
+        if (participants.length === 0) return '';
+
+        const sorted = [...participants]
+          .sort((a, b) => (b.referrals || 0) - (a.referrals || 0))
+          .slice(0, 10);
+
+        return `
+          <div class="leaderboard mt-2">
+            <h4 class="section-title"><i class="fas fa-chart-bar"></i> Top 10 Participanți</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nume</th>
+                  <th>Email</th>
+                  <th>Invitări</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sorted.map((p, index) => `
+                  <tr>
+                    <td class="rank-${index + 1}">${index + 1}</td>
+                    <td>${Utils.escapeHtml(p.name || 'Anonim')}</td>
+                    <td>${Utils.escapeHtml(this.maskEmail(p.email))}</td>
+                    <td>${p.referrals || 0}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      },
+
+      maskEmail(email) {
+        if (!email) return '';
+        const [name, domain] = email.split('@');
+        if (name.length <= 2) return `${name[0]}***@${domain}`;
+        return `${name.substring(0, 2)}***@${domain}`;
+      },
+
+      async joinPromo(promoId) {
+        if (!AppState.currentUser && !confirm('Trebuie să fii autentificat pentru a participa. Continuăm?')) {
+          return;
+        }
+
+        const name = document.querySelector(`[data-promo-id="${promoId}"][data-field="name"]`)?.value;
+        const email = document.querySelector(`[data-promo-id="${promoId}"][data-field="email"]`)?.value;
+        const wallet = document.querySelector(`[data-promo-id="${promoId}"][data-field="wallet"]`)?.value;
+        const referral = document.querySelector(`[data-promo-id="${promoId}"][data-field="referral"]`)?.value;
+
+        if (!name || !email) {
+          alert('Te rugăm să completezi cel puțin numele și email-ul.');
+          return;
+        }
+
+        try {
+          // Generate unique code
+          const code = Math.random().toString(36).substr(2, 8).toUpperCase();
+          
+          // Add participant to Firestore
+          await db.collection('stats').doc('visits').update({
+            [`participants.${promoId}`]: firebase.firestore.FieldValue.arrayUnion({
+              id: Utils.generateId('user'),
+              name,
+              email,
+              wallet,
+              code,
+              referral,
+              joinedAt: new Date().toISOString(),
+              referrals: 0
+            })
+          });
+
+          alert(`Înscriere reușită!\nCodul tău personal: ${code}\nFolosește-l pentru a invita prieteni!`);
+          
+          // Clear form
+          document.querySelectorAll(`[data-promo-id="${promoId}"]`).forEach(input => {
+            if (input.tagName === 'INPUT') input.value = '';
+          });
+
+          // Reload promotions
+          await this.loadPromotions();
+
+        } catch (error) {
+          console.error('Join error:', error);
+          alert('Eroare la înscriere. Te rugăm să încerci din nou.');
+        }
+      }
+    };
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load promotions
+      PromoManager.loadPromotions();
+
+      // Auth state listener
+      if (auth) {
+        auth.onAuthStateChanged((user) => {
+          AppState.currentUser = user;
+          AuthManager.updateUI();
+        });
+      }
+
+      // Login button
+      document.getElementById('login-toggle').addEventListener('click', () => {
+        if (AppState.isAdmin) {
+          AuthManager.logout();
+        } else {
+          document.getElementById('login-form').classList.toggle('hidden');
+        }
+      });
+
+      // Login form
+      document.getElementById('login-btn').addEventListener('click', async () => {
+        const email = document.getElementById('admin-email').value;
+        const password = document.getElementById('admin-password').value;
+        const messageEl = document.getElementById('login-message');
+
+        if (!email || !password) {
+          messageEl.textContent = 'Te rugăm să completezi ambele câmpuri.';
+          messageEl.style.color = 'var(--danger)';
+          return;
+        }
+
+        const result = await AuthManager.login(email, password);
+        if (result.success) {
+          messageEl.textContent = 'Autentificare reușită!';
+          messageEl.style.color = 'var(--success)';
+        } else {
+          messageEl.textContent = `Eroare: ${result.error}`;
+          messageEl.style.color = 'var(--danger)';
+        }
+      });
+
+      // Add promo button
+      document.getElementById('add-promo-btn').addEventListener('click', () => {
+        // TODO: Implement add promo form
+        alert('Funcționalitatea de adăugare promoție va fi implementată în curând!');
+      });
+    });
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+      PromoManager.loadPromotions();
+    }, 30000);
   </script>
 </body>
 </html>
