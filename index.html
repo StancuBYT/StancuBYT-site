@@ -1233,7 +1233,6 @@
         <div class="winners-wrap">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
             <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
-            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="finalizeWinners('${esc(promoId)}')">🏁 Finalizează câștigători</button>
           </div>
           <div id="winners_preview_${esc(promoId)}"></div>
         </div>
@@ -1563,7 +1562,7 @@ try{
   document.addEventListener('DOMContentLoaded', boot);
 
   if(!window.__expiryUiTimer){
-    window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 120000); // 2 minute = 120000 ms (schimbat de la 20000 ms)
+    window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 120000); // 2 minute = 120000 ms
   }
 })();
 
@@ -1627,11 +1626,37 @@ try{
     return { codeToUser, scoreByCode, tieTimeByCode };
   }
 
+  // Funcție pentru a obține promoția și participanții din Firestore direct
+  async function getPromoDataFromFirestore(promoId){
+    try {
+      const db = fs();
+      if(!db) throw new Error("Firestore nu este disponibil");
+      
+      // Citește documentul stats/visits
+      const statsDoc = await db.collection('stats').doc('visits').get();
+      if(!statsDoc.exists) throw new Error("Documentul stats/visits nu există");
+      
+      const data = statsDoc.data();
+      const promos = Array.isArray(data?.promos) ? data.promos : [];
+      const participants = (data?.participants && typeof data.participants === 'object') ? data.participants : {};
+      
+      const promo = promos.find(p => String(p.id) === String(promoId));
+      if(!promo) throw new Error("Promoția nu a fost găsită");
+      
+      const promoParticipants = Array.isArray(participants[String(promoId)]) ? participants[String(promoId)] : [];
+      
+      return { promo, participants: promoParticipants };
+    } catch(error) {
+      console.error("Eroare la citirea din Firestore:", error);
+      throw error;
+    }
+  }
+
   function computeWinnersVariant3(promoId, opts={}){
     const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
     const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
 
-    // Căutăm promoția în cache-ul global - corectat aici
+    // Obținem datele din cache pentru calcul local rapid
     const promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
     if(!promo) throw new Error("Promoția nu a fost găsită.");
 
@@ -1733,7 +1758,7 @@ try{
       </div>
     `;
 
-    let html = `<div class="winners-title">🏁 Câștigători</div><div class="winners-grid">`;
+    let html = `<div class="winners-title">🏁 Câștigători (Preview)</div><div class="winners-grid">`;
 
     // Podium
     podium.forEach((p)=>{
@@ -1756,7 +1781,7 @@ try{
       bonus.forEach((u, idx)=> html += row(`Bonus ${idx+1}`, u, "🎁"));
     }
 
-    html += `</div><div style="opacity:.55;font-size:11px;margin-top:8px;">Seed: ${esc(String(w.seed||""))}</div>`;
+    html += `</div><div style="opacity:.55;font-size:11px;margin-top:8px;">Seed: ${esc(String(w.seed||""))}<br>Preview generat: ${new Date(w.generatedAt).toLocaleString("ro-RO")}</div>`;
     return html;
   }
 
@@ -1775,91 +1800,75 @@ try{
     return false;
   }
 
-  window.previewWinners = function previewWinners(promoId){
-    if(!__isAdminNow()) { return alert('Trebuie să fii logat ca admin.'); }
+  window.previewWinners = async function previewWinners(promoId){
+    if(!__isAdminNow()) { 
+      alert('Trebuie să fii logat ca admin.');
+      return;
+    }
 
     try{
-      // Folosim window.__statsCache în loc de __statsCache local
-      const promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
-      if(!promo) {
-        alert("Promoția nu a fost găsită în cache.");
-        return;
-      }
-      
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(!box) {
         alert("Containerul pentru preview nu a fost găsit.");
         return;
       }
       
+      // Afișează mesaj de încărcare
+      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Se calculează câștigătorii...</div>`;
+      
+      // Încearcă mai întâi din cache pentru rapiditate
+      let promo, participants;
+      
+      try {
+        // Folosim Firestore direct pentru a obține cele mai recente date
+        const data = await getPromoDataFromFirestore(promoId);
+        promo = data.promo;
+        participants = data.participants;
+        
+        // Actualizează cache-ul cu datele proaspete
+        const idx = (window.__statsCache.promos || []).findIndex(p => String(p.id) === String(promoId));
+        if(idx >= 0) {
+          window.__statsCache.promos[idx] = promo;
+        }
+        window.__statsCache.participants[String(promoId)] = participants;
+        
+      } catch(firestoreError) {
+        console.warn("Nu s-au putut obține datele din Firestore, folosim cache:", firestoreError);
+        
+        // Fallback la cache dacă Firestore eșuează
+        promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
+        participants = Array.isArray(window.__statsCache.participants?.[String(promoId)]) ? window.__statsCache.participants[String(promoId)] : [];
+        
+        if(!promo) {
+          box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promoția nu a fost găsită. Încarcă din nou pagina.</div>`;
+          return;
+        }
+      }
+      
+      // Verifică dacă există participanți
+      if(!participants || participants.length === 0) {
+        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 Nu există participanți încă.</div>`;
+        return;
+      }
+      
+      // Calculează câștigătorii
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
       box.innerHTML = buildWinnersHtml(w);
+      
       // scroll to winners preview
       box.scrollIntoView({ behavior:"smooth", block:"nearest" });
+      
     }catch(e){
       console.error("Eroare la preview:", e);
-      alert("Eroare la preview: " + (e?.message || e));
+      const box = document.getElementById(`winners_preview_${promoId}`);
+      if(box) {
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
+      }
     }
   }
 
-  window.finalizeWinners = async function finalizeWinners(promoId){
-    try{
-      if(!(window.__SBYT_ADMIN===true)) return alert("Doar admin.");
-      const promo = (window.__statsCache && window.__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-      if(!promo) return alert("Promoția nu a fost găsită.");
-
-      const endsMs = promo.ends ? new Date(promo.ends).getTime() : NaN;
-      if(!(Number.isFinite(endsMs) && Date.now() >= endsMs)){
-        return alert("Promoția nu este încă expirată.");
-      }
-
-      const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
-
-      // persist into promos array (stats/visits)
-      const promos = (window.__statsCache.promos||[]).slice();
-      const idx = promos.findIndex(p=>String(p.id)===String(promoId));
-      promos[idx] = { ...promos[idx], winners: w, winnersFinalizedAt: new Date().toISOString() };
-      await writeStats({ promos });
-
-      window.__statsCache.promos = promos;
-
-      // refresh leaderboard area
-      const lb = document.getElementById(`lb_${promoId}`);
-      if(lb) lb.innerHTML = buildLeaderboard(promos[idx]);
-
-      // send emails to winners (requires backend callable sendPromoWinnerEmail)
-      if(typeof window.sendPromoWinnerEmail === "function"){
-        const allWinners = []
-          .concat((w.podium || []).map(x => ({ ...x, place: x.place })))
-          .concat((w.afterPodium5 || []).map(x => ({ ...x, place: "BONUS5" })))
-          .concat((w.next10 || []).map(x => ({ ...x, place: "NEXT10" })))
-          .concat((w.bonus || []).map(x => ({ ...x, place: "BONUS" })));
-
-        for(const ww of allWinners){
-          const to = ww.email;
-          if(!to) continue;
-          try{
-            await window.sendPromoWinnerEmail({
-              toEmail: to,
-              name: ww.name || "",
-              promoTitle: promo.title || (promo.kind==='giveaway'?'Giveaway':'Promoție'),
-              place: ww.place || "BONUS",
-              score: ww.score || 0,
-              promoUrl: window.location.href
-            });
-          }catch(mailErr){
-            console.warn("winner email failed:", mailErr);
-          }
-        }
-      } else {
-        console.warn("sendPromoWinnerEmail is not deployed yet. Winners saved, emails not sent.");
-      }
-
-      alert("Câștigători finalizați ✅");
-    }catch(e){
-      alert("Eroare la finalizare: " + (e?.message || e));
-    }
-  }
+  // Am scos funcția finalizeWinners deoarece nu o vrei
+  // window.finalizeWinners = async function finalizeWinners(promoId){ ... }
 
 
   </script>
