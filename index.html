@@ -1563,7 +1563,7 @@ try{
   document.addEventListener('DOMContentLoaded', boot);
 
   if(!window.__expiryUiTimer){
-    window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 20000);
+    window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 120000); // 2 minute = 120000 ms (schimbat de la 20000 ms)
   }
 })();
 
