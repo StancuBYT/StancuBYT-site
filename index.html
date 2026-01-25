@@ -1260,6 +1260,26 @@
       $(`ref_${promoId}`).value = '';
 
       alert(`Înscriere reușită!\nCodul tău: ${u.code}`);
+      // === AUTO EMAIL (SendGrid via Firebase Callable) ===
+      // Uses the participant's generated code as referralCode
+      try {
+        if (typeof window.sendPromoSignupEmail === 'function') {
+          const promo = (__statsCache.promos || []).find(x => String(x.id) === String(promoId)) || {};
+          await window.sendPromoSignupEmail({
+            toEmail: email,
+            name: name,
+            referralCode: u.code,
+            promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+            promoEndsAt: promo.ends || null,
+            promoUrl: window.location.href
+          });
+        } else {
+          console.warn('sendPromoSignupEmail callable is not ready on this page.');
+        }
+      } catch (mailErr) {
+        console.warn('Email send failed (non-blocking):', mailErr);
+      }
+
     } catch(e) {
       console.error('joinPromo:', e);
       alert(e?.message || 'Eroare la înscriere.');
