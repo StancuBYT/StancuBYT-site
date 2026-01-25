@@ -1168,7 +1168,7 @@
     const promoId = (p && p.id!=null) ? p.id : p;
     const promo = (p && typeof p === 'object') ? p : (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId)) || {};
 
-    const arr = Array.isArray(C.participants?.[String(promoId)]) ? C.participants[String(promoId)] : [];
+    const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
     if(!arr.length) {
       return `<div style="opacity:.85;">Nu există participanți încă.</div>`;
     }
@@ -1233,11 +1233,12 @@
         <div class="winners-wrap">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
             <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
-</div>
+            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="finalizeWinners('${esc(promoId)}')">🏁 Finalizează câștigători</button>
+          </div>
           <div id="winners_preview_${esc(promoId)}"></div>
         </div>
-      ${winnersHtml}`;
-}
+      `;
+    }
 
     return html;
   }
@@ -1380,8 +1381,7 @@
     
     // blocare înscriere după expirare (local time)
     try{
-      const C = (window.__statsCache || __statsCache || {promos:[], participants:{}});
-    const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
+      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
       const ms = parseEndsMs(promo && promo.ends);
       if(Number.isFinite(ms) && Date.now() >= ms){
         return alert((promo && promo.kind==='giveaway') ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
@@ -1451,12 +1451,11 @@ try{
     __statsUnsub = ref.onSnapshot(snap=>{
       const data = snap.exists ? snap.data() : {};
       __statsCache = normalizeStats(data);
-      window.__statsCache = __statsCache;
       renderPromos();
     }, err=>{
       console.warn('stats onSnapshot error:', err);
       // fallback one-time read
-      readStatsOnce().then(x=>{ __statsCache=x; window.__statsCache = __statsCache; renderPromos(); }).catch(()=>{});
+      readStatsOnce().then(x=>{ __statsCache=x; renderPromos(); }).catch(()=>{});
     });
   }
 
@@ -1632,11 +1631,10 @@ try{
     const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
     const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
 
-    const C = (window.__statsCache || __statsCache || {promos:[], participants:{}});
-    const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
+    const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
     if(!promo) throw new Error("Promoția nu a fost găsită.");
 
-    const arr = Array.isArray(C.participants?.[String(promoId)]) ? C.participants[String(promoId)] : [];
+    const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
     const participants = arr.slice();
 
     const { scoreByCode, tieTimeByCode } = __buildScores(participants);
@@ -1776,32 +1774,26 @@ try{
     return false;
   }
 
-  function previewWinners(promoId){
+  window.previewWinners = function previewWinners(promoId){
     if(!__isAdminNow()) { return alert('Trebuie să fii logat ca admin.'); }
 
     try{
-      const C = (window.__statsCache || __statsCache || {promos:[], participants:{}});
-    const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
+      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(!box) return;
-      box.innerHTML = '<div style=\"opacity:.8;\">Se calculează…</div>';
-      setTimeout(()=>{
-        try{
-          const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
-          box.innerHTML = buildWinnersHtml(w);
-          box.scrollIntoView({ behavior:\"smooth\", block:\"nearest\" });
-        }catch(err){ box.innerHTML=''; alert(\"Eroare la preview: \" + (err?.message||err)); }
-      }, 10);
+      const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
+      box.innerHTML = buildWinnersHtml(w);
+      // scroll to winners preview
+      box.scrollIntoView({ behavior:"smooth", block:"nearest" });
     }catch(e){
       alert("Eroare la preview: " + (e?.message || e));
     }
   }
 
-  async function finalizeWinners(promoId){
+  window.finalizeWinners = async function finalizeWinners(promoId){
     try{
       if(!(window.__SBYT_ADMIN===true)) return alert("Doar admin.");
-      const C = (window.__statsCache || __statsCache || {promos:[], participants:{}});
-    const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
+      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
       if(!promo) return alert("Promoția nu a fost găsită.");
 
       const endsMs = promo.ends ? new Date(promo.ends).getTime() : NaN;
