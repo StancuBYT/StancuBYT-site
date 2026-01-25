@@ -1210,9 +1210,7 @@
     } else if (__isAdmin) {
       winnersBox = `
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px 0;">
-          <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
-          ${expired ? `<button class="btn small admin-only" data-admin-display="inline-flex" onclick="finalizeWinners('${esc(promoId)}')">✅ Finalizează</button>` : `<span style="opacity:.75;font-size:12px">Finalizează disponibil după expirare.</span>`}
-        </div>
+          <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button></div>
         <div id="winners_preview_${esc(promoId)}"></div>
       `;
     } else if (expired) {
@@ -1393,7 +1391,17 @@
   }
 
   window.joinPromo = async function joinPromo(promoId){
-    const name = ($(`name_${promoId}`)?.value || '').trim();
+    try{
+      const C = (window.__statsCache || __statsCache || {promos:[]});
+      const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
+      if(promo && promo.ends){
+        const endsMs = new Date(promo.ends).getTime();
+        if(Number.isFinite(endsMs) && Date.now() >= endsMs){
+          return alert(promo.kind==='giveaway'?'Giveaway încheiat. Înscrierile sunt închise.':'Promoție încheiată. Înscrierile sunt închise.');
+        }
+      }
+    }catch(e){}
+const name = ($(`name_${promoId}`)?.value || '').trim();
     const email = ($(`email_${promoId}`)?.value || '').trim();
     const wallet = ($(`wallet_${promoId}`)?.value || '').trim();
     const referral = ($(`ref_${promoId}`)?.value || '').trim();
@@ -1759,28 +1767,82 @@
 
   async function previewWinners(promoId){
     try{
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-      const box = document.getElementById(`winners_preview_${promoId}`);
+      const C = (window.__statsCache || __statsCache || {promos:[],participants:{}});
+      const pid = String(promoId);
+      const promo = (C.promos||[]).find(p=>String(p.id)===pid);
+      if(!promo){
+        const ids = (C.promos||[]).map(p=>p.id).slice(0,10).join(", ");
+        throw new Error("Promoția nu a fost găsită. IDs încărcate: " + (ids||"(none)"));
+      }
+      const box = document.getElementById(`winners_preview_${pid}`);
       if(!box) return;
-      const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
+      const w = computeWinnersVariant3(pid, { luckyCount: 16, excludePodiumFromLucky: true });
       box.innerHTML = buildWinnersHtml(w);
-      // scroll to winners preview
       box.scrollIntoView({ behavior:"smooth", block:"nearest" });
     }catch(e){
       alert("Eroare la preview: " + (e?.message || e));
     }
   }
+  }
 
-  async function finalizeWinners(promoId){
+  async function autoFinalizeWinners(promoId){
     try{
-      if(!(window.__SBYT_ADMIN===true)) return alert("Doar admin.");
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-      if(!promo) return alert("Promoția nu a fost găsită.");
+      if(!(window.__SBYT_ADMIN===true)) return;
+      const C = (window.__statsCache || __statsCache || {promos:[],participants:{}});
+      const pid = String(promoId);
+      const promo = (C.promos||[]).find(p=>String(p.id)===pid);
+      if(!promo) return;
 
       const endsMs = promo.ends ? new Date(promo.ends).getTime() : NaN;
-      if(!(Number.isFinite(endsMs) && Date.now() >= endsMs)){
-        return alert("Promoția nu este încă expirată.");
+      if(!(Number.isFinite(endsMs) && Date.now() >= endsMs)) return;
+
+      if(promo.winners && promo.winnersFinalizedAt) return;
+
+      const w = computeWinnersVariant3(pid, { luckyCount: 16, excludePodiumFromLucky: true });
+
+      const promos = (C.promos||[]).slice();
+      const idx = promos.findIndex(p=>String(p.id)===pid);
+      if(idx === -1) return;
+      promos[idx] = { ...promos[idx], winners: w, winnersFinalizedAt: new Date().toISOString() };
+
+      await writeStats({ promos });
+
+      __statsCache.promos = promos;
+      window.__statsCache = __statsCache;
+
+      const lb = document.getElementById(`lb_${pid}`);
+      if(lb) lb.innerHTML = buildLeaderboard(promos[idx]);
+
+      // send emails once
+      if(typeof window.sendPromoWinnerEmail === "function"){
+        const allWinners = []
+          .concat((w.podium || []).map(x => ({ ...x, place: x.place })))
+          .concat((w.afterPodium5 || []).map(x => ({ ...x, place: "BONUS5" })))
+          .concat((w.next10 || []).map(x => ({ ...x, place: "NEXT10" })))
+          .concat((w.bonus || []).map(x => ({ ...x, place: "BONUS" })));
+
+        for(const ww of allWinners){
+          const to = ww.email;
+          if(!to) continue;
+          try{
+            await window.sendPromoWinnerEmail({
+              toEmail: to,
+              name: ww.name || "",
+              promoTitle: promo.title || (promo.kind==='giveaway'?'Giveaway':'Promoție'),
+              place: ww.place || "BONUS",
+              score: ww.score || 0,
+              promoUrl: window.location.href
+            });
+          }catch(mailErr){
+            console.warn("winner email failed:", mailErr);
+          }
+        }
       }
+    }catch(e){
+      console.warn("autoFinalizeWinners error:", e);
+    }
+  }
+
 
       const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
 
