@@ -1344,6 +1344,16 @@
         }
       }
     }catch(e){}
+try{
+      const C = (window.__statsCache || __statsCache || {promos:[]});
+      const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
+      if(promo && promo.ends){
+        const endsMs = new Date(promo.ends).getTime();
+        if(Number.isFinite(endsMs) && Date.now() >= endsMs){
+          return alert(promo.kind==='giveaway' ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
+        }
+      }
+    }catch(e){}
 
     const name = ($(`name_${promoId}`)?.value || '').trim();
     const email = ($(`email_${promoId}`)?.value || '').trim();
