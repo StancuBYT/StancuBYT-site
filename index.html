@@ -254,40 +254,14 @@
     width:100%;
   }
   .leaderboard-mini {
-    height: 100%;
-    max-height: none;
-    overflow: hidden;
-    border-radius: 14px;
-    background: rgba(0,0,0,0.18);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 8px;
-  }
-  
-  .lb-split{
-    display:flex;
-    flex-direction:column;
-    height:100%;
-    gap:10px;
-  }
-  .lb-participants{
-    flex:1 1 50%;
+    max-height: 160px;
     overflow:auto;
     border-radius: 14px;
     background: rgba(0,0,0,0.18);
     border: 1px solid rgba(255,255,255,0.08);
     padding: 8px;
-    min-height: 160px;
   }
-  .lb-winners{
-    flex:1 1 50%;
-    overflow:auto;
-    border-radius: 14px;
-    background: rgba(0,0,0,0.12);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 10px;
-    min-height: 160px;
-  }
-.leaderboard-mini table {
+  .leaderboard-mini table {
     width:100%;
     border-collapse: collapse;
     font-size: 0.92rem;
@@ -1184,12 +1158,11 @@
       };
     }).sort((a,b)=> b.referrals - a.referrals || a.joinedAt - b.joinedAt);
 
-        // participants table (top half)
-    let table = `<table>
+    let html = `<table>
       <tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Invitări</th></tr>`;
     rows.slice(0, 20).forEach((r,i)=> {
       const top = i===0 ? 'style="font-weight:800;"' : '';
-      table += `<tr ${top}>
+      html += `<tr ${top}>
         <td>${i+1}</td>
         <td>${esc(r.name)}</td>
         <td>${esc(maskEmail(r.email))}</td>
@@ -1197,36 +1170,32 @@
         <td><span class="pill">${r.referrals}</span></td>
       </tr>`;
     });
-    table += `</table>`;
-
-    // ===== Winners (bottom half) =====
+    html += `</table>`;
+    // ===== Winners section (auto show after expiry) =====
     const now = Date.now();
     const endsMs = promo && promo.ends ? new Date(promo.ends).getTime() : NaN;
     const expired = Number.isFinite(endsMs) && now >= endsMs;
 
-    let winnersBox = "";
+    let winnersHtml = "";
     if (expired && promo.winners) {
-      winnersBox = buildWinnersHtml(promo.winners);
-    } else if (__isAdmin) {
-      winnersBox = `
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px 0;">
-          <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
-          ${expired ? `<button class="btn small admin-only" data-admin-display="inline-flex" onclick="finalizeWinners('${esc(promoId)}')">✅ Finalizează</button>` : `<span style="opacity:.75;font-size:12px">Finalizează disponibil după expirare.</span>`}
-        </div>
-        <div id="winners_preview_${esc(promoId)}"></div>
-      `;
-    } else if (expired) {
-      winnersBox = `<div style="opacity:.85;">Concurs încheiat. Câștigătorii vor fi afișați după finalizare.</div>`;
-    } else {
-      winnersBox = `<div style="opacity:.75;">Câștigătorii apar după încheiere.</div>`;
+      winnersHtml = buildWinnersHtml(promo.winners);
     }
 
-    const html = `
-      <div class="lb-split">
-        <div class="lb-participants">${table}</div>
-        <div class="lb-winners">${winnersBox}</div>
-      </div>
-    `;
+    if (winnersHtml) {
+      html += `<div class="winners-wrap">${winnersHtml}</div>`;
+    } else if (__isAdmin) {
+      // Admin preview / finalize buttons + preview container
+      html += `
+        <div class="winners-wrap">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
+            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
+            ${expired ? `<button class="btn small admin-only" data-admin-display="inline-flex" onclick="finalizeWinners('${esc(promoId)}')">✅ Finalizează</button>` : `<span style="opacity:.75;font-size:12px">Finalizează disponibil după expirare.</span>`}
+          </div>
+          <div id="winners_preview_${esc(promoId)}"></div>
+        </div>
+      `;
+    }
+
     return html;
   }
 
@@ -1257,8 +1226,6 @@
 
     promos.forEach(p=> {
       const mediaUrl = pickMediaUrl(p);
-      const endsMs = p && p.ends ? new Date(p.ends).getTime() : NaN;
-      const expired = Number.isFinite(endsMs) && Date.now() >= endsMs;
       const ui = p.ui || {};
       const cardH = clamp(Number(ui.cardH ?? 560), 360, 1200);
       const mediaH = clamp(Number(ui.mediaH ?? 200), 120, 520);
@@ -1296,7 +1263,7 @@
         <div class="promo-body">
           <div class="promo-meta">
             <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
-            ${expired ? `<span class="pill">⛔ ${p.kind==='giveaway' ? 'Giveaway încheiat' : 'Promoție încheiată'}</span>` : `<span class="pill">⏳ ${esc(formatEnds(p.ends))}</span>`}
+            <span class="pill">⏳ ${esc(formatEnds(p.ends))}</span>
             <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
             
           </div>
@@ -1334,15 +1301,15 @@
 <div class="divider"></div>
 <div class="kicker">✅ Înscriere</div>
 <div class="join-row">
-  <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80" ${expired ? "disabled" : ""}>
-  <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120" ${expired ? "disabled" : ""}>
+  <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80">
+  <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120">
 </div>
 <div class="join-row">
   <input id="wallet_${esc(p.id)}" type="text" placeholder="Wallet (0x...)" maxlength="80">
-  <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40" ${expired ? "disabled" : ""}>
+  <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
 </div>
 <div class="join-row one">
-  <button class="btn" type="button" onclick="joinPromo('${esc(p.id)}')" ${expired ? "disabled" : ""}>✅ Înscrie-te</button>
+  <button class="btn" type="button" onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-te</button>
 </div>
 </div>
 
@@ -1353,11 +1320,8 @@
       block.appendChild(wrap);
       const lbOut = document.createElement('div');
       lbOut.className = 'promo-leaderboard-out';
-      lbOut.style.height = cardH + 'px';
-      lbOut.style.display = 'flex';
-      lbOut.style.flexDirection = 'column';
       lbOut.innerHTML = `<div style="font-weight:800; margin-bottom:8px;">🏆 Clasament</div>` +
-        `<div class="leaderboard-mini" id="lb_${esc(p.id)}">`<div class=\"leaderboard-mini\" style=\"flex:1 1 auto;\" id=\"lb_${esc(p.id)}\">${buildLeaderboard(p)}</div>`;
+        `<div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p)}</div>`;
       block.appendChild(lbOut);
       list.appendChild(block);
     });
@@ -1375,11 +1339,6 @@
     const wallet = ($(`wallet_${promoId}`)?.value || '').trim();
     const referral = ($(`ref_${promoId}`)?.value || '').trim();
 
-    const promo = (__statsCache.promos || []).find(x => String(x.id) === String(promoId)) || null;
-    const endsMs = promo && promo.ends ? new Date(promo.ends).getTime() : NaN;
-    const expired = Number.isFinite(endsMs) && Date.now() >= endsMs;
-    if (expired) return alert('Promoția este încheiată. Înscrierile sunt oprite.');
-
     if(!name) return alert('Completează numele.');
     if(!email) return alert('Completează email.');
 
@@ -1396,13 +1355,13 @@
       // Uses the participant's generated code as referralCode
       try {
         if (typeof window.sendPromoSignupEmail === 'function') {
-          const promo2 = (__statsCache.promos || []).find(x => String(x.id) === String(promoId)) || {};
+          const promo = (__statsCache.promos || []).find(x => String(x.id) === String(promoId)) || {};
           await window.sendPromoSignupEmail({
             toEmail: email,
             name: name,
             referralCode: u.code,
-            promoTitle: promo2.title || (promo2.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-            promoEndsAt: promo2.ends || null,
+            promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+            promoEndsAt: promo.ends || null,
             promoUrl: window.location.href
           });
         } else {
@@ -1523,8 +1482,8 @@
 
   // ===== Boot =====
   function boot(){
-    try{ injectExtraFields(); }catch(e){ console.warn('injectExtraFields error:', e); }
-    try{ startStatsListener(); }catch(e){ console.warn('startStatsListener error:', e); }
+    injectExtraFields();
+    startStatsListener();
 
     const a = auth();
     if(a) {
