@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StancuBYT | Promoții & Concursuri</title>
   <style>
-
     :root{
       --blue-tech:#0066ff;
       --green-growth:#00ff88;
@@ -171,8 +170,6 @@
     .img-strip img{height:44px;width:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);opacity:0.95;}
     .rulebox{padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:rgba(0,0,0,0.22);opacity:0.92;}
   
-
-  /* === Extra layout fixes (standard cards + mobile) === */
   :root {
     --promo-card-h: 560px;
     --promo-media-h: 200px;
@@ -221,7 +218,7 @@
     flex-direction:column;
     gap: 10px;
     flex: 1 1 auto;
-    min-height: 0; /* important for internal scroll */
+    min-height: 0;
   }
   .promo-desc {
     opacity: 0.92;
@@ -298,7 +295,6 @@
     }
   }
   
-/* === Admin buttons placement + leaderboard outside card === */
 .promo-media { position: relative; }
 .promo-media .admin-actions{
   position:absolute;
@@ -322,14 +318,12 @@
   backdrop-filter: blur(6px);
 }
 
-
-/* === Neon gradient border wrapper for promo + leaderboard (border only) === */
 .promo-block{
   margin: 14px 0;
   border-radius: 24px;
   padding: 12px;
-  background: transparent;          /* no fill over cards */
-  border: 2px solid transparent;    /* gradient border only */
+  background: transparent;
+  border: 2px solid transparent;
   border-image: linear-gradient(135deg,
     rgba(0,255,255,0.95),
     rgba(138,43,226,0.95),
@@ -360,12 +354,9 @@
   .promo-block{ flex-direction: column; }
 }
 
-
-/* === LAYOUT FIX: each promo+leaderboard on one row, next promo on next row === */
 #promoList{ display:flex !important; flex-direction:column !important; gap: 16px !important; }
 .promo-block{ width:100%; }
 
-/* === CARD SIZE + SPACING FIX (no text overlap) === */
 .promo-card{
   height: auto !important;
   min-height: 760px;
@@ -381,7 +372,6 @@
 }
 .divider{ margin: 10px 0; }
 
-/* Join form: prevent button overlapping inputs */
 .promo-join .form-row{
   align-items: stretch;
 }
@@ -402,8 +392,6 @@
   }
 }
 
-
-/* === Prize emphasis tiers === */
 .prize-item{ display:block; width:100%; white-space:pre-wrap; padding:10px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.14); background: rgba(0,0,0,0.18); }
 .prize-item b{ font-weight:900; }
 .prize-gold{ border-color: rgba(255,215,0,0.55); box-shadow: 0 0 18px rgba(255,215,0,0.10); }
@@ -414,8 +402,6 @@
 .prize-tierC{ border-color: rgba(138,43,226,0.40); box-shadow: 0 0 18px rgba(138,43,226,0.06); }
 .prize-subtitle{ font-weight:900; margin: 10px 0 8px; opacity:0.95; }
 
-
-/* === FIX: ensure Join section fits after Premii === */
 .promo-card{
   min-height: 1320px !important;
 }
@@ -423,8 +409,6 @@
   overflow: visible !important;
 }
 
-
-/* === Winners UI === */
 .winners-wrap{
   margin-top: 10px;
   padding-top: 10px;
@@ -444,6 +428,27 @@
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.10);
   background: rgba(0,0,0,0.18);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.winner-info{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.winner-name{
+  font-weight: 900;
+  font-size: 1rem;
+}
+.winner-email{
+  opacity: 0.8;
+  font-size: 0.85rem;
+}
+.winner-prize{
+  font-weight: 800;
+  color: var(--neon-cyan);
+  text-align: right;
 }
 .winner-row b{ font-weight: 900; }
 .winner-pill{
@@ -458,8 +463,6 @@
   font-weight: 800;
 }
 
-
-/* === OVERRIDE: leaderboard split half list / half winners === */
 .promo-leaderboard-out{
   display:flex;
   flex-direction:column;
@@ -480,33 +483,68 @@
   .promo-leaderboard-out .leaderboard-mini{ min-height: 240px; }
   .promo-leaderboard-out .winners-wrap{ min-height: 240px; }
 }
-/* === END OVERRIDE === */
 
-</style>
+.winners-prizes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+.winners-prize-category {
+  margin-bottom: 5px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.prize-icon {
+  font-size: 1.2rem;
+}
+  </style>
 
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <script>
+  
+  <!-- Firebase Functions (callable) -->
+  <script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
 
-  // === Expiry helpers (local time + robust parsing) ===
+    const cfg = window.firebaseConfig;
+    if (!cfg || !cfg.projectId) {
+      console.error("Firebase config missing projectId; cannot init Functions.");
+    } else {
+      let app;
+      if (!getApps().length) {
+        app = initializeApp(cfg);
+      } else {
+        app = getApps()[0];
+      }
+
+      const functions = getFunctions(app, "europe-west1");
+
+      window.sendPromoSignupEmail = httpsCallable(functions, "sendPromoSignupEmail");
+      window.sendPromoWinnerEmail = httpsCallable(functions, "sendPromoWinnerEmail");
+
+      console.log("Functions callable ready:", { projectId: cfg.projectId, region: "europe-west1" });
+    }
+  </script>
+  
+  <script>
   function parseEndsMs(ends){
     try{
       if(!ends) return NaN;
-      // Firestore Timestamp
       if(typeof ends === "object"){
         if(typeof ends.toDate === "function") return ends.toDate().getTime();
         if(typeof ends.seconds === "number") return ends.seconds*1000;
       }
-      // number (ms)
       if(typeof ends === "number") return ends;
       const s = String(ends).trim();
-      // ISO / RFC (includes datetime-local "YYYY-MM-DDTHH:MM")
       const d1 = new Date(s);
       if(!isNaN(d1.getTime())) return d1.getTime();
-      // Romanian: DD.MM.YYYY, HH:MM[:SS]  (comma optional)
       const m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
       if(m){
         const dd = parseInt(m[1],10);
@@ -515,7 +553,7 @@
         const hh = m[4] ? parseInt(m[4],10) : 0;
         const mi = m[5] ? parseInt(m[5],10) : 0;
         const ss = m[6] ? parseInt(m[6],10) : 0;
-        return new Date(yy, mm-1, dd, hh, mi, ss).getTime(); // local time on device
+        return new Date(yy, mm-1, dd, hh, mi, ss).getTime();
       }
       return NaN;
     }catch(e){ return NaN; }
@@ -529,57 +567,24 @@
     if(!Number.isFinite(ms)) return "—";
     return new Date(ms).toLocaleString("ro-RO");
   }
-  // === end helpers ===
 
-    // Firebase init (preluat din "salvare stergere.html")
-    window.firebaseConfig = {
-      apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-      authDomain: "stancubyt-fc2b9.firebaseapp.com",
-      projectId: "stancubyt-fc2b9",
-      storageBucket: "stancubyt-fc2b9.firebasestorage.app",
-      messagingSenderId: "263244200492",
-      appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-      measurementId: "G-272S9HSY3K"
-    };
-    try {
-      if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
-        firebase.initializeApp(window.firebaseConfig);
-      }
-    } catch (e) {
-      console.warn("Firebase init warning:", e);
+  window.firebaseConfig = {
+    apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+    authDomain: "stancubyt-fc2b9.firebaseapp.com",
+    projectId: "stancubyt-fc2b9",
+    storageBucket: "stancubyt-fc2b9.firebasestorage.app",
+    messagingSenderId: "263244200492",
+    appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+    measurementId: "G-272S9HSY3K"
+  };
+  try {
+    if (typeof firebase !== "undefined" && firebase.apps && !firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
     }
-  </script>
-
-<!-- === Added: Firebase v9 Functions (callable) - SAFE PATCH === -->
-<script type="module">
-  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
-
-  // Reuse the SAME config already defined for compat
-  const cfg = window.firebaseConfig;
-  if (!cfg || !cfg.projectId) {
-    console.error("Firebase config missing projectId; cannot init Functions.");
-  } else {
-    // Init modular app ONLY if not already created
-    let app;
-    if (!getApps().length) {
-      app = initializeApp(cfg);
-    } else {
-      app = getApps()[0];
-    }
-
-    // IMPORTANT: region must match the deployed function
-    const functions = getFunctions(app, "europe-west1");
-
-    // Expose callable globally without breaking existing code
-    window.sendPromoSignupEmail = httpsCallable(functions, "sendPromoSignupEmail");
-    window.sendPromoWinnerEmail = httpsCallable(functions, "sendPromoWinnerEmail");
-
-    console.log("Functions callable ready:", { projectId: cfg.projectId, region: "europe-west1" });
+  } catch (e) {
+    console.warn("Firebase init warning:", e);
   }
-</script>
-<!-- === End patch === -->
-
+  </script>
 </head>
 
 <body>
@@ -596,6 +601,7 @@
         <span class="pill">📱 Mobile-first</span>
         <span class="pill">🖼️ Auto-resize imagini</span>
         <span class="pill">🏆 Clasament per card</span>
+        <span class="pill">📧 Email automat</span>
       </div>
     </div>
 
@@ -738,7 +744,6 @@
 
 <script>
 (function(){
-  // ===== Helpers =====
   const $ = (id)=>document.getElementById(id);
   const esc = (s)=>String(s??"").replace(/[&<>"'`=\/]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','=':'&#61;','/':'&#47;','\\':'&#92;'}[ch]||ch));
   const clamp = (n,min,max)=>Math.min(max,Math.max(min,n));
@@ -748,17 +753,13 @@
   const fs = ()=> (window.firebase && firebase.firestore) ? firebase.firestore() : null;
   const st = ()=> (window.firebase && firebase.storage) ? firebase.storage() : null;
 
-  // ===== State =====
   let __isAdmin = false;
   let __user = null;
   let __editingPromoId = null;
   let __statsUnsub = null;
   let __statsCache = { promos: [], participants: {} };
-  // expose for onclick/global helpers
   window.__statsCache = __statsCache;
 
-
-  // IMPORTANT: folosim stats/visits (conform rules trimise de tine)
   function statsRef(){
     const d = fs();
     if(!d) return null;
@@ -774,9 +775,10 @@
   function setAdminUI(isAdmin, user){
     __isAdmin = !!isAdmin;
     __user = user || null;
+    window.__SBYT_ADMIN = __isAdmin;
+    window.__SBYT_USER_EMAIL = (__user && __user.email) ? __user.email : "";
 
     document.querySelectorAll('.admin-only').forEach(el=>{
-      // preserve original display type if needed
       const d = el.dataset && el.dataset.adminDisplay ? el.dataset.adminDisplay : (el.classList.contains('actions') ? 'flex' : 'block');
       el.style.display = __isAdmin ? d : 'none';
     });
@@ -796,7 +798,6 @@
     return !!(user && (user.email||'').toLowerCase() === ADMIN_EMAIL.toLowerCase());
   }
 
-  // ===== Admin auth (same as your working files) =====
   window.adminSignIn = async function adminSignIn(){
     const a = auth();
     const msg = $('adminLoginMsg');
@@ -825,22 +826,17 @@
     try { await a.signOut(); } catch(e) { console.warn(e); }
   };
 
-  // ===== Promo form open/close =====
   window.openPromoForm = function openPromoForm(kind, promoId){
     const f = $('promoForm');
     if(!f) return;
     __editingPromoId = promoId || null;
 
-    // reset
     f.style.display = 'block';
     $('promoSaveBtn')?.setAttribute('data-mode', promoId ? 'edit' : 'add');
 
-    // set kind
     if ($('promoKind')) $('promoKind').value = kind || 'promo';
 
-    // defaults
     if(!promoId){
-      // clear fields
       ['promoEnds','promoTitle','promoPoints','promoHook','promoDesc','prize1','prize2','prize3','promoRules','cardHeight','mediaHeight','overlayText','overlayFontSize','overlayX','overlayY','overlayAlign','overlayColor'].forEach(id=>{ if($(id)) $(id).value=''; });
       if($('promoPoints')) $('promoPoints').value = 10;
       if($('cardHeight')) $('cardHeight').value = 560;
@@ -855,7 +851,6 @@
       return;
     }
 
-    // fill for edit
     const p = (__statsCache.promos || []).find(x=>String(x.id)===String(promoId));
     if(!p) return;
     if($('promoKind')) $('promoKind').value = p.kind || kind || 'promo';
@@ -881,7 +876,6 @@
     if($('overlayAlign')) $('overlayAlign').value = p.ui?.overlay?.align ?? 'left';
     if($('overlayColor')) $('overlayColor').value = p.ui?.overlay?.color ?? '#ffffff';
 
-    // files remain empty unless replaced
     if($('promoBanner')) $('promoBanner').value = '';
     if($('promoBg')) $('promoBg').value = '';
   };
@@ -892,7 +886,6 @@
     __editingPromoId = null;
   };
 
-  // ===== Image resize + upload =====
   async function resizeImageFile(file, opts={}){
     const maxW = Number(opts.maxW || 1600);
     const maxH = Number(opts.maxH || 1600);
@@ -925,7 +918,6 @@
     return { url, path: storagePath };
   }
 
-  // ===== CRUD promos in stats/visits =====
   function makeId(prefix='p'){
     return prefix + '_' + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(3);
   }
@@ -965,9 +957,8 @@
       text: (document.getElementById('rulesText')?.value || '').trim()
     };
     const rulesLegacy = [rulesObj.r1, rulesObj.r2, rulesObj.r3, rulesObj.r4, rulesObj.r5, rulesObj.text].filter(Boolean).join('\n');
-    const rules = rulesLegacy; // compat (text concatenat)
+    const rules = rulesLegacy;
 
-    // IMPORTANT: fara validari "fantoma" - verificam exact ce trebuie
     if(!title) return alert('Completează: Titlu');
     if(!desc) return alert('Completează: Descriere');
     if(!ends) return alert('Completează: Data & ora expirării');
@@ -1011,13 +1002,10 @@
       let banner = prev?.banner || null;
       let bgs = Array.isArray(prev?.bgs) ? prev.bgs : [];
 
-      // Upload in /news/** (respectă storage rules pe care le-ai trimis)
-      // banner
       if (bannerFile) {
         const storagePath = `news/promos/${id}/banner_${Date.now()}_${bannerFile.name}`.replace(/\s+/g,'_');
         banner = await uploadResizedImage(bannerFile, storagePath);
       }
-      // backgrounds
       if (bgFiles.length) {
         const uploads = [];
         for (const f of bgFiles) {
@@ -1048,7 +1036,6 @@
       if (idx >= 0) promos[idx] = promoObj;
       else promos.unshift(promoObj);
 
-      // ensure participants map key exists
       if (!participants[String(id)]) participants[String(id)] = participants[String(id)] || [];
 
       await writeStats({ promos, participants });
@@ -1061,13 +1048,11 @@
     }
   };
 
-  // ===== Delete / Edit promo =====
   window.editPromo = function editPromo(promoId){
     if(!__isAdmin) return;
     const p = (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId));
     if(!p) return;
     openPromoForm(p.kind || 'promo', promoId);
-    // scroll to form
     $('promoForm')?.scrollIntoView({ behavior:'smooth', block:'start' });
   };
 
@@ -1080,7 +1065,7 @@
       if(promo?.banner?.path) paths.push(promo.banner.path);
       if(Array.isArray(promo?.bgs)) promo.bgs.forEach(x=>x?.path && paths.push(x.path));
       for (const p of paths) {
-        try { await storage.ref().child(p).delete(); } catch(e) { /* ignore */ }
+        try { await storage.ref().child(p).delete(); } catch(e) { }
       }
     } catch(e){}
   }
@@ -1107,7 +1092,6 @@
     }
   };
 
-  // ===== Participants / referral =====
   function maskEmail(em){
     const s = String(em||'');
     const at = s.indexOf('@');
@@ -1130,13 +1114,11 @@
     const participants = (stats.participants && typeof stats.participants==='object') ? stats.participants : {};
     const arr = Array.isArray(participants[String(promoId)]) ? participants[String(promoId)].slice() : [];
 
-    // one per wallet
     const walletKey = String(payload.wallet||'').toLowerCase();
     if(walletKey && arr.some(x => String(x.wallet||'').toLowerCase() === walletKey)) {
       throw new Error('Acest wallet este deja înscris.');
     }
 
-    // one per email (optional)
     const emailKey = String(payload.email||'').toLowerCase();
     if(emailKey && arr.some(x => String(x.email||'').toLowerCase() === emailKey)) {
       throw new Error('Acest email este deja înscris.');
@@ -1156,9 +1138,149 @@
     arr.push(participant);
     participants[String(promoId)] = arr;
 
-    // keep promos intact
     await writeStats({ participants });
     return participant;
+  }
+
+  // Funcție nouă pentru afișarea câștigătorilor în ordinea premiilor
+  function buildWinnersSection(promo) {
+    if (!promo.winners || Object.keys(promo.winners).length === 0) {
+      return '';
+    }
+
+    const winners = promo.winners;
+    let html = `
+      <div class="winners-wrap">
+        <div class="winners-title">🏆 Câștigători</div>
+        <div class="winners-prizes-grid">
+    `;
+
+    // Premiul I
+    if (winners.firstPlace && winners.firstPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🏆</span> Premiul I: ${esc(promo.prizes?.p1 || '—')}
+        </div>
+      `;
+      winners.firstPlace.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize">${esc(promo.prizes?.p1 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Premiul II
+    if (winners.secondPlace && winners.secondPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🥈</span> Premiul II: ${esc(promo.prizes?.p2 || '—')}
+        </div>
+      `;
+      winners.secondPlace.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize">${esc(promo.prizes?.p2 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Premiul III
+    if (winners.thirdPlace && winners.thirdPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🥉</span> Premiul III: ${esc(promo.prizes?.p3 || '—')}
+        </div>
+      `;
+      winners.thirdPlace.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize">${esc(promo.prizes?.p3 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Primele 5 locuri după podium
+    if (winners.top5 && winners.top5.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🎖️</span> Primele 5 locuri după podium: ${esc(promo.prizes?.top5 || '—')}
+        </div>
+      `;
+      winners.top5.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize">${esc(promo.prizes?.top5 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Următoarele 10 locuri
+    if (winners.next10 && winners.next10.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🏅</span> Următoarele 10 locuri: ${esc(promo.prizes?.next10 || '—')}
+        </div>
+      `;
+      winners.next10.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize">${esc(promo.prizes?.next10 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Bonus participare
+    if (winners.bonus && winners.bonus.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🎁</span> Bonus participare / surpriză random: ${esc(promo.prizes?.bonus || '—')}
+        </div>
+      `;
+      winners.bonus.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize">${esc(promo.prizes?.bonus || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    html += `
+        </div>
+      </div>
+    `;
+
+    return html;
   }
 
   function buildLeaderboard(p){
@@ -1170,7 +1292,6 @@
       return `<div style="opacity:.85;">Nu există participanți încă.</div>`;
     }
 
-    // referral counts
     const counts = new Map();
     const codeToUser = new Map();
     arr.forEach(u=> {
@@ -1212,41 +1333,30 @@
       </tr>`;
     });
     html += `</table>`;
-    // ===== Winners section (auto show after expiry) =====
+    
     const now = Date.now();
     const endsMs = promo && promo.ends ? new Date(promo.ends).getTime() : NaN;
     const expired = Number.isFinite(endsMs) && now >= endsMs;
 
     let winnersHtml = "";
     if (expired && promo.winners) {
-      winnersHtml = buildWinnersHtml(promo.winners);
+      winnersHtml = buildWinnersSection(promo);
     }
 
     if (winnersHtml) {
-      html += `<div class="winners-wrap">${winnersHtml}</div>`;
-    } else if (__isAdmin) {
-      // Admin preview / finalize buttons + preview container
+      html += winnersHtml;
+    } else if (__isAdmin && expired) {
       html += `
         <div class="winners-wrap">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
-            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="previewWinners('${esc(promoId)}')">👁️ Vezi câștigători</button>
-</div>
+            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="selectWinners('${esc(promoId)}')">🎯 Selectează Câștigători</button>
+          </div>
           <div id="winners_preview_${esc(promoId)}"></div>
         </div>
-      ${winnersHtml}`;
-}
+      `;
+    }
 
     return html;
-  }
-
-  // ===== Render promos =====
-  function formatEnds(ends){
-    if(!ends) return '';
-    try {
-      const d = new Date(ends);
-      if(Number.isNaN(d.getTime())) return ends;
-      return d.toLocaleString('ro-RO');
-    } catch { return ends; }
   }
 
   function pickMediaUrl(p){
@@ -1276,11 +1386,6 @@
       const overlayY = clamp(Number(overlay.y ?? 8), 0, 90);
       const overlayAlign = (overlay.align || 'left');
       const overlayColor = (overlay.color || '#ffffff');
-
-      const prizes = [];
-      if(p.prizes?.p1) prizes.push('🥇 ' + p.prizes.p1);
-      if(p.prizes?.p2) prizes.push('🥈 ' + p.prizes.p2);
-      if(p.prizes?.p3) prizes.push('🥉 ' + p.prizes.p3);
 
       const wrap = document.createElement('div');
       wrap.className = 'card promo-card';
@@ -1366,7 +1471,6 @@
       list.appendChild(block);
     });
 
-    // reapply admin-only after render
     document.querySelectorAll('.admin-only').forEach(el=>{
       const d = el.dataset && el.dataset.adminDisplay ? el.dataset.adminDisplay : (el.classList.contains('actions') ? 'flex' : 'block');
       el.style.display = __isAdmin ? d : 'none';
@@ -1374,16 +1478,7 @@
   }
 
   window.joinPromo = async function joinPromo(promoId){
-    
-    // blocare înscriere după expirare (local time)
     try{
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-      const ms = parseEndsMs(promo && promo.ends);
-      if(Number.isFinite(ms) && Date.now() >= ms){
-        return alert((promo && promo.kind==='giveaway') ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
-      }
-    }catch(e){}
-try{
       const C = (window.__statsCache || __statsCache || {promos:[]});
       const promo = (C.promos||[]).find(p=>String(p.id)===String(promoId));
       if(promo && promo.ends){
@@ -1404,15 +1499,14 @@ try{
 
     try {
       const u = await addParticipant(promoId, { name, email, wallet, referral });
-      // clear inputs
       $(`name_${promoId}`).value = '';
       $(`email_${promoId}`).value = '';
       $(`wallet_${promoId}`).value = '';
       $(`ref_${promoId}`).value = '';
 
       alert(`Înscriere reușită!\nCodul tău: ${u.code}`);
-      // === AUTO EMAIL (SendGrid via Firebase Callable) ===
-      // Uses the participant's generated code as referralCode
+      
+      // === TRIMITE EMAIL LA ÎNSCRIERE ===
       try {
         if (typeof window.sendPromoSignupEmail === 'function') {
           const promo = (__statsCache.promos || []).find(x => String(x.id) === String(promoId)) || {};
@@ -1424,20 +1518,20 @@ try{
             promoEndsAt: promo.ends || null,
             promoUrl: window.location.href
           });
+          console.log('Email de înscriere trimis către:', email);
         } else {
-          console.warn('sendPromoSignupEmail callable is not ready on this page.');
+          console.warn('sendPromoSignupEmail callable nu este disponibil.');
         }
       } catch (mailErr) {
-        console.warn('Email send failed (non-blocking):', mailErr);
+        console.warn('Eroare la trimiterea email-ului de înscriere:', mailErr);
       }
-
+      
     } catch(e) {
       console.error('joinPromo:', e);
       alert(e?.message || 'Eroare la înscriere.');
     }
   };
 
-  // ===== Stats listener =====
   function startStatsListener(){
     const ref = statsRef();
     if(!ref) return;
@@ -1450,21 +1544,15 @@ try{
       renderPromos();
     }, err=>{
       console.warn('stats onSnapshot error:', err);
-      // fallback one-time read
       readStatsOnce().then(x=>{ __statsCache=x; renderPromos(); }).catch(()=>{});
     });
   }
 
-  // ===== Inject the extra form fields into the existing promoForm (from adaugare.html) =====
   function injectExtraFields(){
     const form = $('promoForm');
     if(!form) return;
 
-    // prevent double insert
     if ($('cardHeight')) return;
-
-    const divider = document.createElement('div');
-    divider.className = 'divider';
 
     const block = document.createElement('div');
     block.innerHTML = `
@@ -1527,20 +1615,361 @@ try{
       </div>
     `;
 
-    // insert BEFORE the final action buttons
     const actions = form.querySelector('.actions');
     if(actions) form.insertBefore(block, actions);
     else form.appendChild(block);
   }
 
   window.previewOverlay = function previewOverlay(){
-    // quick preview in first card if any, else just ok
     const txt = ($('overlayText')?.value||'').trim();
     if(!txt) return alert('Completează mai întâi "Text peste imagine".');
     alert('Textul va apărea peste imagine în card după salvare.');
   };
 
-  // ===== Boot =====
+  // Funcții pentru selectarea și salvarea câștigătorilor
+  async function getPromoDataFromFirestore(promoId){
+    try {
+      const db = fs();
+      if(!db) throw new Error("Firestore nu este disponibil");
+      
+      const statsDoc = await db.collection('stats').doc('visits').get();
+      if(!statsDoc.exists) throw new Error("Documentul stats/visits nu există");
+      
+      const data = statsDoc.data();
+      const promos = Array.isArray(data?.promos) ? data.promos : [];
+      const participants = (data?.participants && typeof data.participants === 'object') ? data.participants : {};
+      
+      const promo = promos.find(p => String(p.id) === String(promoId));
+      if(!promo) throw new Error("Promoția nu a fost găsită");
+      
+      const promoParticipants = Array.isArray(participants[String(promoId)]) ? participants[String(promoId)] : [];
+      
+      return { promo, participants: promoParticipants };
+    } catch(error) {
+      console.error("Eroare la citirea din Firestore:", error);
+      throw error;
+    }
+  }
+
+  function __hash32(str){
+    str = String(str || "");
+    let h = 2166136261 >>> 0;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  
+  function __mulberry32(seed){
+    let a = seed >>> 0;
+    return function(){
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function __buildScores(arr){
+    const codeToUser = new Map();
+    arr.forEach(u=>{
+      const c = String(u?.code||"").trim();
+      if(c) codeToUser.set(c, u);
+    });
+
+    const scoreByCode = new Map();
+    const tieTimeByCode = new Map();
+
+    arr.forEach(u=>{
+      const ref = String(u?.referral||"").trim();
+      if(!ref) return;
+      const own = String(u?.code||"").trim();
+      if(own && own === ref) return;
+
+      const owner = codeToUser.get(ref);
+      if(!owner) return;
+
+      const ownerCode = String(owner.code);
+      scoreByCode.set(ownerCode, (scoreByCode.get(ownerCode)||0)+1);
+
+      const t = u?.joinedAt || u?.createdAt || Date.now();
+      const prev = tieTimeByCode.get(ownerCode);
+      if(!prev || t < prev) tieTimeByCode.set(ownerCode, t);
+    });
+
+    return { codeToUser, scoreByCode, tieTimeByCode };
+  }
+
+  async function __isAdminNow(){
+    try{
+      if (window.__SBYT_ADMIN === true) return true;
+      if (typeof __isAdmin !== "undefined" && __isAdmin === true) return true;
+      if (window.firebase && firebase.auth) {
+        const u = firebase.auth().currentUser;
+        if (u && u.email && String(u.email).toLowerCase() === "stancubyt@gmail.com") return true;
+      }
+    }catch(e){}
+    return false;
+  }
+
+  window.selectWinners = async function selectWinners(promoId){
+    if(!__isAdminNow()) { 
+      alert('Trebuie să fii logat ca admin.');
+      return;
+    }
+
+    try{
+      const box = document.getElementById(`winners_preview_${promoId}`);
+      if(!box) {
+        alert("Containerul pentru preview nu a fost găsit.");
+        return;
+      }
+      
+      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Se calculează câștigătorii...</div>`;
+      
+      let promo, participants;
+      
+      try {
+        const data = await getPromoDataFromFirestore(promoId);
+        promo = data.promo;
+        participants = data.participants;
+        
+        const idx = (window.__statsCache.promos || []).findIndex(p => String(p.id) === String(promoId));
+        if(idx >= 0) {
+          window.__statsCache.promos[idx] = promo;
+        }
+        window.__statsCache.participants[String(promoId)] = participants;
+        
+      } catch(firestoreError) {
+        console.warn("Nu s-au putut obține datele din Firestore, folosim cache:", firestoreError);
+        
+        promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
+        participants = Array.isArray(window.__statsCache.participants?.[String(promoId)]) ? window.__statsCache.participants[String(promoId)] : [];
+      }
+      
+      if(!promo) {
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promoția nu a fost găsită. Încarcă din nou pagina.</div>`;
+        return;
+      }
+      
+      if(!participants || participants.length === 0) {
+        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 Nu există participanți încă.</div>`;
+        return;
+      }
+
+      const { scoreByCode } = __buildScores(participants);
+      
+      const ranking = participants
+        .filter(u=>u && u.code)
+        .map(u=>{
+          const code = String(u.code);
+          return {
+            ...u,
+            score: scoreByCode.get(code) || 0
+          };
+        })
+        .sort((a,b)=> b.score - a.score || a.joinedAt - b.joinedAt);
+
+      const seed = `${promoId}|${promo.ends||""}|${participants.length}`;
+      const rng = __mulberry32(__hash32(seed));
+
+      const firstPlace = ranking.slice(0, 1);
+      const secondPlace = ranking.slice(1, 2);
+      const thirdPlace = ranking.slice(2, 3);
+      
+      const remaining = ranking.slice(3);
+      
+      const top5 = [];
+      const poolTop5 = remaining.slice();
+      for(let i=0; i<Math.min(5, poolTop5.length); i++) {
+        const idx = Math.floor(rng() * poolTop5.length);
+        top5.push(poolTop5.splice(idx, 1)[0]);
+      }
+      
+      const next10 = [];
+      const poolNext10 = poolTop5.slice();
+      for(let i=0; i<Math.min(10, poolNext10.length); i++) {
+        const idx = Math.floor(rng() * poolNext10.length);
+        next10.push(poolNext10.splice(idx, 1)[0]);
+      }
+      
+      const bonus = [];
+      const poolBonus = poolNext10.slice();
+      if(poolBonus.length > 0) {
+        const idx = Math.floor(rng() * poolBonus.length);
+        bonus.push(poolBonus[idx]);
+      }
+
+      const winners = {
+        firstPlace: firstPlace.map(u => ({ name: u.name, email: u.email })),
+        secondPlace: secondPlace.map(u => ({ name: u.name, email: u.email })),
+        thirdPlace: thirdPlace.map(u => ({ name: u.name, email: u.email })),
+        top5: top5.map(u => ({ name: u.name, email: u.email })),
+        next10: next10.map(u => ({ name: u.name, email: u.email })),
+        bonus: bonus.map(u => ({ name: u.name, email: u.email })),
+        selectedAt: new Date().toISOString()
+      };
+
+      box.innerHTML = `
+        <div style="margin-bottom:15px;">
+          <div style="font-weight:900; margin-bottom:10px;">🎯 Câștigători selectați</div>
+          <div style="opacity:0.8; font-size:0.9rem;">Acești câștigători au fost selectați automat. Apasă "Salvează" pentru a finaliza.</div>
+        </div>
+        ${buildWinnersSection({ ...promo, winners })}
+        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn" onclick="saveWinners('${esc(promoId)}')">💾 Salvează Câștigători</button>
+          <button class="btn secondary" onclick="this.parentElement.parentElement.innerHTML=''">❌ Anulează</button>
+        </div>
+        <div id="save_winners_msg_${esc(promoId)}" style="margin-top:10px;"></div>
+      `;
+      
+      box.scrollIntoView({ behavior:"smooth", block:"nearest" });
+      
+    }catch(e){
+      console.error("Eroare la selectarea câștigătorilor:", e);
+      const box = document.getElementById(`winners_preview_${promoId}`);
+      if(box) {
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
+      }
+    }
+  };
+
+  window.saveWinners = async function saveWinners(promoId){
+    if(!__isAdminNow()) { 
+      alert('Trebuie să fii logat ca admin.');
+      return;
+    }
+
+    const msgBox = document.getElementById(`save_winners_msg_${promoId}`);
+    if(msgBox) msgBox.innerHTML = `<div style="opacity:0.8;">⏳ Se salvează câștigătorii...</div>`;
+
+    try {
+      const data = await getPromoDataFromFirestore(promoId);
+      const promo = data.promo;
+      const participants = data.participants;
+
+      const { scoreByCode } = __buildScores(participants);
+      
+      const ranking = participants
+        .filter(u=>u && u.code)
+        .map(u=>{
+          const code = String(u.code);
+          return {
+            ...u,
+            score: scoreByCode.get(code) || 0
+          };
+        })
+        .sort((a,b)=> b.score - a.score || a.joinedAt - b.joinedAt);
+
+      const seed = `${promoId}|${promo.ends||""}|${participants.length}`;
+      const rng = __mulberry32(__hash32(seed));
+
+      const firstPlace = ranking.slice(0, 1);
+      const secondPlace = ranking.slice(1, 2);
+      const thirdPlace = ranking.slice(2, 3);
+      
+      const remaining = ranking.slice(3);
+      
+      const top5 = [];
+      const poolTop5 = remaining.slice();
+      for(let i=0; i<Math.min(5, poolTop5.length); i++) {
+        const idx = Math.floor(rng() * poolTop5.length);
+        top5.push(poolTop5.splice(idx, 1)[0]);
+      }
+      
+      const next10 = [];
+      const poolNext10 = poolTop5.slice();
+      for(let i=0; i<Math.min(10, poolNext10.length); i++) {
+        const idx = Math.floor(rng() * poolNext10.length);
+        next10.push(poolNext10.splice(idx, 1)[0]);
+      }
+      
+      const bonus = [];
+      const poolBonus = poolNext10.slice();
+      if(poolBonus.length > 0) {
+        const idx = Math.floor(rng() * poolBonus.length);
+        bonus.push(poolBonus[idx]);
+      }
+
+      const winners = {
+        firstPlace: firstPlace.map(u => ({ name: u.name, email: u.email })),
+        secondPlace: secondPlace.map(u => ({ name: u.name, email: u.email })),
+        thirdPlace: thirdPlace.map(u => ({ name: u.name, email: u.email })),
+        top5: top5.map(u => ({ name: u.name, email: u.email })),
+        next10: next10.map(u => ({ name: u.name, email: u.email })),
+        bonus: bonus.map(u => ({ name: u.name, email: u.email })),
+        selectedAt: new Date().toISOString()
+      };
+
+      const stats = await readStatsOnce();
+      const promos = Array.isArray(stats.promos) ? stats.promos.slice() : [];
+      
+      const idx = promos.findIndex(p => String(p.id) === String(promoId));
+      if(idx >= 0) {
+        promos[idx].winners = winners;
+        
+        await writeStats({ promos });
+        
+        if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700;">✅ Câștigătorii au fost salvați!</div>`;
+        
+        setTimeout(() => {
+          const previewBox = document.getElementById(`winners_preview_${promoId}`);
+          if(previewBox) previewBox.innerHTML = '';
+          
+          const leaderboard = document.getElementById(`lb_${promoId}`);
+          if(leaderboard) {
+            const promoWithWinners = { ...promos[idx], winners };
+            leaderboard.innerHTML = buildLeaderboard(promoWithWinners);
+          }
+        }, 1500);
+
+        // === TRIMITE EMAIL-URI CÂȘTIGĂTORILOR ===
+        try {
+          if (typeof window.sendPromoWinnerEmail === 'function') {
+            const allWinners = [
+              ...firstPlace.map(u => ({ ...u, prize: 'Premiul I: ' + (promo.prizes?.p1 || '') })),
+              ...secondPlace.map(u => ({ ...u, prize: 'Premiul II: ' + (promo.prizes?.p2 || '') })),
+              ...thirdPlace.map(u => ({ ...u, prize: 'Premiul III: ' + (promo.prizes?.p3 || '') })),
+              ...top5.map(u => ({ ...u, prize: 'Primele 5 locuri după podium: ' + (promo.prizes?.top5 || '') })),
+              ...next10.map(u => ({ ...u, prize: 'Următoarele 10 locuri: ' + (promo.prizes?.next10 || '') })),
+              ...bonus.map(u => ({ ...u, prize: 'Bonus participare: ' + (promo.prizes?.bonus || '') }))
+            ];
+
+            let emailCount = 0;
+            for (const winner of allWinners) {
+              if (winner.email) {
+                try {
+                  await window.sendPromoWinnerEmail({
+                    toEmail: winner.email,
+                    name: winner.name,
+                    prize: winner.prize,
+                    promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                    promoUrl: window.location.href
+                  });
+                  emailCount++;
+                  console.log(`Email trimis către câștigător: ${winner.email}`);
+                } catch(emailErr) {
+                  console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                }
+              }
+            }
+            console.log(`Total email-uri trimise către câștigători: ${emailCount}`);
+          } else {
+            console.warn('sendPromoWinnerEmail callable nu este disponibil.');
+          }
+        } catch(emailError) {
+          console.warn('Eroare generală la trimiterea email-urilor:', emailError);
+        }
+      } else {
+        if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Promoția nu a fost găsită.</div>`;
+      }
+    } catch(e) {
+      console.error("Eroare la salvarea câștigătorilor:", e);
+      if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
+    }
+  };
+
   function boot(){
     injectExtraFields();
     startStatsListener();
@@ -1559,279 +1988,9 @@ try{
   document.addEventListener('DOMContentLoaded', boot);
 
   if(!window.__expiryUiTimer){
-    window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 20000);
+    window.__expiryUiTimer = setInterval(()=>{ try{ renderPromos(); }catch(e){} }, 120000);
   }
 })();
-
-  // =======================
-  // WINNERS: Variant 3 (Top + Weighted Lucky Draw)
-  // =======================
-  function __hash32(str){
-    str = String(str || "");
-    let h = 2166136261 >>> 0; // FNV-1a
-    for (let i=0;i<str.length;i++){
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-  function __mulberry32(seed){
-    let a = seed >>> 0;
-    return function(){
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-
-  function __maskEmail(email){
-    email = String(email||"");
-    const at = email.indexOf("@");
-    if(at<=1) return email ? (email[0] + "***") : "";
-    return email.slice(0,2) + "***" + email.slice(at);
-  }
-
-  function __buildScores(arr){
-    const codeToUser = new Map();
-    arr.forEach(u=>{
-      const c = String(u?.code||"").trim();
-      if(c) codeToUser.set(c, u);
-    });
-
-    const scoreByCode = new Map();
-    const tieTimeByCode = new Map();
-
-    arr.forEach(u=>{
-      const ref = String(u?.referral||"").trim();
-      if(!ref) return;
-      const own = String(u?.code||"").trim();
-      if(own && own === ref) return; // no self-referral
-
-      const owner = codeToUser.get(ref);
-      if(!owner) return;
-
-      const ownerCode = String(owner.code);
-      scoreByCode.set(ownerCode, (scoreByCode.get(ownerCode)||0)+1);
-
-      const t = u?.createdAt || u?.ts || u?.time || Date.now();
-      const prev = tieTimeByCode.get(ownerCode);
-      // earliest referral timestamp used as tie-break (who started earlier)
-      if(!prev || t < prev) tieTimeByCode.set(ownerCode, t);
-    });
-
-    return { codeToUser, scoreByCode, tieTimeByCode };
-  }
-
-  function computeWinnersVariant3(promoId, opts={}){
-    const luckyCount = Number(opts.luckyCount ?? 16); // total winners 19: 3 podium + 16 bonus
-    const excludePodiumFromLucky = (opts.excludePodiumFromLucky ?? true);
-
-    const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-    if(!promo) throw new Error("Promoția nu a fost găsită.");
-
-    const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
-    const participants = arr.slice();
-
-    const { scoreByCode, tieTimeByCode } = __buildScores(participants);
-
-    const ranking = participants
-      .filter(u=>u && u.code)
-      .map(u=>{
-        const code = String(u.code);
-        return {
-          code,
-          user: u,
-          score: scoreByCode.get(code) || 0,
-          tieTime: tieTimeByCode.get(code) || (u.createdAt || Date.now())
-        };
-      })
-      .sort((a,b)=> (b.score-a.score) || ((a.tieTime||0)-(b.tieTime||0)));
-
-    const podium = ranking.filter(x=>x.score>0).slice(0,3);
-
-    const seed = `${promoId}|${promo.ends||""}|${participants.length}`;
-    const rng = __mulberry32(__hash32(seed));
-
-    const exclude = new Set();
-    if(excludePodiumFromLucky){
-      podium.forEach(p=>exclude.add(String(p.code)));
-    }
-
-    // weighted draw without replacement
-    const pool = participants
-      .filter(u=>u && u.code)
-      .map(u=>{
-        const code = String(u.code);
-        const score = scoreByCode.get(code) || 0;
-        const tickets = 1 + score;
-        return { u, code, score, tickets };
-      })
-      .filter(x=>!exclude.has(x.code));
-
-    const lucky = [];
-    const pool2 = pool.slice();
-    for(let k=0;k<luckyCount && pool2.length;k++){
-      let total = 0;
-      pool2.forEach(x=> total += x.tickets);
-      let r = rng()*total;
-      let pick = 0;
-      for(let i=0;i<pool2.length;i++){
-        r -= pool2[i].tickets;
-        if(r<=0){ pick=i; break; }
-      }
-      lucky.push(pool2[pick].u);
-      pool2.splice(pick,1);
-    }
-
-    return {
-      seed,
-      generatedAt: new Date().toISOString(),
-      podium: podium.map((p,idx)=>({
-        place: idx+1,
-        code: p.code,
-        name: p.user.name || "",
-        email: p.user.email || "",
-        score: p.score
-      })),
-      afterPodium5: lucky.slice(0,5).map(u=>{
-        const code = String(u.code||"");
-        return { code, name: u.name||"", email: u.email||"", score: scoreByCode.get(code)||0 };
-      }),
-      next10: lucky.slice(5,15).map(u=>{
-        const code = String(u.code||"");
-        return { code, name: u.name||"", email: u.email||"", score: scoreByCode.get(code)||0 };
-      }),
-      bonus: lucky.slice(15,16).map(u=>{
-        const code = String(u.code||"");
-        return { code, name: u.name||"", email: u.email||"", score: scoreByCode.get(code)||0 };
-      })
-    };
-  }
-
-  
-  function buildWinnersHtml(w){
-    if(!w) return "";
-    const podium = Array.isArray(w.podium) ? w.podium : [];
-    const afterPodium5 = Array.isArray(w.afterPodium5) ? w.afterPodium5 : [];
-    const next10 = Array.isArray(w.next10) ? w.next10 : [];
-    const bonus = Array.isArray(w.bonus) ? w.bonus : [];
-
-    const row = (label, item, icon) => `
-      <div class="winner-row">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span class="winner-pill">${icon} ${label}</span>
-          <span style="opacity:.85;font-size:12px;">Referrals: <b>${item.score ?? 0}</b></span>
-        </div>
-        <div style="margin-top:6px;font-weight:800;">${esc(item.name || __maskEmail(item.email) || "Participant")}</div>
-        <div style="opacity:.75;font-size:12px;margin-top:2px;">${esc(__maskEmail(item.email))}</div>
-      </div>
-    `;
-
-    let html = `<div class="winners-title">🏁 Câștigători</div><div class="winners-grid">`;
-
-    // Podium
-    podium.forEach((p)=>{
-      const icon = p.place===1 ? "🥇" : (p.place===2 ? "🥈" : "🥉");
-      html += row(`Locul ${p.place}`, p, icon);
-    });
-
-    if(afterPodium5.length){
-      html += `<div class="winner-row" style="opacity:.9"><b>🎖️ Primele 5 locuri după podium</b></div>`;
-      afterPodium5.forEach((u, idx)=> html += row(`Locul ${4+idx}`, u, "🎖️"));
-    }
-
-    if(next10.length){
-      html += `<div class="winner-row" style="opacity:.9"><b>🏅 Următoarele 10 locuri</b></div>`;
-      next10.forEach((u, idx)=> html += row(`Locul ${9+idx}`, u, "🏅"));
-    }
-
-    if(bonus.length){
-      html += `<div class="winner-row" style="opacity:.9"><b>🎁 Bonus participare / surpriză random</b></div>`;
-      bonus.forEach((u, idx)=> html += row(`Bonus ${idx+1}`, u, "🎁"));
-    }
-
-    html += `</div><div style="opacity:.55;font-size:11px;margin-top:8px;">Seed: ${esc(String(w.seed||""))}</div>`;
-    return html;
-  }
-
-
-  async function previewWinners(promoId){
-    if(!(window.__SBYT_ADMIN===true)) { return alert('Trebuie să fii logat ca admin.'); }
-
-    try{
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-      const box = document.getElementById(`winners_preview_${promoId}`);
-      if(!box) return;
-      const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
-      box.innerHTML = buildWinnersHtml(w);
-      // scroll to winners preview
-      box.scrollIntoView({ behavior:"smooth", block:"nearest" });
-    }catch(e){
-      alert("Eroare la preview: " + (e?.message || e));
-    }
-  }
-
-  async function finalizeWinners(promoId){
-    try{
-      if(!(window.__SBYT_ADMIN===true)) return alert("Doar admin.");
-      const promo = (__statsCache.promos||[]).find(p=>String(p.id)===String(promoId));
-      if(!promo) return alert("Promoția nu a fost găsită.");
-
-      const endsMs = promo.ends ? new Date(promo.ends).getTime() : NaN;
-      if(!(Number.isFinite(endsMs) && Date.now() >= endsMs)){
-        return alert("Promoția nu este încă expirată.");
-      }
-
-      const w = computeWinnersVariant3(promoId, { luckyCount: 16, excludePodiumFromLucky: true });
-
-      // persist into promos array (stats/visits)
-      const promos = (__statsCache.promos||[]).slice();
-      const idx = promos.findIndex(p=>String(p.id)===String(promoId));
-      promos[idx] = { ...promos[idx], winners: w, winnersFinalizedAt: new Date().toISOString() };
-      await writeStats({ promos });
-
-      __statsCache.promos = promos;
-
-      // refresh leaderboard area
-      const lb = document.getElementById(`lb_${promoId}`);
-      if(lb) lb.innerHTML = buildLeaderboard(promos[idx]);
-
-      // send emails to winners (requires backend callable sendPromoWinnerEmail)
-      if(typeof window.sendPromoWinnerEmail === "function"){
-        const allWinners = []
-          .concat((w.podium || []).map(x => ({ ...x, place: x.place })))
-          .concat((w.afterPodium5 || []).map(x => ({ ...x, place: "BONUS5" })))
-          .concat((w.next10 || []).map(x => ({ ...x, place: "NEXT10" })))
-          .concat((w.bonus || []).map(x => ({ ...x, place: "BONUS" })));
-
-        for(const ww of allWinners){
-          const to = ww.email;
-          if(!to) continue;
-          try{
-            await window.sendPromoWinnerEmail({
-              toEmail: to,
-              name: ww.name || "",
-              promoTitle: promo.title || (promo.kind==='giveaway'?'Giveaway':'Promoție'),
-              place: ww.place || "BONUS",
-              score: ww.score || 0,
-              promoUrl: window.location.href
-            });
-          }catch(mailErr){
-            console.warn("winner email failed:", mailErr);
-          }
-        }
-      } else {
-        console.warn("sendPromoWinnerEmail is not deployed yet. Winners saved, emails not sent.");
-      }
-
-      alert("Câștigători finalizați ✅");
-    }catch(e){
-      alert("Eroare la finalizare: " + (e?.message || e));
-    }
-  }
-
-
   </script>
 </body>
 </html>
