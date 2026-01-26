@@ -251,7 +251,7 @@
     width:100%;
   }
   .leaderboard-mini {
-    height: 200px;
+    max-height: 200px;
     overflow:auto;
     border-radius: 14px;
     background: rgba(0,0,0,0.18);
@@ -308,215 +308,14 @@
   font-size:0.9rem;
   border-radius:999px;
 }
-
-/* Stiluri pentru cele două carduri separate */
-.promo-right-column {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.participants-card {
-  flex: 1;
+.promo-leaderboard-out{
+  margin-top: 10px;
+  margin-bottom: 14px;
+  padding: 14px 14px;
+  border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  padding: 16px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  height: 340px;
-}
-
-.winners-card {
-  flex: 1;
-  border: 2px solid transparent;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  height: 340px;
-  border-image: linear-gradient(135deg,
-    rgba(0,255,255,0.95),
-    rgba(138,43,226,0.95),
-    rgba(0,255,136,0.95),
-    rgba(0,102,255,0.95)
-  ) 1;
-  box-shadow:
-    0 0 18px rgba(0,255,255,0.10),
-    0 0 26px rgba(138,43,226,0.08);
-}
-
-/* Border animat pentru cardul câștigători */
-.winners-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(0,255,255,0.8) 20%,
-    rgba(138,43,226,0.8) 40%,
-    rgba(0,255,136,0.8) 60%,
-    rgba(0,102,255,0.8) 80%,
-    transparent 100%
-  );
-  animation: shine 3s infinite linear;
-}
-
-@keyframes shine {
-  0% { background-position: -200px 0; }
-  100% { background-position: 200px 0; }
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.card-header h3 {
-  font-weight: 900;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.participants-card .card-header h3 {
-  color: var(--neon-cyan);
-}
-
-.winners-card .card-header h3 {
-  background: linear-gradient(45deg, #ffd700, #c0c0c0, #cd7f32);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.participants-count, .winners-count {
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
-.participants-list {
-  flex: 1;
-  overflow-y: auto;
-  border-radius: 14px;
   background: rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 8px;
-}
-
-.winners-list {
-  flex: 1;
-  overflow-y: auto;
-  border-radius: 14px;
-  background: rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 8px;
-}
-
-.winner-line {
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: transform 0.2s ease;
-}
-
-.winner-line:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-}
-
-.winner-line:last-child {
-  margin-bottom: 0;
-}
-
-.winner-rank {
-  font-weight: 900;
-  font-size: 0.9rem;
-  min-width: 30px;
-  text-align: center;
-}
-
-.winner-rank.gold { color: #ffd700; }
-.winner-rank.silver { color: #c0c0c0; }
-.winner-rank.bronze { color: #cd7f32; }
-
-.winner-info-compact {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.winner-name-compact {
-  font-weight: 900;
-  font-size: 0.95rem;
-  color: var(--neon-cyan);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.winner-email-compact {
-  opacity: 0.8;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.winner-prize-compact {
-  font-weight: 800;
-  color: #ffd700;
-  font-size: 0.9rem;
-  text-align: right;
-  min-width: 150px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.winner-stats-compact {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  font-size: 0.85rem;
-  opacity: 0.9;
-}
-
-.winner-stats-compact b {
-  color: #00ff88;
-}
-
-.no-winners {
-  text-align: center;
-  padding: 40px 20px;
-  opacity: 0.7;
-  font-size: 0.95rem;
-}
-
-.no-winners i {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  display: block;
+  backdrop-filter: blur(6px);
 }
 
 .promo-block{
@@ -535,37 +334,33 @@
     0 0 18px rgba(0,255,255,0.10),
     0 0 26px rgba(138,43,226,0.08);
   display:flex;
-  gap: 16px;
+  gap: 14px;
   align-items: stretch;
 }
-.promo-block > .promo-main-card{
+.promo-block > .news-card{
   flex: 1 1 0;
   min-width: 0;
 }
-
+.promo-leaderboard-out{
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 22px;
+  padding: 14px 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(6px);
+}
 @media (max-width: 980px){
-  .promo-block{ 
-    flex-direction: column; 
-    gap: 16px;
-  }
-  
-  .promo-right-column {
-    width: 100%;
-  }
-  
-  .participants-card,
-  .winners-card {
-    height: 340px;
-  }
+  .promo-block{ flex-direction: column; }
 }
 
 #promoList{ display:flex !important; flex-direction:column !important; gap: 16px !important; }
 .promo-block{ width:100%; }
 
-.promo-main-card {
+.promo-card{
   height: auto !important;
-  min-height: 820px;
-  max-height: 820px;
+  min-height: 700px;
+  max-height: 700px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -615,151 +410,247 @@
   overflow: visible !important;
 }
 
-/* Ajustări pentru tabelele din cardul participanți */
-.participants-list table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-.participants-list th, .participants-list td {
-  padding: 6px 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  text-align: left;
-  vertical-align: middle;
-}
-
-.participants-list tr:last-child td {
-  border-bottom: none;
-}
-
-.participants-list tr:hover {
-  background: rgba(255,255,255,0.05);
-}
-
-.rank-cell {
-  font-weight: 900;
-  width: 40px;
-}
-
-.name-cell {
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.email-cell {
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  opacity: 0.8;
-}
-
-.code-cell {
-  font-family: monospace;
-  font-size: 0.8rem;
-  opacity: 0.9;
-}
-
-.ref-cell {
-  text-align: center;
-  width: 60px;
-}
-
-/* Stiluri pentru butoanele admin în cardul câștigători */
-.winners-admin-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  justify-content: center;
-}
-
-.winners-admin-actions .btn {
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  border-radius: 12px;
-}
-
-/* Banner fosforescent intermitent */
-.status-banner {
-  margin-top: 20px;
-  padding: 25px 20px;
-  border-radius: 20px;
-  text-align: center;
-  font-weight: 900;
-  font-size: 2.5rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
+.winners-wrap{
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 18px;
+  border: 2px solid transparent;
+  border-image: linear-gradient(135deg,
+    rgba(255,215,0,0.8),
+    rgba(192,192,192,0.8),
+    rgba(205,127,50,0.8)
+  ) 1;
+  background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 40px rgba(0,255,255,0.3);
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-.status-banner.active {
-  background: linear-gradient(135deg, 
-    rgba(0,255,255,0.2),
-    rgba(0,255,136,0.2),
-    rgba(138,43,226,0.2)
+.winners-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,215,0,0.8) 20%,
+    rgba(192,192,192,0.8) 40%,
+    rgba(205,127,50,0.8) 60%,
+    rgba(0,255,255,0.8) 80%,
+    transparent 100%
   );
-  color: #00ffff;
-  border: 3px solid;
-  border-image: linear-gradient(45deg, #00ffff, #00ff88, #8a2be2) 1;
-  animation: pulse 2s infinite;
+  animation: shine 3s infinite linear;
 }
 
-.status-banner.expired {
-  background: linear-gradient(135deg, 
-    rgba(255,77,77,0.2),
-    rgba(255,215,0,0.2),
-    rgba(138,43,226,0.2)
+@keyframes shine {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+.winners-title{
+  font-weight: 900;
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+  text-align: center;
+  background: linear-gradient(45deg, #ffd700, #c0c0c0, #cd7f32);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.winners-title::before,
+.winners-title::after {
+  content: "✦";
+  color: #ffd700;
+  animation: twinkle 2s infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.winners-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.winner-row{
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.winner-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.winner-info{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.winner-name{
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--neon-cyan);
+}
+.winner-email{
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+.winner-stats{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 5px;
+}
+.winner-referrals{
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+.winner-referrals b{
+  color: #00ff88;
+}
+.winner-prize{
+  font-weight: 800;
+  color: #ffd700;
+  text-align: right;
+  min-width: 200px;
+  padding-left: 15px;
+  border-left: 2px solid rgba(255,215,0,0.3);
+}
+.winner-row b{ font-weight: 900; }
+.winner-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.25);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.promo-leaderboard-out{
+  display:flex;
+  flex-direction:column;
+  height: 500px;
+  overflow: hidden;
+}
+.promo-leaderboard-out .leaderboard-mini{
+  flex: 1 1 50%;
+  min-height: 200px;
+  max-height: 300px;
+  overflow: auto;
+}
+.promo-leaderboard-out .winners-wrap{
+  flex: 1 1 50%;
+  min-height: 200px;
+  max-height: 300px;
+  overflow: auto;
+  margin-top: 20px;
+}
+@media (max-width: 980px){
+  .promo-leaderboard-out .leaderboard-mini{ min-height: 240px; }
+  .promo-leaderboard-out .winners-wrap{ min-height: 240px; }
+}
+
+.winners-prizes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+.winners-prize-category {
+  margin-bottom: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.2);
+  border-left: 4px solid;
+}
+.winners-prize-category.gold { border-left-color: #ffd700; }
+.winners-prize-category.silver { border-left-color: #c0c0c0; }
+.winners-prize-category.bronze { border-left-color: #cd7f32; }
+.winners-prize-category.other { border-left-color: #00ffff; }
+.prize-icon {
+  font-size: 1.3rem;
+}
+
+.stars-divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+  height: 2px;
+}
+
+.stars-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,215,0,0.5) 10%,
+    rgba(192,192,192,0.5) 30%,
+    rgba(205,127,50,0.5) 50%,
+    rgba(192,192,192,0.5) 70%,
+    rgba(255,215,0,0.5) 90%,
+    transparent 100%
   );
-  color: #ff4d4d;
-  border: 3px solid;
-  border-image: linear-gradient(45deg, #ff4d4d, #ff9500, #8a2be2) 1;
 }
 
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 20px rgba(0,255,255,0.3),
-                0 0 40px rgba(0,255,255,0.2),
-                0 0 60px rgba(0,255,255,0.1);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(0,255,255,0.5),
-                0 0 80px rgba(0,255,255,0.3),
-                0 0 120px rgba(0,255,255,0.1);
-  }
-  100% {
-    box-shadow: 0 0 20px rgba(0,255,255,0.3),
-                0 0 40px rgba(0,255,255,0.2),
-                0 0 60px rgba(0,255,255,0.1);
-  }
+.stars-divider span {
+  position: relative;
+  display: inline-block;
+  padding: 0 20px;
+  background: rgba(10,10,31,0.9);
+  color: #ffd700;
+  font-size: 1.2rem;
+  letter-spacing: 10px;
 }
 
-/* Glow effect pentru text */
-.glow-text {
-  text-shadow: 
-    0 0 10px currentColor,
-    0 0 20px currentColor,
-    0 0 30px currentColor;
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Responsive adjustments pentru banner */
-@media (max-width: 768px) {
-  .status-banner {
-    font-size: 1.8rem;
-    padding: 20px 15px;
-  }
+.winners-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,215,0,0.3);
 }
 
-@media (max-width: 480px) {
-  .status-banner {
-    font-size: 1.5rem;
-    padding: 18px 12px;
-    letter-spacing: 2px;
-  }
+.winners-count {
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
   </style>
 
@@ -852,7 +743,7 @@
   <div class="wrap">
     <div class="hero">
       <div class="title">🎁 Promoții & Concursuri — StancuBYT</div>
-      <div class="subtitle">Carduri separate pentru participanți și câștigători, fiecare cu scroll individual.</div>
+      <div class="subtitle">Carduri standard, imagini redimensionate automat, text peste imagine + clasament în fiecare card.</div>
 
       <div class="actions admin-only" style="justify-content:center; margin-top:14px; display:none;">
         <button class="btn" type="button" onclick="openPromoForm('promo')">➕ Adaugă Promoție</button>
@@ -861,7 +752,7 @@
       <div style="margin-top:10px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
         <span class="pill">📱 Mobile-first</span>
         <span class="pill">🖼️ Auto-resize imagini</span>
-        <span class="pill">👥 Participanți & Câștigători</span>
+        <span class="pill">🏆 Clasament per card</span>
         <span class="pill">📧 Email automat</span>
       </div>
     </div>
@@ -1403,6 +1294,189 @@
     return participant;
   }
 
+  // Funcție pentru construirea secțiunii câștigătorilor cu delimitare vizuală
+  function buildWinnersSection(promo, participants) {
+    if (!promo.winners || Object.keys(promo.winners).length === 0) {
+      return '';
+    }
+
+    // Calculăm numărul de referral-uri pentru fiecare participant
+    const scores = calculateReferralScores(participants);
+    
+    const winners = promo.winners;
+    let html = `
+      <div class="stars-divider"><span>✦✦✦</span></div>
+      <div class="winners-wrap">
+        <div class="winners-title">🏆 CÂȘTIGĂTORI 🏆</div>
+        <div class="winners-header">
+          <span>Lista câștigătorilor</span>
+          <span class="winners-count">Total: ${
+            (winners.firstPlace?.length || 0) +
+            (winners.secondPlace?.length || 0) +
+            (winners.thirdPlace?.length || 0) +
+            (winners.top5?.length || 0) +
+            (winners.next10?.length || 0) +
+            (winners.bonus?.length || 0)
+          } câștigători</span>
+        </div>
+        <div class="winners-prizes-grid">
+    `;
+
+    // Premiul I
+    if (winners.firstPlace && winners.firstPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category gold">
+          <span class="prize-icon">🥇</span> Premiul I
+        </div>
+      `;
+      winners.firstPlace.forEach(winner => {
+        const score = scores[winner.email] || 0;
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+              <div class="winner-stats">
+                <span class="winner-referrals"><b>${score}</b> referral-uri</span>
+              </div>
+            </div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.p1 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Premiul II
+    if (winners.secondPlace && winners.secondPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category silver">
+          <span class="prize-icon">🥈</span> Premiul II
+        </div>
+      `;
+      winners.secondPlace.forEach(winner => {
+        const score = scores[winner.email] || 0;
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+              <div class="winner-stats">
+                <span class="winner-referrals"><b>${score}</b> referral-uri</span>
+              </div>
+            </div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.p2 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Premiul III
+    if (winners.thirdPlace && winners.thirdPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category bronze">
+          <span class="prize-icon">🥉</span> Premiul III
+        </div>
+      `;
+      winners.thirdPlace.forEach(winner => {
+        const score = scores[winner.email] || 0;
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+              <div class="winner-stats">
+                <span class="winner-referrals"><b>${score}</b> referral-uri</span>
+              </div>
+            </div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.p3 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Primele 5 locuri după podium
+    if (winners.top5 && winners.top5.length > 0) {
+      html += `
+        <div class="winners-prize-category other">
+          <span class="prize-icon">🎖️</span> Primele 5 locuri după podium
+        </div>
+      `;
+      winners.top5.forEach(winner => {
+        const score = scores[winner.email] || 0;
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+              <div class="winner-stats">
+                <span class="winner-referrals"><b>${score}</b> referral-uri</span>
+              </div>
+            </div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.top5 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Următoarele 10 locuri
+    if (winners.next10 && winners.next10.length > 0) {
+      html += `
+        <div class="winners-prize-category other">
+          <span class="prize-icon">🏅</span> Următoarele 10 locuri
+        </div>
+      `;
+      winners.next10.forEach(winner => {
+        const score = scores[winner.email] || 0;
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+              <div class="winner-stats">
+                <span class="winner-referrals"><b>${score}</b> referral-uri</span>
+              </div>
+            </div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.next10 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Bonus participare
+    if (winners.bonus && winners.bonus.length > 0) {
+      html += `
+        <div class="winners-prize-category other">
+          <span class="prize-icon">🎁</span> Bonus participare
+        </div>
+      `;
+      winners.bonus.forEach(winner => {
+        const score = scores[winner.email] || 0;
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+              <div class="winner-stats">
+                <span class="winner-referrals"><b>${score}</b> referral-uri</span>
+              </div>
+            </div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.bonus || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    html += `
+        </div>
+        <div style="text-align:center; margin-top:15px; opacity:0.7; font-size:0.9rem;">
+          🎉 Felicitări tuturor câștigătorilor! 🎉
+        </div>
+      </div>
+    `;
+
+    return html;
+  }
+
   // Funcție pentru calculul scorurilor de referral
   function calculateReferralScores(participants) {
     const scores = {};
@@ -1429,10 +1503,13 @@
     return scores;
   }
 
-  // Funcție pentru construirea listei de participanți
-  function buildParticipantsList(participants) {
+  function buildLeaderboard(p){
+    const promoId = (p && p.id!=null) ? p.id : p;
+    const promo = (p && typeof p === 'object') ? p : (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId)) || {};
+    const participants = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
+
     if(!participants.length) {
-      return '<div style="padding:20px;text-align:center;opacity:0.7;">👥 Nu există participanți încă.</div>';
+      return `<div style="opacity:.85; padding:10px; text-align:center;">📝 Nu există participanți încă.</div>`;
     }
 
     const scores = calculateReferralScores(participants);
@@ -1449,76 +1526,50 @@
       };
     }).sort((a,b)=> b.referrals - a.referrals || a.joinedAt - b.joinedAt);
 
-    let html = `<table>
-      <tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Ref</th></tr>`;
+    let html = `
+      <div class="leaderboard-header">
+        <span style="font-weight:900;">🏆 Clasament</span>
+        <span style="opacity:0.8; font-size:0.9rem;">Total: ${rows.length} participanți</span>
+      </div>
+      <table>
+        <tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Invitări</th></tr>`;
     
     rows.slice(0, 20).forEach((r,i)=> {
       const isTop3 = i < 3;
-      const rankClass = isTop3 ? 
-        (i===0 ? 'gold' : i===1 ? 'silver' : 'bronze') : '';
       const topStyle = isTop3 ? 'style="font-weight:800; color:' + 
         (i===0 ? '#ffd700' : i===1 ? '#c0c0c0' : '#cd7f32') + ';"' : '';
       html += `<tr ${topStyle}>
-        <td class="rank-cell ${rankClass}">${i+1}</td>
-        <td class="name-cell" title="${esc(r.name)}">${esc(r.name)}</td>
-        <td class="email-cell" title="${esc(r.email)}">${esc(maskEmail(r.email))}</td>
-        <td class="code-cell">${esc(maskCode(r.code))}</td>
-        <td class="ref-cell">${r.referrals}</td>
+        <td>${i+1}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(maskEmail(r.email))}</td>
+        <td style="font-family:monospace;">${esc(maskCode(r.code))}</td>
+        <td><span class="pill">${r.referrals}</span></td>
       </tr>`;
     });
     html += `</table>`;
     
-    return html;
-  }
+    const now = Date.now();
+    const endsMs = promo && promo.ends ? new Date(promo.ends).getTime() : NaN;
+    const expired = Number.isFinite(endsMs) && now >= endsMs;
 
-  // Funcție pentru construirea listei de câștigători în linie
-  function buildWinnersList(promo, participants) {
-    if (!promo.winners || Object.keys(promo.winners).length === 0) {
-      if (__isAdmin && isExpiredPromo(promo)) {
-        return `
-          <div class="no-winners">
-            <i>🎯</i>
-            <div>Concurs încheiat. Selectează câștigătorii.</div>
-            <div class="winners-admin-actions admin-only">
-              <button class="btn small" onclick="selectWinners('${esc(promo.id)}')">🎯 Selectează Câștigători</button>
-            </div>
-            <div id="winners_preview_${esc(promo.id)}"></div>
-          </div>
-        `;
-      }
-      return '<div class="no-winners"><i>🏆</i><div>Încă nu sunt câștigători. Reveniți după încheierea concursului.</div></div>';
+    let winnersHtml = "";
+    if (expired && promo.winners) {
+      winnersHtml = buildWinnersSection(promo, participants);
     }
 
-    const scores = calculateReferralScores(participants);
-    const winners = promo.winners;
-    
-    // Combinăm toți câștigătorii într-o singură listă
-    const allWinners = [
-      ...(winners.firstPlace || []).map(w => ({ ...w, rank: '🥇', rankClass: 'gold' })),
-      ...(winners.secondPlace || []).map(w => ({ ...w, rank: '🥈', rankClass: 'silver' })),
-      ...(winners.thirdPlace || []).map(w => ({ ...w, rank: '🥉', rankClass: 'bronze' })),
-      ...(winners.top5 || []).map(w => ({ ...w, rank: '🏅', rankClass: 'other' })),
-      ...(winners.next10 || []).map(w => ({ ...w, rank: '⭐', rankClass: 'other' })),
-      ...(winners.bonus || []).map(w => ({ ...w, rank: '🎁', rankClass: 'other' }))
-    ];
-
-    let html = '';
-    
-    allWinners.forEach((winner, index) => {
-      const score = scores[winner.email] || 0;
+    if (winnersHtml) {
+      html += winnersHtml;
+    } else if (__isAdmin && expired) {
       html += `
-        <div class="winner-line">
-          <div class="winner-rank ${winner.rankClass}">${winner.rank}</div>
-          <div class="winner-info-compact">
-            <div class="winner-name-compact">${esc(winner.name)}</div>
-            <div class="winner-email-compact">${esc(maskEmail(winner.email))}</div>
-            <div class="winner-stats-compact">${score} referral-uri</div>
+        <div class="winners-wrap">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
+            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="selectWinners('${esc(promoId)}')">🎯 Selectează Câștigători</button>
           </div>
-          <div class="winner-prize-compact" title="${esc(winner.prize || '—')}">${esc(winner.prize || '—')}</div>
+          <div id="winners_preview_${esc(promoId)}"></div>
         </div>
       `;
-    });
-    
+    }
+
     return html;
   }
 
@@ -1550,14 +1601,11 @@
       const overlayAlign = (overlay.align || 'left');
       const overlayColor = (overlay.color || '#ffffff');
 
-      const participants = Array.isArray(__statsCache.participants?.[String(p.id)]) ? __statsCache.participants[String(p.id)] : [];
-      const expired = isExpiredPromo(p);
-
-      const mainCard = document.createElement('div');
-      mainCard.className = 'card promo-main-card';
-      mainCard.style.setProperty('--cardH', cardH + 'px');
-      mainCard.style.setProperty('--mediaH', mediaH + 'px');
-      mainCard.innerHTML = `
+      const wrap = document.createElement('div');
+      wrap.className = 'card promo-card';
+      wrap.style.setProperty('--cardH', cardH + 'px');
+      wrap.style.setProperty('--mediaH', mediaH + 'px');
+      wrap.innerHTML = `
         <div class="promo-media" style="${mediaUrl ? `background-image:url('${esc(mediaUrl)}')` : ''}">
 
           <div class="admin-actions admin-only">
@@ -1591,9 +1639,9 @@
               <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
               <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
               <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
-              <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri:</b> ${esc(p.prizes?.top5 || '—')}</div>
+              <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
               <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
-              <div class="prize-item prize-tierC">🎁 <b>Bonus participare:</b> ${esc(p.prizes?.bonus || '—')}</div>
+              <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
             </div>
 
             <div class="divider"></div>
@@ -1618,60 +1666,19 @@
               <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
             </div>
             <div class="join-row one">
-              <button class="btn" type="button" ${expired ? 'disabled title="Înscrieri închise"' : '' } onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-te</button>
+              <button class="btn" type="button" ${ (p.ends && Date.now() >= new Date(p.ends).getTime()) ? 'disabled title="Înscrieri închise"' : '' } onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-te</button>
             </div>
           </div>
         </div>
-
-        <!-- Banner fosforescent -->
-        <div class="status-banner ${expired ? 'expired' : 'active'}">
-          <div class="glow-text">${expired ? 'FINALIZAT' : 'ÎN CURS'}</div>
-        </div>
       `;
 
-      // Cardul pentru Participanți
-      const participantsCard = document.createElement('div');
-      participantsCard.className = 'participants-card';
-      participantsCard.innerHTML = `
-        <div class="card-header">
-          <h3>👥 Participanți</h3>
-          <span class="participants-count">${participants.length}</span>
-        </div>
-        <div class="participants-list" id="participants_${esc(p.id)}">
-          ${buildParticipantsList(participants)}
-        </div>
-      `;
-
-      // Cardul pentru Câștigători
-      const winnersCard = document.createElement('div');
-      winnersCard.className = 'winners-card';
-      winnersCard.innerHTML = `
-        <div class="card-header">
-          <h3>🏆 Câștigători</h3>
-          ${p.winners ? `<span class="winners-count">${Object.values(p.winners).flat().length}</span>` : '<span class="winners-count">0</span>'}
-        </div>
-        <div class="winners-list" id="winners_${esc(p.id)}">
-          ${buildWinnersList(p, participants)}
-        </div>
-      `;
-
-      // Coloana dreapta cu cele două carduri
-      const rightColumn = document.createElement('div');
-      rightColumn.className = 'promo-right-column';
-      rightColumn.appendChild(participantsCard);
-      rightColumn.appendChild(winnersCard);
-
-      // Container principal
       const block = document.createElement('div');
       block.className = 'promo-block';
-      
-      const promoMainCard = document.createElement('div');
-      promoMainCard.className = 'promo-main-card';
-      promoMainCard.appendChild(mainCard);
-      
-      block.appendChild(promoMainCard);
-      block.appendChild(rightColumn);
-      
+      block.appendChild(wrap);
+      const lbOut = document.createElement('div');
+      lbOut.className = 'promo-leaderboard-out';
+      lbOut.innerHTML = `<div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p)}</div>`;
+      block.appendChild(lbOut);
       list.appendChild(block);
     });
 
@@ -1752,6 +1759,84 @@
     });
   }
 
+  function injectExtraFields(){
+    const form = $('promoForm');
+    if(!form) return;
+
+    if ($('cardHeight')) return;
+
+    const block = document.createElement('div');
+    block.innerHTML = `
+      <div class="divider"></div>
+      <div class="kicker">📐 Dimensiuni card & text peste imagine</div>
+
+      <div class="row">
+        <div>
+          <label>Înălțime card (px)</label>
+          <input id="cardHeight" type="number" min="360" max="1200" step="10" value="560" placeholder="Ex: 560">
+        </div>
+        <div>
+          <label>Înălțime imagine (px)</label>
+          <input id="mediaHeight" type="number" min="120" max="520" step="10" value="200" placeholder="Ex: 200">
+        </div>
+      </div>
+
+      <div class="row one">
+        <div>
+          <label>Text peste imagine (opțional)</label>
+          <textarea id="overlayText" rows="2" placeholder="Ex: 🔥 Ultimele 48h — Intră în TOP 5!"></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Mărime font (px)</label>
+          <input id="overlayFontSize" type="number" min="10" max="72" step="1" value="22">
+        </div>
+        <div>
+          <label>Culoare text</label>
+          <input id="overlayColor" type="color" value="#ffffff">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Poziție X (0-90%)</label>
+          <input id="overlayX" type="number" min="0" max="90" step="1" value="6">
+        </div>
+        <div>
+          <label>Poziție Y (0-90%)</label>
+          <input id="overlayY" type="number" min="0" max="90" step="1" value="8">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Aliniere</label>
+          <select id="overlayAlign">
+            <option value="left">Stânga</option>
+            <option value="center">Centru</option>
+            <option value="right">Dreapta</option>
+          </select>
+        </div>
+        <div>
+          <label>Preview rapid</label>
+          <button class="btn secondary" type="button" onclick="previewOverlay()">👁️ Preview</button>
+        </div>
+      </div>
+    `;
+
+    const actions = form.querySelector('.actions');
+    if(actions) form.insertBefore(block, actions);
+    else form.appendChild(block);
+  }
+
+  window.previewOverlay = function previewOverlay(){
+    const txt = ($('overlayText')?.value||'').trim();
+    if(!txt) return alert('Completează mai întâi "Text peste imagine".');
+    alert('Textul va apărea peste imagine în card după salvare.');
+  };
+
   // Funcții pentru selectarea și salvarea câștigătorilor
   async function getPromoDataFromFirestore(promoId){
     try {
@@ -1816,19 +1901,13 @@
     }
 
     try{
-      const winnersList = document.getElementById(`winners_${promoId}`);
-      if(!winnersList) {
-        alert("Containerul pentru câștigători nu a fost găsit.");
+      const box = document.getElementById(`winners_preview_${promoId}`);
+      if(!box) {
+        alert("Containerul pentru preview nu a fost găsit.");
         return;
       }
       
-      const previewDiv = document.createElement('div');
-      previewDiv.id = `winners_preview_${promoId}`;
-      previewDiv.innerHTML = `<div style="padding:10px;text-align:center;opacity:0.8;">⏳ Se calculează câștigătorii...</div>`;
-      
-      // Înlocuim conținutul listei de câștigători cu preview
-      winnersList.innerHTML = '';
-      winnersList.appendChild(previewDiv);
+      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Se calculează câștigătorii...</div>`;
       
       let promo, participants;
       
@@ -1851,12 +1930,12 @@
       }
       
       if(!promo) {
-        previewDiv.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promoția nu a fost găsită.</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promoția nu a fost găsită. Încarcă din nou pagina.</div>`;
         return;
       }
       
       if(!participants || participants.length === 0) {
-        previewDiv.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 Nu există participanți încă.</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 Nu există participanți încă.</div>`;
         return;
       }
 
@@ -1943,54 +2022,26 @@
         selectedAt: new Date().toISOString()
       };
 
-      // Afișăm preview-ul câștigătorilor
-      const allWinners = [
-        ...firstPlace.map(w => ({ ...w, rank: '🥇', rankClass: 'gold' })),
-        ...secondPlace.map(w => ({ ...w, rank: '🥈', rankClass: 'silver' })),
-        ...thirdPlace.map(w => ({ ...w, rank: '🥉', rankClass: 'bronze' })),
-        ...top5.map(w => ({ ...w, rank: '🏅', rankClass: 'other' })),
-        ...next10.map(w => ({ ...w, rank: '⭐', rankClass: 'other' })),
-        ...bonus.map(w => ({ ...w, rank: '🎁', rankClass: 'other' }))
-      ];
-
-      let previewHtml = `
+      box.innerHTML = `
         <div style="margin-bottom:15px;">
-          <div style="font-weight:900; margin-bottom:10px; color: #ffd700;">🎯 Câștigători selectați</div>
-          <div style="opacity:0.8; font-size:0.9rem; margin-bottom:15px;">Acești câștigători au fost selectați automat.</div>
+          <div style="font-weight:900; margin-bottom:10px;">🎯 Câștigători selectați</div>
+          <div style="opacity:0.8; font-size:0.9rem;">Acești câștigători au fost selectați automat. Apasă "Salvează" pentru a finaliza.</div>
         </div>
-      `;
-      
-      allWinners.forEach((winner, index) => {
-        previewHtml += `
-          <div class="winner-line">
-            <div class="winner-rank ${winner.rankClass}">${winner.rank}</div>
-            <div class="winner-info-compact">
-              <div class="winner-name-compact">${esc(winner.name)}</div>
-              <div class="winner-email-compact">${esc(maskEmail(winner.email))}</div>
-              <div class="winner-stats-compact">${winner.score} referral-uri</div>
-            </div>
-            <div class="winner-prize-compact" title="${esc(winner.prize || '—')}">${esc(winner.prize || '—')}</div>
-          </div>
-        `;
-      });
-
-      previewHtml += `
-        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+        ${buildWinnersSection({ ...promo, winners }, participants)}
+        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn" onclick="saveWinners('${esc(promoId)}')">💾 Salvează Câștigători</button>
-          <button class="btn secondary" onclick="winnersList.innerHTML = buildWinnersList(window.__statsCache.promos.find(p=>String(p.id)==='${esc(promoId)}'), participants)">❌ Anulează</button>
+          <button class="btn secondary" onclick="this.parentElement.parentElement.innerHTML=''">❌ Anulează</button>
         </div>
-        <div id="save_winners_msg_${esc(promoId)}" style="margin-top:10px; text-align:center;"></div>
+        <div id="save_winners_msg_${esc(promoId)}" style="margin-top:10px;"></div>
       `;
       
-      previewDiv.innerHTML = previewHtml;
-      
-      previewDiv.scrollIntoView({ behavior:"smooth", block:"nearest" });
+      box.scrollIntoView({ behavior:"smooth", block:"nearest" });
       
     }catch(e){
       console.error("Eroare la selectarea câștigătorilor:", e);
-      const previewDiv = document.getElementById(`winners_preview_${promoId}`);
-      if(previewDiv) {
-        previewDiv.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
+      const box = document.getElementById(`winners_preview_${promoId}`);
+      if(box) {
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
       }
     }
   };
@@ -2002,7 +2053,7 @@
     }
 
     const msgBox = document.getElementById(`save_winners_msg_${promoId}`);
-    if(msgBox) msgBox.innerHTML = `<div style="opacity:0.8; text-align:center;">⏳ Se salvează câștigătorii...</div>`;
+    if(msgBox) msgBox.innerHTML = `<div style="opacity:0.8;">⏳ Se salvează câștigătorii...</div>`;
 
     try {
       const data = await getPromoDataFromFirestore(promoId);
@@ -2101,20 +2152,16 @@
         
         await writeStats({ promos });
         
-        if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700; text-align:center;">✅ Câștigătorii au fost salvați!</div>`;
+        if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700;">✅ Câștigătorii au fost salvați!</div>`;
         
-        // Actualizăm cache-ul local
-        const cacheIdx = (window.__statsCache.promos || []).findIndex(p => String(p.id) === String(promoId));
-        if(cacheIdx >= 0) {
-          window.__statsCache.promos[cacheIdx].winners = winners;
-        }
-        
-        // Actualizăm afișarea după 1.5 secunde
         setTimeout(() => {
-          const winnersList = document.getElementById(`winners_${promoId}`);
-          if(winnersList) {
+          const previewBox = document.getElementById(`winners_preview_${promoId}`);
+          if(previewBox) previewBox.innerHTML = '';
+          
+          const leaderboard = document.getElementById(`lb_${promoId}`);
+          if(leaderboard) {
             const promoWithWinners = { ...promos[idx], winners };
-            winnersList.innerHTML = buildWinnersList(promoWithWinners, participants);
+            leaderboard.innerHTML = buildLeaderboard(promoWithWinners);
           }
         }, 1500);
 
@@ -2188,15 +2235,16 @@
           console.warn('Eroare generală la trimiterea email-urilor:', emailError);
         }
       } else {
-        if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b; text-align:center;">❌ Promoția nu a fost găsită.</div>`;
+        if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Promoția nu a fost găsită.</div>`;
       }
     } catch(e) {
       console.error("Eroare la salvarea câștigătorilor:", e);
-      if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b; text-align:center;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
+      if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
     }
   };
 
   function boot(){
+    injectExtraFields();
     startStatsListener();
 
     const a = auth();
