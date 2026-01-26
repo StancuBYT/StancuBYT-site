@@ -2109,7 +2109,8 @@
                       name: winner.name,
                       prize: '🏆 Premiul I: ' + (promo.prizes?.p1 || ''),
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-                      promoUrl: window.location.href
+                      promoUrl: window.location.href,
+                      winnerType: 'firstPlace'
                     });
                     console.log(`Email trimis către câștigătorul Premiului I: ${winner.email}`);
                   } catch(emailErr) {
@@ -2129,7 +2130,8 @@
                       name: winner.name,
                       prize: '🥈 Premiul II: ' + (promo.prizes?.p2 || ''),
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-                      promoUrl: window.location.href
+                      promoUrl: window.location.href,
+                      winnerType: 'secondPlace'
                     });
                     console.log(`Email trimis către câștigătorul Premiului II: ${winner.email}`);
                   } catch(emailErr) {
@@ -2149,7 +2151,8 @@
                       name: winner.name,
                       prize: '🥉 Premiul III: ' + (promo.prizes?.p3 || ''),
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-                      promoUrl: window.location.href
+                      promoUrl: window.location.href,
+                      winnerType: 'thirdPlace'
                     });
                     console.log(`Email trimis către câștigătorul Premiului III: ${winner.email}`);
                   } catch(emailErr) {
@@ -2169,7 +2172,8 @@
                       name: winner.name,
                       prize: '🎖️ Primele 5 locuri după podium: ' + (promo.prizes?.top5 || ''),
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-                      promoUrl: window.location.href
+                      promoUrl: window.location.href,
+                      winnerType: 'top5'
                     });
                     console.log(`Email trimis către câștigătorul din Top 5: ${winner.email}`);
                   } catch(emailErr) {
@@ -2189,7 +2193,8 @@
                       name: winner.name,
                       prize: '🏅 Următoarele 10 locuri: ' + (promo.prizes?.next10 || ''),
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-                      promoUrl: window.location.href
+                      promoUrl: window.location.href,
+                      winnerType: 'next10'
                     });
                     console.log(`Email trimis către câștigătorul din Următoarele 10: ${winner.email}`);
                   } catch(emailErr) {
@@ -2209,7 +2214,8 @@
                       name: winner.name,
                       prize: '🎁 Bonus participare / surpriză random: ' + (promo.prizes?.bonus || ''),
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-                      promoUrl: window.location.href
+                      promoUrl: window.location.href,
+                      winnerType: 'bonus'
                     });
                     console.log(`Email trimis către câștigătorul Bonus: ${winner.email}`);
                   } catch(emailErr) {
