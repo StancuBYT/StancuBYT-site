@@ -251,7 +251,7 @@
     width:100%;
   }
   .leaderboard-mini {
-    max-height: 160px;
+    max-height: 200px;
     overflow:auto;
     border-radius: 14px;
     background: rgba(0,0,0,0.18);
@@ -359,14 +359,18 @@
 
 .promo-card{
   height: auto !important;
-  min-height: 760px;
+  min-height: 700px;
+  max-height: 700px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .promo-content{
   overflow: visible !important;
   gap: 10px;
 }
 .promo-desc{
-  max-height: 180px;
+  max-height: 120px;
   overflow:auto;
   padding-right: 6px;
 }
@@ -402,9 +406,6 @@
 .prize-tierC{ border-color: rgba(138,43,226,0.40); box-shadow: 0 0 18px rgba(138,43,226,0.06); }
 .prize-subtitle{ font-weight:900; margin: 10px 0 8px; opacity:0.95; }
 
-.promo-card{
-  min-height: 1320px !important;
-}
 .promo-content{
   overflow: visible !important;
 }
@@ -422,6 +423,8 @@
   background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
   position: relative;
   overflow: hidden;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .winners-wrap::before {
@@ -546,17 +549,19 @@
 .promo-leaderboard-out{
   display:flex;
   flex-direction:column;
+  height: 500px;
+  overflow: hidden;
 }
 .promo-leaderboard-out .leaderboard-mini{
   flex: 1 1 50%;
-  min-height: 260px;
-  max-height: none;
+  min-height: 200px;
+  max-height: 300px;
   overflow: auto;
 }
 .promo-leaderboard-out .winners-wrap{
   flex: 1 1 50%;
-  min-height: 260px;
-  max-height: none;
+  min-height: 200px;
+  max-height: 300px;
   overflow: auto;
   margin-top: 20px;
 }
@@ -1218,7 +1223,7 @@
   }
 
   window.deletePromo = async function deletePromo(promoId){
-    if(!__isAdmin) return alert('Doar admin poate șterge.');
+    if(!__isAdmin) return alert('Doar admin poate ștergi.');
     if(!confirm('Sigur vrei să ștergi această promoție/concurs?')) return;
 
     try {
@@ -1335,7 +1340,7 @@
                 <span class="winner-referrals"><b>${score}</b> referral-uri</span>
               </div>
             </div>
-            <div class="winner-prize">${esc(promo.prizes?.p1 || '—')}</div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.p1 || '—')}</div>
           </div>
         `;
       });
@@ -1359,7 +1364,7 @@
                 <span class="winner-referrals"><b>${score}</b> referral-uri</span>
               </div>
             </div>
-            <div class="winner-prize">${esc(promo.prizes?.p2 || '—')}</div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.p2 || '—')}</div>
           </div>
         `;
       });
@@ -1383,7 +1388,7 @@
                 <span class="winner-referrals"><b>${score}</b> referral-uri</span>
               </div>
             </div>
-            <div class="winner-prize">${esc(promo.prizes?.p3 || '—')}</div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.p3 || '—')}</div>
           </div>
         `;
       });
@@ -1407,7 +1412,7 @@
                 <span class="winner-referrals"><b>${score}</b> referral-uri</span>
               </div>
             </div>
-            <div class="winner-prize">${esc(promo.prizes?.top5 || '—')}</div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.top5 || '—')}</div>
           </div>
         `;
       });
@@ -1431,7 +1436,7 @@
                 <span class="winner-referrals"><b>${score}</b> referral-uri</span>
               </div>
             </div>
-            <div class="winner-prize">${esc(promo.prizes?.next10 || '—')}</div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.next10 || '—')}</div>
           </div>
         `;
       });
@@ -1455,7 +1460,7 @@
                 <span class="winner-referrals"><b>${score}</b> referral-uri</span>
               </div>
             </div>
-            <div class="winner-prize">${esc(promo.prizes?.bonus || '—')}</div>
+            <div class="winner-prize">${esc(winner.prize || promo.prizes?.bonus || '—')}</div>
           </div>
         `;
       });
@@ -1978,12 +1983,42 @@
       }
 
       const winners = {
-        firstPlace: firstPlace.map(u => ({ name: u.name, email: u.email, score: scores[u.email] || 0 })),
-        secondPlace: secondPlace.map(u => ({ name: u.name, email: u.email, score: scores[u.email] || 0 })),
-        thirdPlace: thirdPlace.map(u => ({ name: u.name, email: u.email, score: scores[u.email] || 0 })),
-        top5: top5.map(u => ({ name: u.name, email: u.email, score: scores[u.email] || 0 })),
-        next10: next10.map(u => ({ name: u.name, email: u.email, score: scores[u.email] || 0 })),
-        bonus: bonus.map(u => ({ name: u.name, email: u.email, score: scores[u.email] || 0 })),
+        firstPlace: firstPlace.map(u => ({ 
+          name: u.name, 
+          email: u.email, 
+          score: scores[u.email] || 0,
+          prize: promo.prizes?.p1 || ''
+        })),
+        secondPlace: secondPlace.map(u => ({ 
+          name: u.name, 
+          email: u.email, 
+          score: scores[u.email] || 0,
+          prize: promo.prizes?.p2 || ''
+        })),
+        thirdPlace: thirdPlace.map(u => ({ 
+          name: u.name, 
+          email: u.email, 
+          score: scores[u.email] || 0,
+          prize: promo.prizes?.p3 || ''
+        })),
+        top5: top5.map(u => ({ 
+          name: u.name, 
+          email: u.email, 
+          score: scores[u.email] || 0,
+          prize: promo.prizes?.top5 || ''
+        })),
+        next10: next10.map(u => ({ 
+          name: u.name, 
+          email: u.email, 
+          score: scores[u.email] || 0,
+          prize: promo.prizes?.next10 || ''
+        })),
+        bonus: bonus.map(u => ({ 
+          name: u.name, 
+          email: u.email, 
+          score: scores[u.email] || 0,
+          prize: promo.prizes?.bonus || ''
+        })),
         selectedAt: new Date().toISOString()
       };
 
@@ -2130,7 +2165,7 @@
           }
         }, 1500);
 
-        // === TRIMITE EMAIL-URI CÂȘTIGĂTORILOR ===
+        // === TRIMITE EMAIL-URI PERSONALIZATE CÂȘTIGĂTORILOR ===
         try {
           if (typeof window.sendPromoWinnerEmail === 'function') {
             const allWinners = [
@@ -2186,13 +2221,13 @@
                     promoUrl: window.location.href
                   });
                   emailCount++;
-                  console.log(`Email trimis către câștigător: ${winner.email} (${winner.score} referral-uri, ${winner.prize})`);
+                  console.log(`Email personalizat trimis către: ${winner.email} (${winner.prizeCategory}, ${winner.prize})`);
                 } catch(emailErr) {
                   console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
                 }
               }
             }
-            console.log(`Total email-uri trimise către câștigători: ${emailCount}`);
+            console.log(`Total email-uri personalizate trimise: ${emailCount}`);
           } else {
             console.warn('sendPromoWinnerEmail callable nu este disponibil.');
           }
