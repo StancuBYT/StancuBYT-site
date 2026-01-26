@@ -251,7 +251,7 @@
     width:100%;
   }
   .leaderboard-mini {
-    max-height: 200px;
+    height: 200px;
     overflow:auto;
     border-radius: 14px;
     background: rgba(0,0,0,0.18);
@@ -308,15 +308,6 @@
   font-size:0.9rem;
   border-radius:999px;
 }
-.promo-leaderboard-out{
-  margin-top: 10px;
-  margin-bottom: 14px;
-  padding: 14px 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.18);
-  backdrop-filter: blur(6px);
-}
 
 .promo-block{
   margin: 14px 0;
@@ -341,15 +332,7 @@
   flex: 1 1 0;
   min-width: 0;
 }
-.promo-leaderboard-out{
-  flex: 1 1 0;
-  min-width: 0;
-  border-radius: 22px;
-  padding: 14px 14px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.18);
-  backdrop-filter: blur(6px);
-}
+
 @media (max-width: 980px){
   .promo-block{ flex-direction: column; }
 }
@@ -410,80 +393,79 @@
   overflow: visible !important;
 }
 
-.winners-wrap{
-  margin-top: 15px;
-  padding: 15px;
-  border-radius: 18px;
-  border: 2px solid transparent;
-  border-image: linear-gradient(135deg,
-    rgba(255,215,0,0.8),
-    rgba(192,192,192,0.8),
-    rgba(205,127,50,0.8)
-  ) 1;
-  background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
-  position: relative;
-  overflow: hidden;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.winners-wrap::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255,215,0,0.8) 20%,
-    rgba(192,192,192,0.8) 40%,
-    rgba(205,127,50,0.8) 60%,
-    rgba(0,255,255,0.8) 80%,
-    transparent 100%
-  );
-  animation: shine 3s infinite linear;
-}
-
-@keyframes shine {
-  0% { background-position: -200px 0; }
-  100% { background-position: 200px 0; }
-}
-
-.winners-title{
-  font-weight: 900;
-  margin: 0 0 15px 0;
-  font-size: 1.3rem;
-  text-align: center;
-  background: linear-gradient(45deg, #ffd700, #c0c0c0, #cd7f32);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Stiluri pentru cele două carduri separate */
+.promo-side-cards {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.leaderboard-card {
+  flex: 1;
+  border-radius: 22px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.winners-card {
+  flex: 1;
+  border-radius: 22px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.winners-title::before,
-.winners-title::after {
-  content: "✦";
-  color: #ffd700;
-  animation: twinkle 2s infinite;
+.winners-wrap{
+  flex: 1;
+  overflow-y: auto;
+  border-radius: 14px;
+  padding: 10px;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+.winners-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,215,0,0.3);
+}
+
+.winners-count {
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
 .winners-grid{
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 .winner-row{
-  padding: 15px;
-  border-radius: 14px;
+  padding: 12px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.15);
   background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
   display: flex;
@@ -500,26 +482,26 @@
 .winner-info{
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
 }
 .winner-name{
   font-weight: 900;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--neon-cyan);
 }
 .winner-email{
   opacity: 0.8;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 .winner-stats{
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
-  margin-top: 5px;
+  margin-top: 4px;
 }
 .winner-referrals{
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   opacity: 0.9;
 }
 .winner-referrals b{
@@ -529,75 +511,42 @@
   font-weight: 800;
   color: #ffd700;
   text-align: right;
-  min-width: 200px;
-  padding-left: 15px;
+  min-width: 180px;
+  padding-left: 12px;
   border-left: 2px solid rgba(255,215,0,0.3);
+  font-size: 0.9rem;
 }
 .winner-row b{ font-weight: 900; }
-.winner-pill{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(0,0,0,0.25);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.promo-leaderboard-out{
-  display:flex;
-  flex-direction:column;
-  height: 500px;
-  overflow: hidden;
-}
-.promo-leaderboard-out .leaderboard-mini{
-  flex: 1 1 50%;
-  min-height: 200px;
-  max-height: 300px;
-  overflow: auto;
-}
-.promo-leaderboard-out .winners-wrap{
-  flex: 1 1 50%;
-  min-height: 200px;
-  max-height: 300px;
-  overflow: auto;
-  margin-top: 20px;
-}
-@media (max-width: 980px){
-  .promo-leaderboard-out .leaderboard-mini{ min-height: 240px; }
-  .promo-leaderboard-out .winners-wrap{ min-height: 240px; }
-}
 
 .winners-prizes-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
+  gap: 8px;
+  margin-top: 12px;
 }
 .winners-prize-category {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-weight: 900;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 15px;
-  border-radius: 12px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
   background: rgba(0,0,0,0.2);
   border-left: 4px solid;
+  font-size: 0.95rem;
 }
 .winners-prize-category.gold { border-left-color: #ffd700; }
 .winners-prize-category.silver { border-left-color: #c0c0c0; }
 .winners-prize-category.bronze { border-left-color: #cd7f32; }
 .winners-prize-category.other { border-left-color: #00ffff; }
 .prize-icon {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 .stars-divider {
   text-align: center;
-  margin: 20px 0;
+  margin: 15px 0;
   position: relative;
   height: 2px;
 }
@@ -623,34 +572,66 @@
 .stars-divider span {
   position: relative;
   display: inline-block;
-  padding: 0 20px;
+  padding: 0 15px;
   background: rgba(10,10,31,0.9);
   color: #ffd700;
+  font-size: 1.1rem;
+  letter-spacing: 8px;
+}
+
+.winner-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.25);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Stiluri speciale pentru cardul de câștigători */
+.winners-title{
+  font-weight: 900;
+  margin: 0 0 12px 0;
   font-size: 1.2rem;
-  letter-spacing: 10px;
-}
-
-.leaderboard-header {
+  text-align: center;
+  background: linear-gradient(45deg, #ffd700, #c0c0c0, #cd7f32);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  justify-content: center;
+  gap: 8px;
 }
 
-.winners-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255,215,0,0.3);
+.winners-title::before,
+.winners-title::after {
+  content: "✦";
+  color: #ffd700;
+  animation: twinkle 2s infinite;
 }
 
-.winners-count {
-  font-size: 0.9rem;
-  opacity: 0.8;
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Media query pentru mobile */
+@media (max-width: 980px){
+  .promo-side-cards {
+    height: auto;
+    max-height: none;
+  }
+  
+  .leaderboard-card {
+    min-height: 250px;
+  }
+  
+  .winners-card {
+    min-height: 250px;
+  }
 }
   </style>
 
@@ -743,7 +724,7 @@
   <div class="wrap">
     <div class="hero">
       <div class="title">🎁 Promoții & Concursuri — StancuBYT</div>
-      <div class="subtitle">Carduri standard, imagini redimensionate automat, text peste imagine + clasament în fiecare card.</div>
+      <div class="subtitle">Carduri standard, imagini redimensionate automat, text peste imagine + clasament și câștigători în carduri separate.</div>
 
       <div class="actions admin-only" style="justify-content:center; margin-top:14px; display:none;">
         <button class="btn" type="button" onclick="openPromoForm('promo')">➕ Adaugă Promoție</button>
@@ -752,7 +733,7 @@
       <div style="margin-top:10px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
         <span class="pill">📱 Mobile-first</span>
         <span class="pill">🖼️ Auto-resize imagini</span>
-        <span class="pill">🏆 Clasament per card</span>
+        <span class="pill">🏆 Clasament & câștigători</span>
         <span class="pill">📧 Email automat</span>
       </div>
     </div>
@@ -1294,32 +1275,29 @@
     return participant;
   }
 
-  // Funcție pentru construirea secțiunii câștigătorilor cu delimitare vizuală
+  // Funcție pentru construirea secțiunii câștigătorilor
   function buildWinnersSection(promo, participants) {
     if (!promo.winners || Object.keys(promo.winners).length === 0) {
-      return '';
+      return '<div style="padding:20px;text-align:center;opacity:0.7;">🎯 Nu există câștigători selectați încă.</div>';
     }
 
-    // Calculăm numărul de referral-uri pentru fiecare participant
     const scores = calculateReferralScores(participants);
-    
     const winners = promo.winners;
+    
     let html = `
       <div class="stars-divider"><span>✦✦✦</span></div>
-      <div class="winners-wrap">
-        <div class="winners-title">🏆 CÂȘTIGĂTORI 🏆</div>
-        <div class="winners-header">
-          <span>Lista câștigătorilor</span>
-          <span class="winners-count">Total: ${
-            (winners.firstPlace?.length || 0) +
-            (winners.secondPlace?.length || 0) +
-            (winners.thirdPlace?.length || 0) +
-            (winners.top5?.length || 0) +
-            (winners.next10?.length || 0) +
-            (winners.bonus?.length || 0)
-          } câștigători</span>
-        </div>
-        <div class="winners-prizes-grid">
+      <div class="winners-header">
+        <span>Câștigători</span>
+        <span class="winners-count">Total: ${
+          (winners.firstPlace?.length || 0) +
+          (winners.secondPlace?.length || 0) +
+          (winners.thirdPlace?.length || 0) +
+          (winners.top5?.length || 0) +
+          (winners.next10?.length || 0) +
+          (winners.bonus?.length || 0)
+        } câștigători</span>
+      </div>
+      <div class="winners-prizes-grid">
     `;
 
     // Premiul I
@@ -1398,7 +1376,7 @@
     if (winners.top5 && winners.top5.length > 0) {
       html += `
         <div class="winners-prize-category other">
-          <span class="prize-icon">🎖️</span> Primele 5 locuri după podium
+          <span class="prize-icon">🎖️</span> Primele 5 locuri
         </div>
       `;
       winners.top5.forEach(winner => {
@@ -1468,10 +1446,9 @@
 
     html += `
         </div>
-        <div style="text-align:center; margin-top:15px; opacity:0.7; font-size:0.9rem;">
+        <div style="text-align:center; margin-top:12px; opacity:0.7; font-size:0.85rem;">
           🎉 Felicitări tuturor câștigătorilor! 🎉
         </div>
-      </div>
     `;
 
     return html;
@@ -1503,11 +1480,8 @@
     return scores;
   }
 
-  function buildLeaderboard(p){
-    const promoId = (p && p.id!=null) ? p.id : p;
-    const promo = (p && typeof p === 'object') ? p : (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId)) || {};
-    const participants = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
-
+  // Funcție pentru construirea clasamentului
+  function buildLeaderboard(participants) {
     if(!participants.length) {
       return `<div style="opacity:.85; padding:10px; text-align:center;">📝 Nu există participanți încă.</div>`;
     }
@@ -1526,15 +1500,10 @@
       };
     }).sort((a,b)=> b.referrals - a.referrals || a.joinedAt - b.joinedAt);
 
-    let html = `
-      <div class="leaderboard-header">
-        <span style="font-weight:900;">🏆 Clasament</span>
-        <span style="opacity:0.8; font-size:0.9rem;">Total: ${rows.length} participanți</span>
-      </div>
-      <table>
-        <tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Invitări</th></tr>`;
+    let html = `<table>
+      <tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Invitări</th></tr>`;
     
-    rows.slice(0, 20).forEach((r,i)=> {
+    rows.slice(0, 15).forEach((r,i)=> {
       const isTop3 = i < 3;
       const topStyle = isTop3 ? 'style="font-weight:800; color:' + 
         (i===0 ? '#ffd700' : i===1 ? '#c0c0c0' : '#cd7f32') + ';"' : '';
@@ -1548,29 +1517,30 @@
     });
     html += `</table>`;
     
+    return html;
+  }
+
+  // Funcție pentru construirea cardului cu câștigători
+  function buildWinnersCard(promo, participants) {
     const now = Date.now();
     const endsMs = promo && promo.ends ? new Date(promo.ends).getTime() : NaN;
     const expired = Number.isFinite(endsMs) && now >= endsMs;
 
-    let winnersHtml = "";
     if (expired && promo.winners) {
-      winnersHtml = buildWinnersSection(promo, participants);
-    }
-
-    if (winnersHtml) {
-      html += winnersHtml;
+      return buildWinnersSection(promo, participants);
     } else if (__isAdmin && expired) {
-      html += `
-        <div class="winners-wrap">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
-            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="selectWinners('${esc(promoId)}')">🎯 Selectează Câștigători</button>
+      return `
+        <div style="padding:10px;">
+          <div class="winners-title">🏆 CÂȘTIGĂTORI</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 15px 0;">
+            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="selectWinners('${esc(promo.id)}')">🎯 Selectează Câștigători</button>
           </div>
-          <div id="winners_preview_${esc(promoId)}"></div>
+          <div id="winners_preview_${esc(promo.id)}"></div>
         </div>
       `;
+    } else {
+      return '<div style="padding:20px;text-align:center;opacity:0.7;">🎯 Concursul este în desfășurare. Câștigătorii vor fi afișați aici după încheiere.</div>';
     }
-
-    return html;
   }
 
   function pickMediaUrl(p){
@@ -1639,9 +1609,9 @@
               <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
               <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
               <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
-              <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
+              <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri:</b> ${esc(p.prizes?.top5 || '—')}</div>
               <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
-              <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
+              <div class="prize-item prize-tierC">🎁 <b>Bonus participare:</b> ${esc(p.prizes?.bonus || '—')}</div>
             </div>
 
             <div class="divider"></div>
@@ -1675,10 +1645,36 @@
       const block = document.createElement('div');
       block.className = 'promo-block';
       block.appendChild(wrap);
-      const lbOut = document.createElement('div');
-      lbOut.className = 'promo-leaderboard-out';
-      lbOut.innerHTML = `<div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p)}</div>`;
-      block.appendChild(lbOut);
+      
+      // Creăm cele două carduri separate
+      const sideCards = document.createElement('div');
+      sideCards.className = 'promo-side-cards';
+      
+      // Cardul pentru clasament (sus)
+      const leaderboardCard = document.createElement('div');
+      leaderboardCard.className = 'leaderboard-card';
+      leaderboardCard.innerHTML = `
+        <div class="leaderboard-header">
+          <span style="font-weight:900;">🏆 Clasament</span>
+          <span style="opacity:0.8; font-size:0.9rem;">Participanți: ${Array.isArray(__statsCache.participants?.[String(p.id)]) ? __statsCache.participants[String(p.id)].length : 0}</span>
+        </div>
+        <div class="leaderboard-mini" id="lb_${esc(p.id)}">
+          ${buildLeaderboard(Array.isArray(__statsCache.participants?.[String(p.id)]) ? __statsCache.participants[String(p.id)] : [])}
+        </div>
+      `;
+      
+      // Cardul pentru câștigători (jos)
+      const winnersCard = document.createElement('div');
+      winnersCard.className = 'winners-card';
+      winnersCard.innerHTML = `
+        <div class="winners-wrap" id="winners_${esc(p.id)}">
+          ${buildWinnersCard(p, Array.isArray(__statsCache.participants?.[String(p.id)]) ? __statsCache.participants[String(p.id)] : [])}
+        </div>
+      `;
+      
+      sideCards.appendChild(leaderboardCard);
+      sideCards.appendChild(winnersCard);
+      block.appendChild(sideCards);
       list.appendChild(block);
     });
 
@@ -2158,10 +2154,10 @@
           const previewBox = document.getElementById(`winners_preview_${promoId}`);
           if(previewBox) previewBox.innerHTML = '';
           
-          const leaderboard = document.getElementById(`lb_${promoId}`);
-          if(leaderboard) {
+          const winnersWrap = document.getElementById(`winners_${promoId}`);
+          if(winnersWrap) {
             const promoWithWinners = { ...promos[idx], winners };
-            leaderboard.innerHTML = buildLeaderboard(promoWithWinners);
+            winnersWrap.innerHTML = buildWinnersCard(promoWithWinners, participants);
           }
         }, 1500);
 
