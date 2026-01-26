@@ -1111,6 +1111,7 @@
       }
     };
 
+    // ASIGURĂ-TE CĂ PREMIULE SUNT SALVATE CORECT
     const prizes = {
       p1: ($('prize1')?.value || '').trim(),
       p2: ($('prize2')?.value || '').trim(),
@@ -1119,6 +1120,8 @@
       next10: ($('prizeNext10')?.value || '').trim(),
       bonus: ($('prizeBonus')?.value || '').trim()
     };
+
+    console.log('Premii salvate:', prizes); // Pentru debugging
 
     const bannerFile = $('promoBanner')?.files?.[0] || null;
     const bgFiles = Array.from($('promoBg')?.files || []).slice(0, 3);
@@ -1160,13 +1163,15 @@
         desc,
         rulesObj,
         rules,
-        prizes,
+        prizes, // ASIGURĂ-TE CĂ OBȚIUNEA prizes ESTE SALVATĂ
         ui,
         banner,
         bgs,
         createdAt: prev?.createdAt || now,
         updatedAt: now
       };
+
+      console.log('Obiect promo salvat:', promoObj); // Pentru debugging
 
       if (idx >= 0) promos[idx] = promoObj;
       else promos.unshift(promoObj);
@@ -2094,34 +2099,130 @@
         // === TRIMITE EMAIL-URI CÂȘTIGĂTORILOR ===
         try {
           if (typeof window.sendPromoWinnerEmail === 'function') {
-            const allWinners = [
-              ...firstPlace.map(u => ({ ...u, prize: 'Premiul I: ' + (promo.prizes?.p1 || '') })),
-              ...secondPlace.map(u => ({ ...u, prize: 'Premiul II: ' + (promo.prizes?.p2 || '') })),
-              ...thirdPlace.map(u => ({ ...u, prize: 'Premiul III: ' + (promo.prizes?.p3 || '') })),
-              ...top5.map(u => ({ ...u, prize: 'Primele 5 locuri după podium: ' + (promo.prizes?.top5 || '') })),
-              ...next10.map(u => ({ ...u, prize: 'Următoarele 10 locuri: ' + (promo.prizes?.next10 || '') })),
-              ...bonus.map(u => ({ ...u, prize: 'Bonus participare: ' + (promo.prizes?.bonus || '') }))
-            ];
-
-            let emailCount = 0;
-            for (const winner of allWinners) {
-              if (winner.email) {
-                try {
-                  await window.sendPromoWinnerEmail({
-                    toEmail: winner.email,
-                    name: winner.name,
-                    prize: winner.prize,
-                    promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
-                    promoUrl: window.location.href
-                  });
-                  emailCount++;
-                  console.log(`Email trimis către câștigător: ${winner.email} - ${winner.prize}`);
-                } catch(emailErr) {
-                  console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+            // Pentru Premiul I
+            if (firstPlace.length > 0) {
+              for (const winner of firstPlace) {
+                if (winner.email) {
+                  try {
+                    await window.sendPromoWinnerEmail({
+                      toEmail: winner.email,
+                      name: winner.name,
+                      prize: '🏆 Premiul I: ' + (promo.prizes?.p1 || ''),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                      promoUrl: window.location.href
+                    });
+                    console.log(`Email trimis către câștigătorul Premiului I: ${winner.email}`);
+                  } catch(emailErr) {
+                    console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                  }
                 }
               }
             }
-            console.log(`Total email-uri trimise către câștigători: ${emailCount}`);
+
+            // Pentru Premiul II
+            if (secondPlace.length > 0) {
+              for (const winner of secondPlace) {
+                if (winner.email) {
+                  try {
+                    await window.sendPromoWinnerEmail({
+                      toEmail: winner.email,
+                      name: winner.name,
+                      prize: '🥈 Premiul II: ' + (promo.prizes?.p2 || ''),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                      promoUrl: window.location.href
+                    });
+                    console.log(`Email trimis către câștigătorul Premiului II: ${winner.email}`);
+                  } catch(emailErr) {
+                    console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                  }
+                }
+              }
+            }
+
+            // Pentru Premiul III
+            if (thirdPlace.length > 0) {
+              for (const winner of thirdPlace) {
+                if (winner.email) {
+                  try {
+                    await window.sendPromoWinnerEmail({
+                      toEmail: winner.email,
+                      name: winner.name,
+                      prize: '🥉 Premiul III: ' + (promo.prizes?.p3 || ''),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                      promoUrl: window.location.href
+                    });
+                    console.log(`Email trimis către câștigătorul Premiului III: ${winner.email}`);
+                  } catch(emailErr) {
+                    console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                  }
+                }
+              }
+            }
+
+            // Pentru Primele 5 locuri după podium
+            if (top5.length > 0) {
+              for (const winner of top5) {
+                if (winner.email) {
+                  try {
+                    await window.sendPromoWinnerEmail({
+                      toEmail: winner.email,
+                      name: winner.name,
+                      prize: '🎖️ Primele 5 locuri după podium: ' + (promo.prizes?.top5 || ''),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                      promoUrl: window.location.href
+                    });
+                    console.log(`Email trimis către câștigătorul din Top 5: ${winner.email}`);
+                  } catch(emailErr) {
+                    console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                  }
+                }
+              }
+            }
+
+            // Pentru Următoarele 10 locuri
+            if (next10.length > 0) {
+              for (const winner of next10) {
+                if (winner.email) {
+                  try {
+                    await window.sendPromoWinnerEmail({
+                      toEmail: winner.email,
+                      name: winner.name,
+                      prize: '🏅 Următoarele 10 locuri: ' + (promo.prizes?.next10 || ''),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                      promoUrl: window.location.href
+                    });
+                    console.log(`Email trimis către câștigătorul din Următoarele 10: ${winner.email}`);
+                  } catch(emailErr) {
+                    console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                  }
+                }
+              }
+            }
+
+            // Pentru Bonus participare
+            if (bonus.length > 0) {
+              for (const winner of bonus) {
+                if (winner.email) {
+                  try {
+                    await window.sendPromoWinnerEmail({
+                      toEmail: winner.email,
+                      name: winner.name,
+                      prize: '🎁 Bonus participare / surpriză random: ' + (promo.prizes?.bonus || ''),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                      promoUrl: window.location.href
+                    });
+                    console.log(`Email trimis către câștigătorul Bonus: ${winner.email}`);
+                  } catch(emailErr) {
+                    console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                  }
+                }
+              }
+            }
+
+            console.log(`Total email-uri trimise către câștigători: ${
+              firstPlace.length + secondPlace.length + thirdPlace.length + 
+              top5.length + next10.length + bonus.length
+            }`);
           } else {
             console.warn('sendPromoWinnerEmail callable nu este disponibil.');
           }
