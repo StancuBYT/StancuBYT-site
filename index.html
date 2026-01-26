@@ -500,6 +500,141 @@
 .prize-icon {
   font-size: 1.2rem;
 }
+
+/* MODIFICĂRI NOI */
+
+/* Container pentru cele două carduri egale */
+.leaderboard-split-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+}
+
+.leaderboard-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.leaderboard-section-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+}
+
+.leaderboard-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 8px;
+}
+
+/* Cardul câștigători cu efect rainbow */
+.rainbow-card {
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, 
+    #ff0000, #ff8800, #ffff00, #00ff00, 
+    #0088ff, #0000ff, #8800ff, #ff00ff) 1;
+  border-radius: 16px;
+  animation: rainbow-border 3s linear infinite;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 0 20px rgba(255, 0, 255, 0.3),
+    0 0 40px rgba(0, 255, 255, 0.2),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes rainbow-border {
+  0% { border-image-source: linear-gradient(45deg, 
+    #ff0000, #ff8800, #ffff00, #00ff00, 
+    #0088ff, #0000ff, #8800ff, #ff00ff); }
+  25% { border-image-source: linear-gradient(45deg, 
+    #ff00ff, #ff0000, #ff8800, #ffff00, 
+    #00ff00, #0088ff, #0000ff, #8800ff); }
+  50% { border-image-source: linear-gradient(45deg, 
+    #8800ff, #ff00ff, #ff0000, #ff8800, 
+    #ffff00, #00ff00, #0088ff, #0000ff); }
+  75% { border-image-source: linear-gradient(45deg, 
+    #0000ff, #8800ff, #ff00ff, #ff0000, 
+    #ff8800, #ffff00, #00ff00, #0088ff); }
+  100% { border-image-source: linear-gradient(45deg, 
+    #ff0000, #ff8800, #ffff00, #00ff00, 
+    #0088ff, #0000ff, #8800ff, #ff00ff); }
+}
+
+/* Banner pentru status promoție */
+.promo-status-banner {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  animation: phosphorescent-gradient 2s linear infinite;
+  color: #000;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.promo-status-banner.in-progress {
+  background: linear-gradient(90deg, 
+    #00ffff, #00ff88, #00ffff, #00ff88);
+  background-size: 300% 100%;
+}
+
+.promo-status-banner.finalized {
+  background: linear-gradient(90deg, 
+    #ff4d4d, #ff9500, #ff4d4d, #ff9500);
+  background-size: 300% 100%;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.7);
+}
+
+@keyframes phosphorescent-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Email prize styling */
+.email-prize-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--purple-innov));
+  color: #000;
+  font-weight: 900;
+  font-size: 0.85rem;
+  margin-left: 8px;
+}
+
+.winner-prize-full {
+  font-weight: 800;
+  color: var(--neon-cyan);
+  text-align: right;
+  background: rgba(0,0,0,0.3);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,255,255,0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 980px) {
+  .leaderboard-scrollable {
+    min-height: 200px;
+  }
+}
+
   </style>
 
   <!-- Firebase (compat) -->
@@ -1142,154 +1277,11 @@
     return participant;
   }
 
-  // Funcție nouă pentru afișarea câștigătorilor în ordinea premiilor
-  function buildWinnersSection(promo) {
-    if (!promo.winners || Object.keys(promo.winners).length === 0) {
-      return '';
-    }
-
-    const winners = promo.winners;
-    let html = `
-      <div class="winners-wrap">
-        <div class="winners-title">🏆 Câștigători</div>
-        <div class="winners-prizes-grid">
-    `;
-
-    // Premiul I
-    if (winners.firstPlace && winners.firstPlace.length > 0) {
-      html += `
-        <div class="winners-prize-category">
-          <span class="prize-icon">🏆</span> Premiul I: ${esc(promo.prizes?.p1 || '—')}
-        </div>
-      `;
-      winners.firstPlace.forEach(winner => {
-        html += `
-          <div class="winner-row">
-            <div class="winner-info">
-              <div class="winner-name">${esc(winner.name)}</div>
-              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-            </div>
-            <div class="winner-prize">${esc(promo.prizes?.p1 || '—')}</div>
-          </div>
-        `;
-      });
-    }
-
-    // Premiul II
-    if (winners.secondPlace && winners.secondPlace.length > 0) {
-      html += `
-        <div class="winners-prize-category">
-          <span class="prize-icon">🥈</span> Premiul II: ${esc(promo.prizes?.p2 || '—')}
-        </div>
-      `;
-      winners.secondPlace.forEach(winner => {
-        html += `
-          <div class="winner-row">
-            <div class="winner-info">
-              <div class="winner-name">${esc(winner.name)}</div>
-              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-            </div>
-            <div class="winner-prize">${esc(promo.prizes?.p2 || '—')}</div>
-          </div>
-        `;
-      });
-    }
-
-    // Premiul III
-    if (winners.thirdPlace && winners.thirdPlace.length > 0) {
-      html += `
-        <div class="winners-prize-category">
-          <span class="prize-icon">🥉</span> Premiul III: ${esc(promo.prizes?.p3 || '—')}
-        </div>
-      `;
-      winners.thirdPlace.forEach(winner => {
-        html += `
-          <div class="winner-row">
-            <div class="winner-info">
-              <div class="winner-name">${esc(winner.name)}</div>
-              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-            </div>
-            <div class="winner-prize">${esc(promo.prizes?.p3 || '—')}</div>
-          </div>
-        `;
-      });
-    }
-
-    // Primele 5 locuri după podium
-    if (winners.top5 && winners.top5.length > 0) {
-      html += `
-        <div class="winners-prize-category">
-          <span class="prize-icon">🎖️</span> Primele 5 locuri după podium: ${esc(promo.prizes?.top5 || '—')}
-        </div>
-      `;
-      winners.top5.forEach(winner => {
-        html += `
-          <div class="winner-row">
-            <div class="winner-info">
-              <div class="winner-name">${esc(winner.name)}</div>
-              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-            </div>
-            <div class="winner-prize">${esc(promo.prizes?.top5 || '—')}</div>
-          </div>
-        `;
-      });
-    }
-
-    // Următoarele 10 locuri
-    if (winners.next10 && winners.next10.length > 0) {
-      html += `
-        <div class="winners-prize-category">
-          <span class="prize-icon">🏅</span> Următoarele 10 locuri: ${esc(promo.prizes?.next10 || '—')}
-        </div>
-      `;
-      winners.next10.forEach(winner => {
-        html += `
-          <div class="winner-row">
-            <div class="winner-info">
-              <div class="winner-name">${esc(winner.name)}</div>
-              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-            </div>
-            <div class="winner-prize">${esc(promo.prizes?.next10 || '—')}</div>
-          </div>
-        `;
-      });
-    }
-
-    // Bonus participare
-    if (winners.bonus && winners.bonus.length > 0) {
-      html += `
-        <div class="winners-prize-category">
-          <span class="prize-icon">🎁</span> Bonus participare / surpriză random: ${esc(promo.prizes?.bonus || '—')}
-        </div>
-      `;
-      winners.bonus.forEach(winner => {
-        html += `
-          <div class="winner-row">
-            <div class="winner-info">
-              <div class="winner-name">${esc(winner.name)}</div>
-              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-            </div>
-            <div class="winner-prize">${esc(promo.prizes?.bonus || '—')}</div>
-          </div>
-        `;
-      });
-    }
-
-    html += `
-        </div>
-      </div>
-    `;
-
-    return html;
-  }
-
-  function buildLeaderboard(p){
-    const promoId = (p && p.id!=null) ? p.id : p;
-    const promo = (p && typeof p === 'object') ? p : (__statsCache.promos||[]).find(x=>String(x.id)===String(promoId)) || {};
-
+  // Funcție pentru tabelul cu participanți
+  function buildParticipantsTable(promoId) {
     const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
     if(!arr.length) {
-      return `<div style="opacity:.85;">Nu există participanți încă.</div>`;
+      return `<div style="padding:20px;text-align:center;opacity:0.7;">Nu există participanți încă.</div>`;
     }
 
     const counts = new Map();
@@ -1320,42 +1312,172 @@
       };
     }).sort((a,b)=> b.referrals - a.referrals || a.joinedAt - b.joinedAt);
 
-    let html = `<table>
-      <tr><th>#</th><th>Nume</th><th>Email</th><th>Cod</th><th>Invitări</th></tr>`;
-    rows.slice(0, 20).forEach((r,i)=> {
-      const top = i===0 ? 'style="font-weight:800;"' : '';
-      html += `<tr ${top}>
-        <td>${i+1}</td>
-        <td>${esc(r.name)}</td>
-        <td>${esc(maskEmail(r.email))}</td>
-        <td style="font-family:monospace;">${esc(maskCode(r.code))}</td>
-        <td><span class="pill">${r.referrals}</span></td>
+    let html = `<table style="width:100%;">
+      <thead>
+        <tr>
+          <th style="padding:8px 6px;">#</th>
+          <th style="padding:8px 6px;">Nume</th>
+          <th style="padding:8px 6px;">Email</th>
+          <th style="padding:8px 6px;">Cod</th>
+          <th style="padding:8px 6px;">Invitări</th>
+        </tr>
+      </thead>
+      <tbody>`;
+    
+    rows.slice(0, 50).forEach((r,i)=> {
+      const topStyle = i===0 ? 'style="background:rgba(255,215,0,0.1);"' : 
+                      i===1 ? 'style="background:rgba(192,192,192,0.1);"' : 
+                      i===2 ? 'style="background:rgba(205,127,50,0.1);"' : '';
+      html += `<tr ${topStyle}>
+        <td style="padding:8px 6px; font-weight:${i<3?'900':'700'};">${i+1}</td>
+        <td style="padding:8px 6px;">${esc(r.name)}</td>
+        <td style="padding:8px 6px; font-size:0.9rem;">${esc(maskEmail(r.email))}</td>
+        <td style="padding:8px 6px; font-family:monospace; font-size:0.9rem;">${esc(maskCode(r.code))}</td>
+        <td style="padding:8px 6px;"><span class="pill">${r.referrals}</span></td>
       </tr>`;
     });
-    html += `</table>`;
     
-    const now = Date.now();
-    const endsMs = promo && promo.ends ? new Date(promo.ends).getTime() : NaN;
-    const expired = Number.isFinite(endsMs) && now >= endsMs;
+    html += `</tbody></table>`;
+    
+    if (rows.length > 50) {
+      html += `<div style="text-align:center; padding:10px; opacity:0.8;">... și ${rows.length - 50} alți participanți</div>`;
+    }
+    
+    return html;
+  }
 
-    let winnersHtml = "";
-    if (expired && promo.winners) {
-      winnersHtml = buildWinnersSection(promo);
+  // Funcție nouă pentru afișarea câștigătorilor în ordinea premiilor
+  function buildWinnersSection(promo) {
+    if (!promo.winners || Object.keys(promo.winners).length === 0) {
+      return `<div style="padding:20px;text-align:center;opacity:0.7;">Nu există câștigători selectați încă.</div>`;
     }
 
-    if (winnersHtml) {
-      html += winnersHtml;
-    } else if (__isAdmin && expired) {
+    const winners = promo.winners;
+    let html = `
+      <div class="winners-prizes-grid">
+    `;
+
+    // Premiul I
+    if (winners.firstPlace && winners.firstPlace.length > 0) {
       html += `
-        <div class="winners-wrap">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0;">
-            <button class="btn small admin-only" data-admin-display="inline-flex" onclick="selectWinners('${esc(promoId)}')">🎯 Selectează Câștigători</button>
-          </div>
-          <div id="winners_preview_${esc(promoId)}"></div>
+        <div class="winners-prize-category">
+          <span class="prize-icon">🏆</span> Premiul I: ${esc(promo.prizes?.p1 || '—')}
         </div>
       `;
+      winners.firstPlace.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize-full">${esc(promo.prizes?.p1 || '—')}</div>
+          </div>
+        `;
+      });
     }
 
+    // Premiul II
+    if (winners.secondPlace && winners.secondPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🥈</span> Premiul II: ${esc(promo.prizes?.p2 || '—')}
+        </div>
+      `;
+      winners.secondPlace.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize-full">${esc(promo.prizes?.p2 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Premiul III
+    if (winners.thirdPlace && winners.thirdPlace.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🥉</span> Premiul III: ${esc(promo.prizes?.p3 || '—')}
+        </div>
+      `;
+      winners.thirdPlace.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize-full">${esc(promo.prizes?.p3 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Primele 5 locuri după podium
+    if (winners.top5 && winners.top5.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🎖️</span> Primele 5 locuri după podium: ${esc(promo.prizes?.top5 || '—')}
+        </div>
+      `;
+      winners.top5.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize-full">${esc(promo.prizes?.top5 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Următoarele 10 locuri
+    if (winners.next10 && winners.next10.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🏅</span> Următoarele 10 locuri: ${esc(promo.prizes?.next10 || '—')}
+        </div>
+      `;
+      winners.next10.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize-full">${esc(promo.prizes?.next10 || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Bonus participare
+    if (winners.bonus && winners.bonus.length > 0) {
+      html += `
+        <div class="winners-prize-category">
+          <span class="prize-icon">🎁</span> Bonus participare / surpriză random: ${esc(promo.prizes?.bonus || '—')}
+        </div>
+      `;
+      winners.bonus.forEach(winner => {
+        html += `
+          <div class="winner-row">
+            <div class="winner-info">
+              <div class="winner-name">${esc(winner.name)}</div>
+              <div class="winner-email">${esc(maskEmail(winner.email))}</div>
+            </div>
+            <div class="winner-prize-full">${esc(promo.prizes?.bonus || '—')}</div>
+          </div>
+        `;
+      });
+    }
+
+    html += `</div>`;
     return html;
   }
 
@@ -1387,6 +1509,8 @@
       const overlayAlign = (overlay.align || 'left');
       const overlayColor = (overlay.color || '#ffffff');
 
+      const isExpired = isExpiredPromo(p);
+      
       const wrap = document.createElement('div');
       wrap.className = 'card promo-card';
       wrap.style.setProperty('--cardH', cardH + 'px');
@@ -1408,9 +1532,8 @@
         <div class="promo-body">
           <div class="promo-meta">
             <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
-            <span class="pill">⏳ ${ isExpiredPromo(p) ? (p.kind==='giveaway' ? 'Giveaway încheiat' : 'Promoție încheiată') : formatEndsLocal(p.ends) }</span>
+            <span class="pill">⏳ ${ isExpired ? (p.kind==='giveaway' ? 'Giveaway încheiat' : 'Promoție încheiată') : formatEndsLocal(p.ends) }</span>
             <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
-            
           </div>
 
           <div style="font-weight:800; font-size:1.05rem;">${esc(p.title||'')}</div>
@@ -1418,55 +1541,86 @@
           
           <div class="promo-desc">${esc(p.desc||'')}</div>
 
+          <div class="divider"></div>
 
-<div class="divider"></div>
+          <div style="margin-top:14px;">
+            <div style="font-weight:900; margin-bottom:10px;">🏆 Premii</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
+              <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
+              <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
+              <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
+              <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
+              <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
+            </div>
 
-<div style="margin-top:14px;">
-  <div style="font-weight:900; margin-bottom:10px;">🏆 Premii</div>
-  <div style="display:flex; flex-direction:column; gap:10px;">
-    <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
-    <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
-    <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
-    <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
-    <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
-    <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
-  </div>
+            <div class="divider"></div>
+            <div class="kicker">📜 Reguli</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>1.</b> ${esc((p.rulesObj&&p.rulesObj.r1)||'—')}</div>
+              <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>2.</b> ${esc((p.rulesObj&&p.rulesObj.r2)||'—')}</div>
+              <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>3.</b> ${esc((p.rulesObj&&p.rulesObj.r3)||'—')}</div>
+              <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>4.</b> ${esc((p.rulesObj&&p.rulesObj.r4)||'—')}</div>
+              <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>5.</b> ${esc((p.rulesObj&&p.rulesObj.r5)||'—')}</div>
+              <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>Text:</b> ${esc((p.rulesObj&&p.rulesObj.text)||'—')}</div>
+            </div>
 
-<div class="divider"></div>
-<div class="kicker">📜 Reguli</div>
-<div style="display:flex; flex-direction:column; gap:8px;">
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>1.</b> ${esc((p.rulesObj&&p.rulesObj.r1)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>2.</b> ${esc((p.rulesObj&&p.rulesObj.r2)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>3.</b> ${esc((p.rulesObj&&p.rulesObj.r3)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>4.</b> ${esc((p.rulesObj&&p.rulesObj.r4)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>5.</b> ${esc((p.rulesObj&&p.rulesObj.r5)||'—')}</div>
-  <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>Text:</b> ${esc((p.rulesObj&&p.rulesObj.text)||'—')}</div>
-</div>
-
-<div class="divider"></div>
-<div class="kicker">✅ Înscriere</div>
-<div class="join-row">
-  <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80">
-  <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120">
-</div>
-<div class="join-row">
-  <input id="wallet_${esc(p.id)}" type="text" placeholder="Wallet (0x...)" maxlength="80">
-  <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
-</div>
-<div class="join-row one">
-  <button class="btn" type="button" ${ (p.ends && Date.now() >= new Date(p.ends).getTime()) ? 'disabled title=\"Înscrieri închise\"' : '' } onclick=\"joinPromo('${esc(p.id)}')\">✅ Înscrie-te</button>
-</div>
-</div>
-
+            <div class="divider"></div>
+            <div class="kicker">✅ Înscriere</div>
+            <div class="join-row">
+              <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80">
+              <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120">
+            </div>
+            <div class="join-row">
+              <input id="wallet_${esc(p.id)}" type="text" placeholder="Wallet (0x...)" maxlength="80">
+              <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
+            </div>
+            <div class="join-row one">
+              <button class="btn" type="button" ${ isExpired ? 'disabled title="Înscrieri închise"' : '' } onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-te</button>
+            </div>
+            
+            <!-- Banner status promoție -->
+            <div class="promo-status-banner ${isExpired ? 'finalized' : 'in-progress'}">
+              ${isExpired ? '🎉 FINALIZAT' : '🚀 ÎN CURS'}
+            </div>
+          </div>
+        </div>
       `;
 
       const block = document.createElement('div');
       block.className = 'promo-block';
       block.appendChild(wrap);
+      
+      // Cardul clasament împărțit în două
       const lbOut = document.createElement('div');
       lbOut.className = 'promo-leaderboard-out';
-      lbOut.innerHTML = `<div style="font-weight:800; margin-bottom:8px;">🏆 Clasament</div>` +
-        `<div class="leaderboard-mini" id="lb_${esc(p.id)}">${buildLeaderboard(p)}</div>`;
+      lbOut.innerHTML = `
+        <div class="leaderboard-split-container">
+          <div class="leaderboard-section">
+            <div class="leaderboard-section-title">👥 Participanți</div>
+            <div class="leaderboard-scrollable" id="lb_participants_${esc(p.id)}">
+              ${buildParticipantsTable(p.id)}
+            </div>
+          </div>
+          
+          <div class="leaderboard-section">
+            <div class="leaderboard-section-title">🏆 Câștigători</div>
+            <div class="leaderboard-scrollable rainbow-card" id="lb_winners_${esc(p.id)}">
+              ${buildWinnersSection(p)}
+            </div>
+          </div>
+        </div>
+        
+        ${__isAdmin && isExpired && !p.winners ? `
+          <div style="margin-top:15px; padding:12px; border-radius:12px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1);">
+            <div style="font-weight:700; margin-bottom:8px;">🎯 Selectare Câștigători</div>
+            <div style="opacity:0.8; font-size:0.9rem; margin-bottom:10px;">Promoția s-a încheiat. Poți selecta câștigătorii acum.</div>
+            <button class="btn" type="button" onclick="selectWinners('${esc(p.id)}')">🎲 Selectează Câștigători</button>
+            <div id="winners_preview_${esc(p.id)}" style="margin-top:10px;"></div>
+          </div>
+        ` : ''}
+      `;
+      
       block.appendChild(lbOut);
       list.appendChild(block);
     });
@@ -1505,6 +1659,12 @@
       $(`ref_${promoId}`).value = '';
 
       alert(`Înscriere reușită!\nCodul tău: ${u.code}`);
+      
+      // Actualizează lista de participanți
+      const participantsDiv = document.getElementById(`lb_participants_${promoId}`);
+      if (participantsDiv) {
+        participantsDiv.innerHTML = buildParticipantsTable(promoId);
+      }
       
       // === TRIMITE EMAIL LA ÎNSCRIERE ===
       try {
@@ -1917,10 +2077,17 @@
           const previewBox = document.getElementById(`winners_preview_${promoId}`);
           if(previewBox) previewBox.innerHTML = '';
           
-          const leaderboard = document.getElementById(`lb_${promoId}`);
-          if(leaderboard) {
+          // Actualizează secțiunea câștigători
+          const winnersDiv = document.getElementById(`lb_winners_${promoId}`);
+          if(winnersDiv) {
             const promoWithWinners = { ...promos[idx], winners };
-            leaderboard.innerHTML = buildLeaderboard(promoWithWinners);
+            winnersDiv.innerHTML = buildWinnersSection(promoWithWinners);
+          }
+          
+          // Ascunde butonul de selectare
+          const selectButtonContainer = document.querySelector(`[onclick="selectWinners('${promoId}')"]`)?.parentElement?.parentElement;
+          if(selectButtonContainer) {
+            selectButtonContainer.style.display = 'none';
           }
         }, 1500);
 
@@ -1948,7 +2115,7 @@
                     promoUrl: window.location.href
                   });
                   emailCount++;
-                  console.log(`Email trimis către câștigător: ${winner.email}`);
+                  console.log(`Email trimis către câștigător: ${winner.email} - ${winner.prize}`);
                 } catch(emailErr) {
                   console.warn(`Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
                 }
