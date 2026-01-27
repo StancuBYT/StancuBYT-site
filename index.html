@@ -1101,370 +1101,6 @@
   let __allWinners = [];
   window.__statsCache = __statsCache;
 
-  // NOU: Referință către colecția winners
-  function winnersRef(){
-    const d = fs();
-    if(!d) return null;
-    return d.collection('winners');
-  }
-
-  // NOU: Funcție pentru salvare câștigători în colecție separată
-  async function saveWinnersToCollection(promoId, winnersData, participantsData) {
-    try {
-      const winnersCollection = winnersRef();
-      if (!winnersCollection) throw new Error("Firestore nu este disponibil");
-      
-      // Calculează scorurile pentru fiecare participant
-      const scores = calculateScores(participantsData);
-      
-      // Pregătește datele câștigătorilor cu scoruri
-      const winnersWithScores = {
-        promoId,
-        promoTitle: __statsCache.promos.find(p => p.id === promoId)?.title || 'Unknown',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        winners: {}
-      };
-
-      // Adaugă scorurile la fiecare câștigător
-      for (const [category, winners] of Object.entries(winnersData)) {
-        if (category !== 'selectedAt') {
-          winnersWithScores.winners[category] = winners.map(winner => ({
-            ...winner,
-            score: scores[winner.email] || 0,
-            referrals: calculateReferrals(winner.email, participantsData)
-          }));
-        }
-      }
-
-      // Salvează în colecția winners
-      await winnersCollection.doc(promoId).set(winnersWithScores, { merge: true });
-      
-      console.log(`✅ Câștigători salvați pentru promoția ${promoId}`);
-      return winnersWithScores;
-    } catch (error) {
-      console.error('❌ Eroare la salvarea câștigătorilor:', error);
-      throw error;
-    }
-  }
-
-  // NOU: Funcție pentru calculul scorurilor
-  function calculateScores(participants) {
-    const scores = {};
-    const codeToEmail = {};
-    const referrals = {};
-    
-    // Mapare cod -> email
-    participants.forEach(p => {
-      if (p.code && p.email) {
-        codeToEmail[p.code.toUpperCase()] = p.email;
-      }
-    });
-    
-    // Calculează scorurile bazate pe referral-uri
-    participants.forEach(p => {
-      if (p.referral && p.email) {
-        const referralCode = p.referral.toUpperCase().trim();
-        const referrerEmail = codeToEmail[referralCode];
-        if (referrerEmail && referrerEmail !== p.email) {
-          referrals[referrerEmail] = (referrals[referrerEmail] || 0) + 1;
-        }
-      }
-    });
-    
-    // Scorul final = 10 puncte + 5 puncte per referral
-    participants.forEach(p => {
-      if (p.email) {
-        scores[p.email] = 10 + (referrals[p.email] || 0) * 5;
-      }
-    });
-    
-    return scores;
-  }
-
-  // NOU: Funcție pentru calculul numărului de referral-uri
-  function calculateReferrals(email, participants) {
-    let count = 0;
-    const userCodes = participants
-      .filter(p => p.email === email && p.code)
-      .map(p => p.code.toUpperCase());
-    
-    participants.forEach(p => {
-      if (p.referral && userCodes.includes(p.referral.toUpperCase().trim())) {
-        count++;
-      }
-    });
-    
-    return count;
-  }
-
-  // NOU: Funcție pentru încărcarea tuturor câștigătorilor
-  async function loadAllWinners() {
-    if (!__isAdmin) return;
-    
-    try {
-      const winnersCollection = winnersRef();
-      if (!winnersCollection) return;
-      
-      const snapshot = await winnersCollection.get();
-      __allWinners = [];
-      
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        __allWinners.push({
-          id: doc.id,
-          ...data,
-          timestamp: data.timestamp?.toDate()?.toLocaleString('ro-RO') || 'N/A'
-        });
-      });
-      
-      displayGlobalWinners();
-    } catch (error) {
-      console.error('Eroare la încărcarea câștigătorilor:', error);
-    }
-  }
-
-  // NOU: Funcție pentru afișarea câștigătorilor global
-  function displayGlobalWinners() {
-    const container = $('#globalWinnersList');
-    if (!container) return;
-    
-    if (__allWinners.length === 0) {
-      container.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.7;">Nu există câștigători înregistrați.</div>';
-      return;
-    }
-    
-    let html = '<div style="display:flex;flex-direction:column;gap:15px;">';
-    
-    __allWinners.forEach(winnerDoc => {
-      const { id, promoTitle, timestamp, winners } = winnerDoc;
-      
-      html += `
-        <div class="card" style="background:rgba(0,0,0,0.3);">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <div style="font-weight:900;font-size:1.1rem;">${esc(promoTitle)}</div>
-            <div class="pill">${esc(timestamp)}</div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
-      `;
-      
-      // Afișează câștigătorii pe categorii
-      const categories = {
-        firstPlace: '🏆 Premiul I',
-        secondPlace: '🥈 Premiul II', 
-        thirdPlace: '🥉 Premiul III',
-        top5: '🎖️ Top 5',
-        next10: '🏅 Next 10',
-        bonus: '🎁 Bonus'
-      };
-      
-      Object.entries(categories).forEach(([category, label]) => {
-        if (winners[category] && winners[category].length > 0) {
-          html += `
-            <div style="padding:10px;border:1px solid var(--border);border-radius:10px;">
-              <div style="font-weight:800;margin-bottom:5px;">${label}</div>
-              ${winners[category].map(winner => `
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.1);">
-                  <div>
-                    <div style="font-weight:700;">${esc(winner.name)}</div>
-                    <div style="font-size:0.8rem;opacity:0.8;">${esc(winner.email)}</div>
-                  </div>
-                  <div class="score-badge">${winner.score} pts</div>
-                </div>
-              `).join('')}
-            </div>
-          `;
-        }
-      });
-      
-      html += `
-          </div>
-          <div style="margin-top:10px;display:flex;gap:10px;">
-            <button class="btn secondary" onclick="viewWinnerDetails('${id}')">👁️ Vezi Detalii</button>
-            <button class="btn" onclick="resendWinnerEmails('${id}')">📧 Retrimite Email-uri</button>
-          </div>
-        </div>
-      `;
-    });
-    
-    html += '</div>';
-    container.innerHTML = html;
-  }
-
-  // NOU: Funcție pentru vizualizarea detaliilor unui câștigător
-  window.viewWinnerDetails = function(promoId) {
-    const winnerDoc = __allWinners.find(w => w.id === promoId);
-    if (!winnerDoc) return;
-    
-    const modal = $('#winnerDetailsModal');
-    const content = $('#winnerDetailsContent');
-    
-    let html = `
-      <div style="margin-bottom:15px;">
-        <div style="font-weight:900;font-size:1.2rem;">${esc(winnerDoc.promoTitle)}</div>
-        <div style="opacity:0.8;margin-top:5px;">Selectați la: ${esc(winnerDoc.timestamp)}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr;gap:15px;">
-    `;
-    
-    // Detalii pentru fiecare categorie
-    const categories = {
-      firstPlace: '🏆 Premiul I',
-      secondPlace: '🥈 Premiul II',
-      thirdPlace: '🥉 Premiul III',
-      top5: '🎖️ Primele 5 locuri după podium',
-      next10: '🏅 Următoarele 10 locuri',
-      bonus: '🎁 Bonus participare'
-    };
-    
-    Object.entries(categories).forEach(([category, label]) => {
-      if (winnerDoc.winners[category] && winnerDoc.winners[category].length > 0) {
-        html += `
-          <div class="winner-stat-item">
-            <div style="font-weight:900;margin-bottom:10px;">${label}</div>
-            ${winnerDoc.winners[category].map(winner => `
-              <div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;">
-                <div style="display:flex;justify-content:space-between;">
-                  <div>
-                    <div style="font-weight:800;">${esc(winner.name)}</div>
-                    <div style="font-size:0.85rem;opacity:0.8;">${esc(winner.email)}</div>
-                  </div>
-                  <div class="score-badge">${winner.score} puncte</div>
-                </div>
-                <div style="margin-top:5px;display:flex;gap:10px;font-size:0.85rem;">
-                  <span>Referral-uri: ${winner.referrals || 0}</span>
-                  <span>Puncte totale: ${winner.score}</span>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-    });
-    
-    html += '</div>';
-    content.innerHTML = html;
-    modal.style.display = 'flex';
-  };
-
-  // NOU: Funcție pentru retrimiterea email-urilor
-  window.resendWinnerEmails = async function(promoId) {
-    if (!__isAdmin) {
-      alert('Doar administratorii pot retrimite email-uri.');
-      return;
-    }
-    
-    const winnerDoc = __allWinners.find(w => w.id === promoId);
-    if (!winnerDoc) return;
-    
-    if (!confirm(`Sigur doriți să retrimiteți email-urile pentru ${winnerDoc.promoTitle}?`)) {
-      return;
-    }
-    
-    try {
-      const promo = __statsCache.promos.find(p => p.id === promoId);
-      if (!promo) {
-        alert('Promoția nu a fost găsită în cache.');
-        return;
-      }
-      
-      // Trimite email-uri pentru fiecare câștigător
-      const prizeMapping = {
-        firstPlace: promo.prizes?.p1 || '',
-        secondPlace: promo.prizes?.p2 || '',
-        thirdPlace: promo.prizes?.p3 || '',
-        top5: promo.prizes?.top5 || '',
-        next10: promo.prizes?.next10 || '',
-        bonus: promo.prizes?.bonus || ''
-      };
-      
-      let emailsSent = 0;
-      let errors = 0;
-      
-      for (const [category, winners] of Object.entries(winnerDoc.winners)) {
-        if (category === 'selectedAt') continue;
-        
-        const prize = prizeMapping[category];
-        if (!prize) continue;
-        
-        for (const winner of winners) {
-          if (winner.email) {
-            try {
-              await window.sendWinnerNotification({
-                toEmail: winner.email,
-                name: winner.name,
-                prize: prize,
-                score: winner.score || 0,
-                referrals: winner.referrals || 0,
-                promoTitle: promo.title || 'Promoție',
-                promoUrl: window.location.href,
-                winnerType: category
-              });
-              emailsSent++;
-              console.log(`✅ Email retrimis către: ${winner.email}`);
-            } catch (emailErr) {
-              console.error(`❌ Eroare la retrimiterea email-ului către ${winner.email}:`, emailErr);
-              errors++;
-            }
-          }
-        }
-      }
-      
-      alert(`Email-uri retrimise: ${emailsSent} cu succes, ${errors} erori.`);
-      
-    } catch (error) {
-      console.error('Eroare la retrimiterea email-urilor:', error);
-      alert('Eroare la retrimiterea email-urilor.');
-    }
-  };
-
-  // NOU: Funcție pentru export CSV
-  window.exportWinnersToCSV = function() {
-    if (!__isAdmin) return;
-    
-    if (__allWinners.length === 0) {
-      alert('Nu există date de exportat.');
-      return;
-    }
-    
-    let csv = 'Promoție,Email,Nume,Premiu,Scor,Referral-uri,Data\n';
-    
-    __allWinners.forEach(winnerDoc => {
-      const { promoTitle, timestamp, winners } = winnerDoc;
-      
-      const categories = {
-        firstPlace: 'Premiul I',
-        secondPlace: 'Premiul II',
-        thirdPlace: 'Premiul III',
-        top5: 'Top 5',
-        next10: 'Next 10',
-        bonus: 'Bonus'
-      };
-      
-      Object.entries(categories).forEach(([category, prizeLabel]) => {
-        if (winners[category]) {
-          winners[category].forEach(winner => {
-            csv += `"${promoTitle}","${winner.email}","${winner.name}","${prizeLabel}",${winner.score || 0},${winner.referrals || 0},"${timestamp}"\n`;
-          });
-        }
-      });
-    });
-    
-    // Crează și descarcă fișierul
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `castigatori_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  window.closeWinnerDetails = function() {
-    $('#winnerDetailsModal').style.display = 'none';
-  };
-
   function statsRef(){
     const d = fs();
     if(!d) return null;
@@ -1808,16 +1444,6 @@
 
       await writeStats({ promos, participants });
       await tryDeleteStorageFiles(promo);
-      
-      // Șterge și din colecția winners
-      try {
-        const winnersCollection = winnersRef();
-        if (winnersCollection) {
-          await winnersCollection.doc(promoId).delete();
-        }
-      } catch (e) {
-        console.warn('Eroare la ștergerea câștigătorilor:', e);
-      }
     } catch(e) {
       console.error('deletePromo:', e);
       alert('Eroare la ștergere.');
@@ -1943,6 +1569,348 @@
     return html;
   }
 
+  // Funcție pentru calculul scorurilor
+  function calculateScores(participants) {
+    const scores = {};
+    const codeToEmail = {};
+    const referrals = {};
+    
+    // Mapare cod -> email
+    participants.forEach(p => {
+      if (p.code && p.email) {
+        codeToEmail[p.code.toUpperCase()] = p.email;
+      }
+    });
+    
+    // Calculează scorurile bazate pe referral-uri
+    participants.forEach(p => {
+      if (p.referral && p.email) {
+        const referralCode = p.referral.toUpperCase().trim();
+        const referrerEmail = codeToEmail[referralCode];
+        if (referrerEmail && referrerEmail !== p.email) {
+          referrals[referrerEmail] = (referrals[referrerEmail] || 0) + 1;
+        }
+      }
+    });
+    
+    // Scorul final = 10 puncte + 5 puncte per referral
+    participants.forEach(p => {
+      if (p.email) {
+        scores[p.email] = 10 + (referrals[p.email] || 0) * 5;
+      }
+    });
+    
+    return scores;
+  }
+
+  // Funcție pentru calculul numărului de referral-uri
+  function calculateReferrals(email, participants) {
+    let count = 0;
+    const userCodes = participants
+      .filter(p => p.email === email && p.code)
+      .map(p => p.code.toUpperCase());
+    
+    participants.forEach(p => {
+      if (p.referral && userCodes.includes(p.referral.toUpperCase().trim())) {
+        count++;
+      }
+    });
+    
+    return count;
+  }
+
+  // Funcție pentru încărcarea tuturor câștigătorilor
+  async function loadAllWinners() {
+    if (!__isAdmin) return;
+    
+    try {
+      const stats = await readStatsOnce();
+      const promos = Array.isArray(stats.promos) ? stats.promos : [];
+      
+      __allWinners = [];
+      
+      promos.forEach(promo => {
+        if (promo.winners && Object.keys(promo.winners).length > 0) {
+          __allWinners.push({
+            id: promo.id,
+            promoTitle: promo.title || 'Necunoscut',
+            timestamp: promo.winners.selectedAt || new Date().toISOString(),
+            winners: promo.winners
+          });
+        }
+      });
+      
+      displayGlobalWinners();
+    } catch (error) {
+      console.error('Eroare la încărcarea câștigătorilor:', error);
+    }
+  }
+
+  // Funcție pentru afișarea câștigătorilor global
+  function displayGlobalWinners() {
+    const container = $('#globalWinnersList');
+    if (!container) return;
+    
+    if (__allWinners.length === 0) {
+      container.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.7;">Nu există câștigători înregistrați.</div>';
+      return;
+    }
+    
+    let html = '<div style="display:flex;flex-direction:column;gap:15px;">';
+    
+    __allWinners.forEach(winnerDoc => {
+      const { id, promoTitle, timestamp, winners } = winnerDoc;
+      
+      html += `
+        <div class="card" style="background:rgba(0,0,0,0.3);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:900;font-size:1.1rem;">${esc(promoTitle)}</div>
+            <div class="pill">${new Date(timestamp).toLocaleString('ro-RO')}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
+      `;
+      
+      // Afișează câștigătorii pe categorii
+      const categories = {
+        firstPlace: '🏆 Premiul I',
+        secondPlace: '🥈 Premiul II', 
+        thirdPlace: '🥉 Premiul III',
+        top5: '🎖️ Top 5',
+        next10: '🏅 Next 10',
+        bonus: '🎁 Bonus'
+      };
+      
+      Object.entries(categories).forEach(([category, label]) => {
+        if (winners[category] && winners[category].length > 0) {
+          html += `
+            <div style="padding:10px;border:1px solid var(--border);border-radius:10px;">
+              <div style="font-weight:800;margin-bottom:5px;">${label}</div>
+              ${winners[category].map(winner => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                  <div>
+                    <div style="font-weight:700;">${esc(winner.name)}</div>
+                    <div style="font-size:0.8rem;opacity:0.8;">${esc(winner.email)}</div>
+                  </div>
+                  ${winner.score ? `<div class="score-badge">${winner.score} pts</div>` : '<div class="score-badge">—</div>'}
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+      });
+      
+      html += `
+          </div>
+          <div style="margin-top:10px;display:flex;gap:10px;">
+            <button class="btn secondary" onclick="viewWinnerDetails('${id}')">👁️ Vezi Detalii</button>
+            <button class="btn" onclick="resendWinnerEmails('${id}')">📧 Retrimite Email-uri</button>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  // Funcție pentru vizualizarea detaliilor unui câștigător
+  window.viewWinnerDetails = function(promoId) {
+    const winnerDoc = __allWinners.find(w => w.id === promoId);
+    if (!winnerDoc) return;
+    
+    const modal = $('#winnerDetailsModal');
+    const content = $('#winnerDetailsContent');
+    
+    // Găsește promoția completă pentru a obține premiile
+    const promo = __statsCache.promos.find(p => p.id === promoId);
+    const prizes = promo?.prizes || {};
+    
+    let html = `
+      <div style="margin-bottom:15px;">
+        <div style="font-weight:900;font-size:1.2rem;">${esc(winnerDoc.promoTitle)}</div>
+        <div style="opacity:0.8;margin-top:5px;">Selectați la: ${new Date(winnerDoc.timestamp).toLocaleString('ro-RO')}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:15px;">
+    `;
+    
+    // Detalii pentru fiecare categorie
+    const categories = {
+      firstPlace: { label: '🏆 Premiul I', prize: prizes.p1 || '' },
+      secondPlace: { label: '🥈 Premiul II', prize: prizes.p2 || '' },
+      thirdPlace: { label: '🥉 Premiul III', prize: prizes.p3 || '' },
+      top5: { label: '🎖️ Primele 5 locuri după podium', prize: prizes.top5 || '' },
+      next10: { label: '🏅 Următoarele 10 locuri', prize: prizes.next10 || '' },
+      bonus: { label: '🎁 Bonus participare', prize: prizes.bonus || '' }
+    };
+    
+    Object.entries(categories).forEach(([category, info]) => {
+      if (winnerDoc.winners[category] && winnerDoc.winners[category].length > 0) {
+        html += `
+          <div class="winner-stat-item">
+            <div style="font-weight:900;margin-bottom:10px;">${info.label}: ${esc(info.prize)}</div>
+            ${winnerDoc.winners[category].map(winner => `
+              <div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <div>
+                    <div style="font-weight:800;">${esc(winner.name)}</div>
+                    <div style="font-size:0.85rem;opacity:0.8;">${esc(winner.email)}</div>
+                  </div>
+                  ${winner.score ? `<div class="score-badge">${winner.score} puncte</div>` : '<div class="score-badge">—</div>'}
+                </div>
+                <div style="margin-top:5px;display:flex;gap:10px;font-size:0.85rem;">
+                  <span>Referral-uri: ${winner.referrals || 0}</span>
+                  <span>Premiu: ${esc(info.prize)}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    });
+    
+    html += '</div>';
+    content.innerHTML = html;
+    modal.style.display = 'flex';
+  };
+
+  // Funcție pentru retrimiterea email-urilor
+  window.resendWinnerEmails = async function(promoId) {
+    if (!__isAdmin) {
+      alert('Doar administratorii pot retrimite email-uri.');
+      return;
+    }
+    
+    const winnerDoc = __allWinners.find(w => w.id === promoId);
+    if (!winnerDoc) return;
+    
+    if (!confirm(`Sigur doriți să retrimiteți email-urile pentru ${winnerDoc.promoTitle}?`)) {
+      return;
+    }
+    
+    try {
+      const promo = __statsCache.promos.find(p => p.id === promoId);
+      if (!promo) {
+        alert('Promoția nu a fost găsită în cache.');
+        return;
+      }
+      
+      // Trimite email-uri pentru fiecare câștigător
+      const prizeMapping = {
+        firstPlace: promo.prizes?.p1 || '',
+        secondPlace: promo.prizes?.p2 || '',
+        thirdPlace: promo.prizes?.p3 || '',
+        top5: promo.prizes?.top5 || '',
+        next10: promo.prizes?.next10 || '',
+        bonus: promo.prizes?.bonus || ''
+      };
+      
+      let emailsSent = 0;
+      let errors = 0;
+      
+      for (const [category, winners] of Object.entries(winnerDoc.winners)) {
+        if (category === 'selectedAt') continue;
+        
+        const prize = prizeMapping[category];
+        if (!prize) continue;
+        
+        for (const winner of winners) {
+          if (winner.email) {
+            try {
+              // Folosește sendPromoWinnerEmail pentru compatibilitate
+              if (typeof window.sendPromoWinnerEmail === 'function') {
+                await window.sendPromoWinnerEmail({
+                  toEmail: winner.email,
+                  name: winner.name,
+                  prize: `${getCategoryLabel(category)}: ${prize}`,
+                  promoTitle: promo.title || 'Promoție',
+                  promoUrl: window.location.href,
+                  score: winner.score || 0,
+                  referrals: winner.referrals || 0
+                });
+                emailsSent++;
+                console.log(`✅ Email retrimis către: ${winner.email}`);
+              } else {
+                console.warn('sendPromoWinnerEmail nu este disponibil');
+                break;
+              }
+            } catch (emailErr) {
+              console.error(`❌ Eroare la retrimiterea email-ului către ${winner.email}:`, emailErr);
+              errors++;
+            }
+          }
+        }
+      }
+      
+      alert(`Email-uri retrimise: ${emailsSent} cu succes, ${errors} erori.`);
+      
+    } catch (error) {
+      console.error('Eroare la retrimiterea email-urilor:', error);
+      alert('Eroare la retrimiterea email-urilor.');
+    }
+  };
+
+  function getCategoryLabel(category) {
+    const labels = {
+      firstPlace: '🏆 Premiul I',
+      secondPlace: '🥈 Premiul II',
+      thirdPlace: '🥉 Premiul III',
+      top5: '🎖️ Primele 5 locuri',
+      next10: '🏅 Următoarele 10 locuri',
+      bonus: '🎁 Bonus participare'
+    };
+    return labels[category] || category;
+  }
+
+  // Funcție pentru export CSV
+  window.exportWinnersToCSV = function() {
+    if (!__isAdmin) return;
+    
+    if (__allWinners.length === 0) {
+      alert('Nu există date de exportat.');
+      return;
+    }
+    
+    let csv = 'Promoție,Email,Nume,Premiu,Scor,Referral-uri,Data\n';
+    
+    __allWinners.forEach(winnerDoc => {
+      const { promoTitle, timestamp, winners } = winnerDoc;
+      const promo = __statsCache.promos.find(p => p.id === winnerDoc.id);
+      const prizes = promo?.prizes || {};
+      
+      const categories = {
+        firstPlace: prizes.p1 || 'Premiul I',
+        secondPlace: prizes.p2 || 'Premiul II',
+        thirdPlace: prizes.p3 || 'Premiul III',
+        top5: prizes.top5 || 'Top 5',
+        next10: prizes.next10 || 'Next 10',
+        bonus: prizes.bonus || 'Bonus'
+      };
+      
+      Object.entries(categories).forEach(([category, prize]) => {
+        if (winners[category]) {
+          winners[category].forEach(winner => {
+            csv += `"${promoTitle}","${winner.email}","${winner.name}","${prize}",${winner.score || 0},${winner.referrals || 0},"${new Date(timestamp).toLocaleString('ro-RO')}"\n`;
+          });
+        }
+      });
+    });
+    
+    // Crează și descarcă fișierul
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `castigatori_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  window.closeWinnerDetails = function() {
+    $('#winnerDetailsModal').style.display = 'none';
+  };
+
   // Funcție nouă pentru afișarea câștigătorilor în ordinea premiilor
   function buildWinnersSection(promo) {
     if (!promo.winners || Object.keys(promo.winners).length === 0) {
@@ -1967,7 +1935,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte (${winner.referrals || 0} referral-uri)</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p1 || '—')}</div>
           </div>
@@ -1988,7 +1956,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte (${winner.referrals || 0} referral-uri)</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p2 || '—')}</div>
           </div>
@@ -2009,7 +1977,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte (${winner.referrals || 0} referral-uri)</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p3 || '—')}</div>
           </div>
@@ -2030,7 +1998,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte (${winner.referrals || 0} referral-uri)</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.top5 || '—')}</div>
           </div>
@@ -2051,7 +2019,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte (${winner.referrals || 0} referral-uri)</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.next10 || '—')}</div>
           </div>
@@ -2072,7 +2040,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte (${winner.referrals || 0} referral-uri)</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.bonus || '—')}</div>
           </div>
@@ -2574,19 +2542,22 @@
       const firstPlace = ranking.slice(0, 1).map(u => ({
         name: u.name,
         email: u.email,
-        score: scoreByCode.get(String(u.code)) || 0
+        score: scoreByCode.get(String(u.code)) || 0,
+        referrals: calculateReferrals(u.email, participants)
       }));
       
       const secondPlace = ranking.slice(1, 2).map(u => ({
         name: u.name,
         email: u.email,
-        score: scoreByCode.get(String(u.code)) || 0
+        score: scoreByCode.get(String(u.code)) || 0,
+        referrals: calculateReferrals(u.email, participants)
       }));
       
       const thirdPlace = ranking.slice(2, 3).map(u => ({
         name: u.name,
         email: u.email,
-        score: scoreByCode.get(String(u.code)) || 0
+        score: scoreByCode.get(String(u.code)) || 0,
+        referrals: calculateReferrals(u.email, participants)
       }));
       
       const remaining = ranking.slice(3);
@@ -2599,7 +2570,8 @@
         top5.push({
           name: u.name,
           email: u.email,
-          score: scoreByCode.get(String(u.code)) || 0
+          score: scoreByCode.get(String(u.code)) || 0,
+          referrals: calculateReferrals(u.email, participants)
         });
       }
       
@@ -2611,7 +2583,8 @@
         next10.push({
           name: u.name,
           email: u.email,
-          score: scoreByCode.get(String(u.code)) || 0
+          score: scoreByCode.get(String(u.code)) || 0,
+          referrals: calculateReferrals(u.email, participants)
         });
       }
       
@@ -2623,7 +2596,8 @@
         bonus.push({
           name: u.name,
           email: u.email,
-          score: scoreByCode.get(String(u.code)) || 0
+          score: scoreByCode.get(String(u.code)) || 0,
+          referrals: calculateReferrals(u.email, participants)
         });
       }
 
@@ -2694,19 +2668,22 @@
       const firstPlace = ranking.slice(0, 1).map(u => ({
         name: u.name,
         email: u.email,
-        score: scoreByCode.get(String(u.code)) || 0
+        score: scoreByCode.get(String(u.code)) || 0,
+        referrals: calculateReferrals(u.email, participants)
       }));
       
       const secondPlace = ranking.slice(1, 2).map(u => ({
         name: u.name,
         email: u.email,
-        score: scoreByCode.get(String(u.code)) || 0
+        score: scoreByCode.get(String(u.code)) || 0,
+        referrals: calculateReferrals(u.email, participants)
       }));
       
       const thirdPlace = ranking.slice(2, 3).map(u => ({
         name: u.name,
         email: u.email,
-        score: scoreByCode.get(String(u.code)) || 0
+        score: scoreByCode.get(String(u.code)) || 0,
+        referrals: calculateReferrals(u.email, participants)
       }));
       
       const remaining = ranking.slice(3);
@@ -2719,7 +2696,8 @@
         top5.push({
           name: u.name,
           email: u.email,
-          score: scoreByCode.get(String(u.code)) || 0
+          score: scoreByCode.get(String(u.code)) || 0,
+          referrals: calculateReferrals(u.email, participants)
         });
       }
       
@@ -2731,7 +2709,8 @@
         next10.push({
           name: u.name,
           email: u.email,
-          score: scoreByCode.get(String(u.code)) || 0
+          score: scoreByCode.get(String(u.code)) || 0,
+          referrals: calculateReferrals(u.email, participants)
         });
       }
       
@@ -2743,7 +2722,8 @@
         bonus.push({
           name: u.name,
           email: u.email,
-          score: scoreByCode.get(String(u.code)) || 0
+          score: scoreByCode.get(String(u.code)) || 0,
+          referrals: calculateReferrals(u.email, participants)
         });
       }
 
@@ -2757,10 +2737,7 @@
         selectedAt: new Date().toISOString()
       };
 
-      // Salvează în colecția separată winners
-      const savedWinners = await saveWinnersToCollection(promoId, winners, participants);
-
-      // Actualizează și în stats pentru compatibilitate
+      // Salvează în stats/visits
       const stats = await readStatsOnce();
       const promos = Array.isArray(stats.promos) ? stats.promos.slice() : [];
       
@@ -2768,7 +2745,10 @@
       if(idx >= 0) {
         promos[idx].winners = winners;
         
-        await writeStats({ promos });
+        await writeStats({ 
+          promos,
+          participants: stats.participants
+        });
         
         if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700;">✅ Câștigătorii au fost salvați!</div>`;
         
@@ -2795,7 +2775,7 @@
 
         // === TRIMITE EMAIL-URI CÂȘTIGĂTORILOR CU PREMIUL SPECIFIC ===
         try {
-          if (typeof window.sendWinnerNotification === 'function') {
+          if (typeof window.sendPromoWinnerEmail === 'function') {
             const prizeMapping = {
               firstPlace: promo.prizes?.p1 || '',
               secondPlace: promo.prizes?.p2 || '',
@@ -2817,12 +2797,12 @@
               for (const winner of winnersArray) {
                 if (winner.email) {
                   try {
-                    await window.sendWinnerNotification({
+                    await window.sendPromoWinnerEmail({
                       toEmail: winner.email,
                       name: winner.name,
-                      prize: prize,
+                      prize: `${getCategoryLabel(category)}: ${prize}`,
                       score: winner.score || 0,
-                      referrals: calculateReferrals(winner.email, participants),
+                      referrals: winner.referrals || 0,
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
                       promoUrl: window.location.href,
                       winnerType: category
@@ -2845,7 +2825,7 @@
               alert(`✅ Câștigătorii salvați și ${emailsSent} email-uri trimise cu succes!`);
             }
           } else {
-            console.warn('⚠️ sendWinnerNotification callable nu este disponibil.');
+            console.warn('⚠️ sendPromoWinnerEmail callable nu este disponibil.');
             alert('✅ Câștigătorii salvați, dar funcția de email nu este disponibilă.');
           }
         } catch(emailError) {
