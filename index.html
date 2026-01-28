@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StancuBYT | Promoții & Concursuri</title>
+  <title>StancuBYT | Promotions & Contests</title>
   <style>
     :root{
       --blue-tech:#0066ff;
@@ -892,7 +892,7 @@
         </div>
         <div>
           <div class="t1">StancuBYT</div>
-          <div class="t2">Promoții & Concursuri</div>
+          <div class="t2">Promotions & Contests</div>
         </div>
       </div>
       <div class="chip">
@@ -902,8 +902,8 @@
     </div>
 
     <div class="hero">
-      <h1>🎁 Promoții & Concursuri</h1>
-      <p class="subtitle">Gestionează și participă la promoții și giveaway-uri cu sistem complet de clasament și premii</p>
+      <h1>🎁 Promotions & Contests</h1>
+      <p class="subtitle">Manage and participate in promotions and giveaways with a complete ranking system and prizes</p>
 
       <div class="actions admin-only" style="justify-content:center; margin-top:14px; display:none;">
         <button class="btn" type="button" onclick="openPromoForm('promo')">➕ Adaugă Promoție</button>
@@ -912,16 +912,16 @@
     </div>
 
     <div class="winners-dashboard admin-only" style="display:none;">
-      <div class="kicker">🏆 Dashboard Câștigători</div>
+      <div class="kicker">🏆 Winners Dashboard</div>
       <div class="winners-controls">
-        <button class="btn" onclick="loadAllWinners()">🔄 Reîncarcă Câștigători</button>
+        <button class="btn" onclick="loadAllWinners()">🔄 Reload Winners</button>
         <button class="btn secondary" onclick="exportWinnersToCSV()">📊 Export CSV</button>
       </div>
       <div id="globalWinnersList"></div>
     </div>
 
     <div class="card">
-      <div class="kicker">📌 Promoții / Giveaway-uri Active</div>
+      <div class="kicker">📌 Active Promotions / Giveaways</div>
       <div id="promoList" class="grid"></div>
 
       <div id="promoForm" class="form admin-only" style="display:none;">
@@ -1031,14 +1031,14 @@
     <div class="admin-login" id="admin-login">
       <h2>🔐 Administrator Login</h2>
       <div class="admin-login-box">
-        <input type="email" id="adminEmail" placeholder="Email administrator" autocomplete="username">
-        <input type="password" id="adminPass" placeholder="Parola administrator" autocomplete="current-password">
-        <button class="btn" type="button" onclick="adminSignIn()">Autentificare</button>
-        <button class="btn secondary" type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Delogare</button>
+        <input type="email" id="adminEmail" placeholder="Admin email" autocomplete="username">
+        <input type="password" id="adminPass" placeholder="Admin password" autocomplete="current-password">
+        <button class="btn" type="button" onclick="adminSignIn()">Login</button>
+        <button class="btn secondary" type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Logout</button>
       </div>
 
       <div class="admin-status-row">
-        <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
+        <span id="adminStatusBadge" class="admin-badge admin-badge-off">Not Authenticated</span>
         <span id="adminUserLabel" class="admin-user-label"></span>
       </div>
 
@@ -1047,7 +1047,7 @@
 
     <div class="footer">
       <div class="footer-inner">
-        <span style="opacity:.8;">© StancuBYT - Toate drepturile rezervate</span>
+        <span style="opacity:.8;">© StancuBYT - All rights reserved</span>
       </div>
     </div>
   </div>
@@ -1055,7 +1055,7 @@
 <div id="winnerDetailsModal" class="winner-details-modal" style="display:none;">
   <div class="winner-details-content">
     <div class="winner-details-header">
-      <h3>🏆 Detalii Câștigător</h3>
+      <h3>🏆 Winner Details</h3>
       <button class="btn secondary" onclick="closeWinnerDetails()">✕</button>
     </div>
     <div id="winnerDetailsContent"></div>
@@ -1108,7 +1108,7 @@
     const label = $('adminUserLabel');
     const logoutBtn = $('adminLogoutBtn');
     if (badge) {
-      badge.textContent = __isAdmin ? 'Autentificat' : 'Neautentificat';
+      badge.textContent = __isAdmin ? 'Authenticated' : 'Not Authenticated';
       badge.className = __isAdmin ? 'admin-badge admin-badge-on' : 'admin-badge admin-badge-off';
     }
     if (label) label.textContent = __isAdmin && user ? user.email : '';
@@ -1133,13 +1133,13 @@
     const a = auth();
     const msg = $('adminLoginMsg');
     if(!a) {
-      if(msg) msg.textContent = 'Firebase Auth nu este disponibil.';
+      if(msg) msg.textContent = 'Firebase Auth is not available.';
       return;
     }
     const email = ($('adminEmail')?.value||'').trim();
     const pass  = ($('adminPass')?.value||'').trim();
     if(!email || !pass) {
-      if(msg) msg.textContent = 'Completează email + parolă.';
+      if(msg) msg.textContent = 'Please enter email and password.';
       return;
     }
     try {
@@ -1147,7 +1147,7 @@
       if(msg) msg.textContent = '';
     } catch(e) {
       console.error('adminSignIn:', e);
-      if(msg) msg.textContent = 'Eroare autentificare. Verifică datele.';
+      if(msg) msg.textContent = 'Authentication error. Please check your credentials.';
     }
   };
 
@@ -1241,7 +1241,7 @@
 
   async function uploadResizedImage(file, storagePath){
     const storage = st();
-    if(!storage) throw new Error('Storage indisponibil');
+    if(!storage) throw new Error('Storage unavailable');
     const ref = storage.ref().child(storagePath);
     const resized = await resizeImageFile(file, { maxW: 1600, maxH: 1600, quality: 0.86 });
     const snap = await ref.put(resized, { contentType: 'image/jpeg' });
@@ -1268,7 +1268,7 @@
 
   window.savePromo = async function savePromo(){
     if(!__isAdmin) {
-      alert('Trebuie să fii logat ca admin.');
+      alert('You must be logged in as admin.');
       return;
     }
 
@@ -1372,10 +1372,10 @@
       await writeStats({ promos, participants });
       __editingPromoId = null;
       cancelPromo();
-      alert('Salvat ✔️');
+      alert('Saved ✔️');
     } catch(e) {
       console.error('savePromo:', e);
-      alert('Eroare la salvare (verifică Auth/Storage).');
+      alert('Error saving (check Auth/Storage).');
     }
   };
 
@@ -1420,8 +1420,8 @@ async function tryDeleteStorageFiles(promo){
   }
 
   window.deletePromo = async function deletePromo(promoId){
-    if(!__isAdmin) return alert('Doar admin poate șterge.');
-    if(!confirm('Sigur vrei să ștergi această promoție/concurs?')) return;
+    if(!__isAdmin) return alert('Only admin can delete.');
+    if(!confirm('Are you sure you want to delete this promotion/contest?')) return;
 
     try {
       const stats = await readStatsOnce();
@@ -1439,7 +1439,7 @@ async function tryDeleteStorageFiles(promo){
       await deletePromoFirestoreDocs(promoId);
 } catch(e) {
       console.error('deletePromo:', e);
-      alert('Eroare la ștergere.');
+      alert('Error deleting.');
     }
   };
 
@@ -1467,19 +1467,19 @@ async function tryDeleteStorageFiles(promo){
 
     const walletKey = String(payload.wallet||'').toLowerCase();
     if(walletKey && arr.some(x => String(x.wallet||'').toLowerCase() === walletKey)) {
-      throw new Error('Acest wallet este deja înscris.');
+      throw new Error('This wallet is already registered.');
     }
 
     const emailKey = String(payload.email||'').toLowerCase();
     if(emailKey && arr.some(x => String(x.email||'').toLowerCase() === emailKey)) {
-      throw new Error('Acest email este deja înscris.');
+      throw new Error('This email is already registered.');
     }
 
     const id = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
     const code = genCode();
     const participant = {
       id,
-      name: payload.name || 'Anonim',
+      name: payload.name || 'Anonymous',
       email: payload.email || '',
       wallet: payload.wallet || '',
       code,
@@ -1496,7 +1496,7 @@ async function tryDeleteStorageFiles(promo){
   function buildParticipantsTable(promoId) {
     const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
     if(!arr.length) {
-      return `<div style="padding:20px;text-align:center;opacity:0.7;">Nu există participanți încă.</div>`;
+      return `<div style="padding:20px;text-align:center;opacity:0.7;">No participants yet.</div>`;
     }
 
     const counts = new Map();
@@ -1518,7 +1518,7 @@ async function tryDeleteStorageFiles(promo){
     const rows = arr.map(u=> {
       const referrals = counts.get(u.id)||0;
       return {
-        name: u.name||'Anonim',
+        name: u.name||'Anonymous',
         email: u.email||'',
         wallet: u.wallet||'',
         code: u.code||'',
@@ -1531,10 +1531,10 @@ async function tryDeleteStorageFiles(promo){
       <thead>
         <tr>
           <th style="padding:8px 6px;">#</th>
-          <th style="padding:8px 6px;">Nume</th>
+          <th style="padding:8px 6px;">Name</th>
           <th style="padding:8px 6px;">Email</th>
-          <th style="padding:8px 6px;">Cod</th>
-          <th style="padding:8px 6px;">Invitări</th>
+          <th style="padding:8px 6px;">Code</th>
+          <th style="padding:8px 6px;">Invites</th>
         </tr>
       </thead>
       <tbody>`;
@@ -1555,7 +1555,7 @@ async function tryDeleteStorageFiles(promo){
     html += `</tbody></table>`;
     
     if (rows.length > 50) {
-      html += `<div style="text-align:center; padding:10px; opacity:0.8;">... și ${rows.length - 50} alți participanți</div>`;
+      html += `<div style="text-align:center; padding:10px; opacity:0.8;">... and ${rows.length - 50} more participants</div>`;
     }
     
     return html;
@@ -1589,7 +1589,7 @@ async function tryDeleteStorageFiles(promo){
         if (promo.winners && Object.keys(promo.winners).length > 0) {
           __allWinners.push({
             id: promo.id,
-            promoTitle: promo.title || 'Necunoscut',
+            promoTitle: promo.title || 'Unknown',
             timestamp: promo.winners.selectedAt || new Date().toISOString(),
             winners: promo.winners
           });
@@ -1598,7 +1598,7 @@ async function tryDeleteStorageFiles(promo){
       
       displayGlobalWinners();
     } catch (error) {
-      console.error('Eroare la încărcarea câștigătorilor:', error);
+      console.error('Error loading winners:', error);
     }
   }
 
@@ -1607,7 +1607,7 @@ async function tryDeleteStorageFiles(promo){
     if (!container) return;
     
     if (__allWinners.length === 0) {
-      container.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.7;">Nu există câștigători înregistrați.</div>';
+      container.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.7;">No winners registered yet.</div>';
       return;
     }
     
@@ -1620,15 +1620,15 @@ async function tryDeleteStorageFiles(promo){
         <div class="card" style="background:rgba(0,0,0,0.3);">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <div style="font-weight:900;font-size:1.1rem;">${esc(promoTitle)}</div>
-            <div class="pill">${new Date(timestamp).toLocaleString('ro-RO')}</div>
+            <div class="pill">${new Date(timestamp).toLocaleString('en-US')}</div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
       `;
       
       const categories = {
-        firstPlace: '🏆 Premiul I',
-        secondPlace: '🥈 Premiul II', 
-        thirdPlace: '🥉 Premiul III',
+        firstPlace: '🏆 First Place',
+        secondPlace: '🥈 Second Place', 
+        thirdPlace: '🥉 Third Place',
         top5: '🎖️ Top 5',
         next10: '🏅 Next 10',
         bonus: '🎁 Bonus'
@@ -1656,8 +1656,8 @@ async function tryDeleteStorageFiles(promo){
       html += `
           </div>
           <div style="margin-top:10px;display:flex;gap:10px;">
-            <button class="btn secondary" onclick="viewWinnerDetails('${id}')">👁️ Vezi Detalii</button>
-            <button class="btn" onclick="resendWinnerEmails('${id}')">📧 Retrimite Email-uri</button>
+            <button class="btn secondary" onclick="viewWinnerDetails('${id}')">👁️ View Details</button>
+            <button class="btn" onclick="resendWinnerEmails('${id}')">📧 Resend Emails</button>
           </div>
         </div>
       `;
@@ -1680,18 +1680,18 @@ async function tryDeleteStorageFiles(promo){
     let html = `
       <div style="margin-bottom:15px;">
         <div style="font-weight:900;font-size:1.2rem;">${esc(winnerDoc.promoTitle)}</div>
-        <div style="opacity:0.8;margin-top:5px;">Selectați la: ${new Date(winnerDoc.timestamp).toLocaleString('ro-RO')}</div>
+        <div style="opacity:0.8;margin-top:5px;">Selected at: ${new Date(winnerDoc.timestamp).toLocaleString('en-US')}</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr;gap:15px;">
     `;
     
     const categories = {
-      firstPlace: { label: '🏆 Premiul I', prize: prizes.p1 || '' },
-      secondPlace: { label: '🥈 Premiul II', prize: prizes.p2 || '' },
-      thirdPlace: { label: '🥉 Premiul III', prize: prizes.p3 || '' },
-      top5: { label: '🎖️ Primele 5 locuri după podium', prize: prizes.top5 || '' },
-      next10: { label: '🏅 Următoarele 10 locuri', prize: prizes.next10 || '' },
-      bonus: { label: '🎁 Bonus participare', prize: prizes.bonus || '' }
+      firstPlace: { label: '🏆 First Place', prize: prizes.p1 || '' },
+      secondPlace: { label: '🥈 Second Place', prize: prizes.p2 || '' },
+      thirdPlace: { label: '🥉 Third Place', prize: prizes.p3 || '' },
+      top5: { label: '🎖️ Top 5 after podium', prize: prizes.top5 || '' },
+      next10: { label: '🏅 Next 10 places', prize: prizes.next10 || '' },
+      bonus: { label: '🎁 Participation bonus', prize: prizes.bonus || '' }
     };
     
     Object.entries(categories).forEach(([category, info]) => {
@@ -1706,11 +1706,11 @@ async function tryDeleteStorageFiles(promo){
                     <div style="font-weight:800;">${esc(winner.name)}</div>
                     <div style="font-size:0.85rem;opacity:0.8;">${esc(winner.email)}</div>
                   </div>
-                  ${winner.score ? `<div class="score-badge">${winner.score} puncte</div>` : '<div class="score-badge">—</div>'}
+                  ${winner.score ? `<div class="score-badge">${winner.score} points</div>` : '<div class="score-badge">—</div>'}
                 </div>
                 <div style="margin-top:5px;display:flex;gap:10px;font-size:0.85rem;">
-                  <span>Referral-uri: ${winner.referrals || 0}</span>
-                  <span>Premiu: ${esc(info.prize)}</span>
+                  <span>Referrals: ${winner.referrals || 0}</span>
+                  <span>Prize: ${esc(info.prize)}</span>
                 </div>
               </div>
             `).join('')}
@@ -1729,28 +1729,28 @@ async function tryDeleteStorageFiles(promo){
     return match ? match[1] + ' SBYT' : 'N/A';
   }
 
-  // FUNCȚIE CRITICĂ REPARATĂ - Trimite email-uri cu premiul corect
+  // CRITICAL FUNCTION FIXED - Send emails with correct prize
   window.resendWinnerEmails = async function(promoId) {
     if (!__isAdmin) {
-      alert('Doar administratorii pot retrimite email-uri.');
+      alert('Only administrators can resend emails.');
       return;
     }
     
     const winnerDoc = __allWinners.find(w => w.id === promoId);
     if (!winnerDoc) return;
     
-    if (!confirm(`Sigur doriți să retrimiteți email-urile pentru ${winnerDoc.promoTitle}?`)) {
+    if (!confirm(`Are you sure you want to resend emails for ${winnerDoc.promoTitle}?`)) {
       return;
     }
     
     try {
       const promo = __statsCache.promos.find(p => p.id === promoId);
       if (!promo) {
-        alert('Promoția nu a fost găsită în cache.');
+        alert('Promotion not found in cache.');
         return;
       }
       
-      // Mapare corectă între categorie și premiu
+      // Correct mapping between category and prize
       const prizeMapping = {
         firstPlace: promo.prizes?.p1 || '',
         secondPlace: promo.prizes?.p2 || '',
@@ -1763,17 +1763,17 @@ async function tryDeleteStorageFiles(promo){
       let emailsSent = 0;
       let errors = 0;
       
-      // Iterează prin fiecare categorie de câștigători
+      // Iterate through each winner category
       for (const [category, winners] of Object.entries(winnerDoc.winners)) {
         if (category === 'selectedAt') continue;
         
         const prize = prizeMapping[category];
         if (!prize) {
-          console.warn(`Nu s-a găsit premiu pentru categoria ${category}`);
+          console.warn(`No prize found for category ${category}`);
           continue;
         }
         
-        // Trimite email fiecărui câștigător din această categorie
+        // Send email to each winner in this category
         for (const winner of winners) {
           if (winner.email) {
             try {
@@ -1782,8 +1782,8 @@ async function tryDeleteStorageFiles(promo){
                   toEmail: winner.email,
                   name: winner.name,
                   prize: `${getCategoryLabel(category)} — ${prize}`,
-                  prizeOnly: prize, // PREMIUL CORECT pentru categoria respectivă
-                  promoTitle: promo.title || 'Promoție',
+                  prizeOnly: prize, // CORRECT PRIZE for respective category
+                  promoTitle: promo.title || 'Promotion',
                   promoUrl: window.location.href,
                   score: winner.score || 0,
                   referrals: winner.referrals || 0,
@@ -1791,35 +1791,35 @@ async function tryDeleteStorageFiles(promo){
                   sbytAmount: calculateSBYTFromPrize(prize)
                 });
                 emailsSent++;
-                console.log(`✅ Email retrimis către: ${winner.email} pentru ${category} - Premiu: ${prize}`);
+                console.log(`✅ Email resent to: ${winner.email} for ${category} - Prize: ${prize}`);
               } else {
-                console.warn('sendPromoWinnerEmail nu este disponibil');
+                console.warn('sendPromoWinnerEmail is not available');
                 break;
               }
             } catch (emailErr) {
-              console.error(`❌ Eroare la retrimiterea email-ului către ${winner.email}:`, emailErr);
+              console.error(`❌ Error resending email to ${winner.email}:`, emailErr);
               errors++;
             }
           }
         }
       }
       
-      alert(`Email-uri retrimise: ${emailsSent} cu succes, ${errors} erori.`);
+      alert(`Emails resent: ${emailsSent} successful, ${errors} errors.`);
       
     } catch (error) {
-      console.error('Eroare la retrimiterea email-urilor:', error);
-      alert('Eroare la retrimiterea email-urilor.');
+      console.error('Error resending emails:', error);
+      alert('Error resending emails.');
     }
   };
 
   function getCategoryLabel(category) {
     const labels = {
-      firstPlace: '🏆 Premiul I',
-      secondPlace: '🥈 Premiul II',
-      thirdPlace: '🥉 Premiul III',
-      top5: '🎖️ Primele 5 locuri',
-      next10: '🏅 Următoarele 10 locuri',
-      bonus: '🎁 Bonus participare'
+      firstPlace: '🏆 First Place',
+      secondPlace: '🥈 Second Place',
+      thirdPlace: '🥉 Third Place',
+      top5: '🎖️ Top 5 places',
+      next10: '🏅 Next 10 places',
+      bonus: '🎁 Participation bonus'
     };
     return labels[category] || category;
   }
@@ -1828,11 +1828,11 @@ async function tryDeleteStorageFiles(promo){
     if (!__isAdmin) return;
     
     if (__allWinners.length === 0) {
-      alert('Nu există date de exportat.');
+      alert('No data to export.');
       return;
     }
     
-    let csv = 'Promoție,Email,Nume,Categorie,Premiu,SBYT Câștigați,Scor,Referral-uri,Data\n';
+    let csv = 'Promotion,Email,Name,Category,Prize,SBYT Won,Score,Referrals,Date\n';
     
     __allWinners.forEach(winnerDoc => {
       const { promoTitle, timestamp, winners } = winnerDoc;
@@ -1840,9 +1840,9 @@ async function tryDeleteStorageFiles(promo){
       const prizes = promo?.prizes || {};
       
       const categories = {
-        firstPlace: { label: 'Premiul I', prize: prizes.p1 || '' },
-        secondPlace: { label: 'Premiul II', prize: prizes.p2 || '' },
-        thirdPlace: { label: 'Premiul III', prize: prizes.p3 || '' },
+        firstPlace: { label: 'First Place', prize: prizes.p1 || '' },
+        secondPlace: { label: 'Second Place', prize: prizes.p2 || '' },
+        thirdPlace: { label: 'Third Place', prize: prizes.p3 || '' },
         top5: { label: 'Top 5', prize: prizes.top5 || '' },
         next10: { label: 'Next 10', prize: prizes.next10 || '' },
         bonus: { label: 'Bonus', prize: prizes.bonus || '' }
@@ -1852,7 +1852,7 @@ async function tryDeleteStorageFiles(promo){
         if (winners[category]) {
           winners[category].forEach(winner => {
             const sbytAmount = calculateSBYTFromPrize(info.prize);
-            csv += `"${promoTitle}","${winner.email}","${winner.name}","${info.label}","${info.prize}","${sbytAmount}",${winner.score || 0},${winner.referrals || 0},"${new Date(timestamp).toLocaleString('ro-RO')}"\n`;
+            csv += `"${promoTitle}","${winner.email}","${winner.name}","${info.label}","${info.prize}","${sbytAmount}",${winner.score || 0},${winner.referrals || 0},"${new Date(timestamp).toLocaleString('en-US')}"\n`;
           });
         }
       });
@@ -1862,7 +1862,7 @@ async function tryDeleteStorageFiles(promo){
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `castigatori_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `winners_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -1875,7 +1875,7 @@ async function tryDeleteStorageFiles(promo){
 
   function buildWinnersSection(promo) {
     if (!promo.winners || Object.keys(promo.winners).length === 0) {
-      return `<div style="padding:20px;text-align:center;opacity:0.7;">Nu există câștigători selectați încă.</div>`;
+      return `<div style="padding:20px;text-align:center;opacity:0.7;">No winners selected yet.</div>`;
     }
 
     const winners = promo.winners;
@@ -1886,7 +1886,7 @@ async function tryDeleteStorageFiles(promo){
     if (winners.firstPlace && winners.firstPlace.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🏆</span> Premiul I: ${esc(promo.prizes?.p1 || '—')}
+          <span class="prize-icon">🏆</span> First Place: ${esc(promo.prizes?.p1 || '—')}
         </div>
       `;
       winners.firstPlace.forEach(winner => {
@@ -1895,7 +1895,7 @@ async function tryDeleteStorageFiles(promo){
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p1 || '—')}</div>
           </div>
@@ -1906,7 +1906,7 @@ async function tryDeleteStorageFiles(promo){
     if (winners.secondPlace && winners.secondPlace.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🥈</span> Premiul II: ${esc(promo.prizes?.p2 || '—')}
+          <span class="prize-icon">🥈</span> Second Place: ${esc(promo.prizes?.p2 || '—')}
         </div>
       `;
       winners.secondPlace.forEach(winner => {
@@ -1915,7 +1915,7 @@ async function tryDeleteStorageFiles(promo){
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p2 || '—')}</div>
           </div>
@@ -1926,7 +1926,7 @@ async function tryDeleteStorageFiles(promo){
     if (winners.thirdPlace && winners.thirdPlace.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🥉</span> Premiul III: ${esc(promo.prizes?.p3 || '—')}
+          <span class="prize-icon">🥉</span> Third Place: ${esc(promo.prizes?.p3 || '—')}
         </div>
       `;
       winners.thirdPlace.forEach(winner => {
@@ -1935,7 +1935,7 @@ async function tryDeleteStorageFiles(promo){
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p3 || '—')}</div>
           </div>
@@ -1946,7 +1946,7 @@ async function tryDeleteStorageFiles(promo){
     if (winners.top5 && winners.top5.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🎖️</span> Primele 5 locuri după podium: ${esc(promo.prizes?.top5 || '—')}
+          <span class="prize-icon">🎖️</span> Top 5 after podium: ${esc(promo.prizes?.top5 || '—')}
         </div>
       `;
       winners.top5.forEach(winner => {
@@ -1955,7 +1955,7 @@ async function tryDeleteStorageFiles(promo){
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.top5 || '—')}</div>
           </div>
@@ -1966,7 +1966,7 @@ async function tryDeleteStorageFiles(promo){
     if (winners.next10 && winners.next10.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🏅</span> Următoarele 10 locuri: ${esc(promo.prizes?.next10 || '—')}
+          <span class="prize-icon">🏅</span> Next 10 places: ${esc(promo.prizes?.next10 || '—')}
         </div>
       `;
       winners.next10.forEach(winner => {
@@ -1975,7 +1975,7 @@ async function tryDeleteStorageFiles(promo){
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.next10 || '—')}</div>
           </div>
@@ -1986,7 +1986,7 @@ async function tryDeleteStorageFiles(promo){
     if (winners.bonus && winners.bonus.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🎁</span> Bonus participare / surpriză random: ${esc(promo.prizes?.bonus || '—')}
+          <span class="prize-icon">🎁</span> Participation bonus / random surprise: ${esc(promo.prizes?.bonus || '—')}
         </div>
       `;
       winners.bonus.forEach(winner => {
@@ -1995,7 +1995,7 @@ async function tryDeleteStorageFiles(promo){
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.bonus || '—')}</div>
           </div>
@@ -2042,7 +2042,7 @@ async function tryDeleteStorageFiles(promo){
   function formatEndsLocal(ends){
     const ms = parseEndsMs(ends);
     if(!Number.isFinite(ms)) return "—";
-    return new Date(ms).toLocaleString("ro-RO");
+    return new Date(ms).toLocaleString("en-US");
   }
 
   function renderPromos(){
@@ -2052,7 +2052,7 @@ async function tryDeleteStorageFiles(promo){
     list.innerHTML = '';
 
     if(!promos.length){
-      list.innerHTML = `<div style="opacity:.85; padding:10px;">Nu există promoții/concursuri încă.</div>`;
+      list.innerHTML = `<div style="opacity:.85; padding:10px;">No promotions/contests yet.</div>`;
       return;
     }
 
@@ -2079,8 +2079,8 @@ async function tryDeleteStorageFiles(promo){
         <div class="promo-media" style="${mediaUrl ? `background-image:url('${esc(mediaUrl)}')` : ''}">
 
           <div class="admin-actions admin-only">
-            <button class="btn secondary" type="button" onclick="editPromo('${esc(p.id)}')">✏️ Editează</button>
-            <button class="btn" type="button" onclick="deletePromo('${esc(p.id)}')">🗑️ Șterge</button>
+            <button class="btn secondary" type="button" onclick="editPromo('${esc(p.id)}')">✏️ Edit</button>
+            <button class="btn" type="button" onclick="deletePromo('${esc(p.id)}')">🗑️ Delete</button>
           </div>
 
           ${overlayText ? `
@@ -2091,9 +2091,9 @@ async function tryDeleteStorageFiles(promo){
 
         <div class="promo-body">
           <div class="promo-meta">
-            <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
-            <span class="pill">⏳ ${ isExpired ? (p.kind==='giveaway' ? 'Giveaway încheiat' : 'Promoție încheiată') : formatEndsLocal(p.ends) }</span>
-            <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
+            <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promotion'}</span>
+            <span class="pill">⏳ ${ isExpired ? (p.kind==='giveaway' ? 'Giveaway ended' : 'Promotion ended') : formatEndsLocal(p.ends) }</span>
+            <span class="pill">⭐ +${Number(p.points||10)} points</span>
           </div>
 
           <div style="font-weight:800; font-size:1.05rem;">${esc(p.title||'')}</div>
@@ -2104,18 +2104,18 @@ async function tryDeleteStorageFiles(promo){
           <div class="divider"></div>
 
           <div style="margin-top:14px;">
-            <div style="font-weight:900; margin-bottom:10px;">🏆 Premii</div>
+            <div style="font-weight:900; margin-bottom:10px;">🏆 Prizes</div>
             <div style="display:flex; flex-direction:column; gap:10px;">
-              <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
-              <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
-              <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
-              <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
-              <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
-              <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
+              <div class="prize-item prize-gold">🏆 <b>First Place:</b> ${esc(p.prizes?.p1 || '—')}</div>
+              <div class="prize-item prize-silver">🥈 <b>Second Place:</b> ${esc(p.prizes?.p2 || '—')}</div>
+              <div class="prize-item prize-bronze">🥉 <b>Third Place:</b> ${esc(p.prizes?.p3 || '—')}</div>
+              <div class="prize-item prize-tierA">🎖️ <b>Top 5 after podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
+              <div class="prize-item prize-tierB">🏅 <b>Next 10 places:</b> ${esc(p.prizes?.next10 || '—')}</div>
+              <div class="prize-item prize-tierC">🎁 <b>Participation bonus / random surprise:</b> ${esc(p.prizes?.bonus || '—')}</div>
             </div>
 
             <div class="divider"></div>
-            <div class="kicker">📜 Reguli</div>
+            <div class="kicker">📜 Rules</div>
             <div style="display:flex; flex-direction:column; gap:8px;">
               <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>1.</b> ${esc((p.rulesObj&&p.rulesObj.r1)||'—')}</div>
               <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>2.</b> ${esc((p.rulesObj&&p.rulesObj.r2)||'—')}</div>
@@ -2126,22 +2126,22 @@ async function tryDeleteStorageFiles(promo){
             </div>
 
             <div class="divider"></div>
-            <div class="kicker">✅ Înscriere</div>
+            <div class="kicker">✅ Registration</div>
             <div class="join-row">
-              <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80">
+              <input id="name_${esc(p.id)}" type="text" placeholder="Name" maxlength="80">
               <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120">
             </div>
             <div class="join-row">
               <input id="wallet_${esc(p.id)}" type="text" placeholder="Wallet (0x...)" maxlength="80">
-              <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
+              <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (optional)" maxlength="40">
             </div>
             <div class="join-row one">
-              <button class="btn" type="button" ${ isExpired ? 'disabled title="Înscrieri închise"' : '' } onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-te</button>
+              <button class="btn" type="button" ${ isExpired ? 'disabled title="Registrations closed"' : '' } onclick="joinPromo('${esc(p.id)}')">✅ Register</button>
             </div>
             
-            <!-- Banner status promoție -->
+            <!-- Promotion status banner -->
             <div class="promo-status-banner ${isExpired ? 'finalized' : 'in-progress'}">
-              ${isExpired ? '🎉 FINALIZAT' : '🚀 ÎN CURS'}
+              ${isExpired ? '🎉 FINALIZED' : '🚀 IN PROGRESS'}
             </div>
           </div>
         </div>
@@ -2156,14 +2156,14 @@ async function tryDeleteStorageFiles(promo){
       lbOut.innerHTML = `
         <div class="leaderboard-split-container">
           <div class="leaderboard-section">
-            <div class="leaderboard-section-title">👥 Participanți</div>
+            <div class="leaderboard-section-title">👥 Participants</div>
             <div class="leaderboard-scrollable" id="lb_participants_${esc(p.id)}">
               ${buildParticipantsTable(p.id)}
             </div>
           </div>
           
           <div class="leaderboard-section">
-            <div class="leaderboard-section-title">🏆 Câștigători</div>
+            <div class="leaderboard-section-title">🏆 Winners</div>
             <div class="leaderboard-scrollable rainbow-card" id="lb_winners_${esc(p.id)}">
               ${buildWinnersSection(p)}
             </div>
@@ -2172,9 +2172,9 @@ async function tryDeleteStorageFiles(promo){
         
         ${__isAdmin && isExpired && !p.winners ? `
           <div style="margin-top:15px; padding:12px; border-radius:12px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1);">
-            <div style="font-weight:700; margin-bottom:8px;">🎯 Selectare Câștigători</div>
-            <div style="opacity:0.8; font-size:0.9rem; margin-bottom:10px;">Promoția s-a încheiat. Poți selecta câștigătorii acum.</div>
-            <button class="btn" type="button" onclick="selectWinners('${esc(p.id)}')">🎲 Selectează Câștigători</button>
+            <div style="font-weight:700; margin-bottom:8px;">🎯 Select Winners</div>
+            <div style="opacity:0.8; font-size:0.9rem; margin-bottom:10px;">Promotion has ended. You can select winners now.</div>
+            <button class="btn" type="button" onclick="selectWinners('${esc(p.id)}')">🎲 Select Winners</button>
             <div id="winners_preview_${esc(p.id)}" style="margin-top:10px;"></div>
           </div>
         ` : ''}
@@ -2197,7 +2197,7 @@ async function tryDeleteStorageFiles(promo){
       if(promo && promo.ends){
         const endsMs = new Date(promo.ends).getTime();
         if(Number.isFinite(endsMs) && Date.now() >= endsMs){
-          return alert(promo.kind==='giveaway' ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
+          return alert(promo.kind==='giveaway' ? 'Giveaway ended. Registrations are closed.' : 'Promotion ended. Registrations are closed.');
         }
       }
     }catch(e){}
@@ -2207,8 +2207,8 @@ async function tryDeleteStorageFiles(promo){
     const wallet = ($(`wallet_${promoId}`)?.value || '').trim();
     const referral = ($(`ref_${promoId}`)?.value || '').trim();
 
-    if(!name) return alert('Completează numele.');
-    if(!email) return alert('Completează email.');
+    if(!name) return alert('Please enter your name.');
+    if(!email) return alert('Please enter your email.');
 
     try {
       const u = await addParticipant(promoId, { name, email, wallet, referral });
@@ -2217,7 +2217,7 @@ async function tryDeleteStorageFiles(promo){
       $(`wallet_${promoId}`).value = '';
       $(`ref_${promoId}`).value = '';
 
-      alert(`Înscriere reușită!\nCodul tău: ${u.code}`);
+      alert(`Registration successful!\nYour code: ${u.code}`);
       
       const participantsDiv = document.getElementById(`lb_participants_${promoId}`);
       if (participantsDiv) {
@@ -2231,21 +2231,21 @@ async function tryDeleteStorageFiles(promo){
             toEmail: email,
             name: name,
             referralCode: u.code,
-            promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+            promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promotion'),
             promoEndsAt: promo.ends || null,
             promoUrl: window.location.href
           });
-          console.log('Email de înscriere trimis către:', email);
+          console.log('Registration email sent to:', email);
         } else {
-          console.warn('sendPromoSignupEmail callable nu este disponibil.');
+          console.warn('sendPromoSignupEmail callable is not available.');
         }
       } catch (mailErr) {
-        console.warn('Eroare la trimiterea email-ului de înscriere:', mailErr);
+        console.warn('Error sending registration email:', mailErr);
       }
       
     } catch(e) {
       console.error('joinPromo:', e);
-      alert(e?.message || 'Eroare la înscriere.');
+      alert(e?.message || 'Registration error.');
     }
   };
 
@@ -2346,23 +2346,23 @@ async function tryDeleteStorageFiles(promo){
   async function getPromoDataFromFirestore(promoId){
     try {
       const db = fs();
-      if(!db) throw new Error("Firestore nu este disponibil");
+      if(!db) throw new Error("Firestore not available");
       
       const statsDoc = await db.collection('stats').doc('visits').get();
-      if(!statsDoc.exists) throw new Error("Documentul stats/visits nu există");
+      if(!statsDoc.exists) throw new Error("stats/visits document does not exist");
       
       const data = statsDoc.data();
       const promos = Array.isArray(data?.promos) ? data.promos : [];
       const participants = (data?.participants && typeof data.participants === 'object') ? data.participants : {};
       
       const promo = promos.find(p => String(p.id) === String(promoId));
-      if(!promo) throw new Error("Promoția nu a fost găsită");
+      if(!promo) throw new Error("Promotion not found");
       
       const promoParticipants = Array.isArray(participants[String(promoId)]) ? participants[String(promoId)] : [];
       
       return { promo, participants: promoParticipants };
     } catch(error) {
-      console.error("Eroare la citirea din Firestore:", error);
+      console.error("Error reading from Firestore:", error);
       throw error;
     }
   }
@@ -2431,18 +2431,18 @@ async function tryDeleteStorageFiles(promo){
 
   window.selectWinners = async function selectWinners(promoId){
     if(!__isAdminNow()) { 
-      alert('Trebuie să fii logat ca admin.');
+      alert('You must be logged in as admin.');
       return;
     }
 
     try{
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(!box) {
-        alert("Containerul pentru preview nu a fost găsit.");
+        alert("Preview container not found.");
         return;
       }
       
-      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Se calculează câștigătorii...</div>`;
+      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Calculating winners...</div>`;
       
       let promo, participants;
       
@@ -2458,19 +2458,19 @@ async function tryDeleteStorageFiles(promo){
         window.__statsCache.participants[String(promoId)] = participants;
         
       } catch(firestoreError) {
-        console.warn("Nu s-au putut obține datele din Firestore, folosim cache:", firestoreError);
+        console.warn("Could not get data from Firestore, using cache:", firestoreError);
         
         promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
         participants = Array.isArray(window.__statsCache.participants?.[String(promoId)]) ? window.__statsCache.participants[String(promoId)] : [];
       }
       
       if(!promo) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promoția nu a fost găsită. Încarcă din nou pagina.</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promotion not found. Please reload the page.</div>`;
         return;
       }
       
       if(!participants || participants.length === 0) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 Nu există participanți încă.</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 No participants yet.</div>`;
         return;
       }
 
@@ -2564,13 +2564,13 @@ async function tryDeleteStorageFiles(promo){
 
       box.innerHTML = `
         <div style="margin-bottom:15px;">
-          <div style="font-weight:900; margin-bottom:10px;">🎯 Câștigători selectați</div>
-          <div style="opacity:0.8; font-size:0.9rem;">Acești câștigători au fost selectați automat. Apasă "Salvează" pentru a finaliza.</div>
+          <div style="font-weight:900; margin-bottom:10px;">🎯 Selected Winners</div>
+          <div style="opacity:0.8; font-size:0.9rem;">These winners have been automatically selected. Click "Save" to finalize.</div>
         </div>
         ${buildWinnersSection({ ...promo, winners })}
         <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn" onclick="saveWinners('${esc(promoId)}')">💾 Salvează Câștigători</button>
-          <button class="btn secondary" onclick="this.parentElement.parentElement.innerHTML=''">❌ Anulează</button>
+          <button class="btn" onclick="saveWinners('${esc(promoId)}')">💾 Save Winners</button>
+          <button class="btn secondary" onclick="this.parentElement.parentElement.innerHTML=''">❌ Cancel</button>
         </div>
         <div id="save_winners_msg_${esc(promoId)}" style="margin-top:10px;"></div>
       `;
@@ -2578,23 +2578,23 @@ async function tryDeleteStorageFiles(promo){
       box.scrollIntoView({ behavior:"smooth", block:"nearest" });
       
     }catch(e){
-      console.error("Eroare la selectarea câștigătorilor:", e);
+      console.error("Error selecting winners:", e);
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(box) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Error: ${esc(e?.message || "Unknown")}</div>`;
       }
     }
   };
 
-  // FUNCȚIE CRITICĂ REPARATĂ - Salvează câștigătorii și trimite email-uri cu premiile corecte
+  // CRITICAL FUNCTION FIXED - Save winners and send emails with correct prizes
   window.saveWinners = async function saveWinners(promoId){
     if(!__isAdminNow()) { 
-      alert('Trebuie să fii logat ca admin.');
+      alert('You must be logged in as admin.');
       return;
     }
 
     const msgBox = document.getElementById(`save_winners_msg_${promoId}`);
-    if(msgBox) msgBox.innerHTML = `<div style="opacity:0.8;">⏳ Se salvează câștigătorii...</div>`;
+    if(msgBox) msgBox.innerHTML = `<div style="opacity:0.8;">⏳ Saving winners...</div>`;
 
     try {
       const data = await getPromoDataFromFirestore(promoId);
@@ -2701,7 +2701,7 @@ async function tryDeleteStorageFiles(promo){
           participants: stats.participants
         });
         
-        if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700;">✅ Câștigătorii au fost salvați!</div>`;
+        if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700;">✅ Winners have been saved!</div>`;
         
         await loadAllWinners();
         
@@ -2721,11 +2721,11 @@ async function tryDeleteStorageFiles(promo){
           }
         }, 1500);
 
-        // ========== PARTEA CRITICĂ REPARATĂ ==========
-        // Trimite email-uri cu premiile corecte pentru fiecare categorie
+        // ========== CRITICAL PART FIXED ==========
+        // Send emails with correct prizes for each category
         try {
           if (typeof window.sendPromoWinnerEmail === 'function') {
-            // Mapare corectă între categorie și premiu
+            // Correct mapping between category and prize
             const prizeMapping = {
               firstPlace: promo.prizes?.p1 || '',
               secondPlace: promo.prizes?.p2 || '',
@@ -2738,17 +2738,17 @@ async function tryDeleteStorageFiles(promo){
             let emailsSent = 0;
             let errors = 0;
 
-            // Iterează prin fiecare categorie de câștigători
+            // Iterate through each winner category
             for (const [category, winnersArray] of Object.entries(winners)) {
               if (category === 'selectedAt') continue;
               
               const prize = prizeMapping[category];
               if (!prize) {
-                console.warn(`Nu s-a găsit premiu pentru categoria ${category}`);
+                console.warn(`No prize found for category ${category}`);
                 continue;
               }
               
-              // Trimite email fiecărui câștigător din această categorie
+              // Send email to each winner in this category
               for (const winner of winnersArray) {
                 if (winner.email) {
                   try {
@@ -2756,47 +2756,47 @@ async function tryDeleteStorageFiles(promo){
                       toEmail: winner.email,
                       name: winner.name,
                       prize: `${getCategoryLabel(category)} — ${prize}`,
-                  prizeOnly: prize, // PREMIUL CORECT pentru categoria respectivă
+                      prizeOnly: prize, // CORRECT PRIZE for respective category
                       score: winner.score || 0,
                       referrals: winner.referrals || 0,
-                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promotion'),
                       promoUrl: window.location.href,
                       category: getCategoryLabel(category),
                       sbytAmount: calculateSBYTFromPrize(prize)
                     });
                     emailsSent++;
-                    console.log(`✅ Email trimis către: ${winner.email} pentru ${category} - Premiu: ${prize}`);
+                    console.log(`✅ Email sent to: ${winner.email} for ${category} - Prize: ${prize}`);
                   } catch(emailErr) {
-                    console.error(`❌ Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
+                    console.error(`❌ Error sending email to ${winner.email}:`, emailErr);
                     errors++;
                   }
                 }
               }
             }
 
-            console.log(`📧 Total email-uri trimise: ${emailsSent}, erori: ${errors}`);
+            console.log(`📧 Total emails sent: ${emailsSent}, errors: ${errors}`);
             
             if (errors > 0) {
-              alert(`Câștigătorii au fost salvați, dar ${errors} email-uri nu au putut fi trimise.`);
+              alert(`Winners have been saved, but ${errors} emails could not be sent.`);
             } else {
-              alert(`✅ Câștigătorii salvați și ${emailsSent} email-uri trimise cu succes!`);
+              alert(`✅ Winners saved and ${emailsSent} emails sent successfully!`);
             }
           } else {
-            console.warn('⚠️ sendPromoWinnerEmail callable nu este disponibil.');
-            alert('✅ Câștigătorii salvați, dar funcția de email nu este disponibilă.');
+            console.warn('⚠️ sendPromoWinnerEmail callable is not available.');
+            alert('✅ Winners saved, but email function is not available.');
           }
         } catch(emailError) {
-          console.warn('❌ Eroare generală la trimiterea email-urilor:', emailError);
-          alert('✅ Câștigătorii salvați, dar a apărut o eroare la trimiterea email-urilor.');
+          console.warn('❌ General error sending emails:', emailError);
+          alert('✅ Winners saved, but an error occurred while sending emails.');
         }
-        // ========== FINAL PARTEA CRITICĂ ==========
+        // ========== END CRITICAL PART ==========
         
       } else {
-        if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Promoția nu a fost găsită.</div>`;
+        if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Promotion not found.</div>`;
       }
     } catch(e) {
-      console.error("❌ Eroare la salvarea câștigătorilor:", e);
-      if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
+      console.error("❌ Error saving winners:", e);
+      if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Error: ${esc(e?.message || "Unknown")}</div>`;
     }
   };
 
