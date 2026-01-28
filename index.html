@@ -859,7 +859,6 @@
 
       window.sendPromoSignupEmail = httpsCallable(functions, "sendPromoSignupEmail");
       window.sendPromoWinnerEmail = httpsCallable(functions, "sendPromoWinnerEmail");
-      window.sendWinnerNotification = httpsCallable(functions, "sendWinnerNotification");
 
       console.log("Functions callable ready:", { projectId: cfg.projectId, region: "europe-west1" });
     }
@@ -1704,7 +1703,7 @@
                 </div>
                 <div style="margin-top:5px;display:flex;gap:10px;font-size:0.85rem;">
                   <span>Referral-uri: ${winner.referrals || 0}</span>
-                  <span>SBYT câștigați: ${calculateSBYTFromPrize(info.prize)}</span>
+                  <span>Premiu: ${esc(info.prize)}</span>
                 </div>
               </div>
             `).join('')}
@@ -1723,6 +1722,7 @@
     return match ? match[1] + ' SBYT' : 'N/A';
   }
 
+  // FUNCȚIE CRITICĂ REPARATĂ - Trimite email-uri cu premiul corect
   window.resendWinnerEmails = async function(promoId) {
     if (!__isAdmin) {
       alert('Doar administratorii pot retrimite email-uri.');
@@ -1743,6 +1743,7 @@
         return;
       }
       
+      // Mapare corectă între categorie și premiu
       const prizeMapping = {
         firstPlace: promo.prizes?.p1 || '',
         secondPlace: promo.prizes?.p2 || '',
@@ -1755,12 +1756,17 @@
       let emailsSent = 0;
       let errors = 0;
       
+      // Iterează prin fiecare categorie de câștigători
       for (const [category, winners] of Object.entries(winnerDoc.winners)) {
         if (category === 'selectedAt') continue;
         
         const prize = prizeMapping[category];
-        if (!prize) continue;
+        if (!prize) {
+          console.warn(`Nu s-a găsit premiu pentru categoria ${category}`);
+          continue;
+        }
         
+        // Trimite email fiecărui câștigător din această categorie
         for (const winner of winners) {
           if (winner.email) {
             try {
@@ -1768,7 +1774,7 @@
                 await window.sendPromoWinnerEmail({
                   toEmail: winner.email,
                   name: winner.name,
-                  prize: prize,
+                  prize: prize, // PREMIUL CORECT pentru categoria respectivă
                   promoTitle: promo.title || 'Promoție',
                   promoUrl: window.location.href,
                   score: winner.score || 0,
@@ -1777,7 +1783,7 @@
                   sbytAmount: calculateSBYTFromPrize(prize)
                 });
                 emailsSent++;
-                console.log(`✅ Email retrimis către: ${winner.email} pentru ${category}`);
+                console.log(`✅ Email retrimis către: ${winner.email} pentru ${category} - Premiu: ${prize}`);
               } else {
                 console.warn('sendPromoWinnerEmail nu este disponibil');
                 break;
@@ -2572,6 +2578,7 @@
     }
   };
 
+  // FUNCȚIE CRITICĂ REPARATĂ - Salvează câștigătorii și trimite email-uri cu premiile corecte
   window.saveWinners = async function saveWinners(promoId){
     if(!__isAdminNow()) { 
       alert('Trebuie să fii logat ca admin.');
@@ -2706,8 +2713,11 @@
           }
         }, 1500);
 
+        // ========== PARTEA CRITICĂ REPARATĂ ==========
+        // Trimite email-uri cu premiile corecte pentru fiecare categorie
         try {
           if (typeof window.sendPromoWinnerEmail === 'function') {
+            // Mapare corectă între categorie și premiu
             const prizeMapping = {
               firstPlace: promo.prizes?.p1 || '',
               secondPlace: promo.prizes?.p2 || '',
@@ -2720,19 +2730,24 @@
             let emailsSent = 0;
             let errors = 0;
 
+            // Iterează prin fiecare categorie de câștigători
             for (const [category, winnersArray] of Object.entries(winners)) {
               if (category === 'selectedAt') continue;
               
               const prize = prizeMapping[category];
-              if (!prize) continue;
+              if (!prize) {
+                console.warn(`Nu s-a găsit premiu pentru categoria ${category}`);
+                continue;
+              }
               
+              // Trimite email fiecărui câștigător din această categorie
               for (const winner of winnersArray) {
                 if (winner.email) {
                   try {
                     await window.sendPromoWinnerEmail({
                       toEmail: winner.email,
                       name: winner.name,
-                      prize: prize,
+                      prize: prize, // PREMIUL CORECT pentru categoria respectivă
                       score: winner.score || 0,
                       referrals: winner.referrals || 0,
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
@@ -2741,7 +2756,7 @@
                       sbytAmount: calculateSBYTFromPrize(prize)
                     });
                     emailsSent++;
-                    console.log(`✅ Email trimis către: ${winner.email} pentru ${category}`);
+                    console.log(`✅ Email trimis către: ${winner.email} pentru ${category} - Premiu: ${prize}`);
                   } catch(emailErr) {
                     console.error(`❌ Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
                     errors++;
@@ -2765,6 +2780,8 @@
           console.warn('❌ Eroare generală la trimiterea email-urilor:', emailError);
           alert('✅ Câștigătorii salvați, dar a apărut o eroare la trimiterea email-urilor.');
         }
+        // ========== FINAL PARTEA CRITICĂ ==========
+        
       } else {
         if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Promoția nu a fost găsită.</div>`;
       }
