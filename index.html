@@ -1761,7 +1761,8 @@
                 await window.sendPromoWinnerEmail({
                   toEmail: winner.email,
                   name: winner.name,
-                  prize: prize, // PREMIUL CORECT pentru categoria respectivă
+                  prize: `${getCategoryLabel(category)} — ${prize}`,
+                      prizeRaw: prize, // PREMIUL CORECT pentru categoria respectivă
                   promoTitle: promo.title || 'Promoție',
                   promoUrl: window.location.href,
                   score: winner.score || 0,
@@ -2734,7 +2735,8 @@
                     await window.sendPromoWinnerEmail({
                       toEmail: winner.email,
                       name: winner.name,
-                      prize: prize, // PREMIUL CORECT pentru categoria respectivă
+                      prize: `${getCategoryLabel(category)} — ${prize}`,
+                      prizeRaw: prize, // PREMIUL CORECT pentru categoria respectivă
                       score: winner.score || 0,
                       referrals: winner.referrals || 0,
                       promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
