@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StancuBYT | Promotions & Contests</title>
+  <title>StancuBYT | Promoții & Concursuri</title>
   <style>
     :root{
       --blue-tech:#0066ff;
@@ -892,7 +892,7 @@
         </div>
         <div>
           <div class="t1">StancuBYT</div>
-          <div class="t2">Promotions & Contests</div>
+          <div class="t2">Promoții & Concursuri</div>
         </div>
       </div>
       <div class="chip">
@@ -902,128 +902,128 @@
     </div>
 
     <div class="hero">
-      <h1>🎁 Promotions & Contests</h1>
-      <p class="subtitle">Manage and participate in promotions and giveaways with complete ranking and prize system</p>
+      <h1>🎁 Promoții & Concursuri</h1>
+      <p class="subtitle">Gestionează și participă la promoții și giveaway-uri cu sistem complet de clasament și premii</p>
 
       <div class="actions admin-only" style="justify-content:center; margin-top:14px; display:none;">
-        <button class="btn" type="button" onclick="openPromoForm('promo')">➕ Add Promotion</button>
-        <button class="btn secondary" type="button" onclick="openPromoForm('giveaway')">🏆 Add Contest</button>
+        <button class="btn" type="button" onclick="openPromoForm('promo')">➕ Adaugă Promoție</button>
+        <button class="btn secondary" type="button" onclick="openPromoForm('giveaway')">🏆 Adaugă Concurs</button>
       </div>
     </div>
 
     <div class="winners-dashboard admin-only" style="display:none;">
-      <div class="kicker">🏆 Winners Dashboard</div>
+      <div class="kicker">🏆 Dashboard Câștigători</div>
       <div class="winners-controls">
-        <button class="btn" onclick="loadAllWinners()">🔄 Reload Winners</button>
+        <button class="btn" onclick="loadAllWinners()">🔄 Reîncarcă Câștigători</button>
         <button class="btn secondary" onclick="exportWinnersToCSV()">📊 Export CSV</button>
       </div>
       <div id="globalWinnersList"></div>
     </div>
 
     <div class="card">
-      <div class="kicker">📌 Active Promotions / Giveaways</div>
+      <div class="kicker">📌 Promoții / Giveaway-uri Active</div>
       <div id="promoList" class="grid"></div>
 
       <div id="promoForm" class="form admin-only" style="display:none;">
-        <div class="kicker">✨ Create promotion / contest</div>
+        <div class="kicker">✨ Creează promoție / concurs</div>
 
         <div class="row">
           <div>
-            <label>Type</label>
+            <label>Tip</label>
             <select id="promoKind">
-              <option value="promo">📣 Promotion</option>
-              <option value="giveaway">🎁 Contest / Giveaway</option>
+              <option value="promo">📣 Promoție</option>
+              <option value="giveaway">🎁 Concurs / Giveaway</option>
             </select>
           </div>
           <div>
-            <label>Expiration date & time</label>
+            <label>Data & ora expirării</label>
             <input id="promoEnds" type="datetime-local">
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label>Title</label>
-            <input id="promoTitle" type="text" maxlength="120" placeholder="Ex: SBYT Giveaway — 7 days + tiered prizes">
+            <label>Titlu</label>
+            <input id="promoTitle" type="text" maxlength="120" placeholder="Ex: Giveaway SBYT — 7 zile + premii pe niveluri">
           </div>
           <div>
-            <label>Points per action (gamification)</label>
+            <label>Puncte / acțiune (gamification)</label>
             <input id="promoPoints" type="number" min="1" step="1" value="10" placeholder="Ex: 10">
           </div>
         </div>
 
         <div class="row one">
           <div>
-            <label>Hook (1-2 sentences, short impactful message)</label>
-            <textarea id="promoHook" rows="2" placeholder="Ex: Enter TOP 5 and win bonuses! Each share = +10 points."></textarea>
+            <label>Hook (1–2 fraze, mesaj scurt de impact)</label>
+            <textarea id="promoHook" rows="2" placeholder="Ex: Intră în TOP 5 și câștigă bonusuri! Fiecare share = +10 puncte."></textarea>
           </div>
         </div>
 
         <div class="row one">
           <div>
-            <label>Description (benefits + how it works)</label>
-            <textarea id="promoDesc" placeholder="Ex: Participate, collect points and enter the ranking. At the end, top positions win prizes, and active participants receive bonuses."></textarea>
+            <label>Descriere (beneficiu + cum funcționează)</label>
+            <textarea id="promoDesc" placeholder="Ex: Participă, strânge puncte și intră în clasament. La final, primele locuri primesc premii, iar participanții activi primesc bonusuri."></textarea>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <div class="kicker">🎨 Visual (banner + background images)</div>
+        <div class="kicker">🎨 Vizual (banner + imagini de fundal)</div>
         <div class="row">
           <div>
-            <label>Banner (recommended)</label>
+            <label>Banner (recomandat)</label>
             <input id="promoBanner" type="file" accept="image/*">
           </div>
           <div>
-            <label>Background images (max 3 recommended)</label>
+            <label>Imagini fundal (max 3 recomandat)</label>
             <input id="promoBg" type="file" accept="image/*" multiple>
           </div>
         </div>
-        <small class="help">Save to Firestore: <b>stats/visits</b> (fields <b>promos</b> + <b>participants</b>). Upload images to Storage: <b>/news/**</b>.</small>
+        <small class="help">Salvează în Firestore: <b>stats/visits</b> (câmpuri <b>promos</b> + <b>participants</b>). Upload imagini în Storage: <b>/news/**</b>.</small>
 
         <div class="divider"></div>
 
-        <div class="kicker">🏆 Prizes (attractive distribution)</div>
+        <div class="kicker">🏆 Premii (distribuție atractivă)</div>
         <div class="row">
-          <div><label>1st Prize</label><input id="prize1" type="text" maxlength="180" placeholder="Ex: 10,000 SBYT + VIP role"></div>
-          <div><label>2nd Prize</label><input id="prize2" type="text" maxlength="180" placeholder="Ex: 5,000 SBYT"></div>
+          <div><label>Premiul I</label><input id="prize1" type="text" maxlength="180" placeholder="Ex: 10.000 SBYT + rol VIP"></div>
+          <div><label>Premiul II</label><input id="prize2" type="text" maxlength="180" placeholder="Ex: 5.000 SBYT"></div>
         </div>
         <div class="row">
-          <div><label>3rd Prize</label><input id="prize3" type="text" maxlength="180" placeholder="Ex: 2,500 SBYT"></div>
-          <div><label>Top 5 places (after podium)</label><input id="prizeTop5" type="text" maxlength="180" placeholder="Ex: 500 SBYT each"></div>
+          <div><label>Premiul III</label><input id="prize3" type="text" maxlength="180" placeholder="Ex: 2.500 SBYT"></div>
+          <div><label>Primele 5 locuri (după podium)</label><input id="prizeTop5" type="text" maxlength="180" placeholder="Ex: 500 SBYT fiecare"></div>
         </div>
         <div class="row">
-          <div><label>Next 10 places</label><input id="prizeNext10" type="text" maxlength="180" placeholder="Ex: 200 SBYT each"></div>
-          <div><label>Participation bonus / surprise</label><input id="prizeBonus" type="text" maxlength="180" placeholder="Ex: 50 SBYT for those with min. 3 actions"></div>
+          <div><label>Următoarele 10 locuri</label><input id="prizeNext10" type="text" maxlength="180" placeholder="Ex: 200 SBYT fiecare"></div>
+          <div><label>Bonus participare / surpriză</label><input id="prizeBonus" type="text" maxlength="180" placeholder="Ex: 50 SBYT pentru cei cu min. 3 acțiuni"></div>
         </div>
 
         <div class="divider"></div>
 
-        <div class="kicker">📜 Rules & conditions</div>
+        <div class="kicker">📜 Regulament & condiții</div>
         <div class="row one">
           <div>
-            <label>Rules (clear, step by step)</label>
+            <label>Regulament (clar, pe pași)</label>
             
 <div class="form-row" style="flex-direction:column; gap:10px;">
-  <div style="font-weight:900;">📜 Rules (5 points + text)</div>
-  <input id="rule1" type="text" placeholder="Rule 1 (ex: Follow the account / Subscribe)" maxlength="120">
-  <input id="rule2" type="text" placeholder="Rule 2" maxlength="120">
-  <input id="rule3" type="text" placeholder="Rule 3" maxlength="120">
-  <input id="rule4" type="text" placeholder="Rule 4" maxlength="120">
-  <input id="rule5" type="text" placeholder="Rule 5" maxlength="120">
-  <textarea id="rulesText" placeholder="Rules text (optional, 5-6 lines)" rows="6" style="width:100%;"></textarea>
+  <div style="font-weight:900;">📜 Reguli (5 puncte + text)</div>
+  <input id="rule1" type="text" placeholder="Regula 1 (ex: Urmărește contul / Subscribe)" maxlength="120">
+  <input id="rule2" type="text" placeholder="Regula 2" maxlength="120">
+  <input id="rule3" type="text" placeholder="Regula 3" maxlength="120">
+  <input id="rule4" type="text" placeholder="Regula 4" maxlength="120">
+  <input id="rule5" type="text" placeholder="Regula 5" maxlength="120">
+  <textarea id="rulesText" placeholder="Text reguli (opțional, 5-6 rânduri)" rows="6" style="width:100%;"></textarea>
 </div>
 
           </div>
         </div>
 
         <div class="actions">
-          <button id="promoSaveBtn" class="btn" type="button" onclick="savePromo()">💾 Save</button>
-          <button class="btn secondary" type="button" onclick="cancelPromo()">❌ Cancel</button>
+          <button id="promoSaveBtn" class="btn" type="button" onclick="savePromo()">💾 Salvează</button>
+          <button class="btn secondary" type="button" onclick="cancelPromo()">❌ Anulează</button>
         </div>
 
         <small class="help">
-          Save to Firestore: <b>promos</b> (and subcollection <b>participants</b>). Writing requires admin authentication.
+          Salvează în Firestore: <b>promos</b> (și subcolecție <b>participants</b>). Scrierea necesită autentificare admin.
         </small>
       </div>
     </div>
@@ -1031,14 +1031,14 @@
     <div class="admin-login" id="admin-login">
       <h2>🔐 Administrator Login</h2>
       <div class="admin-login-box">
-        <input type="email" id="adminEmail" placeholder="Administrator email" autocomplete="username">
-        <input type="password" id="adminPass" placeholder="Administrator password" autocomplete="current-password">
-        <button class="btn" type="button" onclick="adminSignIn()">Login</button>
-        <button class="btn secondary" type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Logout</button>
+        <input type="email" id="adminEmail" placeholder="Email administrator" autocomplete="username">
+        <input type="password" id="adminPass" placeholder="Parola administrator" autocomplete="current-password">
+        <button class="btn" type="button" onclick="adminSignIn()">Autentificare</button>
+        <button class="btn secondary" type="button" onclick="adminSignOut()" id="adminLogoutBtn" style="display:none;">Delogare</button>
       </div>
 
       <div class="admin-status-row">
-        <span id="adminStatusBadge" class="admin-badge admin-badge-off">Not authenticated</span>
+        <span id="adminStatusBadge" class="admin-badge admin-badge-off">Neautentificat</span>
         <span id="adminUserLabel" class="admin-user-label"></span>
       </div>
 
@@ -1047,7 +1047,7 @@
 
     <div class="footer">
       <div class="footer-inner">
-        <span style="opacity:.8;">© StancuBYT - All rights reserved</span>
+        <span style="opacity:.8;">© StancuBYT - Toate drepturile rezervate</span>
       </div>
     </div>
   </div>
@@ -1055,7 +1055,7 @@
 <div id="winnerDetailsModal" class="winner-details-modal" style="display:none;">
   <div class="winner-details-content">
     <div class="winner-details-header">
-      <h3>🏆 Winner Details</h3>
+      <h3>🏆 Detalii Câștigător</h3>
       <button class="btn secondary" onclick="closeWinnerDetails()">✕</button>
     </div>
     <div id="winnerDetailsContent"></div>
@@ -1108,7 +1108,7 @@
     const label = $('adminUserLabel');
     const logoutBtn = $('adminLogoutBtn');
     if (badge) {
-      badge.textContent = __isAdmin ? 'Authenticated' : 'Not authenticated';
+      badge.textContent = __isAdmin ? 'Autentificat' : 'Neautentificat';
       badge.className = __isAdmin ? 'admin-badge admin-badge-on' : 'admin-badge admin-badge-off';
     }
     if (label) label.textContent = __isAdmin && user ? user.email : '';
@@ -1133,13 +1133,13 @@
     const a = auth();
     const msg = $('adminLoginMsg');
     if(!a) {
-      if(msg) msg.textContent = 'Firebase Auth is not available.';
+      if(msg) msg.textContent = 'Firebase Auth nu este disponibil.';
       return;
     }
     const email = ($('adminEmail')?.value||'').trim();
     const pass  = ($('adminPass')?.value||'').trim();
     if(!email || !pass) {
-      if(msg) msg.textContent = 'Fill in email + password.';
+      if(msg) msg.textContent = 'Completează email + parolă.';
       return;
     }
     try {
@@ -1147,7 +1147,7 @@
       if(msg) msg.textContent = '';
     } catch(e) {
       console.error('adminSignIn:', e);
-      if(msg) msg.textContent = 'Authentication error. Check your credentials.';
+      if(msg) msg.textContent = 'Eroare autentificare. Verifică datele.';
     }
   };
 
@@ -1241,7 +1241,7 @@
 
   async function uploadResizedImage(file, storagePath){
     const storage = st();
-    if(!storage) throw new Error('Storage not available');
+    if(!storage) throw new Error('Storage indisponibil');
     const ref = storage.ref().child(storagePath);
     const resized = await resizeImageFile(file, { maxW: 1600, maxH: 1600, quality: 0.86 });
     const snap = await ref.put(resized, { contentType: 'image/jpeg' });
@@ -1268,7 +1268,7 @@
 
   window.savePromo = async function savePromo(){
     if(!__isAdmin) {
-      alert('You must be logged in as admin.');
+      alert('Trebuie să fii logat ca admin.');
       return;
     }
 
@@ -1290,9 +1290,9 @@
     const rulesLegacy = [rulesObj.r1, rulesObj.r2, rulesObj.r3, rulesObj.r4, rulesObj.r5, rulesObj.text].filter(Boolean).join('\n');
     const rules = rulesLegacy;
 
-    if(!title) return alert('Fill in: Title');
-    if(!desc) return alert('Fill in: Description');
-    if(!ends) return alert('Fill in: Expiration date & time');
+    if(!title) return alert('Completează: Titlu');
+    if(!desc) return alert('Completează: Descriere');
+    if(!ends) return alert('Completează: Data & ora expirării');
 
     const ui = {
       cardH: clamp(Number($('cardHeight')?.value || 560), 360, 1200),
@@ -1372,10 +1372,10 @@
       await writeStats({ promos, participants });
       __editingPromoId = null;
       cancelPromo();
-      alert('Saved ✔️');
+      alert('Salvat ✔️');
     } catch(e) {
       console.error('savePromo:', e);
-      alert('Error saving (check Auth/Storage).');
+      alert('Eroare la salvare (verifică Auth/Storage).');
     }
   };
 
@@ -1387,7 +1387,25 @@
     $('promoForm')?.scrollIntoView({ behavior:'smooth', block:'start' });
   };
 
-  async function tryDeleteStorageFiles(promo){
+  
+  async function deletePromoFirestoreDocs(promoId){
+    try{
+      const db = fs();
+      if(!db) return;
+      const docRef = db.collection('promos').doc(String(promoId));
+      // șterge (best-effort) subcolecția participants dacă există
+      try{
+        const snap = await docRef.collection('participants').get();
+        for (const d of snap.docs){
+          try{ await d.ref.delete(); }catch(e){}
+        }
+      }catch(e){}
+      // șterge documentul promoției (dacă există)
+      try{ await docRef.delete(); }catch(e){}
+    }catch(e){}
+  }
+
+async function tryDeleteStorageFiles(promo){
     try {
       if(!__isAdmin) return;
       const storage = st();
@@ -1402,8 +1420,8 @@
   }
 
   window.deletePromo = async function deletePromo(promoId){
-    if(!__isAdmin) return alert('Only admin can delete.');
-    if(!confirm('Are you sure you want to delete this promotion/contest?')) return;
+    if(!__isAdmin) return alert('Doar admin poate șterge.');
+    if(!confirm('Sigur vrei să ștergi această promoție/concurs?')) return;
 
     try {
       const stats = await readStatsOnce();
@@ -1417,9 +1435,11 @@
 
       await writeStats({ promos, participants });
       await tryDeleteStorageFiles(promo);
-    } catch(e) {
+    
+      await deletePromoFirestoreDocs(promoId);
+} catch(e) {
       console.error('deletePromo:', e);
-      alert('Error deleting.');
+      alert('Eroare la ștergere.');
     }
   };
 
@@ -1447,19 +1467,19 @@
 
     const walletKey = String(payload.wallet||'').toLowerCase();
     if(walletKey && arr.some(x => String(x.wallet||'').toLowerCase() === walletKey)) {
-      throw new Error('This wallet is already registered.');
+      throw new Error('Acest wallet este deja înscris.');
     }
 
     const emailKey = String(payload.email||'').toLowerCase();
     if(emailKey && arr.some(x => String(x.email||'').toLowerCase() === emailKey)) {
-      throw new Error('This email is already registered.');
+      throw new Error('Acest email este deja înscris.');
     }
 
     const id = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
     const code = genCode();
     const participant = {
       id,
-      name: payload.name || 'Anonymous',
+      name: payload.name || 'Anonim',
       email: payload.email || '',
       wallet: payload.wallet || '',
       code,
@@ -1476,7 +1496,7 @@
   function buildParticipantsTable(promoId) {
     const arr = Array.isArray(__statsCache.participants?.[String(promoId)]) ? __statsCache.participants[String(promoId)] : [];
     if(!arr.length) {
-      return `<div style="padding:20px;text-align:center;opacity:0.7;">No participants yet.</div>`;
+      return `<div style="padding:20px;text-align:center;opacity:0.7;">Nu există participanți încă.</div>`;
     }
 
     const counts = new Map();
@@ -1498,7 +1518,7 @@
     const rows = arr.map(u=> {
       const referrals = counts.get(u.id)||0;
       return {
-        name: u.name||'Anonymous',
+        name: u.name||'Anonim',
         email: u.email||'',
         wallet: u.wallet||'',
         code: u.code||'',
@@ -1511,10 +1531,10 @@
       <thead>
         <tr>
           <th style="padding:8px 6px;">#</th>
-          <th style="padding:8px 6px;">Name</th>
+          <th style="padding:8px 6px;">Nume</th>
           <th style="padding:8px 6px;">Email</th>
-          <th style="padding:8px 6px;">Code</th>
-          <th style="padding:8px 6px;">Invitations</th>
+          <th style="padding:8px 6px;">Cod</th>
+          <th style="padding:8px 6px;">Invitări</th>
         </tr>
       </thead>
       <tbody>`;
@@ -1535,7 +1555,7 @@
     html += `</tbody></table>`;
     
     if (rows.length > 50) {
-      html += `<div style="text-align:center; padding:10px; opacity:0.8;">... and ${rows.length - 50} more participants</div>`;
+      html += `<div style="text-align:center; padding:10px; opacity:0.8;">... și ${rows.length - 50} alți participanți</div>`;
     }
     
     return html;
@@ -1569,7 +1589,7 @@
         if (promo.winners && Object.keys(promo.winners).length > 0) {
           __allWinners.push({
             id: promo.id,
-            promoTitle: promo.title || 'Unknown',
+            promoTitle: promo.title || 'Necunoscut',
             timestamp: promo.winners.selectedAt || new Date().toISOString(),
             winners: promo.winners
           });
@@ -1578,7 +1598,7 @@
       
       displayGlobalWinners();
     } catch (error) {
-      console.error('Error loading winners:', error);
+      console.error('Eroare la încărcarea câștigătorilor:', error);
     }
   }
 
@@ -1587,7 +1607,7 @@
     if (!container) return;
     
     if (__allWinners.length === 0) {
-      container.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.7;">No winners registered yet.</div>';
+      container.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.7;">Nu există câștigători înregistrați.</div>';
       return;
     }
     
@@ -1600,15 +1620,15 @@
         <div class="card" style="background:rgba(0,0,0,0.3);">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <div style="font-weight:900;font-size:1.1rem;">${esc(promoTitle)}</div>
-            <div class="pill">${new Date(timestamp).toLocaleString('en-US')}</div>
+            <div class="pill">${new Date(timestamp).toLocaleString('ro-RO')}</div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
       `;
       
       const categories = {
-        firstPlace: '🏆 1st Prize',
-        secondPlace: '🥈 2nd Prize', 
-        thirdPlace: '🥉 3rd Prize',
+        firstPlace: '🏆 Premiul I',
+        secondPlace: '🥈 Premiul II', 
+        thirdPlace: '🥉 Premiul III',
         top5: '🎖️ Top 5',
         next10: '🏅 Next 10',
         bonus: '🎁 Bonus'
@@ -1636,8 +1656,8 @@
       html += `
           </div>
           <div style="margin-top:10px;display:flex;gap:10px;">
-            <button class="btn secondary" onclick="viewWinnerDetails('${id}')">👁️ View Details</button>
-            <button class="btn" onclick="resendWinnerEmails('${id}')">📧 Resend Emails</button>
+            <button class="btn secondary" onclick="viewWinnerDetails('${id}')">👁️ Vezi Detalii</button>
+            <button class="btn" onclick="resendWinnerEmails('${id}')">📧 Retrimite Email-uri</button>
           </div>
         </div>
       `;
@@ -1660,18 +1680,18 @@
     let html = `
       <div style="margin-bottom:15px;">
         <div style="font-weight:900;font-size:1.2rem;">${esc(winnerDoc.promoTitle)}</div>
-        <div style="opacity:0.8;margin-top:5px;">Selected at: ${new Date(winnerDoc.timestamp).toLocaleString('en-US')}</div>
+        <div style="opacity:0.8;margin-top:5px;">Selectați la: ${new Date(winnerDoc.timestamp).toLocaleString('ro-RO')}</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr;gap:15px;">
     `;
     
     const categories = {
-      firstPlace: { label: '🏆 1st Prize', prize: prizes.p1 || '' },
-      secondPlace: { label: '🥈 2nd Prize', prize: prizes.p2 || '' },
-      thirdPlace: { label: '🥉 3rd Prize', prize: prizes.p3 || '' },
-      top5: { label: '🎖️ Top 5 places after podium', prize: prizes.top5 || '' },
-      next10: { label: '🏅 Next 10 places', prize: prizes.next10 || '' },
-      bonus: { label: '🎁 Participation bonus', prize: prizes.bonus || '' }
+      firstPlace: { label: '🏆 Premiul I', prize: prizes.p1 || '' },
+      secondPlace: { label: '🥈 Premiul II', prize: prizes.p2 || '' },
+      thirdPlace: { label: '🥉 Premiul III', prize: prizes.p3 || '' },
+      top5: { label: '🎖️ Primele 5 locuri după podium', prize: prizes.top5 || '' },
+      next10: { label: '🏅 Următoarele 10 locuri', prize: prizes.next10 || '' },
+      bonus: { label: '🎁 Bonus participare', prize: prizes.bonus || '' }
     };
     
     Object.entries(categories).forEach(([category, info]) => {
@@ -1686,11 +1706,11 @@
                     <div style="font-weight:800;">${esc(winner.name)}</div>
                     <div style="font-size:0.85rem;opacity:0.8;">${esc(winner.email)}</div>
                   </div>
-                  ${winner.score ? `<div class="score-badge">${winner.score} points</div>` : '<div class="score-badge">—</div>'}
+                  ${winner.score ? `<div class="score-badge">${winner.score} puncte</div>` : '<div class="score-badge">—</div>'}
                 </div>
                 <div style="margin-top:5px;display:flex;gap:10px;font-size:0.85rem;">
-                  <span>Referrals: ${winner.referrals || 0}</span>
-                  <span>Prize: ${esc(info.prize)}</span>
+                  <span>Referral-uri: ${winner.referrals || 0}</span>
+                  <span>Premiu: ${esc(info.prize)}</span>
                 </div>
               </div>
             `).join('')}
@@ -1709,26 +1729,28 @@
     return match ? match[1] + ' SBYT' : 'N/A';
   }
 
+  // FUNCȚIE CRITICĂ REPARATĂ - Trimite email-uri cu premiul corect
   window.resendWinnerEmails = async function(promoId) {
     if (!__isAdmin) {
-      alert('Only administrators can resend emails.');
+      alert('Doar administratorii pot retrimite email-uri.');
       return;
     }
     
     const winnerDoc = __allWinners.find(w => w.id === promoId);
     if (!winnerDoc) return;
     
-    if (!confirm(`Are you sure you want to resend emails for ${winnerDoc.promoTitle}?`)) {
+    if (!confirm(`Sigur doriți să retrimiteți email-urile pentru ${winnerDoc.promoTitle}?`)) {
       return;
     }
     
     try {
       const promo = __statsCache.promos.find(p => p.id === promoId);
       if (!promo) {
-        alert('Promotion not found in cache.');
+        alert('Promoția nu a fost găsită în cache.');
         return;
       }
       
+      // Mapare corectă între categorie și premiu
       const prizeMapping = {
         firstPlace: promo.prizes?.p1 || '',
         secondPlace: promo.prizes?.p2 || '',
@@ -1741,63 +1763,63 @@
       let emailsSent = 0;
       let errors = 0;
       
-      const categories = [
-        { key: 'firstPlace', winners: winnerDoc.winners.firstPlace, prize: prizeMapping.firstPlace },
-        { key: 'secondPlace', winners: winnerDoc.winners.secondPlace, prize: prizeMapping.secondPlace },
-        { key: 'thirdPlace', winners: winnerDoc.winners.thirdPlace, prize: prizeMapping.thirdPlace },
-        { key: 'top5', winners: winnerDoc.winners.top5, prize: prizeMapping.top5 },
-        { key: 'next10', winners: winnerDoc.winners.next10, prize: prizeMapping.next10 },
-        { key: 'bonus', winners: winnerDoc.winners.bonus, prize: prizeMapping.bonus }
-      ];
-      
-      for (const category of categories) {
-        if (!category.winners || category.winners.length === 0) continue;
+      // Iterează prin fiecare categorie de câștigători
+      for (const [category, winners] of Object.entries(winnerDoc.winners)) {
+        if (category === 'selectedAt') continue;
         
-        for (const winner of category.winners) {
+        const prize = prizeMapping[category];
+        if (!prize) {
+          console.warn(`Nu s-a găsit premiu pentru categoria ${category}`);
+          continue;
+        }
+        
+        // Trimite email fiecărui câștigător din această categorie
+        for (const winner of winners) {
           if (winner.email) {
             try {
               if (typeof window.sendPromoWinnerEmail === 'function') {
                 await window.sendPromoWinnerEmail({
                   toEmail: winner.email,
                   name: winner.name,
-                  prize: category.prize,
-                  promoTitle: promo.title || 'Promotion',
+                  prize: `${getCategoryLabel(category)} — ${prize}`,
+                  prizeOnly: prize, // PREMIUL CORECT pentru categoria respectivă
+                  promoTitle: promo.title || 'Promoție',
                   promoUrl: window.location.href,
                   score: winner.score || 0,
                   referrals: winner.referrals || 0,
-                  category: getCategoryLabel(category.key),
-                  sbytAmount: calculateSBYTFromPrize(category.prize)
+                  category: getCategoryLabel(category),
+                  sbytAmount: calculateSBYTFromPrize(prize)
                 });
                 emailsSent++;
-                console.log(`✅ Email resent to: ${winner.email} for ${category.key} - Prize: ${category.prize}`);
+                console.log(`✅ Email retrimis către: ${winner.email} pentru ${category} - Premiu: ${prize}`);
               } else {
-                console.warn('sendPromoWinnerEmail not available');
+                console.warn('sendPromoWinnerEmail nu este disponibil');
                 break;
               }
             } catch (emailErr) {
-              console.error(`❌ Error resending email to ${winner.email}:`, emailErr);
+              console.error(`❌ Eroare la retrimiterea email-ului către ${winner.email}:`, emailErr);
               errors++;
             }
           }
         }
       }
       
-      alert(`Emails resent: ${emailsSent} successful, ${errors} errors.`);
+      alert(`Email-uri retrimise: ${emailsSent} cu succes, ${errors} erori.`);
       
     } catch (error) {
-      console.error('Error resending emails:', error);
-      alert('Error resending emails.');
+      console.error('Eroare la retrimiterea email-urilor:', error);
+      alert('Eroare la retrimiterea email-urilor.');
     }
   };
 
   function getCategoryLabel(category) {
     const labels = {
-      firstPlace: '🏆 1st Prize',
-      secondPlace: '🥈 2nd Prize',
-      thirdPlace: '🥉 3rd Prize',
-      top5: '🎖️ Top 5 places',
-      next10: '🏅 Next 10 places',
-      bonus: '🎁 Participation bonus'
+      firstPlace: '🏆 Premiul I',
+      secondPlace: '🥈 Premiul II',
+      thirdPlace: '🥉 Premiul III',
+      top5: '🎖️ Primele 5 locuri',
+      next10: '🏅 Următoarele 10 locuri',
+      bonus: '🎁 Bonus participare'
     };
     return labels[category] || category;
   }
@@ -1806,11 +1828,11 @@
     if (!__isAdmin) return;
     
     if (__allWinners.length === 0) {
-      alert('No data to export.');
+      alert('Nu există date de exportat.');
       return;
     }
     
-    let csv = 'Promotion,Email,Name,Category,Prize,SBYT Won,Score,Referrals,Date\n';
+    let csv = 'Promoție,Email,Nume,Categorie,Premiu,SBYT Câștigați,Scor,Referral-uri,Data\n';
     
     __allWinners.forEach(winnerDoc => {
       const { promoTitle, timestamp, winners } = winnerDoc;
@@ -1818,9 +1840,9 @@
       const prizes = promo?.prizes || {};
       
       const categories = {
-        firstPlace: { label: '1st Prize', prize: prizes.p1 || '' },
-        secondPlace: { label: '2nd Prize', prize: prizes.p2 || '' },
-        thirdPlace: { label: '3rd Prize', prize: prizes.p3 || '' },
+        firstPlace: { label: 'Premiul I', prize: prizes.p1 || '' },
+        secondPlace: { label: 'Premiul II', prize: prizes.p2 || '' },
+        thirdPlace: { label: 'Premiul III', prize: prizes.p3 || '' },
         top5: { label: 'Top 5', prize: prizes.top5 || '' },
         next10: { label: 'Next 10', prize: prizes.next10 || '' },
         bonus: { label: 'Bonus', prize: prizes.bonus || '' }
@@ -1830,7 +1852,7 @@
         if (winners[category]) {
           winners[category].forEach(winner => {
             const sbytAmount = calculateSBYTFromPrize(info.prize);
-            csv += `"${promoTitle}","${winner.email}","${winner.name}","${info.label}","${info.prize}","${sbytAmount}",${winner.score || 0},${winner.referrals || 0},"${new Date(timestamp).toLocaleString('en-US')}"\n`;
+            csv += `"${promoTitle}","${winner.email}","${winner.name}","${info.label}","${info.prize}","${sbytAmount}",${winner.score || 0},${winner.referrals || 0},"${new Date(timestamp).toLocaleString('ro-RO')}"\n`;
           });
         }
       });
@@ -1840,7 +1862,7 @@
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `winners_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `castigatori_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -1853,7 +1875,7 @@
 
   function buildWinnersSection(promo) {
     if (!promo.winners || Object.keys(promo.winners).length === 0) {
-      return `<div style="padding:20px;text-align:center;opacity:0.7;">No winners selected yet.</div>`;
+      return `<div style="padding:20px;text-align:center;opacity:0.7;">Nu există câștigători selectați încă.</div>`;
     }
 
     const winners = promo.winners;
@@ -1864,7 +1886,7 @@
     if (winners.firstPlace && winners.firstPlace.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🏆</span> 1st Prize: ${esc(promo.prizes?.p1 || '—')}
+          <span class="prize-icon">🏆</span> Premiul I: ${esc(promo.prizes?.p1 || '—')}
         </div>
       `;
       winners.firstPlace.forEach(winner => {
@@ -1873,7 +1895,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p1 || '—')}</div>
           </div>
@@ -1884,7 +1906,7 @@
     if (winners.secondPlace && winners.secondPlace.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🥈</span> 2nd Prize: ${esc(promo.prizes?.p2 || '—')}
+          <span class="prize-icon">🥈</span> Premiul II: ${esc(promo.prizes?.p2 || '—')}
         </div>
       `;
       winners.secondPlace.forEach(winner => {
@@ -1893,7 +1915,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p2 || '—')}</div>
           </div>
@@ -1904,7 +1926,7 @@
     if (winners.thirdPlace && winners.thirdPlace.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🥉</span> 3rd Prize: ${esc(promo.prizes?.p3 || '—')}
+          <span class="prize-icon">🥉</span> Premiul III: ${esc(promo.prizes?.p3 || '—')}
         </div>
       `;
       winners.thirdPlace.forEach(winner => {
@@ -1913,7 +1935,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.p3 || '—')}</div>
           </div>
@@ -1924,7 +1946,7 @@
     if (winners.top5 && winners.top5.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🎖️</span> Top 5 places after podium: ${esc(promo.prizes?.top5 || '—')}
+          <span class="prize-icon">🎖️</span> Primele 5 locuri după podium: ${esc(promo.prizes?.top5 || '—')}
         </div>
       `;
       winners.top5.forEach(winner => {
@@ -1933,7 +1955,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.top5 || '—')}</div>
           </div>
@@ -1944,7 +1966,7 @@
     if (winners.next10 && winners.next10.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🏅</span> Next 10 places: ${esc(promo.prizes?.next10 || '—')}
+          <span class="prize-icon">🏅</span> Următoarele 10 locuri: ${esc(promo.prizes?.next10 || '—')}
         </div>
       `;
       winners.next10.forEach(winner => {
@@ -1953,7 +1975,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.next10 || '—')}</div>
           </div>
@@ -1964,7 +1986,7 @@
     if (winners.bonus && winners.bonus.length > 0) {
       html += `
         <div class="winners-prize-category">
-          <span class="prize-icon">🎁</span> Participation bonus / random surprise: ${esc(promo.prizes?.bonus || '—')}
+          <span class="prize-icon">🎁</span> Bonus participare / surpriză random: ${esc(promo.prizes?.bonus || '—')}
         </div>
       `;
       winners.bonus.forEach(winner => {
@@ -1973,7 +1995,7 @@
             <div class="winner-info">
               <div class="winner-name">${esc(winner.name)}</div>
               <div class="winner-email">${esc(maskEmail(winner.email))}</div>
-              ${winner.score ? `<div class="winner-score">Score: ${winner.score} points | Referrals: ${winner.referrals || 0}</div>` : ''}
+              ${winner.score ? `<div class="winner-score">Scor: ${winner.score} puncte | Referral-uri: ${winner.referrals || 0}</div>` : ''}
             </div>
             <div class="winner-prize-full">${esc(promo.prizes?.bonus || '—')}</div>
           </div>
@@ -2020,7 +2042,7 @@
   function formatEndsLocal(ends){
     const ms = parseEndsMs(ends);
     if(!Number.isFinite(ms)) return "—";
-    return new Date(ms).toLocaleString("en-US");
+    return new Date(ms).toLocaleString("ro-RO");
   }
 
   function renderPromos(){
@@ -2030,7 +2052,7 @@
     list.innerHTML = '';
 
     if(!promos.length){
-      list.innerHTML = `<div style="opacity:.85; padding:10px;">No promotions/contests yet.</div>`;
+      list.innerHTML = `<div style="opacity:.85; padding:10px;">Nu există promoții/concursuri încă.</div>`;
       return;
     }
 
@@ -2057,8 +2079,8 @@
         <div class="promo-media" style="${mediaUrl ? `background-image:url('${esc(mediaUrl)}')` : ''}">
 
           <div class="admin-actions admin-only">
-            <button class="btn secondary" type="button" onclick="editPromo('${esc(p.id)}')">✏️ Edit</button>
-            <button class="btn" type="button" onclick="deletePromo('${esc(p.id)}')">🗑️ Delete</button>
+            <button class="btn secondary" type="button" onclick="editPromo('${esc(p.id)}')">✏️ Editează</button>
+            <button class="btn" type="button" onclick="deletePromo('${esc(p.id)}')">🗑️ Șterge</button>
           </div>
 
           ${overlayText ? `
@@ -2069,9 +2091,9 @@
 
         <div class="promo-body">
           <div class="promo-meta">
-            <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promotion'}</span>
-            <span class="pill">⏳ ${ isExpired ? (p.kind==='giveaway' ? 'Giveaway ended' : 'Promotion ended') : formatEndsLocal(p.ends) }</span>
-            <span class="pill">⭐ +${Number(p.points||10)} points</span>
+            <span class="pill">${p.kind==='giveaway' ? '🎁 Giveaway' : '📣 Promoție'}</span>
+            <span class="pill">⏳ ${ isExpired ? (p.kind==='giveaway' ? 'Giveaway încheiat' : 'Promoție încheiată') : formatEndsLocal(p.ends) }</span>
+            <span class="pill">⭐ +${Number(p.points||10)} puncte</span>
           </div>
 
           <div style="font-weight:800; font-size:1.05rem;">${esc(p.title||'')}</div>
@@ -2082,18 +2104,18 @@
           <div class="divider"></div>
 
           <div style="margin-top:14px;">
-            <div style="font-weight:900; margin-bottom:10px;">🏆 Prizes</div>
+            <div style="font-weight:900; margin-bottom:10px;">🏆 Premii</div>
             <div style="display:flex; flex-direction:column; gap:10px;">
-              <div class="prize-item prize-gold">🏆 <b>1st Prize:</b> ${esc(p.prizes?.p1 || '—')}</div>
-              <div class="prize-item prize-silver">🥈 <b>2nd Prize:</b> ${esc(p.prizes?.p2 || '—')}</div>
-              <div class="prize-item prize-bronze">🥉 <b>3rd Prize:</b> ${esc(p.prizes?.p3 || '—')}</div>
-              <div class="prize-item prize-tierA">🎖️ <b>Top 5 places after podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
-              <div class="prize-item prize-tierB">🏅 <b>Next 10 places:</b> ${esc(p.prizes?.next10 || '—')}</div>
-              <div class="prize-item prize-tierC">🎁 <b>Participation bonus / random surprise:</b> ${esc(p.prizes?.bonus || '—')}</div>
+              <div class="prize-item prize-gold">🏆 <b>Premiul I:</b> ${esc(p.prizes?.p1 || '—')}</div>
+              <div class="prize-item prize-silver">🥈 <b>Premiul II:</b> ${esc(p.prizes?.p2 || '—')}</div>
+              <div class="prize-item prize-bronze">🥉 <b>Premiul III:</b> ${esc(p.prizes?.p3 || '—')}</div>
+              <div class="prize-item prize-tierA">🎖️ <b>Primele 5 locuri după podium:</b> ${esc(p.prizes?.top5 || '—')}</div>
+              <div class="prize-item prize-tierB">🏅 <b>Următoarele 10 locuri:</b> ${esc(p.prizes?.next10 || '—')}</div>
+              <div class="prize-item prize-tierC">🎁 <b>Bonus participare / surpriză random:</b> ${esc(p.prizes?.bonus || '—')}</div>
             </div>
 
             <div class="divider"></div>
-            <div class="kicker">📜 Rules</div>
+            <div class="kicker">📜 Reguli</div>
             <div style="display:flex; flex-direction:column; gap:8px;">
               <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>1.</b> ${esc((p.rulesObj&&p.rulesObj.r1)||'—')}</div>
               <div class="pill" style="display:block; width:100%; white-space:pre-wrap;"><b>2.</b> ${esc((p.rulesObj&&p.rulesObj.r2)||'—')}</div>
@@ -2104,21 +2126,22 @@
             </div>
 
             <div class="divider"></div>
-            <div class="kicker">✅ Registration</div>
+            <div class="kicker">✅ Înscriere</div>
             <div class="join-row">
-              <input id="name_${esc(p.id)}" type="text" placeholder="Name" maxlength="80">
+              <input id="name_${esc(p.id)}" type="text" placeholder="Nume" maxlength="80">
               <input id="email_${esc(p.id)}" type="email" placeholder="Email" maxlength="120">
             </div>
             <div class="join-row">
               <input id="wallet_${esc(p.id)}" type="text" placeholder="Wallet (0x...)" maxlength="80">
-              <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (optional)" maxlength="40">
+              <input id="ref_${esc(p.id)}" type="text" placeholder="Referral (opțional)" maxlength="40">
             </div>
             <div class="join-row one">
-              <button class="btn" type="button" ${ isExpired ? 'disabled title="Registration closed"' : '' } onclick="joinPromo('${esc(p.id)}')">✅ Register</button>
+              <button class="btn" type="button" ${ isExpired ? 'disabled title="Înscrieri închise"' : '' } onclick="joinPromo('${esc(p.id)}')">✅ Înscrie-te</button>
             </div>
             
+            <!-- Banner status promoție -->
             <div class="promo-status-banner ${isExpired ? 'finalized' : 'in-progress'}">
-              ${isExpired ? '🎉 FINALIZED' : '🚀 IN PROGRESS'}
+              ${isExpired ? '🎉 FINALIZAT' : '🚀 ÎN CURS'}
             </div>
           </div>
         </div>
@@ -2133,14 +2156,14 @@
       lbOut.innerHTML = `
         <div class="leaderboard-split-container">
           <div class="leaderboard-section">
-            <div class="leaderboard-section-title">👥 Participants</div>
+            <div class="leaderboard-section-title">👥 Participanți</div>
             <div class="leaderboard-scrollable" id="lb_participants_${esc(p.id)}">
               ${buildParticipantsTable(p.id)}
             </div>
           </div>
           
           <div class="leaderboard-section">
-            <div class="leaderboard-section-title">🏆 Winners</div>
+            <div class="leaderboard-section-title">🏆 Câștigători</div>
             <div class="leaderboard-scrollable rainbow-card" id="lb_winners_${esc(p.id)}">
               ${buildWinnersSection(p)}
             </div>
@@ -2149,9 +2172,9 @@
         
         ${__isAdmin && isExpired && !p.winners ? `
           <div style="margin-top:15px; padding:12px; border-radius:12px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1);">
-            <div style="font-weight:700; margin-bottom:8px;">🎯 Select Winners</div>
-            <div style="opacity:0.8; font-size:0.9rem; margin-bottom:10px;">The promotion has ended. You can select winners now.</div>
-            <button class="btn" type="button" onclick="selectWinners('${esc(p.id)}')">🎲 Select Winners</button>
+            <div style="font-weight:700; margin-bottom:8px;">🎯 Selectare Câștigători</div>
+            <div style="opacity:0.8; font-size:0.9rem; margin-bottom:10px;">Promoția s-a încheiat. Poți selecta câștigătorii acum.</div>
+            <button class="btn" type="button" onclick="selectWinners('${esc(p.id)}')">🎲 Selectează Câștigători</button>
             <div id="winners_preview_${esc(p.id)}" style="margin-top:10px;"></div>
           </div>
         ` : ''}
@@ -2174,7 +2197,7 @@
       if(promo && promo.ends){
         const endsMs = new Date(promo.ends).getTime();
         if(Number.isFinite(endsMs) && Date.now() >= endsMs){
-          return alert(promo.kind==='giveaway' ? 'Giveaway ended. Registration is closed.' : 'Promotion ended. Registration is closed.');
+          return alert(promo.kind==='giveaway' ? 'Giveaway încheiat. Înscrierile sunt închise.' : 'Promoție încheiată. Înscrierile sunt închise.');
         }
       }
     }catch(e){}
@@ -2184,8 +2207,8 @@
     const wallet = ($(`wallet_${promoId}`)?.value || '').trim();
     const referral = ($(`ref_${promoId}`)?.value || '').trim();
 
-    if(!name) return alert('Fill in your name.');
-    if(!email) return alert('Fill in your email.');
+    if(!name) return alert('Completează numele.');
+    if(!email) return alert('Completează email.');
 
     try {
       const u = await addParticipant(promoId, { name, email, wallet, referral });
@@ -2194,7 +2217,7 @@
       $(`wallet_${promoId}`).value = '';
       $(`ref_${promoId}`).value = '';
 
-      alert(`Registration successful!\nYour code: ${u.code}`);
+      alert(`Înscriere reușită!\nCodul tău: ${u.code}`);
       
       const participantsDiv = document.getElementById(`lb_participants_${promoId}`);
       if (participantsDiv) {
@@ -2208,21 +2231,21 @@
             toEmail: email,
             name: name,
             referralCode: u.code,
-            promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promotion'),
+            promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
             promoEndsAt: promo.ends || null,
             promoUrl: window.location.href
           });
-          console.log('Registration email sent to:', email);
+          console.log('Email de înscriere trimis către:', email);
         } else {
-          console.warn('sendPromoSignupEmail callable not available.');
+          console.warn('sendPromoSignupEmail callable nu este disponibil.');
         }
       } catch (mailErr) {
-        console.warn('Error sending registration email:', mailErr);
+        console.warn('Eroare la trimiterea email-ului de înscriere:', mailErr);
       }
       
     } catch(e) {
       console.error('joinPromo:', e);
-      alert(e?.message || 'Registration error.');
+      alert(e?.message || 'Eroare la înscriere.');
     }
   };
 
@@ -2251,59 +2274,59 @@
     const block = document.createElement('div');
     block.innerHTML = `
       <div class="divider"></div>
-      <div class="kicker">📐 Card dimensions & text over image</div>
+      <div class="kicker">📐 Dimensiuni card & text peste imagine</div>
 
       <div class="row">
         <div>
-          <label>Card height (px)</label>
+          <label>Înălțime card (px)</label>
           <input id="cardHeight" type="number" min="360" max="1200" step="10" value="560" placeholder="Ex: 560">
         </div>
         <div>
-          <label>Image height (px)</label>
+          <label>Înălțime imagine (px)</label>
           <input id="mediaHeight" type="number" min="120" max="520" step="10" value="200" placeholder="Ex: 200">
         </div>
       </div>
 
       <div class="row one">
         <div>
-          <label>Text over image (optional)</label>
-          <textarea id="overlayText" rows="2" placeholder="Ex: 🔥 Last 48h — Enter TOP 5!"></textarea>
+          <label>Text peste imagine (opțional)</label>
+          <textarea id="overlayText" rows="2" placeholder="Ex: 🔥 Ultimele 48h — Intră în TOP 5!"></textarea>
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label>Font size (px)</label>
+          <label>Mărime font (px)</label>
           <input id="overlayFontSize" type="number" min="10" max="72" step="1" value="22">
         </div>
         <div>
-          <label>Text color</label>
+          <label>Culoare text</label>
           <input id="overlayColor" type="color" value="#ffffff">
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label>Position X (0-90%)</label>
+          <label>Poziție X (0-90%)</label>
           <input id="overlayX" type="number" min="0" max="90" step="1" value="6">
         </div>
         <div>
-          <label>Position Y (0-90%)</label>
+          <label>Poziție Y (0-90%)</label>
           <input id="overlayY" type="number" min="0" max="90" step="1" value="8">
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label>Alignment</label>
+          <label>Aliniere</label>
           <select id="overlayAlign">
-            <option value="left">Left</option>
-            <option value="center">Center</option>
-            <option value="right">Right</option>
+            <option value="left">Stânga</option>
+            <option value="center">Centru</option>
+            <option value="right">Dreapta</option>
           </select>
         </div>
         <div>
-          <label>Quick preview</label>
+          <label>Preview rapid</label>
           <button class="btn secondary" type="button" onclick="previewOverlay()">👁️ Preview</button>
         </div>
       </div>
@@ -2316,30 +2339,30 @@
 
   window.previewOverlay = function previewOverlay(){
     const txt = ($('overlayText')?.value||'').trim();
-    if(!txt) return alert('First fill in "Text over image".');
-    alert('The text will appear over the image in the card after saving.');
+    if(!txt) return alert('Completează mai întâi "Text peste imagine".');
+    alert('Textul va apărea peste imagine în card după salvare.');
   };
 
   async function getPromoDataFromFirestore(promoId){
     try {
       const db = fs();
-      if(!db) throw new Error("Firestore not available");
+      if(!db) throw new Error("Firestore nu este disponibil");
       
       const statsDoc = await db.collection('stats').doc('visits').get();
-      if(!statsDoc.exists) throw new Error("stats/visits document does not exist");
+      if(!statsDoc.exists) throw new Error("Documentul stats/visits nu există");
       
       const data = statsDoc.data();
       const promos = Array.isArray(data?.promos) ? data.promos : [];
       const participants = (data?.participants && typeof data.participants === 'object') ? data.participants : {};
       
       const promo = promos.find(p => String(p.id) === String(promoId));
-      if(!promo) throw new Error("Promotion not found");
+      if(!promo) throw new Error("Promoția nu a fost găsită");
       
       const promoParticipants = Array.isArray(participants[String(promoId)]) ? participants[String(promoId)] : [];
       
       return { promo, participants: promoParticipants };
     } catch(error) {
-      console.error("Error reading from Firestore:", error);
+      console.error("Eroare la citirea din Firestore:", error);
       throw error;
     }
   }
@@ -2408,18 +2431,18 @@
 
   window.selectWinners = async function selectWinners(promoId){
     if(!__isAdminNow()) { 
-      alert('You must be logged in as admin.');
+      alert('Trebuie să fii logat ca admin.');
       return;
     }
 
     try{
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(!box) {
-        alert("Preview container not found.");
+        alert("Containerul pentru preview nu a fost găsit.");
         return;
       }
       
-      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Calculating winners...</div>`;
+      box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">⏳ Se calculează câștigătorii...</div>`;
       
       let promo, participants;
       
@@ -2435,19 +2458,19 @@
         window.__statsCache.participants[String(promoId)] = participants;
         
       } catch(firestoreError) {
-        console.warn("Could not get data from Firestore, using cache:", firestoreError);
+        console.warn("Nu s-au putut obține datele din Firestore, folosim cache:", firestoreError);
         
         promo = (window.__statsCache && window.__statsCache.promos || []).find(p=>String(p.id)===String(promoId));
         participants = Array.isArray(window.__statsCache.participants?.[String(promoId)]) ? window.__statsCache.participants[String(promoId)] : [];
       }
       
       if(!promo) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promotion not found. Reload the page.</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Promoția nu a fost găsită. Încarcă din nou pagina.</div>`;
         return;
       }
       
       if(!participants || participants.length === 0) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 No participants yet.</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.8;">📝 Nu există participanți încă.</div>`;
         return;
       }
 
@@ -2541,13 +2564,13 @@
 
       box.innerHTML = `
         <div style="margin-bottom:15px;">
-          <div style="font-weight:900; margin-bottom:10px;">🎯 Selected Winners</div>
-          <div style="opacity:0.8; font-size:0.9rem;">These winners have been automatically selected. Click "Save" to finalize.</div>
+          <div style="font-weight:900; margin-bottom:10px;">🎯 Câștigători selectați</div>
+          <div style="opacity:0.8; font-size:0.9rem;">Acești câștigători au fost selectați automat. Apasă "Salvează" pentru a finaliza.</div>
         </div>
         ${buildWinnersSection({ ...promo, winners })}
         <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn" onclick="saveWinners('${esc(promoId)}')">💾 Save Winners</button>
-          <button class="btn secondary" onclick="this.parentElement.parentElement.innerHTML=''">❌ Cancel</button>
+          <button class="btn" onclick="saveWinners('${esc(promoId)}')">💾 Salvează Câștigători</button>
+          <button class="btn secondary" onclick="this.parentElement.parentElement.innerHTML=''">❌ Anulează</button>
         </div>
         <div id="save_winners_msg_${esc(promoId)}" style="margin-top:10px;"></div>
       `;
@@ -2555,22 +2578,23 @@
       box.scrollIntoView({ behavior:"smooth", block:"nearest" });
       
     }catch(e){
-      console.error("Error selecting winners:", e);
+      console.error("Eroare la selectarea câștigătorilor:", e);
       const box = document.getElementById(`winners_preview_${promoId}`);
       if(box) {
-        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Error: ${esc(e?.message || "Unknown")}</div>`;
+        box.innerHTML = `<div style="padding:20px;text-align:center;color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
       }
     }
   };
 
+  // FUNCȚIE CRITICĂ REPARATĂ - Salvează câștigătorii și trimite email-uri cu premiile corecte
   window.saveWinners = async function saveWinners(promoId){
     if(!__isAdminNow()) { 
-      alert('You must be logged in as admin.');
+      alert('Trebuie să fii logat ca admin.');
       return;
     }
 
     const msgBox = document.getElementById(`save_winners_msg_${promoId}`);
-    if(msgBox) msgBox.innerHTML = `<div style="opacity:0.8;">⏳ Saving winners...</div>`;
+    if(msgBox) msgBox.innerHTML = `<div style="opacity:0.8;">⏳ Se salvează câștigătorii...</div>`;
 
     try {
       const data = await getPromoDataFromFirestore(promoId);
@@ -2677,7 +2701,7 @@
           participants: stats.participants
         });
         
-        if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700;">✅ Winners have been saved!</div>`;
+        if(msgBox) msgBox.innerHTML = `<div style="color:#00ff88; font-weight:700;">✅ Câștigătorii au fost salvați!</div>`;
         
         await loadAllWinners();
         
@@ -2697,8 +2721,11 @@
           }
         }, 1500);
 
+        // ========== PARTEA CRITICĂ REPARATĂ ==========
+        // Trimite email-uri cu premiile corecte pentru fiecare categorie
         try {
           if (typeof window.sendPromoWinnerEmail === 'function') {
+            // Mapare corectă între categorie și premiu
             const prizeMapping = {
               firstPlace: promo.prizes?.p1 || '',
               secondPlace: promo.prizes?.p2 || '',
@@ -2711,63 +2738,65 @@
             let emailsSent = 0;
             let errors = 0;
 
-            const categories = [
-              { key: 'firstPlace', winners: winners.firstPlace, prize: prizeMapping.firstPlace },
-              { key: 'secondPlace', winners: winners.secondPlace, prize: prizeMapping.secondPlace },
-              { key: 'thirdPlace', winners: winners.thirdPlace, prize: prizeMapping.thirdPlace },
-              { key: 'top5', winners: winners.top5, prize: prizeMapping.top5 },
-              { key: 'next10', winners: winners.next10, prize: prizeMapping.next10 },
-              { key: 'bonus', winners: winners.bonus, prize: prizeMapping.bonus }
-            ];
-
-            for (const category of categories) {
-              if (!category.winners || category.winners.length === 0) continue;
+            // Iterează prin fiecare categorie de câștigători
+            for (const [category, winnersArray] of Object.entries(winners)) {
+              if (category === 'selectedAt') continue;
               
-              for (const winner of category.winners) {
+              const prize = prizeMapping[category];
+              if (!prize) {
+                console.warn(`Nu s-a găsit premiu pentru categoria ${category}`);
+                continue;
+              }
+              
+              // Trimite email fiecărui câștigător din această categorie
+              for (const winner of winnersArray) {
                 if (winner.email) {
                   try {
                     await window.sendPromoWinnerEmail({
                       toEmail: winner.email,
                       name: winner.name,
-                      prize: category.prize,
+                      prize: `${getCategoryLabel(category)} — ${prize}`,
+                  prizeOnly: prize, // PREMIUL CORECT pentru categoria respectivă
                       score: winner.score || 0,
                       referrals: winner.referrals || 0,
-                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promotion'),
+                      promoTitle: promo.title || (promo.kind === 'giveaway' ? 'Giveaway' : 'Promoție'),
                       promoUrl: window.location.href,
-                      category: getCategoryLabel(category.key),
-                      sbytAmount: calculateSBYTFromPrize(category.prize)
+                      category: getCategoryLabel(category),
+                      sbytAmount: calculateSBYTFromPrize(prize)
                     });
                     emailsSent++;
-                    
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    console.log(`✅ Email trimis către: ${winner.email} pentru ${category} - Premiu: ${prize}`);
                   } catch(emailErr) {
-                    console.error(`❌ Error sending email to ${winner.email}:`, emailErr);
+                    console.error(`❌ Eroare la trimiterea email-ului către ${winner.email}:`, emailErr);
                     errors++;
                   }
                 }
               }
             }
 
+            console.log(`📧 Total email-uri trimise: ${emailsSent}, erori: ${errors}`);
+            
             if (errors > 0) {
-              alert(`Winners have been saved, but ${errors} emails could not be sent.`);
+              alert(`Câștigătorii au fost salvați, dar ${errors} email-uri nu au putut fi trimise.`);
             } else {
-              alert(`✅ Winners saved and ${emailsSent} emails sent successfully!\n\nEach winner received the specific prize for their category.`);
+              alert(`✅ Câștigătorii salvați și ${emailsSent} email-uri trimise cu succes!`);
             }
           } else {
-            console.warn('⚠️ sendPromoWinnerEmail callable not available.');
-            alert('✅ Winners saved, but email function is not available.');
+            console.warn('⚠️ sendPromoWinnerEmail callable nu este disponibil.');
+            alert('✅ Câștigătorii salvați, dar funcția de email nu este disponibilă.');
           }
         } catch(emailError) {
-          console.warn('❌ General error sending emails:', emailError);
-          alert('✅ Winners saved, but an error occurred sending emails.');
+          console.warn('❌ Eroare generală la trimiterea email-urilor:', emailError);
+          alert('✅ Câștigătorii salvați, dar a apărut o eroare la trimiterea email-urilor.');
         }
+        // ========== FINAL PARTEA CRITICĂ ==========
         
       } else {
-        if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Promotion not found.</div>`;
+        if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Promoția nu a fost găsită.</div>`;
       }
     } catch(e) {
-      console.error("❌ Error saving winners:", e);
-      if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Error: ${esc(e?.message || "Unknown")}</div>`;
+      console.error("❌ Eroare la salvarea câștigătorilor:", e);
+      if(msgBox) msgBox.innerHTML = `<div style="color:#ff6b6b;">❌ Eroare: ${esc(e?.message || "Necunoscută")}</div>`;
     }
   };
 
