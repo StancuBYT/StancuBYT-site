@@ -1,523 +1,821 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StancuBYT | Contact</title>
-
+  <title>StancuBYT | Contact Center</title>
+  
+  <!-- Particles.js Library -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
   <style>
-        /* Variabile culori conform psihologiei marketingului */
-        :root {
-            --blue-tech: #0066ff;
-            --green-growth: #00ff88;
-            --purple-innov: #8a2be2;
-            --neon-cyan: #00ffff;
-            --dark-bg: #0a0a1f;
-            --darker-bg: #050510;
-            --orange-alert: #ff9500;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: var(--dark-bg);
-            color: white;
-            overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
-        }
-
-        /* Particle Animation Background */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        /* Logo Background pentru Hero Section */
-        .hero-logo-bg {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-            opacity: 0.12;
-        }
-        .logo-3d-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: min(600px, 80vw);
-            height: min(600px, 80vw);
-            animation: rotate3d 20s linear infinite;
-            filter: drop-shadow(0 0 50px rgba(0, 255, 136, 0.3));
-        }
-        .logo-3d-bg img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 50%;
-        }
-        @keyframes rotate3d {
-            0% { transform: translate(-50%, -50%) rotateY(0deg) rotateX(0deg); }
-            25% { transform: translate(-50%, -50%) rotateY(90deg) rotateX(10deg); }
-            50% { transform: translate(-50%, -50%) rotateY(180deg) rotateX(0deg); }
-            75% { transform: translate(-50%, -50%) rotateY(270deg) rotateX(-10deg); }
-            100% { transform: translate(-50%, -50%) rotateY(360deg) rotateX(0deg); }
-        }
-
-        /* Container principal */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Secțiuni pagină */
-        .page-section {
-            display: block;
-            padding: 80px 0 40px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Efect neon */
-        .neon-glow {
-            box-shadow:
-                0 0 20px rgba(0, 255, 255, 0.1),
-                0 0 40px rgba(0, 102, 255, 0.05);
-        }
-
-        /* Carduri / box-uri */
-        .data-visualization {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 255, 255, 0.15);
-            border-radius: 16px;
-            padding: 1.5rem;
-        }
-
-        /* Contact grid */
-        .contact-grid{
-            display:grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .form-group{
-            margin-bottom: 1rem;
-        }
-        .form-group label{
-            display:block;
-            font-weight: 700;
-            margin-bottom: 0.45rem;
-            opacity: 0.95;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea{
-            width:100%;
-            padding: 12px 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(0,0,0,0.25);
-            color: #fff;
-            outline: none;
-        }
-        .form-group select option{
-            background: #0a0a1f;
-            color: #fff;
-        }
-        .required{ color:#ff4d4d; font-weight: 900; }
-
-        /* Buton modern */
-        .btn-refresh-modern{
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            gap:10px;
-            border:0;
-            cursor:pointer;
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-weight: 900;
-            color: #061018;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            box-shadow: 0 12px 28px rgba(0,255,136,0.18);
-            transition: transform .06s ease, opacity .15s ease;
-        }
-        .btn-refresh-modern:active{ transform: translateY(1px); }
-        .btn-refresh-modern:disabled{
-            opacity: 0.65;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .refresh-icon{ font-size: 1.1rem; }
-
-        /* Contact cards */
-        .contact-card{
-            padding: 14px 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.10);
-            background: rgba(0,0,0,0.20);
-        }
-        .contact-card.business{ border-color: rgba(0,255,136,0.18); }
-        .contact-card.partnership{ border-color: rgba(0,102,255,0.18); }
-        .contact-card.security{ border-color: rgba(138,43,226,0.18); }
-
-        /* Social grid */
-        .social-grid{
-            display:grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-        }
-        .social-card{
-            display:flex;
-            gap: 12px;
-            align-items:center;
-            padding: 14px;
-            border-radius: 16px;
-            text-decoration:none;
-            color:#fff;
-            border: 1px solid rgba(255,255,255,0.10);
-            background: rgba(0,0,0,0.18);
-            transition: transform .08s ease, border-color .12s ease;
-        }
-        .social-card:hover{
-            border-color: rgba(0,255,255,0.22);
-            transform: translateY(-1px);
-        }
-        .social-icon{
-            width: 44px;
-            height: 44px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            border-radius: 14px;
-            font-size: 1.2rem;
-            border: 1px solid rgba(255,255,255,0.12);
-        }
-
-        /* Time grid */
-        .time-grid{
-            display:grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-        }
-        .time-item{
-            padding: 16px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.10);
-            background: rgba(0,0,0,0.18);
-            text-align:center;
-        }
-        .time-item .icon{
-            font-size: 1.6rem;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px){
-            .page-section{ padding: 60px 0 30px; }
-        }
+    /* Color variables following marketing psychology */
+    :root {
+      --blue-tech: #0066ff;
+      --green-growth: #00ff88;
+      --purple-innov: #8a2be2;
+      --neon-cyan: #00ffff;
+      --dark-bg: #0a0a1f;
+      --darker-bg: #050510;
+      --orange-alert: #ff9500;
+      --danger: #ff4d4d;
+      --card: rgba(255,255,255,0.06);
+      --card2: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.12);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    /* Particles Background */
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+    
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(0,102,255,0.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 20%, rgba(0,255,136,0.14), transparent 55%),
+        radial-gradient(700px 500px at 50% 90%, rgba(138,43,226,0.12), transparent 60%),
+        linear-gradient(180deg, var(--darker-bg), var(--dark-bg));
+      color: #fff;
+      padding: 26px 14px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    /* Topbar styling */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      position: sticky;
+      top: 12px;
+      backdrop-filter: blur(8px);
+      z-index: 10;
+      margin-bottom: 30px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .brand .t1 {
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      font-size: 1.4rem;
+      background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .brand .t2 {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+    
+    /* Logo 3D Animation */
+    .logo-3d-container {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      perspective: 1000px;
+    }
+    
+    .logo-3d {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: rotate3d 8s infinite linear;
+    }
+    
+    .logo-3d img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: absolute;
+      backface-visibility: hidden;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+    
+    .backnote-orbit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70px;
+      height: 70px;
+      transform: translate(-50%, -50%);
+      animation: orbit 6s infinite linear;
+    }
+    
+    .backnote {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: 0.7;
+    }
+    
+    .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+    .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+    .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+    
+    @keyframes rotate3d {
+      0% { transform: rotateY(0deg) rotateX(5deg); }
+      100% { transform: rotateY(360deg) rotateX(5deg); }
+    }
+    
+    @keyframes orbit {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 28px 10px 10px;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      font-size: 2.3rem;
+      background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan), var(--purple-innov));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      opacity: 0.85;
+      line-height: 1.5;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    
+    /* Contact Grid */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    
+    /* Card Styling */
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      padding: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .card.has-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.80));
+      z-index: 0;
+    }
+    
+    .card > * {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Form Styling */
+    .form {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      padding: 16px;
+    }
+    
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .row.one {
+      grid-template-columns: 1fr;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.25);
+      color: #fff;
+      outline: none;
+    }
+    
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    
+    label {
+      font-size: 12px;
+      opacity: 0.85;
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    
+    small.help {
+      display: block;
+      margin-top: 8px;
+      opacity: 0.75;
+      line-height: 1.35;
+    }
+    
+    /* Button Styling */
+    .btn {
+      cursor: pointer;
+      border: none;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: linear-gradient(45deg, var(--blue-tech), var(--green-growth));
+      color: #001018;
+      font-weight: 900;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn.secondary {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-weight: 800;
+    }
+    
+    .btn.danger {
+      background: rgba(255,77,77,0.14);
+      border: 1px solid rgba(255,77,77,0.35);
+      color: #fff;
+    }
+    
+    /* Contact Cards */
+    .contact-card {
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.20);
+      margin-bottom: 15px;
+    }
+    
+    .contact-card.business {
+      border-color: rgba(0,255,136,0.18);
+    }
+    
+    .contact-card.partnership {
+      border-color: rgba(0,102,255,0.18);
+    }
+    
+    .contact-card.security {
+      border-color: rgba(138,43,226,0.18);
+    }
+    
+    /* Social Grid */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .social-card {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 16px;
+      text-decoration: none;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.18);
+      transition: transform .08s ease, border-color .12s ease;
+    }
+    
+    .social-card:hover {
+      border-color: rgba(0,255,255,0.22);
+      transform: translateY(-1px);
+    }
+    
+    .social-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      font-size: 1.2rem;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    
+    /* Time Grid */
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .time-item {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.18);
+      text-align: center;
+    }
+    
+    .time-item .icon {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+    
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin: 12px 0;
+    }
+    
+    /* Required field indicator */
+    .required {
+      color: #ff4d4d;
+      font-weight: 900;
+    }
+    
+    /* Form status */
+    .form-status {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 0.6rem;
+      border-radius: 10px;
+      display: none;
+    }
+    
+    .form-status.success {
+      background: rgba(0,255,136,0.10);
+      border: 1px solid rgba(0,255,136,0.25);
+      color: #00ff88;
+    }
+    
+    .form-status.error {
+      background: rgba(255,77,77,0.10);
+      border: 1px solid rgba(255,77,77,0.25);
+      color: #ff4d4d;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px;
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+      
+      .topbar {
+        flex-direction: column;
+        text-align: center;
+        padding: 12px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        padding: 16px 8px;
+      }
+      
+      .card {
+        padding: 12px;
+      }
+      
+      .social-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <!-- Particles Background -->
   <div id="particles-js"></div>
 
-  <div class="container">
+  <div class="wrap">
+    <!-- Top Navigation Bar -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo-3d-container">
+          <div class="logo-3d">
+            <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/50/0a0a1f/00ff88?text=SBYT'">
+          </div>
+          <div class="backnote-orbit">
+            <div class="backnote"></div>
+            <div class="backnote"></div>
+            <div class="backnote"></div>
+            <div class="backnote"></div>
+          </div>
+        </div>
+        <div>
+          <div class="t1">StancuBYT</div>
+          <div class="t2">Technical Contact Center</div>
+        </div>
+      </div>
+    </div>
 
-    <!-- PAGINA CONTACT -->
-    <section id="contact" class="page-section">
-        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
-            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(45deg, var(--blue-tech), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                Centru de Contact Tehnic
-            </h1>
-            <p style="opacity: 0.8;">Contact direct pentru colaborări tehnice, parteneriate și suport</p>
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1>📞 Contact Center</h1>
+      <p class="subtitle">Direct contact for technical collaborations, partnerships, and support. We're here to help you with any inquiries.</p>
+    </div>
+
+    <!-- Contact Grid -->
+    <div class="contact-grid">
+      <!-- Quick Contact Form -->
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+          <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 1.2rem;">📨</span>
+          </div>
+          <h3 style="margin: 0;">Quick Contact Form</h3>
         </div>
 
-        <div class="contact-grid">
-            <!-- Formular Contact Rapid (Formspree – sigur pe GitHub Pages) -->
-            <div class="data-visualization neon-glow">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
-                    <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                        <span style="font-size: 1.2rem;">📨</span>
-                    </div>
-                    <h3 style="margin: 0;">Formular Contact Rapid</h3>
-                </div>
+        <form id="quickContactForm" action="https://formspree.io/f/mjggyzno" method="POST" autocomplete="off">
+          <input type="hidden" name="_subject" id="contactSubject" value="StancuBYT | New Message">
+          <input type="hidden" name="_next" id="contactNext" value="">
 
-                <form id="quickContactForm" action="https://formspree.io/f/mjggyzno" method="POST" autocomplete="off">
-                    <input type="hidden" name="_subject" id="contactSubject" value="StancuBYT | Mesaj nou">
-                    <input type="hidden" name="_next" id="contactNext" value="">
+          <div class="form-group">
+            <label>Full Name <span class="required">*</span></label>
+            <input type="text" id="contactName" name="name" placeholder="Enter your full name..." required>
+          </div>
 
-                    <div class="form-group">
-                        <label>Nume complet <span class="required">*</span></label>
-                        <input type="text" id="contactName" name="name" placeholder="Introduceți numele complet..." required>
-                    </div>
+          <div class="form-group">
+            <label>Professional Email Address <span class="required">*</span></label>
+            <input type="email" id="contactEmail" name="email" placeholder="ex: contact@company.com" required>
+          </div>
 
-                    <div class="form-group">
-                        <label>Adresă email profesională <span class="required">*</span></label>
-                        <input type="email" id="contactEmail" name="email" placeholder="ex: contact@companie.ro" required>
-                    </div>
+          <div class="form-group">
+            <label>Request Type <span class="required">*</span></label>
+            <select id="contactType" name="type" required>
+              <option value="technical">Technical Support</option>
+              <option value="partnership">Business Partnership</option>
+              <option value="investment">Investment Opportunities</option>
+              <option value="listing">Exchange Listing</option>
+              <option value="media">Media Interview</option>
+              <option value="security">Security & Compliance</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
 
-                    <div class="form-group">
-                        <label>Tip solicitare <span class="required">*</span></label>
-                        <select id="contactType" name="type" required>
-                            <option value="technical">Suport Tehnic</option>
-                            <option value="partnership">Parteneriat de afaceri</option>
-                            <option value="investment">Oportunități de investiție</option>
-                            <option value="listing">Listing pe exchange</option>
-                            <option value="media">Interviu media</option>
-                            <option value="security">Securitate & Compliance</option>
-                            <option value="other">Altceva</option>
-                        </select>
-                    </div>
+          <div class="form-group">
+            <label>Detailed Message <span class="required">*</span></label>
+            <textarea id="contactMessage" name="message" placeholder="Describe your request in detail..." rows="6" required></textarea>
+          </div>
 
-                    <div class="form-group">
-                        <label>Mesaj detaliat <span class="required">*</span></label>
-                        <textarea id="contactMessage" name="message" placeholder="Descrieți solicitarea în detaliu..." rows="6" required></textarea>
-                    </div>
+          <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+            <input type="checkbox" id="contactPrivacy" name="privacy_agree" style="transform: scale(1.2);" required>
+            <label for="contactPrivacy" style="font-size: 0.9rem; opacity: 0.8;">
+              I agree to data processing according to the
+              <a href="https://stancubyt.com/privacy" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Privacy Policy</a>
+            </label>
+          </div>
 
-                    <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
-                        <input type="checkbox" id="contactPrivacy" name="privacy_agree" style="transform: scale(1.2);" required>
-                        <label for="contactPrivacy" style="font-size: 0.9rem; opacity: 0.8;">
-                            Sunt de acord cu prelucrarea datelor conform
-                            <a href="https://stancubyt.com/privacy" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Politicii de confidențialitate</a>
-                        </label>
-                    </div>
+          <button class="btn" style="width: 100%; margin-top: 1rem;" type="submit" id="submitContactBtn">
+            <span id="sendIcon">🚀</span>
+            <span id="sendText">Send Request</span>
+          </button>
 
-                    <button class="btn-refresh-modern" style="width: 100%; margin-top: 1rem;" type="submit" id="submitContactBtn">
-                        <span class="refresh-icon" id="sendIcon">🚀</span>
-                        <span class="refresh-text" id="sendText">Trimite solicitarea</span>
-                    </button>
+          <div id="contactStatus" class="form-status"></div>
+        </form>
+      </div>
 
-                    <div id="contactStatus" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
-                </form>
-            </div>
-
-            <!-- Informații Contact -->
-            <div class="data-visualization neon-glow">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
-                    <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                        <span style="font-size: 1.2rem;">📍</span>
-                    </div>
-                    <h3 style="margin: 0;">Canale de comunicare</h3>
-                </div>
-
-                <div style="margin-bottom: 2rem;">
-                    <h4 style="color: var(--green-growth); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5rem;">👨‍💼</span> Contact Principal
-                    </h4>
-                    <div class="contact-card business">
-                        <p style="margin: 0.5rem 0;"><strong>Stancu Marian</strong></p>
-                        <p style="margin: 0.5rem 0; opacity: 0.9;">Fondator & CEO</p>
-                        <p style="margin: 0.5rem 0;">
-                            <a href="mailto:contact@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
-                                📧 contact@stancubyt.com
-                            </a>
-                        </p>
-                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
-                            Pentru întrebări generale și suport
-                        </p>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 2rem;">
-                    <h4 style="color: var(--blue-tech); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5rem;">🤝</span> Pentru parteneriate
-                    </h4>
-                    <div class="contact-card partnership">
-                        <p style="margin: 0.5rem 0;">
-                            <a href="mailto:partnerships@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
-                                📧 partnerships@stancubyt.com
-                            </a>
-                        </p>
-                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
-                            Colaborări, listing-uri, parteneriate
-                        </p>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 2rem;">
-                    <h4 style="color: var(--purple-innov); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5rem;">🛡️</span> Securitate & Compliance
-                    </h4>
-                    <div class="contact-card security">
-                        <p style="margin: 0.5rem 0;">
-                            <a href="mailto:security@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
-                                🔒 security@stancubyt.com
-                            </a>
-                        </p>
-                        <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
-                            Raportări de securitate și audite
-                        </p>
-                    </div>
-                </div>
-            </div>
+      <!-- Contact Information -->
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+          <div style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 1.2rem;">📍</span>
+          </div>
+          <h3 style="margin: 0;">Communication Channels</h3>
         </div>
 
-        <!-- Social Links Grid -->
-        <div class="data-visualization neon-glow" style="padding: 2rem; margin-bottom: 2rem;">
-            <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">🌐 Rețele Sociale Oficiale</h3>
-
-            <div class="social-grid">
-                <a href="https://twitter.com/StancuBYT" target="_blank" class="social-card">
-                    <div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">🐦</div>
-                    <div><strong style="display: block;">Twitter</strong><small style="opacity: 0.7;">@StancuBYT</small></div>
-                </a>
-
-                <a href="https://t.me/StancuBYT_Official" target="_blank" class="social-card">
-                    <div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">📢</div>
-                    <div><strong style="display: block;">Telegram</strong><small style="opacity: 0.7;">Official Channel</small></div>
-                </a>
-
-                <a href="https://github.com/StancuBYT" target="_blank" class="social-card">
-                    <div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">💻</div>
-                    <div><strong style="display: block;">GitHub</strong><small style="opacity: 0.7;">Cod sursă</small></div>
-                </a>
-
-                <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank" class="social-card">
-                    <div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">👔</div>
-                    <div><strong style="display: block;">LinkedIn</strong><small style="opacity: 0.7;">Business Network</small></div>
-                </a>
-
-                <a href="https://stancubyt.com" target="_blank" class="social-card">
-                    <div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">🌐</div>
-                    <div><strong style="display: block;">Website</strong><small style="opacity: 0.7;">stancubyt.com</small></div>
-                </a>
-
-                <a href="https://discord.gg/" target="_blank" class="social-card">
-                    <div class="social-icon" style="background: rgba(88, 101, 242, 0.2);">💬</div>
-                    <div><strong style="display: block;">Discord</strong><small style="opacity: 0.7;">stancubyt</small></div>
-                </a>
-            </div>
+        <div style="margin-bottom: 2rem;">
+          <h4 style="color: var(--green-growth); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">👨‍💼</span> Primary Contact
+          </h4>
+          <div class="contact-card business">
+            <p style="margin: 0.5rem 0;"><strong>Stancu Marian</strong></p>
+            <p style="margin: 0.5rem 0; opacity: 0.9;">Founder & CEO</p>
+            <p style="margin: 0.5rem 0;">
+              <a href="mailto:contact@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                📧 contact@stancubyt.com
+              </a>
+            </p>
+            <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+              For general questions and support
+            </p>
+          </div>
         </div>
 
-        <!-- Timpi de răspuns -->
-        <div class="data-visualization neon-glow" style="padding: 2rem;">
-            <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">⏰ Timpi de răspuns</h3>
-
-            <div class="time-grid">
-                <div class="time-item">
-                    <div class="icon">📧</div>
-                    <h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Email Business</h4>
-                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 24h lucrătoare</p>
-                </div>
-
-                <div class="time-item">
-                    <div class="icon">💬</div>
-                    <h4 style="color: var(--blue-tech); margin-bottom: 0.5rem;">Telegram</h4>
-                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 2-4 ore</p>
-                </div>
-
-                <div class="time-item">
-                    <div class="icon">🐦</div>
-                    <h4 style="color: var(--purple-innov); margin-bottom: 0.5rem;">Twitter</h4>
-                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 6-12 ore</p>
-                </div>
-
-                <div class="time-item">
-                    <div class="icon">🛡️</div>
-                    <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Security</h4>
-                    <p style="font-size: 0.9rem; opacity: 0.8;">Răspuns în 12h max</p>
-                </div>
-            </div>
-
-            <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center;">
-                <p style="font-size: 0.9rem; opacity: 0.8; margin: 0;">
-                    ⚠️ <strong>Important:</strong> Nu trimitem mesaje directe pentru investiții sau OTC.
-                    Toate comunicările oficiale se fac prin canalele menționate mai sus.
-                </p>
-            </div>
+        <div style="margin-bottom: 2rem;">
+          <h4 style="color: var(--blue-tech); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">🤝</span> For Partnerships
+          </h4>
+          <div class="contact-card partnership">
+            <p style="margin: 0.5rem 0;">
+              <a href="mailto:partnerships@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                📧 partnerships@stancubyt.com
+              </a>
+            </p>
+            <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+              Collaborations, listings, partnerships
+            </p>
+          </div>
         </div>
-    </section>
 
+        <div style="margin-bottom: 2rem;">
+          <h4 style="color: var(--purple-innov); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">🛡️</span> Security & Compliance
+          </h4>
+          <div class="contact-card security">
+            <p style="margin: 0.5rem 0;">
+              <a href="mailto:security@stancubyt.com" style="color: var(--neon-cyan); text-decoration: none;">
+                🔒 security@stancubyt.com
+              </a>
+            </p>
+            <p style="margin: 0.5rem 0; font-size: 0.9rem; opacity: 0.8;">
+              Security reports and audits
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Links Grid -->
+    <div class="card" style="margin-bottom: 30px;">
+      <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">🌐 Official Social Networks</h3>
+
+      <div class="social-grid">
+        <a href="https://twitter.com/StancuBYT" target="_blank" class="social-card">
+          <div class="social-icon" style="background: rgba(29, 161, 242, 0.2);">🐦</div>
+          <div><strong style="display: block;">Twitter</strong><small style="opacity: 0.7;">@StancuBYT</small></div>
+        </a>
+
+        <a href="https://t.me/StancuBYT_Official" target="_blank" class="social-card">
+          <div class="social-icon" style="background: rgba(0, 136, 204, 0.2);">📢</div>
+          <div><strong style="display: block;">Telegram</strong><small style="opacity: 0.7;">Official Channel</small></div>
+        </a>
+
+        <a href="https://github.com/StancuBYT" target="_blank" class="social-card">
+          <div class="social-icon" style="background: rgba(24, 23, 23, 0.2);">💻</div>
+          <div><strong style="display: block;">GitHub</strong><small style="opacity: 0.7;">Source code</small></div>
+        </a>
+
+        <a href="https://www.linkedin.com/in/sbyt-stancu-212728392/" target="_blank" class="social-card">
+          <div class="social-icon" style="background: rgba(10, 102, 194, 0.2);">👔</div>
+          <div><strong style="display: block;">LinkedIn</strong><small style="opacity: 0.7;">Business Network</small></div>
+        </a>
+
+        <a href="https://stancubyt.com" target="_blank" class="social-card">
+          <div class="social-icon" style="background: rgba(0, 255, 136, 0.2);">🌐</div>
+          <div><strong style="display: block;">Website</strong><small style="opacity: 0.7;">stancubyt.com</small></div>
+        </a>
+
+        <a href="https://discord.gg/" target="_blank" class="social-card">
+          <div class="social-icon" style="background: rgba(88, 101, 242, 0.2);">💬</div>
+          <div><strong style="display: block;">Discord</strong><small style="opacity: 0.7;">stancubyt</small></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Response Times -->
+    <div class="card">
+      <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--neon-cyan);">⏰ Response Times</h3>
+
+      <div class="time-grid">
+        <div class="time-item">
+          <div class="icon">📧</div>
+          <h4 style="color: var(--green-growth); margin-bottom: 0.5rem;">Business Email</h4>
+          <p style="font-size: 0.9rem; opacity: 0.8;">Response within 24 business hours</p>
+        </div>
+
+        <div class="time-item">
+          <div class="icon">💬</div>
+          <h4 style="color: var(--blue-tech); margin-bottom: 0.5rem;">Telegram</h4>
+          <p style="font-size: 0.9rem; opacity: 0.8;">Response within 2-4 hours</p>
+        </div>
+
+        <div class="time-item">
+          <div class="icon">🐦</div>
+          <h4 style="color: var(--purple-innov); margin-bottom: 0.5rem;">Twitter</h4>
+          <p style="font-size: 0.9rem; opacity: 0.8;">Response within 6-12 hours</p>
+        </div>
+
+        <div class="time-item">
+          <div class="icon">🛡️</div>
+          <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Security</h4>
+          <p style="font-size: 0.9rem; opacity: 0.8;">Response within 12 hours max</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center;">
+        <p style="font-size: 0.9rem; opacity: 0.8; margin: 0;">
+          ⚠️ <strong>Important:</strong> We do not send direct messages for investments or OTC.
+          All official communications are made through the channels mentioned above.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-inner">
+        <span style="opacity:.8;">© StancuBYT - All rights reserved</span>
+      </div>
+    </div>
   </div>
 
   <script>
-  (function () {
-    const form = document.getElementById('quickContactForm');
-    const status = document.getElementById('contactStatus');
-    const btn = document.getElementById('submitContactBtn');
-    const icon = document.getElementById('sendIcon');
-    const text = document.getElementById('sendText');
-
-    function setStatus(msg, ok) {
-      if (!status) return;
-      status.textContent = msg;
-      status.style.color = ok ? '#00ff88' : '#ff4d4d';
-      status.style.background = ok ? 'rgba(0,255,136,0.10)' : 'rgba(255,77,77,0.10)';
-      status.style.border = ok ? '1px solid rgba(0,255,136,0.25)' : '1px solid rgba(255,77,77,0.25)';
-      status.style.padding = '0.6rem';
-      status.style.borderRadius = '10px';
-      status.style.display = 'block';
-    }
-
-    function buildNextUrl() {
-      const url = new URL(window.location.href);
-      url.search = '';
-      url.hash = '';
-      url.searchParams.set('sent', '1');
-      return url.toString();
-    }
-
-    function setHiddenFields() {
-      const nextEl = document.getElementById('contactNext');
-      if (nextEl) nextEl.value = buildNextUrl();
-
-      const name = (document.getElementById('contactName')?.value || '').trim();
-      const type = (document.getElementById('contactType')?.value || 'contact').trim();
-      const subjEl = document.getElementById('contactSubject');
-      if (subjEl) subjEl.value = 'StancuBYT | ' + type + ' | ' + (name || 'Vizitator');
-    }
-
-    // Mesaj după redirect (Formspree -> _next)
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('sent') === '1') {
-      setStatus('✅ Mesaj trimis. Dacă nu apare în inbox, verifică și Spam + Formspree → Submissions.', true);
-    }
-
-    if (form) {
-      const nextEl = document.getElementById('contactNext');
-      if (nextEl && !nextEl.value) nextEl.value = buildNextUrl();
-
-      form.addEventListener('submit', function () {
-        setHiddenFields();
-
-        // UX: blocăm dublu-click
-        if (btn) {
-          btn.disabled = true;
-          btn.style.opacity = '0.8';
-          btn.style.cursor = 'not-allowed';
-        }
-        if (icon) icon.textContent = '⏳';
-        if (text) text.textContent = 'Se trimite...';
-
-        setStatus('⏳ Se trimite mesajul...', true);
-
-        // Safety re-enable (dacă utilizatorul revine cu Back)
-        setTimeout(function () {
-          if (btn) {
-            btn.disabled = false;
-            btn.style.opacity = '';
-            btn.style.cursor = '';
+    (function () {
+      // Initialize Particles.js
+      if (typeof particlesJS !== 'undefined') {
+        particlesJS('particles-js', {
+          particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: ["#0066ff", "#00ff88", "#8a2be2"] },
+            shape: { type: "circle" },
+            opacity: { value: 0.5, random: true },
+            size: { value: 3, random: true },
+            line_linked: {
+              enable: true,
+              distance: 150,
+              color: "#00ffff",
+              opacity: 0.2,
+              width: 1
+            },
+            move: {
+              enable: true,
+              speed: 2,
+              direction: "none",
+              random: true,
+              straight: false,
+              out_mode: "out",
+              bounce: false
+            }
+          },
+          interactivity: {
+            detect_on: "canvas",
+            events: {
+              onhover: { enable: true, mode: "repulse" },
+              onclick: { enable: true, mode: "push" }
+            }
           }
-          if (icon) icon.textContent = '🚀';
-          if (text) text.textContent = 'Trimite solicitarea';
-        }, 12000);
-      });
-    }
-  })();
+        });
+      }
+
+      // Form handling
+      const form = document.getElementById('quickContactForm');
+      const status = document.getElementById('contactStatus');
+      const btn = document.getElementById('submitContactBtn');
+      const icon = document.getElementById('sendIcon');
+      const text = document.getElementById('sendText');
+
+      function setStatus(msg, isSuccess) {
+        if (!status) return;
+        status.textContent = msg;
+        status.className = isSuccess ? 'form-status success' : 'form-status error';
+        status.style.display = 'block';
+      }
+
+      function buildNextUrl() {
+        const url = new URL(window.location.href);
+        url.search = '';
+        url.hash = '';
+        url.searchParams.set('sent', '1');
+        return url.toString();
+      }
+
+      function setHiddenFields() {
+        const nextEl = document.getElementById('contactNext');
+        if (nextEl) nextEl.value = buildNextUrl();
+
+        const name = (document.getElementById('contactName')?.value || '').trim();
+        const type = (document.getElementById('contactType')?.value || 'contact').trim();
+        const subjEl = document.getElementById('contactSubject');
+        if (subjEl) subjEl.value = 'StancuBYT | ' + type + ' | ' + (name || 'Visitor');
+      }
+
+      // Check for successful submission in URL
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('sent') === '1') {
+        setStatus('✅ Message sent successfully. If it doesn\'t appear in your inbox, please check Spam and Formspree → Submissions.', true);
+      }
+
+      if (form) {
+        // Set initial next URL
+        const nextEl = document.getElementById('contactNext');
+        if (nextEl && !nextEl.value) nextEl.value = buildNextUrl();
+
+        form.addEventListener('submit', function () {
+          setHiddenFields();
+
+          // Disable button to prevent double-click
+          if (btn) {
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            btn.style.cursor = 'not-allowed';
+          }
+          if (icon) icon.textContent = '⏳';
+          if (text) text.textContent = 'Sending...';
+
+          setStatus('⏳ Sending your message...', true);
+
+          // Re-enable button after 12 seconds (in case user goes back)
+          setTimeout(function () {
+            if (btn) {
+              btn.disabled = false;
+              btn.style.opacity = '';
+              btn.style.cursor = '';
+            }
+            if (icon) icon.textContent = '🚀';
+            if (text) text.textContent = 'Send Request';
+          }, 12000);
+        });
+      }
+    })();
   </script>
 </body>
 </html>
-
