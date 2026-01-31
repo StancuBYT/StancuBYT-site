@@ -1,407 +1,633 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StancuBYT | Statistici</title>
+  <title>StancuBYT | Statistics</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
   <style>
-        :root {
-            --blue-tech: #0066ff;
-            --green-growth: #00ff88;
-            --purple-innov: #8a2be2;
-            --neon-cyan: #00ffff;
-            --dark-bg: #0a0a1f;
-            --darker-bg: #050510;
-            --orange-alert: #ff9500;
-        }
+    :root {
+      --blue-tech: #0066ff;
+      --green-growth: #00ff88;
+      --purple-innov: #8a2be2;
+      --neon-cyan: #00ffff;
+      --dark-bg: #0a0a1f;
+      --darker-bg: #050510;
+      --orange-alert: #ff9500;
+      --card: rgba(255,255,255,0.06);
+      --card2: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.12);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
 
-        body {
-            background: var(--dark-bg);
-            color: white;
-            overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
-        }
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
 
-        #particles-js { position: fixed; width: 100%; height: 100%; z-index: -1; }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(0,102,255,0.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 20%, rgba(0,255,136,0.14), transparent 55%),
+        radial-gradient(700px 500px at 50% 90%, rgba(138,43,226,0.12), transparent 60%),
+        linear-gradient(180deg, var(--darker-bg), var(--dark-bg));
+      color: white;
+      padding: 26px 14px;
+      position: relative;
+      overflow-x: hidden;
+    }
 
-        .btn-refresh-modern {
-            background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-            margin-top: 1rem;
-            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
-        }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
+      z-index: -1;
+      pointer-events: none;
+    }
 
-        .btn-refresh-modern:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5); }
-        .btn-refresh-modern:active { transform: translateY(0) scale(1); }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
 
-        .refresh-icon { font-size: 1.3rem; transition: transform 0.5s ease; }
-        .btn-refresh-modern:hover .refresh-icon { animation: rotate360 1s linear infinite; }
+    /* ========== TOPBAR WITH LOGO (FROM FIRST CODE) ========== */
+    .logo-3d-container {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      perspective: 1000px;
+    }
 
-        .refresh-pulse {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border-radius: 50px;
-            background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
-            opacity: 0;
-            z-index: -1;
-            animation: pulseEffect 2s infinite;
-        }
+    .logo-3d {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: rotate3d 8s infinite linear;
+    }
 
-        @keyframes rotate360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulseEffect {
-            0% { transform: scale(1); opacity: 0.7; }
-            100% { transform: scale(1.2); opacity: 0; }
-        }
+    .logo-3d img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: absolute;
+      backface-visibility: hidden;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
 
-        .btn-refresh-modern.loading { background: linear-gradient(45deg, #666, #888); cursor: wait; }
-        .btn-refresh-modern.loading .refresh-icon { animation: rotate360 1s linear infinite; }
-        .btn-refresh-modern.loading .refresh-text { opacity: 0.7; }
+    .backnote-orbit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70px;
+      height: 70px;
+      transform: translate(-50%, -50%);
+      animation: orbit 6s infinite linear;
+    }
 
-        @keyframes successFlash {
-            0%, 100% { background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); }
-            50% { background: linear-gradient(45deg, var(--green-growth), #00cc66); }
-        }
-        .btn-refresh-modern.success { animation: successFlash 0.5s ease 2; }
+    .backnote {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: 0.7;
+    }
 
-        .page-section {
-            min-height: 100vh;
-            padding: 120px 2rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: none;
-            position: relative;
-            overflow: hidden;
-        }
-        .active-section { display: block; }
+    .backnote:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+    .backnote:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+    .backnote:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .backnote:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
 
-        .data-visualization {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-        }
+    @keyframes rotate3d {
+      0% { transform: rotateY(0deg) rotateX(5deg); }
+      100% { transform: rotateY(360deg) rotateX(5deg); }
+    }
 
-        /* === CHART CARD (mai mic + mai frumos) === */
-        .chart-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(0,255,136,0.18);
-            border-radius: 16px;
-            padding: 14px 14px 10px;
-            margin-top: 10px;
-            box-shadow:
-              0 0 20px rgba(0, 102, 255, 0.16),
-              0 0 40px rgba(0, 255, 136, 0.10);
-        }
+    @keyframes orbit {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
 
-        .chart-toprow {
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      position: sticky;
+      top: 12px;
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
 
-        .chart-container {
-            position: relative;
-            height: 240px; /* mai mic */
-            margin: 10px 0 6px;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand .t1 {
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      font-size: 1.4rem;
+    }
+    .brand .t2 {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
 
-        .chart-controls {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 0;
-        }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.25);
+      font-size: 12px;
+      opacity: 0.92;
+    }
+    .chip b {
+      font-weight: 800;
+    }
 
-        .period-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            color: white;
-            padding: 0.42rem 0.7rem;
-            border-radius: 999px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-            user-select: none;
-        }
+    /* ========== REST OF STYLES ========== */
+    .btn-refresh-modern {
+      background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov));
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 1rem;
+      box-shadow: 0 5px 20px rgba(0, 102, 255, 0.3);
+    }
 
-        .period-btn.active {
-            background: rgba(0, 102, 255, 0.35);
-            border-color: rgba(0, 255, 136, 0.55);
-            box-shadow: 0 0 10px rgba(0,255,136,0.15);
-        }
-        .period-btn:hover { background: rgba(0, 102, 255, 0.2); transform: translateY(-1px); }
+    .btn-refresh-modern:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 102, 255, 0.5);
+    }
+    .btn-refresh-modern:active {
+      transform: translateY(0) scale(1);
+    }
 
-        .toggle {
-            display: inline-flex;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(0, 102, 255, 0.25);
-            border-radius: 999px;
-            padding: 3px;
-            gap: 3px;
-        }
-        .toggle button {
-            border: none;
-            background: transparent;
-            color: rgba(255,255,255,0.85);
-            padding: 0.42rem 0.8rem;
-            border-radius: 999px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-        .toggle button.active {
-            background: linear-gradient(45deg, rgba(0,102,255,0.55), rgba(0,255,136,0.25));
-            color: #fff;
-        }
+    .refresh-icon {
+      font-size: 1.3rem;
+      transition: transform 0.5s ease;
+    }
+    .btn-refresh-modern:hover .refresh-icon {
+      animation: rotate360 1s linear infinite;
+    }
 
-        .chart-meta {
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-            font-size: 0.88rem;
-            opacity: 0.85;
-            padding: 6px 2px 2px;
-        }
+    .refresh-pulse {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border-radius: 50px;
+      background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
+      opacity: 0;
+      z-index: -1;
+      animation: pulseEffect 2s infinite;
+    }
 
-        .pill {
-            display:inline-flex;
-            align-items:center;
-            gap:8px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: rgba(0,255,136,0.10);
-            border: 1px solid rgba(0,255,136,0.18);
-        }
+    @keyframes rotate360 {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulseEffect {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(1.2); opacity: 0; }
+    }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
+    .btn-refresh-modern.loading {
+      background: linear-gradient(45deg, #666, #888);
+      cursor: wait;
+    }
+    .btn-refresh-modern.loading .refresh-icon {
+      animation: rotate360 1s linear infinite;
+    }
+    .btn-refresh-modern.loading .refresh-text {
+      opacity: 0.7;
+    }
 
-        .stat-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
+    @keyframes successFlash {
+      0%, 100% { background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); }
+      50% { background: linear-gradient(45deg, var(--green-growth), #00cc66); }
+    }
+    .btn-refresh-modern.success {
+      animation: successFlash 0.5s ease 2;
+    }
 
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--neon-cyan);
-            margin: 0.5rem 0;
-        }
+    .page-section {
+      min-height: 100vh;
+      padding: 120px 2rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .active-section {
+      display: block;
+    }
 
-        .neon-glow {
-            box-shadow:
-                0 0 20px rgba(0, 102, 255, 0.3),
-                0 0 40px rgba(0, 255, 136, 0.2),
-                inset 0 0 20px rgba(138, 43, 226, 0.1);
-        }
+    .data-visualization {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
 
-        .token-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
+    /* === CHART CARD (smaller + prettier) === */
+    .chart-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,255,136,0.18);
+      border-radius: 16px;
+      padding: 14px 14px 10px;
+      margin-top: 10px;
+      box-shadow:
+        0 0 20px rgba(0, 102, 255, 0.16),
+        0 0 40px rgba(0, 255, 136, 0.10);
+    }
 
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 102, 255, 0.3);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
+    .chart-toprow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
 
-        .info-card:hover { transform: translateY(-10px); border-color: var(--green-growth); }
+    .chart-container {
+      position: relative;
+      height: 240px; /* smaller */
+      margin: 10px 0 6px;
+    }
 
-        @media (max-width: 768px) {
-            .chart-container { height: 210px; }
-            .btn-refresh-modern { padding: 0.8rem 1.5rem; font-size: 1rem; }
-            .token-info-grid { grid-template-columns: 1fr; }
-            .period-btn { font-size: 0.85rem; padding: 0.4rem 0.65rem; }
-            .toggle button { font-size: 0.85rem; padding: 0.4rem 0.7rem; }
-        }
+    .chart-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    .period-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 102, 255, 0.3);
+      color: white;
+      padding: 0.42rem 0.7rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+
+    .period-btn.active {
+      background: rgba(0, 102, 255, 0.35);
+      border-color: rgba(0, 255, 136, 0.55);
+      box-shadow: 0 0 10px rgba(0,255,136,0.15);
+    }
+    .period-btn:hover {
+      background: rgba(0, 102, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .toggle {
+      display: inline-flex;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(0, 102, 255, 0.25);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .toggle button {
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.85);
+      padding: 0.42rem 0.8rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+    .toggle button.active {
+      background: linear-gradient(45deg, rgba(0,102,255,0.55), rgba(0,255,136,0.25));
+      color: #fff;
+    }
+
+    .chart-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+      opacity: 0.85;
+      padding: 6px 2px 2px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,255,136,0.10);
+      border: 1px solid rgba(0,255,136,0.18);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--neon-cyan);
+      margin: 0.5rem 0;
+    }
+
+    .neon-glow {
+      box-shadow:
+        0 0 20px rgba(0, 102, 255, 0.3),
+        0 0 40px rgba(0, 255, 136, 0.2),
+        inset 0 0 20px rgba(138, 43, 226, 0.1);
+    }
+
+    .token-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .info-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 102, 255, 0.3);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--green-growth);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px;
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .chart-container {
+        height: 210px;
+      }
+      .btn-refresh-modern {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+      }
+      .token-info-grid {
+        grid-template-columns: 1fr;
+      }
+      .period-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.65rem;
+      }
+      .toggle button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.7rem;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <section id="statistici" class="page-section active-section">
-        <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
-            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Analiză Științifică în Timp Real</h1>
-            <p>Date live preluate de pe Etherscan</p>
+  <div id="particles-js"></div>
 
-            <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
-                <span class="refresh-icon">🔄</span>
-                <span class="refresh-text">Reîmprospătează Datele</span>
-                <span class="refresh-pulse"></span>
-            </button>
+  <div class="wrap">
+    <!-- TOPBAR WITH LOGO -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo-3d-container">
+          <div class="logo-3d">
+            <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/50/0a0a1f/00ff88?text=SBYT'">
+          </div>
+          <div class="backnote-orbit">
+            <div class="backnote"></div>
+            <div class="backnote"></div>
+            <div class="backnote"></div>
+            <div class="backnote"></div>
+          </div>
+        </div>
+        <div>
+          <div class="t1">StancuBYT</div>
+          <div class="t2">Statistics & Analytics</div>
+        </div>
+      </div>
+      <div class="chip">
+        <span>📊 Live Data:</span>
+        <b id="dataStatus">Refreshing...</b>
+      </div>
+    </div>
+
+    <section id="statistics" class="page-section active-section">
+      <div style="text-align: center; margin-bottom: 3rem; padding-top: 20px;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Scientific Real-Time Analysis</h1>
+        <p>Live data from Etherscan & CoinMarketCap</p>
+
+        <button onclick="fetchAllData()" class="btn-refresh-modern" id="refreshButton">
+          <span class="refresh-icon">🔄</span>
+          <span class="refresh-text">Refresh Data</span>
+          <span class="refresh-pulse"></span>
+        </button>
+      </div>
+
+      <div class="data-visualization neon-glow">
+        <h3>📈 Real-Time Price</h3>
+
+        <div id="sbyt-price-box" style="margin-top:14px; margin-bottom:10px;">
+          <div style="font-size:18px; opacity:.85;">1 SBYT in USD</div>
+          <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:var(--green-growth);">Loading...</div>
         </div>
 
-        <div class="data-visualization neon-glow">
-            <h3>📈 Preț în Timp Real</h3>
-
-            <div id="sbyt-price-box" style="margin-top:14px; margin-bottom:10px;">
-              <div style="font-size:18px; opacity:.85;">1 SBYT în USD</div>
-              <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:var(--green-growth);">Se încarcă...</div>
+        <!-- CHART (smaller + modern) -->
+        <div class="chart-card">
+          <div class="chart-toprow">
+            <div class="chart-controls" aria-label="Chart period">
+              <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
+              <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
+              <button class="period-btn" onclick="changeChartPeriod('7d')">7 Days</button>
+              <button class="period-btn" onclick="changeChartPeriod('1m')">1 Month</button>
             </div>
 
-            <!-- CHART (mai mic + mai modern) -->
-            <div class="chart-card">
-              <div class="chart-toprow">
-                <div class="chart-controls" aria-label="Perioada grafic">
-                    <button class="period-btn active" onclick="changeChartPeriod('1h')">1H</button>
-                    <button class="period-btn" onclick="changeChartPeriod('24h')">24H</button>
-                    <button class="period-btn" onclick="changeChartPeriod('7d')">7 Zile</button>
-                    <button class="period-btn" onclick="changeChartPeriod('1m')">1 Lună</button>
-                </div>
-
-                <div class="toggle" aria-label="Tip grafic">
-                  <button id="btnLine" class="active" onclick="changeChartType('line')">Linie</button>
-                  <button id="btnCandle" onclick="changeChartType('candlestick')">Lumânări</button>
-                </div>
-              </div>
-
-              <div class="chart-container">
-                  <canvas id="priceChart"></canvas>
-              </div>
-
-              <div class="chart-meta">
-                <div class="pill">🕒 <span id="chartUpdatedAt">—</span></div>
-                <div class="pill">📌 <span id="chartPoints">0</span> puncte</div>
-              </div>
-
-              <div id="priceData" class="loading" style="margin-top:6px; opacity:.85;">Se încarcă datele live...</div>
+            <div class="toggle" aria-label="Chart type">
+              <button id="btnLine" class="active" onclick="changeChartType('line')">Line</button>
+              <button id="btnCandle" onclick="changeChartType('candlestick')">Candles</button>
             </div>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+          </div>
+
+          <div class="chart-meta">
+            <div class="pill">🕒 <span id="chartUpdatedAt">—</span></div>
+            <div class="pill">📌 <span id="chartPoints">0</span> points</div>
+          </div>
+
+          <div id="priceData" class="loading" style="margin-top:6px; opacity:.85;">Loading live data...</div>
+        </div>
+      </div>
+
+      <div class="data-visualization neon-glow">
+        <h3>📊 Contract Metrics - CoinMarketCap LIVE</h3>
+        <div class="stats-grid" id="etherscanStats">
+          <div class="stat-item">
+            <div>Holders</div>
+            <div class="stat-value" id="holdersCount">-</div>
+            <div>Holders</div>
+          </div>
+          <div class="stat-item">
+            <div>Total Supply REAL</div>
+            <div class="stat-value" id="totalSupply">-</div>
+            <div>SBYT</div>
+          </div>
+          <div class="stat-item">
+            <div>Transactions</div>
+            <div class="stat-value" id="transactionsCount">-</div>
+            <div>Total TX</div>
+          </div>
+          <div class="stat-item">
+            <div>Market Cap</div>
+            <div class="stat-value" id="marketCap">-</div>
+            <div>USD</div>
+          </div>
+          <div class="stat-item">
+            <div>Volume 24h</div>
+            <div class="stat-value" id="volume24h">-</div>
+            <div>USD</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-visualization neon-glow">
+        <h3>📋 Contract Details</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+          <div>
+            <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
+            <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
+            <p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
+            <p><strong>Creation Date:</strong> <span id="creationDate">26.10.2025</span></p>
+          </div>
+          <div>
+            <p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
+            <p><strong>Contract Age:</strong> <span id="contractAge">-</span> days</p>
+            <p><strong>Last Update:</strong> <span id="lastUpdateTime">-</span></p>
+            <p><strong>Contract verified on Etherscan</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="token-info-grid">
+        <div class="info-card">
+          <h3>🔍 View on Etherscan</h3>
+          <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833"
+             target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+            Detailed Etherscan Analysis ›
+          </a>
+        </div>
+        <div class="info-card">
+          <h3>📈 View on DexTools</h3>
+          <a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462"
+             target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+            Live Chart DexTools ›
+          </a>
+        </div>
+        <div class="info-card">
+          <h3>🦍 View on Apespace</h3>
+          <a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368"
+             target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+            Apespace Analysis ›
+          </a>
         </div>
 
-        <div class="data-visualization neon-glow">
-            <h3>📊 Metrici Contract - coinmarketcap LIVE</h3>
-            <div class="stats-grid" id="etherscanStats">
-                <div class="stat-item">
-                    <div>Holders</div>
-                    <div class="stat-value" id="holdersCount">-</div>
-                    <div>Deținători</div>
-                </div>
-                <div class="stat-item">
-                    <div>Total Supply REAL</div>
-                    <div class="stat-value" id="totalSupply">-</div>
-                    <div>SBYT</div>
-                </div>
-                <div class="stat-item">
-                    <div>Tranzacții</div>
-                    <div class="stat-value" id="transactionsCount">-</div>
-                    <div>Total TX</div>
-                </div>
-                <div class="stat-item">
-                    <div>Market Cap</div>
-                    <div class="stat-value" id="marketCap">-</div>
-                    <div>USD</div>
-                </div>
-                <div class="stat-item">
-                    <div>Volum 24h</div>
-                    <div class="stat-value" id="volume24h">-</div>
-                    <div>USD</div>
-                </div>
-            </div>
+        <div class="info-card">
+          <h3>🦎 View on GeckoTerminal</h3>
+          <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults"
+             target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+            Pool & Trading GeckoTerminal ›
+          </a>
         </div>
-
-        <div class="data-visualization neon-glow">
-            <h3>📋 Detalii Contract</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                <div>
-                    <p><strong>Token Name:</strong> <span id="tokenName">StancuBYT</span></p>
-                    <p><strong>Symbol:</strong> <span id="tokenSymbol">SBYT</span></p>
-                    <p><strong>Decimals:</strong> <span id="tokenDecimals">18</span></p>
-                    <p><strong>Creation Date:</strong> <span id="creationDate">26.10.2025</span></p>
-                </div>
-                <div>
-                    <p><strong>Contract Address:</strong> <span id="contractCreator">0x44Cf220399be798baeaE45fd7C4fF44623713833</span></p>
-                    <p><strong>Contract Age:</strong> <span id="contractAge">-</span> zile</p>
-                    <p><strong>Last Update:</strong> <span id="lastUpdateTime">-</span></p>
-                    <p><strong>Contract verificat pe Etherscan</strong></p>
-                </div>
-            </div>
+        <div class="info-card">
+          <h3>📌 View on CoinMarketCap DEX</h3>
+          <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/"
+             target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+            CoinMarketCap DEX ›
+          </a>
         </div>
+      </div>
+    </section>
 
-        <div class="token-info-grid">
-            <div class="info-card">
-                <h3>🔍 Vezi pe Etherscan</h3>
-                <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833"
-                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                    Analiză detaliată Etherscan ›
-                </a>
-            </div>
-            <div class="info-card">
-                <h3>📈 Vezi pe DexTools</h3>
-                <a href="https://www.dextools.io/app/ether/pair-explorer/0xad4140b82dc8e2249af076b5669a8d868d2d55be8920f0a3882b7149dc507b18?t=1764524205462"
-                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                    Chart live DexTools ›
-                </a>
-            </div>
-            <div class="info-card">
-                <h3>🦍 Vezi pe Apespace</h3>
-                <a href="https://apespace.io/eth/0x83ced65e291d19c436a6f85aaa0a24e47f6e4368"
-                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                    Analiză Apespace ›
-                </a>
-            </div>
-
-            <div class="info-card">
-                <h3>🦎 Vezi pe GeckoTerminal</h3>
-                <a href="https://www.geckoterminal.com/eth/pools/0xabfa4bdb1b4485e0c590bba4adc93a3980f591e44e7ca17d61aa7420e6b81d07?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults"
-                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                    Pool & tranzacționare GeckoTerminal ›
-                </a>
-            </div>
-            <div class="info-card">
-                <h3>📌 Vezi pe CoinMarketCap DEX</h3>
-                <a href="https://dex.coinmarketcap.com/token/ethereum/0x44cf220399be798baeae45fd7c4ff44623713833/"
-                   target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
-                    coinmarketcap DEX ›
-                </a>
-            </div>
-        </div>
-  </section>
+    <div class="footer">
+      <div class="footer-inner">
+        <span style="opacity:.8;">© StancuBYT - All rights reserved</span>
+      </div>
+    </div>
+  </div>
 
   <script>
 /* ===================== ENDPOINTS ===================== */
@@ -412,7 +638,7 @@ const CONTRACT_INFO_ENDPOINT = "https://sbytcontractinfofree-jfka2frgwa-uc.a.run
 const POOL_STATS_ENDPOINT    = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPoolStats";
 
 /* ===================== CONTRACT CREATION (FIXED + AUTO AGE) ===================== */
-const CONTRACT_CREATION_LOCAL = { y: 2025, m: 9, d: 26 }; // Oct (0=Ian)
+const CONTRACT_CREATION_LOCAL = { y: 2025, m: 9, d: 26 }; // Oct (0=Jan)
 
 function contractCreationMsLocalMidnight() {
   return new Date(CONTRACT_CREATION_LOCAL.y, CONTRACT_CREATION_LOCAL.m, CONTRACT_CREATION_LOCAL.d, 0, 0, 0).getTime();
@@ -431,9 +657,9 @@ function renderContractDatesFixed() {
   const ms = contractCreationMsLocalMidnight();
   const creationEl = document.getElementById("creationDate");
   const ageEl      = document.getElementById("contractAge");
-  if (creationEl) creationEl.textContent = "26.10.2025"; // FIX, fara shift
+  if (creationEl) creationEl.textContent = "26.10.2025"; // FIX, without shift
   const ageDays = calcAgeDaysFromLocalMidnight(ms);
-  if (ageEl) ageEl.textContent = (ageDays == null) ? "—" : ageDays.toLocaleString("ro-RO");
+  if (ageEl) ageEl.textContent = (ageDays == null) ? "—" : ageDays.toLocaleString("en-US");
 }
 
 /* ===================== HOLDERS - EXACT METHOD FROM FIRST CODE ===================== */
@@ -470,7 +696,7 @@ async function parseFromEtherscanText(t) {
     return Number.isFinite(n) ? n : null;
   };
 
-  // Holders (ex: "Holders:" sau "Holders (xxx)")
+  // Holders (ex: "Holders:" or "Holders (xxx)")
   let holders = null;
   const holdersMatch =
     clean.match(/Holders\s*[:\)]\s*<[^>]*>\s*([0-9.,]+)/i) ||
@@ -478,7 +704,7 @@ async function parseFromEtherscanText(t) {
     clean.match(/Holders\s*\((\s*[0-9.,]+\s*)\)/i);
   holders = pickNum(holdersMatch && holdersMatch[1]);
 
-  // Token Transfers / Transfers count (de obicei apare ca "Token Transfers (123,456)")
+  // Token Transfers / Transfers count (usually appears as "Token Transfers (123,456)")
   let transfers = null;
   const transfersMatch =
     clean.match(/Token\s*Transfers\s*\(\s*([0-9.,]+)\s*\)/i) ||
@@ -502,18 +728,18 @@ async function updateHolders() {
   el.textContent = "…";
   
   try {
-    // Metoda EXACTĂ din primul cod: scraping Etherscan + fallback Ethplorer
+    // EXACT method from first code: scraping Etherscan + fallback Ethplorer
     const txt = await fetchEtherscanTokenPageText();
     const parsed = await parseFromEtherscanText(txt);
 
     if (parsed.holders != null) { 
-      el.textContent = parsed.holders.toLocaleString('ro-RO'); 
+      el.textContent = parsed.holders.toLocaleString('en-US'); 
     } else { 
-      // Fallback la Ethplorer
+      // Fallback to Ethplorer
       try { 
         const info = await fetchEthplorerTokenInfo(); 
         const hc = info && info.holdersCount; 
-        if (hc != null) el.textContent = Number(hc).toLocaleString('ro-RO');
+        if (hc != null) el.textContent = Number(hc).toLocaleString('en-US');
         else el.textContent = "0";
       } catch(e) {
         el.textContent = "0";
@@ -587,20 +813,20 @@ function bucketSizeMs(period) {
   switch(period){
     case "1h":  return 60*1000;
     case "24h": return 15*60*1000;
-    case "7d":  return 12*60*60*1000;  // mai smooth
+    case "7d":  return 12*60*60*1000;  // smoother
     case "1m":  return 24*60*60*1000;
     default:    return 15*60*1000;
   }
 }
 
-/* FIX IMPORTANT: etichete unice/clare pentru 7d/1m ca sa nu "dispara" graficul */
+/* IMPORTANT FIX: unique/clear labels for 7d/1m so chart doesn't "disappear" */
 function fmtLabel(ts){
   const d = new Date(ts);
   if (currentPeriod === "1h" || currentPeriod === "24h") {
-    return d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   }
-  // 7d & 1m: zi.luna (evita weekday short care se repeta / se vede ciudat)
-  return d.toLocaleDateString("ro-RO", { day: "2-digit", month: "2-digit" });
+  // 7d & 1m: day.month (avoid short weekday which repeats/looks weird)
+  return d.toLocaleDateString("en-US", { day: "2-digit", month: "2-digit" });
 }
 
 function destroyChart() {
@@ -640,7 +866,7 @@ function buildLineSeries(samples, period) {
   return { labels, values };
 }
 
-/* FIX IMPORTANT: candlestick trebuie sa primeasca x (altfel deseori nu afiseaza nimic) */
+/* IMPORTANT FIX: candlestick needs to receive x (otherwise often shows nothing) */
 function buildCandlesSeries(samples, period) {
   const start = nowMs() - periodWindowMs(period);
   const bms = bucketSizeMs(period);
@@ -668,7 +894,7 @@ function buildCandlesSeries(samples, period) {
 function updateChartMeta(pointsCount){
   const u = document.getElementById("chartUpdatedAt");
   const p = document.getElementById("chartPoints");
-  if (u) u.textContent = new Date().toLocaleTimeString("ro-RO", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+  if (u) u.textContent = new Date().toLocaleTimeString("en-US", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
   if (p) p.textContent = String(pointsCount ?? 0);
 }
 
@@ -703,10 +929,10 @@ function renderPriceChart(samples) {
 
   const safeSamples = Array.isArray(samples) ? samples : [];
 
-  // mesaj util daca alegi 7d/1m si nu ai istoric suficient
+  // useful message if you choose 7d/1m and don't have enough history
   if (priceDataEl && (currentPeriod === "7d" || currentPeriod === "1m")) {
     if (safeSamples.length < 5) {
-      priceDataEl.textContent = "Nu ai încă istoric suficient pentru 7 zile / 1 lună. Lasă pagina deschisă sau revino zilnic ca să se umple.";
+      priceDataEl.textContent = "Not enough history yet for 7 days / 1 month. Keep page open or come back daily to fill it up.";
     }
   }
 
@@ -725,7 +951,7 @@ function renderPriceChart(samples) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        parsing: false, // important pentru candlestick
+        parsing: false, // important for candlestick
         layout: { padding: { left: 6, right: 10, top: 8, bottom: 4 } },
         plugins: {
           legend: { display: false },
@@ -748,7 +974,7 @@ function renderPriceChart(samples) {
     });
 
     updateChartMeta(candles.length);
-    if (priceDataEl && candles.length === 0) priceDataEl.textContent = "Nu există suficiente mostre pentru lumânări încă.";
+    if (priceDataEl && candles.length === 0) priceDataEl.textContent = "Not enough samples for candles yet.";
     return;
   }
 
@@ -806,7 +1032,8 @@ function renderPriceChart(samples) {
 function setLastUpdate() {
   const el = document.getElementById("lastUpdateTime");
   if (!el) return;
-  el.textContent = new Date().toLocaleString("ro-RO");
+  el.textContent = new Date().toLocaleString("en-US");
+  document.getElementById("dataStatus").textContent = "Updated";
 }
 
 function updateMarketCapUI() {
@@ -814,14 +1041,14 @@ function updateMarketCapUI() {
   if (!el) return;
   if (!Number.isFinite(CURRENT_PRICE_USD) || !Number.isFinite(CURRENT_SUPPLY)) { el.textContent = "—"; return; }
   const mc = CURRENT_PRICE_USD * CURRENT_SUPPLY;
-  el.textContent = Number.isFinite(mc) ? mc.toLocaleString("ro-RO", { maximumFractionDigits: 0 }) : "—";
+  el.textContent = Number.isFinite(mc) ? mc.toLocaleString("en-US", { maximumFractionDigits: 0 }) : "—";
 }
 
 function updateVolumeUI() {
   const el = document.getElementById("volume24h");
   if (!el) return;
   el.textContent = Number.isFinite(CURRENT_VOLUME_24H)
-    ? CURRENT_VOLUME_24H.toLocaleString("ro-RO", { maximumFractionDigits: 0 })
+    ? CURRENT_VOLUME_24H.toLocaleString("en-US", { maximumFractionDigits: 0 })
     : "—";
 }
 
@@ -844,16 +1071,16 @@ async function updateSBYTPrice() {
       const samples = addSample(p);
       renderPriceChart(samples);
 
-      if (priceDataEl) priceDataEl.textContent = "Ultima citire: $" + p.toFixed(8);
+      if (priceDataEl) priceDataEl.textContent = "Last reading: $" + p.toFixed(8);
       setLastUpdate();
       return;
     }
 
     priceEl.innerText = "—";
-    if (priceDataEl) priceDataEl.textContent = "Nu am primit preț valid.";
+    if (priceDataEl) priceDataEl.textContent = "No valid price received.";
   } catch {
     priceEl.innerText = "—";
-    if (priceDataEl) priceDataEl.textContent = "Eroare la încărcarea prețului.";
+    if (priceDataEl) priceDataEl.textContent = "Error loading price.";
   }
 }
 
@@ -866,7 +1093,7 @@ async function updateTotalSupply() {
     const d = await r.json();
     const supplyNum = parseFloat(String(d?.supply ?? ""));
     if (d?.ok && Number.isFinite(supplyNum)) {
-      el.textContent = supplyNum.toLocaleString("ro-RO", { maximumFractionDigits: 0 });
+      el.textContent = supplyNum.toLocaleString("en-US", { maximumFractionDigits: 0 });
       CURRENT_SUPPLY = supplyNum;
       updateMarketCapUI();
       setLastUpdate();
@@ -890,7 +1117,7 @@ async function updateTransactions() {
     const r = await fetch(TX_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
     const d = await r.json();
     const v = Number(d?.txCount);
-    el.textContent = (d?.ok && Number.isFinite(v)) ? v.toLocaleString("ro-RO") : "0";
+    el.textContent = (d?.ok && Number.isFinite(v)) ? v.toLocaleString("en-US") : "0";
     setLastUpdate();
   } catch {
     el.textContent = "0";
@@ -949,11 +1176,12 @@ window.changeChartType = function(mode){
 window.fetchAllData = async function(){
   const btn = document.getElementById("refreshButton");
   if (btn) btn.classList.add("loading");
+  document.getElementById("dataStatus").textContent = "Refreshing...";
 
   try{
     await Promise.allSettled([
       updateSBYTPrice(),
-      updateHolders(), // FOLOSESTE METODA EXACTA DIN PRIMUL COD
+      updateHolders(), // USES EXACT METHOD FROM FIRST CODE
       updateTotalSupply(),
       updateTransactions(),
       updateContractInfo(),
@@ -970,22 +1198,61 @@ window.fetchAllData = async function(){
   }
 };
 
+/* ===================== PARTICLES ANIMATION ===================== */
+function initParticles() {
+  if (typeof particlesJS !== 'undefined') {
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: ["#0066ff", "#00ff88", "#8a2be2"] },
+        shape: { type: "circle" },
+        opacity: { value: 0.5, random: true },
+        size: { value: 3, random: true },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#00ffff",
+          opacity: 0.2,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: "none",
+          random: true,
+          straight: false,
+          out_mode: "out",
+          bounce: false
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" }
+        }
+      }
+    });
+  }
+}
+
 /* ===================== BOOT ===================== */
 document.addEventListener("DOMContentLoaded", () => {
+  initParticles();
   renderContractDatesFixed();
 
   syncActiveButtons();
   renderPriceChart(loadSamples());
 
   updateSBYTPrice();
-  updateHolders(); // FOLOSESTE METODA EXACTA DIN PRIMUL COD
+  updateHolders(); // USES EXACT METHOD FROM FIRST CODE
   updateTotalSupply();
   updateTransactions();
   updateContractInfo();
   updatePoolStats();
 
   setInterval(updateSBYTPrice, 30000);
-  setInterval(updateHolders, 300000); // FOLOSESTE METODA EXACTA DIN PRIMUL COD
+  setInterval(updateHolders, 300000); // USES EXACT METHOD FROM FIRST CODE
   setInterval(updateTotalSupply, 300000);
   setInterval(updateTransactions, 300000);
   setInterval(updateContractInfo, 3600000);
