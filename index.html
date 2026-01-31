@@ -1868,15 +1868,16 @@ function applyDistributionToUI(data){
   if (summaryEl) summaryEl.textContent = summary;
 
   if (bulletsEl) {
-    bulletsEl.innerHTML = '';
-    bullets.forEach((b) => {
-      const li = document.createElement('li');
-      li.textContent = String(b);
-      bulletsEl.appendChild(li);
-    });
-  }
-
-  if (updatedEl) {
+    // Safe render: if bullets is empty/invalid, keep existing DOM content
+    if (Array.isArray(bullets) && bullets.length) {
+      bulletsEl.innerHTML = '';
+      bullets.forEach((b) => {
+        const li = document.createElement('li');
+        li.textContent = String(b);
+        bulletsEl.appendChild(li);
+      });
+    }
+  }if (updatedEl) {
     const when = fmtFirestoreDate(data?.updatedAt);
     const by = data?.updatedBy ? String(data.updatedBy) : '';
     updatedEl.textContent = (when || by) ? `Ultima actualizare: ${when}${by ? ' • ' + by : ''}` : '';
