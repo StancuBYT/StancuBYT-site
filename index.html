@@ -1822,24 +1822,30 @@ window.__SBYT_ADMIN = false;
 const ADMIN_EMAILS = ["stancubyt@gmail.com"]; // ai zis ca acesta e admin
 
 /* ============================================================
-   DISTRIBUTION TRANSPARENCY (Firestore editable)
-   - Afisare publica: oricine vede
+   DISTRIBUTION TRANSPARENCY (Firestore editable) — FIXED
+   - Afisare publica: oricine vede (fallback HTML + localStorage)
    - Editare: doar admin (dupa logare)
    - Salvare in Firestore: news/distribution_transparency
    ============================================================ */
-const DISTRO_STATS_DOC = { col: 'news', doc: 'distribution_transparency' };
-let __distUnsub = null;
-let __distHydrating = false;
-let __distData = {
+const DISTRO_DOC = { col: 'news', doc: 'distribution_transparency' };
+const DISTRO_LS_KEY = 'sbyt_distro_public_v1';
+
+// Fallback (public) — afisat chiar daca Firestore nu e accesibil
+const DISTRO_FALLBACK = {
+  title: 'Transparență & Distribuție',
   summary: 'Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.',
   bullets: [
-    'Wallet-uri publice pentru: echipă, marketing, rezervă, presale.',
-    'Plan de vesting: perioadă, cliff, eliberare treptată (ex: lunar).',
-    'Dovezi: linkuri către adrese pe Etherscan + lock/vesting dacă există.'
+    'Total supply fix: 4,000,000 SBYT (18 decimals) — fără mint după deploy.',
+    'Distribuție: lichiditate (DEX), ecosistem, echipă, rezervă — detalii verificabile on-chain.',
+    'Vesting/lock: vor fi publicate dovezi (adrese Etherscan + lock/vesting) când sunt implementate.'
   ],
   updatedAt: null,
   updatedBy: null
 };
+
+let __distroUnsub = null;
+let __distroHydrating = false;
+let __distroData = { ...DISTRO_FALLBACK };
 
 function fmtFirestoreDate(ts){
   if (!ts) return '';
@@ -1849,35 +1855,59 @@ function fmtFirestoreDate(ts){
   } catch(e) { return ''; }
 }
 
-function sanitizeLinesToBullets(text){
-  return String(text || '')
-    .split('\n')
-    .map(x => x.trim())
-    .filter(x => x.length > 0)
-    .slice(0, 12); // suficient pentru UI
+function safeJSONParse(str){
+  try { return JSON.parse(str); } catch(e) { return null; }
 }
 
-function applyDistributionToUI(data){
-  const summaryEl = document.getElementById('distSummary');
-  const bulletsEl = document.getElementById('distBullets');
-  const updatedEl = document.getElementById('distUpdated');
+function saveDistroToLocal(data){
+  try {
+    const payload = {
+      title: String(data?.title || DISTRO_FALLBACK.title),
+      summary: String(data?.summary || DISTRO_FALLBACK.summary),
+      bullets: Array.isArray(data?.bullets) ? data.bullets.map(x => String(x)) : DISTRO_FALLBACK.bullets,
+      updatedAt: data?.updatedAt && data.updatedAt.toMillis ? data.updatedAt.toMillis() : (data?.updatedAt || null),
+      updatedBy: data?.updatedBy ? String(data.updatedBy) : null
+    };
+    localStorage.setItem(DISTRO_LS_KEY, JSON.stringify(payload));
+  } catch(e) {}
+}
 
-  const summary = (data && data.summary) ? String(data.summary) : __distData.summary;
-  const bullets = (data && Array.isArray(data.bullets) && data.bullets.length) ? data.bullets : __distData.bullets;
+function loadDistroFromLocal(){
+  const obj = safeJSONParse(localStorage.getItem(DISTRO_LS_KEY) || '');
+  if (!obj) return null;
+  return {
+    title: obj.title || DISTRO_FALLBACK.title,
+    summary: obj.summary || DISTRO_FALLBACK.summary,
+    bullets: Array.isArray(obj.bullets) && obj.bullets.length ? obj.bullets : DISTRO_FALLBACK.bullets,
+    updatedAt: obj.updatedAt ? new Date(obj.updatedAt) : null,
+    updatedBy: obj.updatedBy || null
+  };
+}
 
-  if (summaryEl) summaryEl.textContent = summary;
+function applyDistroToUI(data){
+  // NOTE: NU golim UI daca nu avem date valide; pastram ce exista
+  const titleEl = document.getElementById('dist-title');
+  const textEl  = document.getElementById('dist-text');
+  const bulletsEl = document.getElementById('dist-bullets');
+  const updatedEl = document.getElementById('dist-updated');
 
-  if (bulletsEl) {
-    // Safe render: if bullets is empty/invalid, keep existing DOM content
-    if (Array.isArray(bullets) && bullets.length) {
-      bulletsEl.innerHTML = '';
-      bullets.forEach((b) => {
-        const li = document.createElement('li');
-        li.textContent = String(b);
-        bulletsEl.appendChild(li);
-      });
-    }
-  }if (updatedEl) {
+  const title = String(data?.title || '').trim();
+  const summary = String(data?.summary || '').trim();
+  const bullets = Array.isArray(data?.bullets) ? data.bullets : null;
+
+  if (titleEl && title) titleEl.textContent = title;
+  if (textEl && summary) textEl.innerHTML = summary;
+
+  if (bulletsEl && Array.isArray(bullets) && bullets.length) {
+    bulletsEl.innerHTML = '';
+    bullets.forEach((b) => {
+      const li = document.createElement('li');
+      li.textContent = String(b);
+      bulletsEl.appendChild(li);
+    });
+  }
+
+  if (updatedEl) {
     const when = fmtFirestoreDate(data?.updatedAt);
     const by = data?.updatedBy ? String(data.updatedBy) : '';
     updatedEl.textContent = (when || by) ? `Ultima actualizare: ${when}${by ? ' • ' + by : ''}` : '';
@@ -1887,186 +1917,142 @@ function applyDistributionToUI(data){
   if (window.__SBYT_ADMIN) {
     const sIn = document.getElementById('distSummaryInput');
     const bIn = document.getElementById('distBulletsInput');
-    if (__distHydrating) {
-      if (sIn) sIn.value = summary;
-      if (bIn) bIn.value = bullets.join('\n');
+    const tIn = document.getElementById('distTitleInput');
+    if (__distroHydrating) {
+      if (tIn) tIn.value = String(data?.title || DISTRO_FALLBACK.title);
+      if (sIn) sIn.value = String(data?.summary || DISTRO_FALLBACK.summary);
+      if (bIn) bIn.value = (Array.isArray(data?.bullets) ? data.bullets : DISTRO_FALLBACK.bullets).join('\n');
     }
   }
 }
 
-function setDistributionAdminUI(isAdmin){
-  const box = document.getElementById('distAdminControls');
-  if (box) box.style.display = isAdmin ? 'block' : 'none';
-
-  if (!isAdmin) return;
-
-  // hydrate inputs with current data
-  __distHydrating = true;
-  try { applyDistributionToUI(__distData); } catch(e) {}
-  __distHydrating = false;
+function sanitizeLinesToBullets(text){
+  return String(text || '')
+    .split('\n')
+    .map(x => x.trim())
+    .filter(x => x.length > 0)
+    .slice(0, 12);
 }
 
-function resetDistributionDraft(){
-  if (!window.__SBYT_ADMIN) return;
-  const sIn = document.getElementById('distSummaryInput');
-  const bIn = document.getElementById('distBulletsInput');
-  if (sIn) sIn.value = __distData.summary || '';
-  if (bIn) bIn.value = (Array.isArray(__distData.bullets) ? __distData.bullets : []).join('\n');
-  const msg = document.getElementById('distMsg');
-  if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Draft resetat la varianta publicată.'; }
+function setDistroEditorVisible(show){
+  const box = document.getElementById('distAdminBox');
+  if (!box) return;
+  box.style.display = show ? 'block' : 'none';
 }
 
-async function saveDistributionTransparency(){
-  const msg = document.getElementById('distMsg');
-  try{
-    if (!window.__SBYT_ADMIN) {
-      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Nu ai drepturi admin.'; }
-      return;
-    }
-    if (!db) {
-      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Firestore nu este disponibil.'; }
-      return;
-    }
-
-    const sIn = document.getElementById('distSummaryInput');
-    const bIn = document.getElementById('distBulletsInput');
-
-    const summary = (sIn?.value || '').trim() || __distData.summary;
-    const bullets = sanitizeLinesToBullets(bIn?.value || '') || __distData.bullets;
-
-    const payload = {
-      summary,
-      bullets,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedBy: auth?.currentUser?.email ? String(auth.currentUser.email) : 'admin'
-    };
-
-    await db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).set(payload, { merge: true });
-
-    if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Salvat ✅ (Transparență Distribuție)'; }
-  } catch(e){
-    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare salvare: ' + (e?.message || e); }
+async function loadDistroOnce(){
+  // 1) Aplica localStorage (daca exista) ca sa nu fie gol la delogare / permisiuni
+  const local = loadDistroFromLocal();
+  if (local) {
+    __distroData = { ...__distroData, ...local };
+    applyDistroToUI(__distroData);
+  } else {
+    applyDistroToUI(__distroData);
   }
-}
 
-function initDistributionLive(){
+  // 2) Citire live din Firestore (daca se poate)
   if (!db) return;
-  if (__distUnsub) { try{ __distUnsub(); } catch(e){} __distUnsub = null; }
 
-  __distUnsub = db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).onSnapshot((snap) => {
-    const data = snap.exists ? snap.data() : null;
-    __distData = {
-      summary: data?.summary || __distData.summary,
-      bullets: Array.isArray(data?.bullets) && data.bullets.length ? data.bullets : __distData.bullets,
-      updatedAt: data?.updatedAt || null,
-      updatedBy: data?.updatedBy || null
-    };
+  try {
+    const ref = db.collection(DISTRO_DOC.col).doc(DISTRO_DOC.doc);
+    // onSnapshot (public) — daca rules permit read
+    __distroUnsub = ref.onSnapshot((snap) => {
+      if (!snap.exists) return;
+      const d = snap.data() || {};
+      __distroHydrating = true;
+      __distroData = {
+        ...DISTRO_FALLBACK,
+        ...d,
+        title: d.title || DISTRO_FALLBACK.title,
+        summary: d.summary || DISTRO_FALLBACK.summary,
+        bullets: Array.isArray(d.bullets) && d.bullets.length ? d.bullets : DISTRO_FALLBACK.bullets
+      };
+      applyDistroToUI(__distroData);
+      saveDistroToLocal(__distroData);
+      __distroHydrating = false;
+    }, (err) => {
+      // Daca nu avem permisiuni, ramanem pe fallback/local, fara sa golim UI
+      console.warn('Distro Firestore read blocked:', err?.message || err);
+    });
+  } catch(e) {
+    console.warn('Distro Firestore init failed:', e?.message || e);
+  }
+}
 
-    __distHydrating = true;
-    applyDistributionToUI(__distData);
-    __distHydrating = false;
-  }, (err) => {
-    // fallback: still show defaults
-    try { applyDistributionToUI(__distData); } catch(e) {}
+async function saveDistroToFirestore(){
+  if (!db) throw new Error('Firestore not available');
+  const title = (document.getElementById('distTitleInput')?.value || DISTRO_FALLBACK.title).trim();
+  const summary = (document.getElementById('distSummaryInput')?.value || DISTRO_FALLBACK.summary).trim();
+  const bulletsTxt = (document.getElementById('distBulletsInput')?.value || '').trim();
+  const bullets = sanitizeLinesToBullets(bulletsTxt);
+
+  const ref = db.collection(DISTRO_DOC.col).doc(DISTRO_DOC.doc);
+  const user = auth?.currentUser;
+
+  const payload = {
+    title: title || DISTRO_FALLBACK.title,
+    summary: summary || DISTRO_FALLBACK.summary,
+    bullets: bullets.length ? bullets : DISTRO_FALLBACK.bullets,
+    updatedAt: (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue)
+      ? firebase.firestore.FieldValue.serverTimestamp()
+      : new Date(),
+    updatedBy: user?.email || 'admin'
+  };
+
+  await ref.set(payload, { merge: true });
+}
+
+function wireDistroAdminActions(){
+  const saveBtn = document.getElementById('distSaveBtn');
+  const resetBtn = document.getElementById('distResetBtn');
+  if (saveBtn && !saveBtn.__wired) {
+    saveBtn.__wired = true;
+    saveBtn.addEventListener('click', async () => {
+      try {
+        saveBtn.disabled = true;
+        await saveDistroToFirestore();
+      } catch(e) {
+        alert('Nu s-a putut salva în Firestore. Verifică permisiunile / autentificarea.\n' + (e?.message || e));
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+  }
+  if (resetBtn && !resetBtn.__wired) {
+    resetBtn.__wired = true;
+    resetBtn.addEventListener('click', () => {
+      __distroHydrating = true;
+      applyDistroToUI(DISTRO_FALLBACK);
+      // repopuleaza editorul
+      const tIn = document.getElementById('distTitleInput');
+      const sIn = document.getElementById('distSummaryInput');
+      const bIn = document.getElementById('distBulletsInput');
+      if (tIn) tIn.value = DISTRO_FALLBACK.title;
+      if (sIn) sIn.value = DISTRO_FALLBACK.summary;
+      if (bIn) bIn.value = DISTRO_FALLBACK.bullets.join('\n');
+      __distroHydrating = false;
+    });
+  }
+}
+
+// Admin detection (fara sa atingem alte sectiuni): ascunde editorul pana la logare
+if (auth) {
+  auth.onAuthStateChanged((user) => {
+    const isAdmin = !!(user && ADMIN_EMAILS.includes((user.email || '').toLowerCase()));
+    // respectam flag global folosit si de alte sectiuni
+    if (isAdmin) window.__SBYT_ADMIN = true;
+    setDistroEditorVisible(isAdmin);
   });
-
-  // initial render even before snapshot returns
-  try { applyDistributionToUI(__distData); } catch(e) {}
+} else {
+  setDistroEditorVisible(false);
 }
 
-function maskEmail(email) {
-  if (!email || typeof email !== 'string') return '';
-  const parts = email.split('@');
-  if (parts.length !== 2) return email;
-  const u = parts[0], d = parts[1];
-  const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
-  return `${u2}@${d}`;
-}
-
-async function computeIsAdmin(user) {
-  if (!user) return false;
-  try {
-    const token = await user.getIdTokenResult(true);
-    if (token && token.claims && token.claims.admin === true) return true;
-  } catch (e) {}
-  const email = (user.email || '').toLowerCase();
-  return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
-}
-
-function setAdminUI(isAdmin, user) {
-  const badge = document.getElementById('adminStatusBadge');
-  const label = document.getElementById('adminUserLabel');
-  const msg = document.getElementById('adminLoginMsg');
-  const logoutBtn = document.getElementById('adminLogoutBtn');
-
-  if (badge) {
-    badge.classList.remove('admin-badge-on','admin-badge-off');
-    badge.classList.add(isAdmin ? 'admin-badge-on' : 'admin-badge-off');
-    badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
-  }
-  if (label) label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
-  if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
-
-  if (msg) {
-    msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
-    msg.textContent = user
-      ? (isAdmin ? 'Mod administrator activ. Roadmap poate fi editat.' : 'Autentificat, dar fara drepturi admin.')
-      : 'Autentifica-te cu email + parola (Firebase).';
-  }
-
-  // activeaza/dezactiveaza controalele roadmap
-  try { setRoadmapAdminMode(isAdmin); } catch(e) {}
-  try { setFounderAdminUI(isAdmin); } catch(e) {}
-  // activeaza/dezactiveaza controalele membri echipa
-  try { setTeamAdminMode(isAdmin); } catch(e) {}
-  try { setDistributionAdminUI(isAdmin); } catch(e) {}
-}
-
-window.adminSignIn = async function adminSignIn(){
-  try {
-    if (!auth) { alert('Firebase Auth nu este incarcat.'); return; }
-    const email = (document.getElementById('adminEmail')?.value || '').trim();
-    const pass = (document.getElementById('adminPass')?.value || '');
-    if (!email || !pass) {
-      const msg = document.getElementById('adminLoginMsg');
-      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
-      return;
-    }
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch (e) {
-    const msg = document.getElementById('adminLoginMsg');
-    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
-  }
-}
-
-window.adminSignOut = async function adminSignOut(){
-  try { if (auth) await auth.signOut(); } catch(e) {}
-}
-
-// listener
+// Start
 document.addEventListener('DOMContentLoaded', () => {
-  try {
-    if (auth) {
-      auth.onAuthStateChanged(async (user) => {
-        const isAdmin = await computeIsAdmin(user);
-        window.__SBYT_ADMIN = isAdmin;
-        setAdminUI(isAdmin, user);
-      });
-    }
-  } catch (e) {}
-
-  // init roadmap from firestore (daca exista)
-  try { initRoadmapLive(); } catch(e) {}
-
-  // init founder live photo
-  try { initFounderLive(); } catch(e) {}
-
-  // init team from firestore (live)
-  try { initTeamLive(); } catch(e) {}
-
-  // init distributie transparency (live)
-  try { initDistributionLive(); } catch(e) {}
+  loadDistroOnce();
+  wireDistroAdminActions();
 });
+
 
 /* ============================================================
    ROADMAP CRUD + PERSISTENTA (1:1 ca principiu cu anunturile)
