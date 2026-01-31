@@ -1415,7 +1415,7 @@
 <!-- ADMIN LOGIN (Presentation - bottom of page) -->
 <section class="admin-login" id="admin-login">
 <h2>🔐 Administrator Login</h2>
-<p class="admin-desc">Authentication required for adding/deleting members, announcements, news, giveaway and promotions.</p>
+<p class="admin-desc"></p>
 <div class="admin-login-box">
 <input autocomplete="username" id="adminEmail" placeholder="Admin email" type="email"/>
 <input autocomplete="current-password" id="adminPass" placeholder="Admin password" type="password"/>
@@ -1724,7 +1724,7 @@ function setAdminUI(isAdmin, user) {
     msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
     msg.textContent = user
       ? (isAdmin ? 'Admin mode active.' : 'Logged in, but no admin rights.')
-      : 'Login with email + password (Firebase).';
+      : '';
   }
 
   setNewsAdminVisible(isAdmin);
