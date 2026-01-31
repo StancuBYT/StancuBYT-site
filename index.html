@@ -406,7 +406,6 @@
   <script>
 /* ===================== ENDPOINTS ===================== */
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-const HOLDERS_ENDPOINT       = "https://sbytholdersfree-jfka2frgwa-uc.a.run.app";
 const TOTALSUPPLY_ENDPOINT   = "https://sbyttotalsupplyfree-jfka2frgwa-uc.a.run.app";
 const TX_ENDPOINT            = "https://sbyttxcountfree-jfka2frgwa-uc.a.run.app";
 const CONTRACT_INFO_ENDPOINT = "https://sbytcontractinfofree-jfka2frgwa-uc.a.run.app";
@@ -435,6 +434,96 @@ function renderContractDatesFixed() {
   if (creationEl) creationEl.textContent = "26.10.2025"; // FIX, fara shift
   const ageDays = calcAgeDaysFromLocalMidnight(ms);
   if (ageEl) ageEl.textContent = (ageDays == null) ? "—" : ageDays.toLocaleString("ro-RO");
+}
+
+/* ===================== HOLDERS - EXACT METHOD FROM FIRST CODE ===================== */
+const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
+
+async function fetchEthplorerTokenInfo() {
+  try {
+    const url = `https://api.ethplorer.io/getTokenInfo/${CONTRACT_ADDRESS}?apiKey=freekey`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('ethplorer http ' + r.status);
+    const j = await r.json();
+    return j && typeof j === 'object' ? j : null;
+  } catch (e) {
+    console.warn('Ethplorer fallback failed', e);
+    return null;
+  }
+}
+
+async function fetchEtherscanTokenPageText() {
+  const url = `https://r.jina.ai/https://etherscan.io/token/${CONTRACT_ADDRESS}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('jina fetch failed');
+  return await r.text();
+}
+
+async function parseFromEtherscanText(t) {
+  const clean = (t || '').replace(/\u00a0/g, ' ');
+
+  const pickNum = (arr) => {
+    if (!arr) return null;
+    const raw = String(arr).replace(/[^0-9.,]/g, '');
+    if (!raw) return null;
+    const n = parseFloat(raw.replace(/,/g, ''));
+    return Number.isFinite(n) ? n : null;
+  };
+
+  // Holders (ex: "Holders:" sau "Holders (xxx)")
+  let holders = null;
+  const holdersMatch =
+    clean.match(/Holders\s*[:\)]\s*<[^>]*>\s*([0-9.,]+)/i) ||
+    clean.match(/Holders\s*[:\)]\s*([0-9.,]+)/i) ||
+    clean.match(/Holders\s*\((\s*[0-9.,]+\s*)\)/i);
+  holders = pickNum(holdersMatch && holdersMatch[1]);
+
+  // Token Transfers / Transfers count (de obicei apare ca "Token Transfers (123,456)")
+  let transfers = null;
+  const transfersMatch =
+    clean.match(/Token\s*Transfers\s*\(\s*([0-9.,]+)\s*\)/i) ||
+    clean.match(/Transfers\s*\(\s*([0-9.,]+)\s*\)/i) ||
+    clean.match(/Token\s*Transfers\s*[:\)]\s*([0-9.,]+)/i);
+  transfers = pickNum(transfersMatch && transfersMatch[1]);
+
+  // Total Supply (text)
+  let supplyTokens = null;
+  const supplyMatch =
+    clean.match(/Total\s*Supply\s*[:\)]\s*<[^>]*>\s*([0-9.,]+)\s*([A-Z]{2,10})/i) ||
+    clean.match(/Total\s*Supply\s*[:\)]\s*([0-9.,]+)\s*([A-Z]{2,10})/i);
+  supplyTokens = pickNum(supplyMatch && supplyMatch[1]);
+
+  return { holders, transfers, supplyTokens };
+}
+
+async function updateHolders() {
+  const el = document.getElementById("holdersCount");
+  if (!el) return;
+  el.textContent = "…";
+  
+  try {
+    // Metoda EXACTĂ din primul cod: scraping Etherscan + fallback Ethplorer
+    const txt = await fetchEtherscanTokenPageText();
+    const parsed = await parseFromEtherscanText(txt);
+
+    if (parsed.holders != null) { 
+      el.textContent = parsed.holders.toLocaleString('ro-RO'); 
+    } else { 
+      // Fallback la Ethplorer
+      try { 
+        const info = await fetchEthplorerTokenInfo(); 
+        const hc = info && info.holdersCount; 
+        if (hc != null) el.textContent = Number(hc).toLocaleString('ro-RO');
+        else el.textContent = "0";
+      } catch(e) {
+        el.textContent = "0";
+      }
+    }
+    setLastUpdate();
+  } catch (e) {
+    console.warn('Etherscan scrape failed:', e);
+    el.textContent = "0";
+  }
 }
 
 /* ===================== PRICE HISTORY STORAGE ===================== */
@@ -768,21 +857,6 @@ async function updateSBYTPrice() {
   }
 }
 
-async function updateHolders() {
-  const el = document.getElementById("holdersCount");
-  if (!el) return;
-  el.textContent = "…";
-  try {
-    const r = await fetch(HOLDERS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
-    const d = await r.json();
-    const v = Number(d?.holders);
-    el.textContent = (d?.ok && Number.isFinite(v)) ? v.toLocaleString("ro-RO") : "0";
-    setLastUpdate();
-  } catch {
-    el.textContent = "0";
-  }
-}
-
 async function updateTotalSupply() {
   const el = document.getElementById("totalSupply");
   if (!el) return;
@@ -879,7 +953,7 @@ window.fetchAllData = async function(){
   try{
     await Promise.allSettled([
       updateSBYTPrice(),
-      updateHolders(),
+      updateHolders(), // FOLOSESTE METODA EXACTA DIN PRIMUL COD
       updateTotalSupply(),
       updateTransactions(),
       updateContractInfo(),
@@ -904,14 +978,14 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPriceChart(loadSamples());
 
   updateSBYTPrice();
-  updateHolders();
+  updateHolders(); // FOLOSESTE METODA EXACTA DIN PRIMUL COD
   updateTotalSupply();
   updateTransactions();
   updateContractInfo();
   updatePoolStats();
 
   setInterval(updateSBYTPrice, 30000);
-  setInterval(updateHolders, 300000);
+  setInterval(updateHolders, 300000); // FOLOSESTE METODA EXACTA DIN PRIMUL COD
   setInterval(updateTotalSupply, 300000);
   setInterval(updateTransactions, 300000);
   setInterval(updateContractInfo, 3600000);
@@ -922,4 +996,3 @@ document.addEventListener("DOMContentLoaded", () => {
   </script>
 </body>
 </html>
-
