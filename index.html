@@ -1646,6 +1646,7 @@ function renderNewsList(items, isAdmin) {
         if (!db) return alert("Firestore unavailable.");
         try {
           await db.collection("news").doc(item._id).delete();
+          alert("News deleted successfully!");
         } catch (e) {
           console.error("delete news failed:", e);
           alert("Error deleting (check permissions).");
