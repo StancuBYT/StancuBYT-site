@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StancuBYT | Site (5 pagini)</title>
+  <title> | Site (5 pagini)</title>
   <style>
     :root {
       --shell-bg: #050510;
@@ -80,13 +80,14 @@
       border: 1px solid var(--shell-border);
       background: rgba(255,255,255,0.06);
       color: #fff;
-      padding: 8px 12px;
+      padding: 10px 16px;
       border-radius: 999px;
       font-weight: 800;
-      font-size: 12px;
+      font-size: 22px;
       transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
       user-select: none;
       white-space: nowrap;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.45);
     }
     .tab:hover {
       transform: translateY(-1px);
@@ -134,13 +135,84 @@
     /* Hidden templates */
     template { display: none; }
   
-/* === Home 3D logos: CENTER BOTH === */
-.scientific-nav .nav-container{
-  display:flex;
-  justify-content:center !important;
+.shell-logo-right img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
 }
-.scientific-nav .logo{
-  margin:0 14px;
+
+.shell-logo-left img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+
+.scientific-nav .logo-text{ display:none !important; }
+
+.scientific-nav .nav-container{
+  justify-content: space-between !important;
+}
+.scientific-nav .logo-left{
+  justify-content:flex-start;
+}
+.scientific-nav .logo-right{
+  justify-content:flex-end;
+}
+
+</style>
+
+    .tab-promos{
+      position: relative;
+      border-color: rgba(255, 149, 0, 0.55);
+      background: linear-gradient(45deg, rgba(255,149,0,0.18), rgba(138,43,226,0.16));
+      box-shadow: 0 0 18px rgba(255,149,0,0.18);
+    }
+    .tab-promos::after{
+      content: "CONTESTS";
+      position: absolute;
+      top: -8px;
+      right: -6px;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      padding: 3px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,149,0,0.65);
+      background: rgba(10,10,31,0.85);
+      color: #ffb14d;
+      box-shadow: 0 0 14px rgba(255,149,0,0.22);
+    }
+    .tab-promos:hover{
+      border-color: rgba(255,149,0,0.85);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.25), 0 0 24px rgba(255,149,0,0.22);
+    }
+    .tab-promos.active{
+      background: linear-gradient(45deg, rgba(255,149,0,0.30), rgba(0,255,136,0.18));
+      border-color: rgba(255,149,0,0.90);
+      box-shadow: 0 0 22px rgba(255,149,0,0.24);
+    }
+    @keyframes promosPulse{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-1px); }
+    }
+    .tab-promos{ animation: promosPulse 1.8s ease-in-out infinite; }
+
+
+.shell-logo-right img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+.shell-logo-left img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
 }
 
 </style>
@@ -149,11 +221,19 @@
 
   <div class="nav">
     <div class="brand">
+    <div class="shell-logo-left">
+      <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" />
+    </div>
+
       <span class="dot"></span>
       <div>
-        <div class="title">StancuBYT</div>
-        <div class="subtitle">Site (5 pagini într-un singur index.html)</div>
+        
       </div>
+    
+    <div class="shell-logo-right">
+      <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" />
+    </div>
+    
     </div>
 
     <div class="tabs" id="tabs"></div>
@@ -1394,6 +1474,21 @@
 .lb-top3{ background: rgba(205,127,50,.12); }
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
 
+
+.shell-logo-right img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+.shell-logo-left img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
 </style>
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1431,7 +1526,7 @@
 <!-- Scientific Navigation -->
 <nav class="scientific-nav">
 <div class="nav-container">
-<div class="logo">
+<div class="logo logo-left">
 <div class="logo-3d-container">
 <div class="logo-3d">
 <img alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
@@ -1443,10 +1538,22 @@
 <div class="backnote"></div>
 </div>
 </div>
-<div class="logo-text">StancuBYT</div>
-</div>
+
 <div class="nav-links">
-<a href="#presentation" onclick="showSection('presentation')">Presentation</a>
+  <a href="#presentation" onclick="showSection('presentation')">&nbsp;</a>
+</div>
+
+<div class="logo logo-right">
+<div class="logo-3d-container">
+<div class="logo-3d">
+<img alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/80/0a0a1f/00ff88?text=SBYT'" src="https://i.ibb.co/Zzb6ZTG0/logo.png"/>
+</div>
+<div class="backnote-orbit">
+<div class="backnote"></div>
+<div class="backnote"></div>
+<div class="backnote"></div>
+<div class="backnote"></div>
+</div>
 </div>
 </div>
 </nav>
@@ -1465,7 +1572,7 @@
             </p>
 <!-- Live Price Display -->
 <div id="sbyt-price-box" style="margin-top:20px;">
-  <div style="font-size:18px; opacity:.85;">1 SBYT in USD</div>
+  <div style="font-size: 22px; opacity:.85;">1 SBYT in USD</div>
   <div id="sbyt-price"
        style="font-size:32px; font-weight:bold; color:#00ff88;">
        Loading...
@@ -2853,7 +2960,22 @@ document.addEventListener("DOMContentLoaded", () => {
       border: 1px solid var(--border);
     }
 
-  </style>
+  
+.shell-logo-right img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+.shell-logo-left img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+</style>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -2912,6 +3034,10 @@ document.addEventListener("DOMContentLoaded", () => {
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
+    <div class="shell-logo-left">
+      <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" />
+    </div>
+
         <div class="logo-3d-container">
           <div class="logo-3d">
             <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/50/0a0a1f/00ff88?text=SBYT'">
@@ -5353,7 +5479,22 @@ async function tryDeleteStorageFiles(promo){
         padding: 0.4rem 0.7rem;
       }
     }
-  </style>
+  
+.shell-logo-right img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+.shell-logo-left img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+</style>
 </head>
 
 <body>
@@ -5363,6 +5504,10 @@ async function tryDeleteStorageFiles(promo){
     <!-- TOPBAR WITH LOGO -->
     <div class="topbar">
       <div class="brand">
+    <div class="shell-logo-left">
+      <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" />
+    </div>
+
         <div class="logo-3d-container">
           <div class="logo-3d">
             <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/50/0a0a1f/00ff88?text=SBYT'">
@@ -5401,7 +5546,7 @@ async function tryDeleteStorageFiles(promo){
         <h3>📈 Real-Time Price</h3>
 
         <div id="sbyt-price-box" style="margin-top:14px; margin-bottom:10px;">
-          <div style="font-size:18px; opacity:.85;">1 SBYT in USD</div>
+          <div style="font-size: 22px; opacity:.85;">1 SBYT in USD</div>
           <div id="sbyt-price" style="font-size:32px; font-weight:bold; color:var(--green-growth);">Loading...</div>
         </div>
 
@@ -6789,7 +6934,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 0 0 40px rgba(0, 255, 136, 0.2),
                 inset 0 0 20px rgba(138, 43, 226, 0.1);
         }
-    </style>
+    
+.shell-logo-right img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+.shell-logo-left img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+</style>
     
     <!-- Firebase (compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -6806,6 +6966,10 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="wrap">
         <div class="topbar">
             <div class="brand">
+    <div class="shell-logo-left">
+      <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" />
+    </div>
+
                 <div class="logo-3d-container">
                     <div class="logo-3d">
                         <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/50/0a0a1f/00ff88?text=SBYT'">
@@ -7616,7 +7780,7 @@ function setAdminUI(isAdmin, user) {
         msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
         msg.textContent = user
             ? (isAdmin ? 'Admin mode active. Roadmap can be edited.' : 'Authenticated, but no admin rights.')
-            : 'Login with email + password (Firebase).';
+            : '';
     }
 
     try { setRoadmapAdminMode(isAdmin); } catch(e) {}
@@ -8937,7 +9101,22 @@ function initDistributionLive(){
         grid-template-columns: 1fr;
       }
     }
-  </style>
+  
+.shell-logo-right img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+.shell-logo-left img{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+
+</style>
 </head>
 
 <body>
@@ -8948,6 +9127,10 @@ function initDistributionLive(){
     <!-- Top Navigation Bar -->
     <div class="topbar">
       <div class="brand">
+    <div class="shell-logo-left">
+      <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="SBYT" />
+    </div>
+
         <div class="logo-3d-container">
           <div class="logo-3d">
             <img src="https://i.ibb.co/Zzb6ZTG0/logo.png" alt="StancuBYT Logo" onerror="this.src='https://via.placeholder.com/50/0a0a1f/00ff88?text=SBYT'">
@@ -9293,9 +9476,9 @@ function initDistributionLive(){
 
   <script>
     const PAGES = [
-      { id: "prezentare", label: "Prezentare", tpl: "tpl-prezentare" },
-      { id: "promotii", label: "Promoții", tpl: "tpl-promotii" },
-      { id: "statistici", label: "Statistici", tpl: "tpl-statistici" },
+      { id: "prezentare", label: "Home", tpl: "tpl-prezentare" },
+      { id: "promotii", label: "Promotions", tpl: "tpl-promotii" },
+      { id: "statistici", label: "Statistics", tpl: "tpl-statistici" },
       { id: "whitepaper", label: "Whitepaper", tpl: "tpl-whitepaper" },
       { id: "contact", label: "Contact", tpl: "tpl-contact" },
     ];
@@ -9322,7 +9505,7 @@ function initDistributionLive(){
     // Build tabs
     PAGES.forEach(p => {
       const btn = document.createElement("button");
-      btn.className = "tab";
+      btn.className = "tab" + (p.id === "promotii" ? " tab-promos" : "");
       btn.textContent = p.label;
       btn.dataset.page = p.id;
       btn.addEventListener("click", () => loadPage(p.id));
