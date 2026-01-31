@@ -1671,7 +1671,7 @@
     <!-- Admin edit (doar după logare) -->
     <div id="distAdminControls" style="display:none; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.14);">
         <p style="margin:0 0 0.7rem 0; font-size:0.85rem; opacity:0.85;">
-            ✍️ Editează conținutul “Transparență Distribuție” (salvare în Firestore).
+            ✍️ Editează conținutul "Transparență Distribuție" (salvare în Firestore).
         </p>
 
         <label style="display:block; font-size:0.85rem; opacity:0.85; margin-bottom:6px;">Text principal</label>
@@ -1863,34 +1863,36 @@ function applyDistributionToUI(data){
   const updatedEl = document.getElementById('distUpdated');
 
   const summary = (data && data.summary) ? String(data.summary) : __distData.summary;
-  const bullets = (data && Array.isArray(data.bullets) && data.bullets.length) ? data.bullets : __distData.bullets;
+  const bullets = (data && Array.isArray(data.bullets) && data.bullets.length > 0) ? data.bullets : __distData.bullets;
 
   if (summaryEl) summaryEl.textContent = summary;
 
   if (bulletsEl) {
-    // Safe render: if bullets is empty/invalid, keep existing DOM content
-    if (Array.isArray(bullets) && bullets.length) {
-      bulletsEl.innerHTML = '';
-      bullets.forEach((b) => {
-        const li = document.createElement('li');
-        li.textContent = String(b);
-        bulletsEl.appendChild(li);
-      });
-    }
-  }if (updatedEl) {
+    // Clear existing content
+    bulletsEl.innerHTML = '';
+    
+    // Always render bullets, even if using defaults
+    const bulletsToRender = Array.isArray(bullets) && bullets.length > 0 ? bullets : __distData.bullets;
+    
+    bulletsToRender.forEach((b) => {
+      const li = document.createElement('li');
+      li.textContent = String(b);
+      bulletsEl.appendChild(li);
+    });
+  }
+  
+  if (updatedEl) {
     const when = fmtFirestoreDate(data?.updatedAt);
     const by = data?.updatedBy ? String(data.updatedBy) : '';
     updatedEl.textContent = (when || by) ? `Ultima actualizare: ${when}${by ? ' • ' + by : ''}` : '';
   }
 
   // daca admin e activ, actualizam draftul (fara sa deranjam editarea curenta)
-  if (window.__SBYT_ADMIN) {
+  if (window.__SBYT_ADMIN && !__distHydrating) {
     const sIn = document.getElementById('distSummaryInput');
     const bIn = document.getElementById('distBulletsInput');
-    if (__distHydrating) {
-      if (sIn) sIn.value = summary;
-      if (bIn) bIn.value = bullets.join('\n');
-    }
+    if (sIn) sIn.value = summary;
+    if (bIn) bIn.value = (Array.isArray(bullets) ? bullets : __distData.bullets).join('\n');
   }
 }
 
@@ -1944,6 +1946,11 @@ async function saveDistributionTransparency(){
     await db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).set(payload, { merge: true });
 
     if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Salvat ✅ (Transparență Distribuție)'; }
+    
+    // Actualizeaza UI-ul imediat
+    __distData = { ...__distData, ...payload };
+    applyDistributionToUI(__distData);
+    
   } catch(e){
     if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare salvare: ' + (e?.message || e); }
   }
@@ -1957,7 +1964,7 @@ function initDistributionLive(){
     const data = snap.exists ? snap.data() : null;
     __distData = {
       summary: data?.summary || __distData.summary,
-      bullets: Array.isArray(data?.bullets) && data.bullets.length ? data.bullets : __distData.bullets,
+      bullets: Array.isArray(data?.bullets) && data.bullets.length > 0 ? data.bullets : __distData.bullets,
       updatedAt: data?.updatedAt || null,
       updatedBy: data?.updatedBy || null
     };
