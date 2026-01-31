@@ -6,6 +6,10 @@
     <title>StancuBYT | Token Digital Avansat</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+    
+    <!-- Particules.js pentru fundal -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
     <style>
         /* Variabile culori conform psihologiei marketingului */
         :root {
@@ -16,6 +20,9 @@
             --dark-bg: #0a0a1f;
             --darker-bg: #050510;
             --orange-alert: #ff9500;
+            --card: rgba(255,255,255,0.06);
+            --card2: rgba(255,255,255,0.09);
+            --border: rgba(255,255,255,0.12);
         }
 
         * {
@@ -25,22 +32,40 @@
             font-family: 'Arial', sans-serif;
         }
 
-        body {
-            background: var(--dark-bg);
-            color: white;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
-        }
-
-        /* Particle Animation Background */
+        /* Particules Background */
         #particles-js {
             position: fixed;
             width: 100%;
             height: 100%;
+            z-index: -2;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(1200px 600px at 10% 10%, rgba(0,102,255,0.18), transparent 55%),
+                radial-gradient(900px 500px at 80% 20%, rgba(0,255,136,0.14), transparent 55%),
+                radial-gradient(700px 500px at 50% 90%, rgba(138,43,226,0.12), transparent 60%),
+                linear-gradient(180deg, var(--darker-bg), var(--dark-bg));
+            color: #fff;
+            padding: 26px 14px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 60%, rgba(0, 255, 136, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
             z-index: -1;
+            pointer-events: none;
         }
 
         /* Logo Background pentru Hero Section */
@@ -1012,6 +1037,94 @@
             margin-bottom: 0.5rem;
         }
 
+        /* ====== ADMIN LOGIN + ADMIN ONLY ====== */
+        .admin-login{
+            margin-top: 80px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+            border-top: 2px solid rgba(122,92,255,.8);
+            text-align: center;
+            border-radius: 16px;
+        }
+        .admin-login h2{ color:#fff; margin:0 0 10px; }
+        .admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
+        .admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+        .admin-login-box input{
+            padding:12px 14px; width:280px; max-width:92vw;
+            border-radius:10px; border:1px solid rgba(255,255,255,.12);
+            background: rgba(0,0,0,.25); color:#fff; outline:none;
+        }
+        .admin-login-box button{
+            padding:12px 16px; border-radius:10px; border:none;
+            background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
+        }
+        .admin-login-box button:hover{ filter: brightness(1.08); }
+        .admin-msg{ margin-top:12px; font-weight:700; }
+
+        .admin-status-row{ margin-top:12px; display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; }
+        .admin-badge{ display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800; font-size:.9rem; border:1px solid rgba(255,255,255,.14); }
+        .admin-badge-on{ background: rgba(0,255,136,.12); color:#00ff88; border-color: rgba(0,255,136,.22); }
+        .admin-badge-off{ background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22); }
+        .admin-user-label{ opacity:.85; font-size:.95rem; }
+        .admin-pill{
+            display:inline-flex; align-items:center; gap:8px;
+            padding:6px 10px; border-radius:999px; font-size:.9rem;
+            background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
+        }
+        .admin-pill.off{
+            background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
+        }
+        .admin-only{ display:none !important; }
+
+        /* ====== TROPHY BUTTON (Giveaway add) ====== */
+        .trophy-btn{
+            padding: 10px 14px !important;
+            display:inline-flex; align-items:center; justify-content:center; gap:10px;
+            min-width: 54px;
+        }
+        .trophy-btn .trophy-wrap{ font-size: 1.2rem; }
+        .trophy-btn .trophy-logo{
+            width: 22px; height: 22px; border-radius: 6px;
+            box-shadow: 0 0 12px rgba(0,255,136,.25);
+        }
+        .table-responsive{ overflow-x:auto; width:100%; }
+        .lb-table{ width:100%; border-collapse: collapse; }
+        .lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
+        .lb-top1{ background: rgba(255,215,0,.12); }
+        .lb-top2{ background: rgba(192,192,192,.12); }
+        .lb-top3{ background: rgba(205,127,50,.12); }
+        .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
+
+        /* ====== TEAM (Membri) Admin + Firebase ====== */
+        .team-member-card{display:flex; gap:14px; align-items:flex-start;}
+        .team-avatar{width:84px; height:84px; border-radius:50%; flex:0 0 84px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow: 0 0 18px rgba(0,102,255,0.25);}
+        .team-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
+        .team-emoji{font-size:2.4rem;}
+        .team-meta{flex:1;}
+        .team-meta h4{margin:0; color: var(--green-growth);}
+        .team-role{margin-top:6px; opacity:.95;}
+        .team-since{margin-top:6px; font-size:.9rem; opacity:.8;}
+        .team-actions{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;}
+        .team-file-input{padding:12px 14px; width:280px; max-width:92vw; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color:#fff; outline:none;}
+        #teamPhotoFile{padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color:#fff;}
+
+        /* ====== ROADMAP DRAG & DROP (Admin) ====== */
+        .roadmap-drag-handle{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            margin-left:10px;
+            padding:2px 8px;
+            border-radius:10px;
+            border:1px solid rgba(255,255,255,.14);
+            background: rgba(255,255,255,.06);
+            cursor: grab;
+            user-select:none;
+            font-weight:900;
+        }
+        .timeline-item[draggable="true"]{ cursor: grab; }
+        .timeline-item.dragging{ opacity: .45; }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .nav-container {
@@ -1111,112 +1224,23 @@
                 height: 100px;
             }
         }
-    
+
         .form-group select option {
             background: var(--darker-bg);
             color: #ffffff;
         }
-
+    </style>
     
-/* ====== ADMIN LOGIN + ADMIN ONLY ====== */
-.admin-login{
-  margin-top: 80px;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
-  border-top: 2px solid rgba(122,92,255,.8);
-  text-align: center;
-  border-radius: 16px;
-}
-.admin-login h2{ color:#fff; margin:0 0 10px; }
-.admin-login .admin-desc{ color:#cfcfe8; margin:0 0 18px; opacity:.9; }
-.admin-login-box{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-.admin-login-box input{
-  padding:12px 14px; width:280px; max-width:92vw;
-  border-radius:10px; border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.25); color:#fff; outline:none;
-}
-.admin-login-box button{
-  padding:12px 16px; border-radius:10px; border:none;
-  background:#7a5cff; color:#fff; font-weight:700; cursor:pointer;
-}
-.admin-login-box button:hover{ filter: brightness(1.08); }
-.admin-msg{ margin-top:12px; font-weight:700; }
-
-.admin-status-row{ margin-top:12px; display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; }
-.admin-badge{ display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800; font-size:.9rem; border:1px solid rgba(255,255,255,.14); }
-.admin-badge-on{ background: rgba(0,255,136,.12); color:#00ff88; border-color: rgba(0,255,136,.22); }
-.admin-badge-off{ background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22); }
-.admin-user-label{ opacity:.85; font-size:.95rem; }
-.admin-pill{
-  display:inline-flex; align-items:center; gap:8px;
-  padding:6px 10px; border-radius:999px; font-size:.9rem;
-  background: rgba(0,255,136,.12); color:#00ff88; border:1px solid rgba(0,255,136,.22);
-}
-.admin-pill.off{
-  background: rgba(255,77,77,.12); color:#ff4d4d; border-color: rgba(255,77,77,.22);
-}
-.admin-only{ display:none !important; }
-
-/* ====== TROPHY BUTTON (Giveaway add) ====== */
-.trophy-btn{
-  padding: 10px 14px !important;
-  display:inline-flex; align-items:center; justify-content:center; gap:10px;
-  min-width: 54px;
-}
-.trophy-btn .trophy-wrap{ font-size: 1.2rem; }
-.trophy-btn .trophy-logo{
-  width: 22px; height: 22px; border-radius: 6px;
-  box-shadow: 0 0 12px rgba(0,255,136,.25);
-}
-.table-responsive{ overflow-x:auto; width:100%; }
-.lb-table{ width:100%; border-collapse: collapse; }
-.lb-table th,.lb-table td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; }
-.lb-top1{ background: rgba(255,215,0,.12); }
-.lb-top2{ background: rgba(192,192,192,.12); }
-.lb-top3{ background: rgba(205,127,50,.12); }
-.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
-
-
-/* ====== TEAM (Membri) Admin + Firebase ====== */
-.team-member-card{display:flex; gap:14px; align-items:flex-start;}
-.team-avatar{width:84px; height:84px; border-radius:50%; flex:0 0 84px; background: linear-gradient(45deg, var(--blue-tech), var(--purple-innov)); display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow: 0 0 18px rgba(0,102,255,0.25);}
-.team-avatar img{width:100%; height:100%; object-fit:cover; display:block;}
-.team-emoji{font-size:2.4rem;}
-.team-meta{flex:1;}
-.team-meta h4{margin:0; color: var(--green-growth);}
-.team-role{margin-top:6px; opacity:.95;}
-.team-since{margin-top:6px; font-size:.9rem; opacity:.8;}
-.team-actions{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;}
-.team-file-input{padding:12px 14px; width:280px; max-width:92vw; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color:#fff; outline:none;}
-#teamPhotoFile{padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color:#fff;}
-
-
-
-/* ====== ROADMAP DRAG & DROP (Admin) ====== */
-.roadmap-drag-handle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  margin-left:10px;
-  padding:2px 8px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  cursor: grab;
-  user-select:none;
-  font-weight:900;
-}
-.timeline-item[draggable="true"]{ cursor: grab; }
-.timeline-item.dragging{ opacity: .45; }
-
-</style>
-<!-- Firebase (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <!-- Firebase (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 <body>
+
+    <!-- Particules Background -->
+    <div id="particles-js"></div>
 
     <section id="whitepaper" class="page-section active-section">
         <div class="whitepaper-header">
@@ -1506,11 +1530,7 @@
                 </table>
             </div>
 
-            <div style="background: rgba(255, 204, 0, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid #ffcc00; margin-top: 1.5rem;">
-                <p style="margin: 0; font-size: 0.9rem;">
-                    <strong>⚠️ Notă:</strong> Dacă implementezi *taxă suplimentară pe transfer*, aceasta trebuie definită clar în smart‑contract și poate merge spre lichiditate, marketing, burn sau recompense comunitate.
-                </p>
-            </div>
+            <!-- TEXT ELIMINAT aici -->
         </div>
 
         <!-- 7. Echipa -->
@@ -1535,12 +1555,12 @@
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <input id="founderPhotoFile" type="file" accept="image/*" style="max-width: 320px;" />
                         <button class="news-btn" type="button" onclick="saveFounderPhoto()">💾 Salveaza foto</button>
-                <button onclick="window.open('https://github.com/StancuBYT/StancuBYT-Contract', '_blank')" class="download-btn">
-                    <span>🛡️</span> Cod sursă & Audit (GitHub)
-                </button>
-                <button onclick="window.open('https://github.com/StancuBYT/StancuBYT-Contract/blob/main/Audit.md', '_blank')" class="download-btn">
-                    <span>📄</span> Raport Audit (Audit.md)
-                </button>
+                        <button onclick="window.open('https://github.com/StancuBYT/StancuBYT-Contract', '_blank')" class="download-btn">
+                            <span>🛡️</span> Cod sursă & Audit (GitHub)
+                        </button>
+                        <button onclick="window.open('https://github.com/StancuBYT/StancuBYT-Contract/blob/main/Audit.md', '_blank')" class="download-btn">
+                            <span>📄</span> Raport Audit (Audit.md)
+                        </button>
                         <button class="news-btn" type="button" onclick="removeFounderPhoto()">🗑️ Sterge foto</button>
                     </div>
                 </div>
@@ -1588,8 +1608,7 @@
                 </div>
             </div>
 
-
-            <div style="background: rgba(0, 204, 255, 0.05)"; padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
+            <div style="background: rgba(0, 204, 255, 0.05); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--neon-cyan);">
                 <p style="margin: 0; font-size: 0.9rem;">
                     <strong>💼 Echipa în formare:</strong> Vor fi incluși dezvoltatori blockchain, marketeri, manager comunitate. Informațiile vor fi actualizate pe măsură ce echipa se extinde.
                 </p>
@@ -1643,7 +1662,7 @@
                         <span style="font-size: 1.5rem;">🔍</span>
                         <div>
                             <strong>Audit Smart‑Contract</strong>
-                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Recomandat pentru credibilitate și securitate suplimentară înainte de listare.</p>
+                            <!-- TEXT ELIMINAT aici -->
                             <p style="margin-top: 0.6rem; font-size: 0.9rem; opacity: 0.9;">
                                 Linkuri: <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Etherscan</a> ·
                                 <a href="https://github.com/StancuBYT/StancuBYT-Contract" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">GitHub</a> ·
@@ -1656,41 +1675,40 @@
                         <div>
                             <strong>Transparență Distribuție</strong>
                             
-    <div id="distributionPublic">
-        <p id="distSummary" style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.88;">
-            Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.
-        </p>
-        <ul id="distBullets" style="margin: 0.7rem 0 0 1.2rem; font-size: 0.9rem; opacity: 0.86; line-height: 1.5;">
-            <li>Wallet-uri publice pentru: echipă, marketing, rezervă, presale.</li>
-            <li>Plan de vesting: perioadă, cliff, eliberare treptată (ex: lunar).</li>
-            <li>Dovezi: linkuri către adrese pe Etherscan + lock/vesting dacă există.</li>
-        </ul>
-        <p id="distUpdated" style="margin-top: 0.6rem; font-size: 0.82rem; opacity: 0.7;"></p>
-    </div>
+                            <div id="distributionPublic">
+                                <p id="distSummary" style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.88;">
+                                    Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.
+                                </p>
+                                <ul id="distBullets" style="margin: 0.7rem 0 0 1.2rem; font-size: 0.9rem; opacity: 0.86; line-height: 1.5;">
+                                    <li>Wallet-uri publice pentru: echipă, marketing, rezervă, presale.</li>
+                                    <li>Plan de vesting: perioadă, cliff, eliberare treptată (ex: lunar).</li>
+                                    <li>Dovezi: linkuri către adrese pe Etherscan + lock/vesting dacă există.</li>
+                                </ul>
+                                <p id="distUpdated" style="margin-top: 0.6rem; font-size: 0.82rem; opacity: 0.7;"></p>
+                            </div>
 
-    <!-- Admin edit (doar după logare) -->
-    <div id="distAdminControls" style="display:none; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.14);">
-        <p style="margin:0 0 0.7rem 0; font-size:0.85rem; opacity:0.85;">
-            ✍️ Editează conținutul "Transparență Distribuție" (salvare în Firestore).
-        </p>
+                            <!-- Admin edit (doar după logare) -->
+                            <div id="distAdminControls" style="display:none; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.14);">
+                                <p style="margin:0 0 0.7rem 0; font-size:0.85rem; opacity:0.85;">
+                                    ✍️ Editează conținutul "Transparență Distribuție" (salvare în Firestore).
+                                </p>
 
-        <label style="display:block; font-size:0.85rem; opacity:0.85; margin-bottom:6px;">Text principal</label>
-        <textarea id="distSummaryInput" class="team-file-input" style="width:100%; min-height: 84px; resize: vertical;" placeholder="Ex: Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori."></textarea>
+                                <label style="display:block; font-size:0.85rem; opacity:0.85; margin-bottom:6px;">Text principal</label>
+                                <textarea id="distSummaryInput" class="team-file-input" style="width:100%; min-height: 84px; resize: vertical;" placeholder="Ex: Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori."></textarea>
 
-        <label style="display:block; font-size:0.85rem; opacity:0.85; margin: 10px 0 6px;">Bullets (o linie = un punct)</label>
-        <textarea id="distBulletsInput" class="team-file-input" style="width:100%; min-height: 110px; resize: vertical;" placeholder="Ex:
-Wallet echipă: 0x...
-Vesting: 12 luni, eliberare lunară
-LP Lock: link..."></textarea>
+                                <label style="display:block; font-size:0.85rem; opacity:0.85; margin: 10px 0 6px;">Bullets (o linie = un punct)</label>
+                                <textarea id="distBulletsInput" class="team-file-input" style="width:100%; min-height: 110px; resize: vertical;" placeholder="Ex:
+        Wallet echipă: 0x...
+        Vesting: 12 luni, eliberare lunară
+        LP Lock: link..."></textarea>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
-            <button type="button" class="news-btn" onclick="saveDistributionTransparency()">💾 Salvează</button>
-            <button type="button" class="news-btn" onclick="resetDistributionDraft()">↩️ Reset</button>
-        </div>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+                                    <button type="button" class="news-btn" onclick="saveDistributionTransparency()">💾 Salvează</button>
+                                    <button type="button" class="news-btn" onclick="resetDistributionDraft()">↩️ Reset</button>
+                                </div>
 
-        <div id="distMsg" style="margin-top: 10px; font-size:0.85rem; opacity:0.85;"></div>
-    </div>
-
+                                <div id="distMsg" style="margin-top: 10px; font-size:0.85rem; opacity:0.85;"></div>
+                            </div>
                         </div>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(138, 43, 226, 0.05); border-radius: 10px;">
@@ -1746,11 +1764,10 @@ LP Lock: link..."></textarea>
             </button>
         </div>
 
-
         <!-- ADMIN LOGIN (Whitepaper - josul paginii) -->
         <section class="admin-login" id="admin-login">
             <h2>🔐 Administrator Login</h2>
-            <p class="admin-desc">Autentificare necesara pentru editarea sectiunii 5. Plan de lansare / Roadmap.</p>
+            <!-- TEXT ELIMINAT aici -->
             <div class="admin-login-box">
                 <input autocomplete="username" id="adminEmail" placeholder="Email administrator" type="email"/>
                 <input autocomplete="current-password" id="adminPass" placeholder="Parola administrator" type="password"/>
@@ -1763,34 +1780,70 @@ LP Lock: link..."></textarea>
             </div>
             <p class="admin-msg" id="adminLoginMsg"></p>
         </section>
-
     </section>
 
 <script>
+// Initializare particules pentru fundal
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof particlesJS !== 'undefined') {
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: ["#0066ff", "#00ff88", "#8a2be2"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#00ffff",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+    }
+});
 
 // Whitepaper-only helpers (extracted / minimal)
 window.downloadWhitepaper = function(language){
-  const file = (language === 'ro') ? 'StancuBYT_RO.pdf' : 'StancuBYT_EN.pdf';
-  const url = `Whitepaper/${file}`;
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = file;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+    const file = (language === 'ro') ? 'StancuBYT_RO.pdf' : 'StancuBYT_EN.pdf';
+    const url = `Whitepaper/${file}`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 };
 
 window.scrollToSection = function(id){
-  try{
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
-  }catch(e){}
+    try{
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }catch(e){}
 };
 
 window.addEventListener('load', ()=>{
-  // evita conflictul de id duplicat (in cazul in care exista #contact in whitepaper)
-  const wpContact = document.querySelector('#whitepaper #contact');
-  if (wpContact) wpContact.id = 'contact-wp';
+    // evita conflictul de id duplicat (in cazul in care exista #contact in whitepaper)
+    const wpContact = document.querySelector('#whitepaper #contact');
+    if (wpContact) wpContact.id = 'contact-wp';
 });
 
 
@@ -1799,19 +1852,17 @@ window.addEventListener('load', ()=>{
    ============================================================ */
 
 try {
-  if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
-    firebase.initializeApp({
-      apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
-      authDomain: "stancubyt-fc2b9.firebaseapp.com",
-      projectId: "stancubyt-fc2b9",
-      // IMPORTANT: Firebase Storage bucket must be the *.appspot.com bucket name
-      // Otherwise file uploads may fail even if Auth/Firestore work.
-      storageBucket: "stancubyt-fc2b9.appspot.com",
-      messagingSenderId: "263244200492",
-      appId: "1:263244200492:web:28adf253b726cfdafaaf89",
-      measurementId: "G-272S9HSY3K"
-    });
-  }
+    if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
+        firebase.initializeApp({
+            apiKey: "AIzaSyBPGUlNhohbVrfsIRcIfYAD5Fh7GMZlw2Q",
+            authDomain: "stancubyt-fc2b9.firebaseapp.com",
+            projectId: "stancubyt-fc2b9",
+            storageBucket: "stancubyt-fc2b9.appspot.com",
+            messagingSenderId: "263244200492",
+            appId: "1:263244200492:web:28adf253b726cfdafaaf89",
+            measurementId: "G-272S9HSY3K"
+        });
+    }
 } catch (e) {}
 
 const auth = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth() : null;
@@ -1831,248 +1882,223 @@ const DISTRO_STATS_DOC = { col: 'news', doc: 'distribution_transparency' };
 let __distUnsub = null;
 let __distHydrating = false;
 let __distData = {
-  summary: 'Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.',
-  bullets: [
-    'Wallet-uri publice pentru: echipă, marketing, rezervă, presale.',
-    'Plan de vesting: perioadă, cliff, eliberare treptată (ex: lunar).',
-    'Dovezi: linkuri către adrese pe Etherscan + lock/vesting dacă există.'
-  ],
-  updatedAt: null,
-  updatedBy: null
+    summary: 'Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.',
+    bullets: [
+        'Wallet-uri publice pentru: echipă, marketing, rezervă, presale.',
+        'Plan de vesting: perioadă, cliff, eliberare treptată (ex: lunar).',
+        'Dovezi: linkuri către adrese pe Etherscan + lock/vesting dacă există.'
+    ],
+    updatedAt: null,
+    updatedBy: null
 };
 
 function fmtFirestoreDate(ts){
-  if (!ts) return '';
-  try {
-    const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleString('ro-RO');
-  } catch(e) { return ''; }
+    if (!ts) return '';
+    try {
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleString('ro-RO');
+    } catch(e) { return ''; }
 }
 
 function sanitizeLinesToBullets(text){
-  return String(text || '')
-    .split('\n')
-    .map(x => x.trim())
-    .filter(x => x.length > 0)
-    .slice(0, 12); // suficient pentru UI
+    return String(text || '')
+        .split('\n')
+        .map(x => x.trim())
+        .filter(x => x.length > 0)
+        .slice(0, 12); // suficient pentru UI
 }
 
 function applyDistributionToUI(data){
-  const summaryEl = document.getElementById('distSummary');
-  const bulletsEl = document.getElementById('distBullets');
-  const updatedEl = document.getElementById('distUpdated');
+    const summaryEl = document.getElementById('distSummary');
+    const bulletsEl = document.getElementById('distBullets');
+    const updatedEl = document.getElementById('distUpdated');
 
-  const summary = (data && data.summary) ? String(data.summary) : __distData.summary;
-  const bullets = (data && Array.isArray(data.bullets) && data.bullets.length > 0) ? data.bullets : __distData.bullets;
+    const summary = (data && data.summary) ? String(data.summary) : __distData.summary;
+    const bullets = (data && Array.isArray(data.bullets) && data.bullets.length > 0) ? data.bullets : __distData.bullets;
 
-  if (summaryEl) summaryEl.textContent = summary;
+    if (summaryEl) summaryEl.textContent = summary;
 
-  if (bulletsEl) {
-    // Clear existing content
-    bulletsEl.innerHTML = '';
+    if (bulletsEl) {
+        // Clear existing content
+        bulletsEl.innerHTML = '';
+        
+        // Always render bullets, even if using defaults
+        const bulletsToRender = Array.isArray(bullets) && bullets.length > 0 ? bullets : __distData.bullets;
+        
+        bulletsToRender.forEach((b) => {
+            const li = document.createElement('li');
+            li.textContent = String(b);
+            bulletsEl.appendChild(li);
+        });
+    }
     
-    // Always render bullets, even if using defaults
-    const bulletsToRender = Array.isArray(bullets) && bullets.length > 0 ? bullets : __distData.bullets;
-    
-    bulletsToRender.forEach((b) => {
-      const li = document.createElement('li');
-      li.textContent = String(b);
-      bulletsEl.appendChild(li);
-    });
-  }
-  
-  if (updatedEl) {
-    const when = fmtFirestoreDate(data?.updatedAt);
-    const by = data?.updatedBy ? String(data.updatedBy) : '';
-    updatedEl.textContent = (when || by) ? `Ultima actualizare: ${when}${by ? ' • ' + by : ''}` : '';
-  }
+    if (updatedEl) {
+        const when = fmtFirestoreDate(data?.updatedAt);
+        const by = data?.updatedBy ? String(data.updatedBy) : '';
+        updatedEl.textContent = (when || by) ? `Ultima actualizare: ${when}${by ? ' • ' + by : ''}` : '';
+    }
 
-  // daca admin e activ, actualizam draftul (fara sa deranjam editarea curenta)
-  if (window.__SBYT_ADMIN && !__distHydrating) {
-    const sIn = document.getElementById('distSummaryInput');
-    const bIn = document.getElementById('distBulletsInput');
-    if (sIn) sIn.value = summary;
-    if (bIn) bIn.value = (Array.isArray(bullets) ? bullets : __distData.bullets).join('\n');
-  }
+    // daca admin e activ, actualizam draftul (fara sa deranjam editarea curenta)
+    if (window.__SBYT_ADMIN && !__distHydrating) {
+        const sIn = document.getElementById('distSummaryInput');
+        const bIn = document.getElementById('distBulletsInput');
+        if (sIn) sIn.value = summary;
+        if (bIn) bIn.value = (Array.isArray(bullets) ? bullets : __distData.bullets).join('\n');
+    }
 }
 
 function setDistributionAdminUI(isAdmin){
-  const box = document.getElementById('distAdminControls');
-  if (box) box.style.display = isAdmin ? 'block' : 'none';
+    const box = document.getElementById('distAdminControls');
+    if (box) box.style.display = isAdmin ? 'block' : 'none';
 
-  if (!isAdmin) return;
+    if (!isAdmin) return;
 
-  // hydrate inputs with current data
-  __distHydrating = true;
-  try { applyDistributionToUI(__distData); } catch(e) {}
-  __distHydrating = false;
+    // hydrate inputs with current data
+    __distHydrating = true;
+    try { applyDistributionToUI(__distData); } catch(e) {}
+    __distHydrating = false;
 }
 
 function resetDistributionDraft(){
-  if (!window.__SBYT_ADMIN) return;
-  const sIn = document.getElementById('distSummaryInput');
-  const bIn = document.getElementById('distBulletsInput');
-  if (sIn) sIn.value = __distData.summary || '';
-  if (bIn) bIn.value = (Array.isArray(__distData.bullets) ? __distData.bullets : []).join('\n');
-  const msg = document.getElementById('distMsg');
-  if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Draft resetat la varianta publicată.'; }
+    if (!window.__SBYT_ADMIN) return;
+    const sIn = document.getElementById('distSummaryInput');
+    const bIn = document.getElementById('distBulletsInput');
+    if (sIn) sIn.value = __distData.summary || '';
+    if (bIn) bIn.value = (Array.isArray(__distData.bullets) ? __distData.bullets : []).join('\n');
+    const msg = document.getElementById('distMsg');
+    if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Draft resetat la varianta publicată.'; }
 }
 
 async function saveDistributionTransparency(){
-  const msg = document.getElementById('distMsg');
-  try{
-    if (!window.__SBYT_ADMIN) {
-      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Nu ai drepturi admin.'; }
-      return;
+    const msg = document.getElementById('distMsg');
+    try{
+        if (!window.__SBYT_ADMIN) {
+            if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Nu ai drepturi admin.'; }
+            return;
+        }
+        if (!db) {
+            if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Firestore nu este disponibil.'; }
+            return;
+        }
+
+        const sIn = document.getElementById('distSummaryInput');
+        const bIn = document.getElementById('distBulletsInput');
+
+        const summary = (sIn?.value || '').trim() || __distData.summary;
+        const bullets = sanitizeLinesToBullets(bIn?.value || '') || __distData.bullets;
+
+        const payload = {
+            summary,
+            bullets,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: auth?.currentUser?.email ? String(auth.currentUser.email) : 'admin'
+        };
+
+        await db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).set(payload, { merge: true });
+
+        if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Salvat ✅ (Transparență Distribuție)'; }
+        
+        // Actualizeaza UI-ul imediat
+        __distData = { ...__distData, ...payload };
+        applyDistributionToUI(__distData);
+        
+    } catch(e){
+        if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare salvare: ' + (e?.message || e); }
     }
-    if (!db) {
-      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Firestore nu este disponibil.'; }
-      return;
-    }
-
-    const sIn = document.getElementById('distSummaryInput');
-    const bIn = document.getElementById('distBulletsInput');
-
-    const summary = (sIn?.value || '').trim() || __distData.summary;
-    const bullets = sanitizeLinesToBullets(bIn?.value || '') || __distData.bullets;
-
-    const payload = {
-      summary,
-      bullets,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedBy: auth?.currentUser?.email ? String(auth.currentUser.email) : 'admin'
-    };
-
-    await db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).set(payload, { merge: true });
-
-    if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Salvat ✅ (Transparență Distribuție)'; }
-    
-    // Actualizeaza UI-ul imediat
-    __distData = { ...__distData, ...payload };
-    applyDistributionToUI(__distData);
-    
-  } catch(e){
-    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare salvare: ' + (e?.message || e); }
-  }
-}
-
-function initDistributionLive(){
-  if (!db) return;
-  if (__distUnsub) { try{ __distUnsub(); } catch(e){} __distUnsub = null; }
-
-  __distUnsub = db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).onSnapshot((snap) => {
-    const data = snap.exists ? snap.data() : null;
-    __distData = {
-      summary: data?.summary || __distData.summary,
-      bullets: Array.isArray(data?.bullets) && data.bullets.length > 0 ? data.bullets : __distData.bullets,
-      updatedAt: data?.updatedAt || null,
-      updatedBy: data?.updatedBy || null
-    };
-
-    __distHydrating = true;
-    applyDistributionToUI(__distData);
-    __distHydrating = false;
-  }, (err) => {
-    // fallback: still show defaults
-    try { applyDistributionToUI(__distData); } catch(e) {}
-  });
-
-  // initial render even before snapshot returns
-  try { applyDistributionToUI(__distData); } catch(e) {}
 }
 
 function maskEmail(email) {
-  if (!email || typeof email !== 'string') return '';
-  const parts = email.split('@');
-  if (parts.length !== 2) return email;
-  const u = parts[0], d = parts[1];
-  const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
-  return `${u2}@${d}`;
+    if (!email || typeof email !== 'string') return '';
+    const parts = email.split('@');
+    if (parts.length !== 2) return email;
+    const u = parts[0], d = parts[1];
+    const u2 = u.length <= 2 ? (u[0] + '*') : (u.slice(0,2) + '*'.repeat(Math.min(8, u.length-2)));
+    return `${u2}@${d}`;
 }
 
 async function computeIsAdmin(user) {
-  if (!user) return false;
-  try {
-    const token = await user.getIdTokenResult(true);
-    if (token && token.claims && token.claims.admin === true) return true;
-  } catch (e) {}
-  const email = (user.email || '').toLowerCase();
-  return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
+    if (!user) return false;
+    try {
+        const token = await user.getIdTokenResult(true);
+        if (token && token.claims && token.claims.admin === true) return true;
+    } catch (e) {}
+    const email = (user.email || '').toLowerCase();
+    return ADMIN_EMAILS.map(x => String(x).toLowerCase()).includes(email);
 }
 
 function setAdminUI(isAdmin, user) {
-  const badge = document.getElementById('adminStatusBadge');
-  const label = document.getElementById('adminUserLabel');
-  const msg = document.getElementById('adminLoginMsg');
-  const logoutBtn = document.getElementById('adminLogoutBtn');
+    const badge = document.getElementById('adminStatusBadge');
+    const label = document.getElementById('adminUserLabel');
+    const msg = document.getElementById('adminLoginMsg');
+    const logoutBtn = document.getElementById('adminLogoutBtn');
 
-  if (badge) {
-    badge.classList.remove('admin-badge-on','admin-badge-off');
-    badge.classList.add(isAdmin ? 'admin-badge-on' : 'admin-badge-off');
-    badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
-  }
-  if (label) label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
-  if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
+    if (badge) {
+        badge.classList.remove('admin-badge-on','admin-badge-off');
+        badge.classList.add(isAdmin ? 'admin-badge-on' : 'admin-badge-off');
+        badge.textContent = isAdmin ? 'Autentificat (Admin)' : 'Neautentificat';
+    }
+    if (label) label.textContent = user ? `User: ${maskEmail(user.email || '')}` : '';
+    if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
 
-  if (msg) {
-    msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
-    msg.textContent = user
-      ? (isAdmin ? 'Mod administrator activ. Roadmap poate fi editat.' : 'Autentificat, dar fara drepturi admin.')
-      : 'Autentifica-te cu email + parola (Firebase).';
-  }
+    if (msg) {
+        msg.style.color = isAdmin ? '#00ff9c' : '#ff4d4d';
+        msg.textContent = user
+            ? (isAdmin ? 'Mod administrator activ. Roadmap poate fi editat.' : 'Autentificat, dar fara drepturi admin.')
+            : 'Autentifica-te cu email + parola (Firebase).';
+    }
 
-  // activeaza/dezactiveaza controalele roadmap
-  try { setRoadmapAdminMode(isAdmin); } catch(e) {}
-  try { setFounderAdminUI(isAdmin); } catch(e) {}
-  // activeaza/dezactiveaza controalele membri echipa
-  try { setTeamAdminMode(isAdmin); } catch(e) {}
-  try { setDistributionAdminUI(isAdmin); } catch(e) {}
+    // activeaza/dezactiveaza controalele roadmap
+    try { setRoadmapAdminMode(isAdmin); } catch(e) {}
+    try { setFounderAdminUI(isAdmin); } catch(e) {}
+    // activeaza/dezactiveaza controalele membri echipa
+    try { setTeamAdminMode(isAdmin); } catch(e) {}
+    try { setDistributionAdminUI(isAdmin); } catch(e) {}
 }
 
 window.adminSignIn = async function adminSignIn(){
-  try {
-    if (!auth) { alert('Firebase Auth nu este incarcat.'); return; }
-    const email = (document.getElementById('adminEmail')?.value || '').trim();
-    const pass = (document.getElementById('adminPass')?.value || '');
-    if (!email || !pass) {
-      const msg = document.getElementById('adminLoginMsg');
-      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
-      return;
+    try {
+        if (!auth) { alert('Firebase Auth nu este incarcat.'); return; }
+        const email = (document.getElementById('adminEmail')?.value || '').trim();
+        const pass = (document.getElementById('adminPass')?.value || '');
+        if (!email || !pass) {
+            const msg = document.getElementById('adminLoginMsg');
+            if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Completeaza email si parola.'; }
+            return;
+        }
+        await auth.signInWithEmailAndPassword(email, pass);
+    } catch (e) {
+        const msg = document.getElementById('adminLoginMsg');
+        if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
     }
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch (e) {
-    const msg = document.getElementById('adminLoginMsg');
-    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare autentificare: ' + (e?.message || e); }
-  }
 }
 
 window.adminSignOut = async function adminSignOut(){
-  try { if (auth) await auth.signOut(); } catch(e) {}
+    try { if (auth) await auth.signOut(); } catch(e) {}
 }
 
 // listener
 document.addEventListener('DOMContentLoaded', () => {
-  try {
-    if (auth) {
-      auth.onAuthStateChanged(async (user) => {
-        const isAdmin = await computeIsAdmin(user);
-        window.__SBYT_ADMIN = isAdmin;
-        setAdminUI(isAdmin, user);
-      });
-    }
-  } catch (e) {}
+    try {
+        if (auth) {
+            auth.onAuthStateChanged(async (user) => {
+                const isAdmin = await computeIsAdmin(user);
+                window.__SBYT_ADMIN = isAdmin;
+                setAdminUI(isAdmin, user);
+            });
+        }
+    } catch (e) {}
 
-  // init roadmap from firestore (daca exista)
-  try { initRoadmapLive(); } catch(e) {}
+    // init roadmap from firestore (daca exista)
+    try { initRoadmapLive(); } catch(e) {}
 
-  // init founder live photo
-  try { initFounderLive(); } catch(e) {}
+    // init founder live photo
+    try { initFounderLive(); } catch(e) {}
 
-  // init team from firestore (live)
-  try { initTeamLive(); } catch(e) {}
+    // init team from firestore (live)
+    try { initTeamLive(); } catch(e) {}
 
-  // init distributie transparency (live)
-  try { initDistributionLive(); } catch(e) {}
+    // init distributie transparency (live)
+    try { initDistributionLive(); } catch(e) {}
 });
 
 /* ============================================================
@@ -2087,74 +2113,74 @@ let __roadmapUnsub = null;
 let __roadmapHydrating = false; // evita bucle (snapshot -> render -> save)
 
 function getRoadmapEls(){
-  const wrap = document.querySelector('#roadmap .roadmap-timeline');
-  const items = Array.from(document.querySelectorAll('#roadmap .roadmap-timeline .timeline-item'));
-  return {wrap, items};
+    const wrap = document.querySelector('#roadmap .roadmap-timeline');
+    const items = Array.from(document.querySelectorAll('#roadmap .roadmap-timeline .timeline-item'));
+    return {wrap, items};
 }
 
 function statusToBadgeClass(statusText){
-  const s = (statusText || '').toLowerCase();
-  if (s.includes('complet')) return 'badge-success';
-  if (s.includes('curs')) return 'badge-warning';
-  return 'badge-info';
+    const s = (statusText || '').toLowerCase();
+    if (s.includes('complet')) return 'badge-success';
+    if (s.includes('curs')) return 'badge-warning';
+    return 'badge-info';
 }
 
 function ensureAdminButtonsOnItem(item){
-  if (!item) return;
-  if (item.querySelector('.roadmap-admin-bar')) return;
+    if (!item) return;
+    if (item.querySelector('.roadmap-admin-bar')) return;
 
-  const bar = document.createElement('div');
-  bar.className = 'roadmap-admin-bar';
-  bar.style.display = 'flex';
-  bar.style.gap = '10px';
-  bar.style.marginTop = '12px';
-  bar.style.flexWrap = 'wrap';
+    const bar = document.createElement('div');
+    bar.className = 'roadmap-admin-bar';
+    bar.style.display = 'flex';
+    bar.style.gap = '10px';
+    bar.style.marginTop = '12px';
+    bar.style.flexWrap = 'wrap';
 
-  const btnEdit = document.createElement('button');
-  btnEdit.type = 'button';
-  btnEdit.className = 'news-btn';
-  btnEdit.textContent = '✏️ Editeaza';
-  btnEdit.onclick = () => editRoadmapItem(item);
+    const btnEdit = document.createElement('button');
+    btnEdit.type = 'button';
+    btnEdit.className = 'news-btn';
+    btnEdit.textContent = '✏️ Editeaza';
+    btnEdit.onclick = () => editRoadmapItem(item);
 
-  const btnDel = document.createElement('button');
-  btnDel.type = 'button';
-  btnDel.className = 'news-btn';
-  btnDel.textContent = '🗑️ Sterge';
-  btnDel.onclick = () => deleteRoadmapItem(item);
+    const btnDel = document.createElement('button');
+    btnDel.type = 'button';
+    btnDel.className = 'news-btn';
+    btnDel.textContent = '🗑️ Sterge';
+    btnDel.onclick = () => deleteRoadmapItem(item);
 
-  bar.appendChild(btnEdit);
-  bar.appendChild(btnDel);
-  item.appendChild(bar);
+    bar.appendChild(btnEdit);
+    bar.appendChild(btnDel);
+    item.appendChild(bar);
 }
 
 function removeAdminButtonsFromItem(item){
-  item?.querySelector('.roadmap-admin-bar')?.remove();
+    item?.querySelector('.roadmap-admin-bar')?.remove();
 }
 
 function ensureAddPhaseButton(){
-  const {wrap} = getRoadmapEls();
-  if (!wrap) return;
-  if (document.getElementById('roadmapAddPhaseBtn')) return;
+    const {wrap} = getRoadmapEls();
+    if (!wrap) return;
+    if (document.getElementById('roadmapAddPhaseBtn')) return;
 
-  const row = document.createElement('div');
-  row.id = 'roadmapAdminRow';
-  row.style.display = 'flex';
-  row.style.justifyContent = 'flex-end';
-  row.style.marginTop = '14px';
+    const row = document.createElement('div');
+    row.id = 'roadmapAdminRow';
+    row.style.display = 'flex';
+    row.style.justifyContent = 'flex-end';
+    row.style.marginTop = '14px';
 
-  const btn = document.createElement('button');
-  btn.id = 'roadmapAddPhaseBtn';
-  btn.type = 'button';
-  btn.className = 'news-btn';
-  btn.textContent = '➕ Adauga faza noua';
-  btn.onclick = () => addRoadmapItem();
+    const btn = document.createElement('button');
+    btn.id = 'roadmapAddPhaseBtn';
+    btn.type = 'button';
+    btn.className = 'news-btn';
+    btn.textContent = '➕ Adauga faza noua';
+    btn.onclick = () => addRoadmapItem();
 
-  row.appendChild(btn);
-  wrap.parentElement.appendChild(row);
+    row.appendChild(btn);
+    wrap.parentElement.appendChild(row);
 }
 
 function removeAddPhaseButton(){
-  document.getElementById('roadmapAdminRow')?.remove();
+    document.getElementById('roadmapAdminRow')?.remove();
 }
 
 
@@ -2162,259 +2188,256 @@ function removeAddPhaseButton(){
 let __roadmapDragEl = null;
 
 function ensureDragHandle(item){
-  if (!item) return;
-  const titleEl = item.querySelector('.timeline-date');
-  if (!titleEl) return;
-  if (titleEl.querySelector('.roadmap-drag-handle')) return;
+    if (!item) return;
+    const titleEl = item.querySelector('.timeline-date');
+    if (!titleEl) return;
+    if (titleEl.querySelector('.roadmap-drag-handle')) return;
 
-  const h = document.createElement('span');
-  h.className = 'roadmap-drag-handle';
-  h.title = 'Trage pentru a reordona';
-  h.textContent = '⇅';
-  titleEl.appendChild(h);
+    const h = document.createElement('span');
+    h.className = 'roadmap-drag-handle';
+    h.title = 'Trage pentru a reordona';
+    h.textContent = '⇅';
+    titleEl.appendChild(h);
 }
 
 function enableRoadmapDragDrop(enable){
-  const {wrap, items} = getRoadmapEls();
-  if (!wrap) return;
+    const {wrap, items} = getRoadmapEls();
+    if (!wrap) return;
 
-  items.forEach((item) => {
-    if (enable){
-      ensureDragHandle(item);
-      item.setAttribute('draggable','true');
+    items.forEach((item) => {
+        if (enable){
+            ensureDragHandle(item);
+            item.setAttribute('draggable','true');
 
-      if (!item.__dndBound){
-        item.addEventListener('dragstart', (e) => {
-          if (!window.__SBYT_ADMIN) return;
-          __roadmapDragEl = item;
-          item.classList.add('dragging');
-          try{
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', 'roadmap');
-          }catch(_){}
-        });
+            if (!item.__dndBound){
+                item.addEventListener('dragstart', (e) => {
+                    if (!window.__SBYT_ADMIN) return;
+                    __roadmapDragEl = item;
+                    item.classList.add('dragging');
+                    try{
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', 'roadmap');
+                    }catch(_){}
+                });
 
-        item.addEventListener('dragover', (e) => {
-          if (!window.__SBYT_ADMIN) return;
-          e.preventDefault();
-          if (!__roadmapDragEl || __roadmapDragEl === item) return;
+                item.addEventListener('dragover', (e) => {
+                    if (!window.__SBYT_ADMIN) return;
+                    e.preventDefault();
+                    if (!__roadmapDragEl || __roadmapDragEl === item) return;
 
-          const rect = item.getBoundingClientRect();
-          const after = (e.clientY - rect.top) > (rect.height / 2);
-          wrap.insertBefore(__roadmapDragEl, after ? item.nextSibling : item);
-        });
+                    const rect = item.getBoundingClientRect();
+                    const after = (e.clientY - rect.top) > (rect.height / 2);
+                    wrap.insertBefore(__roadmapDragEl, after ? item.nextSibling : item);
+                });
 
-        item.addEventListener('dragend', async () => {
-          item.classList.remove('dragging');
-          __roadmapDragEl = null;
-          // dupa reordonare, salvam noua ordine in Firestore
-          await saveRoadmapToFirestore();
-        });
+                item.addEventListener('dragend', async () => {
+                    item.classList.remove('dragging');
+                    __roadmapDragEl = null;
+                    // dupa reordonare, salvam noua ordine in Firestore
+                    await saveRoadmapToFirestore();
+                });
 
-        item.__dndBound = true;
-      }
-    } else {
-      item.removeAttribute('draggable');
-      // pastram handle-ul (nu strica), dar poti sa-l ascunzi daca vrei
-    }
-  });
+                item.__dndBound = true;
+            }
+        } else {
+            item.removeAttribute('draggable');
+            // pastram handle-ul (nu strica), dar poti sa-l ascunzi daca vrei
+        }
+    });
 }
 
 function setRoadmapAdminMode(isAdmin){
-  const {items} = getRoadmapEls();
-  if (isAdmin){
-    items.forEach(ensureAdminButtonsOnItem);
-    ensureAddPhaseButton();
-    enableRoadmapDragDrop(true);
-  } else {
-    items.forEach(removeAdminButtonsFromItem);
-    removeAddPhaseButton();
-    enableRoadmapDragDrop(false);
-  }
+    const {items} = getRoadmapEls();
+    if (isAdmin){
+        items.forEach(ensureAdminButtonsOnItem);
+        ensureAddPhaseButton();
+        enableRoadmapDragDrop(true);
+    } else {
+        items.forEach(removeAdminButtonsFromItem);
+        removeAddPhaseButton();
+        enableRoadmapDragDrop(false);
+    }
 }
 
 function readRoadmapItem(item){
-  const titleEl = item.querySelector('.timeline-date');
-  const descEl = item.querySelector('p');
-  const badgeEl = item.querySelector('.badge');
-  return {
-    title: titleEl ? titleEl.textContent.trim() : '',
-    description: descEl ? descEl.textContent.trim() : '',
-    status: badgeEl ? badgeEl.textContent.trim() : 'Planificat',
-  };
+    const titleEl = item.querySelector('.timeline-date');
+    const descEl = item.querySelector('p');
+    const badgeEl = item.querySelector('.badge');
+    return {
+        title: titleEl ? titleEl.textContent.trim() : '',
+        description: descEl ? descEl.textContent.trim() : '',
+        status: badgeEl ? badgeEl.textContent.trim() : 'Planificat',
+    };
 }
 
 function writeRoadmapItem(item, data){
-  const titleEl = item.querySelector('.timeline-date');
-  const descEl = item.querySelector('p') || item.appendChild(document.createElement('p'));
-  let badgeEl = item.querySelector('.badge');
-  if (!badgeEl){
-    badgeEl = document.createElement('span');
-    badgeEl.className = 'badge badge-info';
-    item.appendChild(badgeEl);
-  }
+    const titleEl = item.querySelector('.timeline-date');
+    const descEl = item.querySelector('p') || item.appendChild(document.createElement('p'));
+    let badgeEl = item.querySelector('.badge');
+    if (!badgeEl){
+        badgeEl = document.createElement('span');
+        badgeEl.className = 'badge badge-info';
+        item.appendChild(badgeEl);
+    }
 
-  if (titleEl) titleEl.textContent = data.title || '';
-  descEl.textContent = data.description || '';
-  badgeEl.textContent = data.status || 'Planificat';
+    if (titleEl) titleEl.textContent = data.title || '';
+    descEl.textContent = data.description || '';
+    badgeEl.textContent = data.status || 'Planificat';
 
-  badgeEl.classList.remove('badge-success','badge-warning','badge-info');
-  badgeEl.classList.add(statusToBadgeClass(data.status));
+    badgeEl.classList.remove('badge-success','badge-warning','badge-info');
+    badgeEl.classList.add(statusToBadgeClass(data.status));
 }
 
 function collectRoadmapFromDOM(){
-  const items = Array.from(document.querySelectorAll('#roadmap .roadmap-timeline .timeline-item'));
-  return items.map((it, idx)=>{
-    const d = readRoadmapItem(it);
-    return { order: idx, title: d.title, description: d.description, status: d.status };
-  });
+    const items = Array.from(document.querySelectorAll('#roadmap .roadmap-timeline .timeline-item'));
+    return items.map((it, idx)=>{
+        const d = readRoadmapItem(it);
+        return { order: idx, title: d.title, description: d.description, status: d.status };
+    });
 }
 
 function renderRoadmapFromArray(arr){
-  const wrap = document.querySelector('#roadmap .roadmap-timeline');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  (arr||[]).sort((a,b)=>(Number(a.order)-Number(b.order))).forEach((d)=>{
-    const item = document.createElement('div');
-    item.className = 'timeline-item';
-    item.innerHTML = `
-      <div class="timeline-date"></div>
-      <p></p>
-      <span class="badge badge-info"></span>
-    `;
-    wrap.appendChild(item);
-    writeRoadmapItem(item, {
-      title: d.title || '',
-      description: d.description || '',
-      status: d.status || 'Planificat'
+    const wrap = document.querySelector('#roadmap .roadmap-timeline');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    (arr||[]).sort((a,b)=>(Number(a.order)-Number(b.order))).forEach((d)=>{
+        const item = document.createElement('div');
+        item.className = 'timeline-item';
+        item.innerHTML = `
+            <div class="timeline-date"></div>
+            <p></p>
+            <span class="badge badge-info"></span>
+        `;
+        wrap.appendChild(item);
+        writeRoadmapItem(item, {
+            title: d.title || '',
+            description: d.description || '',
+            status: d.status || 'Planificat'
+        });
     });
-  });
 }
 
 async function saveRoadmapToFirestore(){
-  if (!db || !auth?.currentUser) return;
-  try{
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) return;
+    if (!db || !auth?.currentUser) return;
+    try{
+        const isAdmin = await computeIsAdmin(auth.currentUser);
+        if (!isAdmin) return;
 
-    const items = collectRoadmapFromDOM();
-        // salvam intr-un singur doc, ca in "stats" (usor de permis in Rules)
-    await db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc).set({
-      items,
-      updatedAt: Date.now(),
-      updatedBy: auth.currentUser.email || null
-    }, { merge: true });
-  }catch(e){
-    console.warn('Roadmap save (news/roadmap) error:', e);
-    alert('Eroare la salvare roadmap in Firestore (verifica Rules pentru news/roadmap).');
-  }
+        const items = collectRoadmapFromDOM();
+            // salvam intr-un singur doc, ca in "stats" (usor de permis in Rules)
+        await db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc).set({
+            items,
+            updatedAt: Date.now(),
+            updatedBy: auth.currentUser.email || null
+        }, { merge: true });
+    }catch(e){
+        console.warn('Roadmap save (news/roadmap) error:', e);
+        alert('Eroare la salvare roadmap in Firestore (verifica Rules pentru news/roadmap).');
+    }
 }
 
 async function seedRoadmapIfMissing(){
-  // Daca doc-ul nu exista, il cream din fazele HTML existente, ca sa nu dispara la refresh
-  if (!db) return;
-  try{
-    const ref = db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc);
-    const snap = await ref.get();
-    if (snap.exists) return;
-    const items = collectRoadmapFromDOM();
-    if (!items.length) return;
-    await ref.set({ items, createdAt: Date.now() }, { merge: true });
-  }catch(e){
-    console.warn('Roadmap seed error:', e);
-  }
+    // Daca doc-ul nu exista, il cream din fazele HTML existente, ca sa nu dispara la refresh
+    if (!db) return;
+    try{
+        const ref = db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc);
+        const snap = await ref.get();
+        if (snap.exists) return;
+        const items = collectRoadmapFromDOM();
+        if (!items.length) return;
+        await ref.set({ items, createdAt: Date.now() }, { merge: true });
+    }catch(e){
+        console.warn('Roadmap seed error:', e);
+    }
 }
 
 async function editRoadmapItem(item){
-  if (!window.__SBYT_ADMIN) return;
-  await seedRoadmapIfMissing();
+    if (!window.__SBYT_ADMIN) return;
+    await seedRoadmapIfMissing();
 
-  const cur = readRoadmapItem(item);
-  const title = prompt('Titlu faza:', cur.title);
-  if (title === null) return;
-  const description = prompt('Descriere:', cur.description);
-  if (description === null) return;
-  const status = prompt('Status (Completat / În Curs / Planificat):', cur.status);
-  if (status === null) return;
+    const cur = readRoadmapItem(item);
+    const title = prompt('Titlu faza:', cur.title);
+    if (title === null) return;
+    const description = prompt('Descriere:', cur.description);
+    if (description === null) return;
+    const status = prompt('Status (Completat / În Curs / Planificat):', cur.status);
+    if (status === null) return;
 
-  writeRoadmapItem(item, {title, description, status});
-  ensureAdminButtonsOnItem(item);
-  await saveRoadmapToFirestore();
+    writeRoadmapItem(item, {title, description, status});
+    ensureAdminButtonsOnItem(item);
+    await saveRoadmapToFirestore();
 }
 
 async function deleteRoadmapItem(item){
-  if (!window.__SBYT_ADMIN) return;
-  await seedRoadmapIfMissing();
+    if (!window.__SBYT_ADMIN) return;
+    await seedRoadmapIfMissing();
 
-  if (!confirm('Sigur vrei sa stergi aceasta faza?')) return;
-  item.remove();
-  await saveRoadmapToFirestore();
+    if (!confirm('Sigur vrei sa stergi aceasta faza?')) return;
+    item.remove();
+    await saveRoadmapToFirestore();
 }
 
 async function addRoadmapItem(){
-  if (!window.__SBYT_ADMIN) return;
-  await seedRoadmapIfMissing();
+    if (!window.__SBYT_ADMIN) return;
+    await seedRoadmapIfMissing();
 
-  const title = prompt('Titlu faza (ex: Faza 5: ...):', 'Faza noua');
-  if (title === null) return;
-  const description = prompt('Descriere:', '');
-  if (description === null) return;
-  const status = prompt('Status (Completat / În Curs / Planificat):', 'Planificat');
-  if (status === null) return;
+    const title = prompt('Titlu faza (ex: Faza 5: ...):', 'Faza noua');
+    if (title === null) return;
+    const description = prompt('Descriere:', '');
+    if (description === null) return;
+    const status = prompt('Status (Completat / În Curs / Planificat):', 'Planificat');
+    if (status === null) return;
 
-  const {wrap} = getRoadmapEls();
-  if (!wrap) return;
+    const {wrap} = getRoadmapEls();
+    if (!wrap) return;
 
-  const item = document.createElement('div');
-  item.className = 'timeline-item';
-  item.innerHTML = `
-    <div class="timeline-date"></div>
-    <p></p>
-    <span class="badge badge-info"></span>
-  `;
-  wrap.appendChild(item);
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+    item.innerHTML = `
+        <div class="timeline-date"></div>
+        <p></p>
+        <span class="badge badge-info"></span>
+    `;
+    wrap.appendChild(item);
 
-  writeRoadmapItem(item, {title, description, status});
-  ensureAdminButtonsOnItem(item);
-  await saveRoadmapToFirestore();
+    writeRoadmapItem(item, {title, description, status});
+    ensureAdminButtonsOnItem(item);
+    await saveRoadmapToFirestore();
 }
 
 function listenRoadmapLive(){
-  if (!db) return;
-  // evitam dublu subscribe
-  if (__roadmapUnsub) { try{__roadmapUnsub();}catch(e){} __roadmapUnsub=null; }
+    if (!db) return;
+    // evitam dublu subscribe
+    if (__roadmapUnsub) { try{__roadmapUnsub();}catch(e){} __roadmapUnsub=null; }
 
-  const ref = db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc);
-  __roadmapUnsub = ref.onSnapshot((snap)=>{
-    try{
-      if (snap.exists){
-        const data = snap.data() || {};
-        const items = Array.isArray(data.items) ? data.items : [];
-        __roadmapHydrating = true;
-        renderRoadmapFromArray(items);
-        __roadmapHydrating = false;
+    const ref = db.collection(ROADMAP_STATS_DOC.col).doc(ROADMAP_STATS_DOC.doc);
+    __roadmapUnsub = ref.onSnapshot((snap)=>{
+        try{
+            if (snap.exists){
+                const data = snap.data() || {};
+                const items = Array.isArray(data.items) ? data.items : [];
+                __roadmapHydrating = true;
+                renderRoadmapFromArray(items);
+                __roadmapHydrating = false;
+                setRoadmapAdminMode(!!window.__SBYT_ADMIN);
+            } else {
+                // daca nu exista doc -> lasam fazele HTML
+                setRoadmapAdminMode(!!window.__SBYT_ADMIN);
+            }
+        }catch(e){
+            __roadmapHydrating = false;
+            setRoadmapAdminMode(!!window.__SBYT_ADMIN);
+        }
+    }, (err)=>{
+        console.warn('Roadmap listen error:', err);
         setRoadmapAdminMode(!!window.__SBYT_ADMIN);
-      } else {
-        // daca nu exista doc -> lasam fazele HTML
-        setRoadmapAdminMode(!!window.__SBYT_ADMIN);
-      }
-    }catch(e){
-      __roadmapHydrating = false;
-      setRoadmapAdminMode(!!window.__SBYT_ADMIN);
-    }
-  }, (err)=>{
-    console.warn('Roadmap listen error:', err);
-    setRoadmapAdminMode(!!window.__SBYT_ADMIN);
-  });
+    });
 }
 
 // init: live listen (public read). daca nu exista doc, va ramane HTML-ul.
 function initRoadmapLive(){
-  listenRoadmapLive();
+    listenRoadmapLive();
 }
-
-
-
 
 /* ============================================================
    TEAM (Membri) CRUD + PERSISTENTA
@@ -2428,287 +2451,272 @@ let __teamHydrating = false;
 let __teamMembers = [];
 
 function setTeamAdminMode(isAdmin){
-  const addBtn = document.getElementById('teamAddBtn');
-  const clearBtn = document.getElementById('teamClearBtn');
-  if (addBtn) addBtn.style.display = isAdmin ? 'inline-block' : 'none';
-  if (clearBtn) clearBtn.style.display = isAdmin ? 'inline-block' : 'none';
+    const addBtn = document.getElementById('teamAddBtn');
+    const clearBtn = document.getElementById('teamClearBtn');
+    if (addBtn) addBtn.style.display = isAdmin ? 'inline-block' : 'none';
+    if (clearBtn) clearBtn.style.display = isAdmin ? 'inline-block' : 'none';
 
-  if (!isAdmin) {
-    const form = document.getElementById('teamForm');
-    if (form) form.style.display = 'none';
-    clearTeamFormInputs();
-  }
-  renderTeamList();
+    if (!isAdmin) {
+        const form = document.getElementById('teamForm');
+        if (form) form.style.display = 'none';
+        clearTeamFormInputs();
+    }
+    renderTeamList();
 }
 
 function clearTeamFormInputs(){
-  const name = document.getElementById('teamName');
-  const role = document.getElementById('teamRole');
-  const date = document.getElementById('teamJoinDate');
-  const face = document.getElementById('teamFace');
-  const file = document.getElementById('teamPhotoFile');
-  const url = document.getElementById('teamPhotoUrl');
-  if (name) name.value='';
-  if (role) role.value='';
-  if (date) date.value='';
-  if (face) face.value='👨‍💼';
-  if (file) file.value='';
-  if (url) url.value='';
+    const name = document.getElementById('teamName');
+    const role = document.getElementById('teamRole');
+    const date = document.getElementById('teamJoinDate');
+    const face = document.getElementById('teamFace');
+    const file = document.getElementById('teamPhotoFile');
+    const url = document.getElementById('teamPhotoUrl');
+    if (name) name.value='';
+    if (role) role.value='';
+    if (date) date.value='';
+    if (face) face.value='👨‍💼';
+    if (file) file.value='';
+    if (url) url.value='';
 }
 
 window.openTeamForm = function openTeamForm(){
-  if (!window.__SBYT_ADMIN) return;
-  const form = document.getElementById('teamForm');
-  if (form) form.style.display = 'block';
+    if (!window.__SBYT_ADMIN) return;
+    const form = document.getElementById('teamForm');
+    if (form) form.style.display = 'block';
 }
 
 window.cancelTeamMember = function cancelTeamMember(){
-  const form = document.getElementById('teamForm');
-  if (form) form.style.display = 'none';
-  clearTeamFormInputs();
+    const form = document.getElementById('teamForm');
+    if (form) form.style.display = 'none';
+    clearTeamFormInputs();
 }
 
 function teamId(){
-  return 'm_' + Date.now() + '_' + Math.random().toString(16).slice(2);
+    return 'm_' + Date.now() + '_' + Math.random().toString(16).slice(2);
 }
 
 async function uploadTeamPhoto(memberId, file){
-  if (!file) return { url: '', path: '' };
+    if (!file) return { url: '', path: '' };
 
-  // IMPORTANT:
-  // In your deployment, browser uploads to Firebase Storage are blocked by CORS/preflight.
-  // To keep announcements upload untouched (and avoid any Firebase console changes),
-  // we store a SMALL thumbnail as a data URL directly in Firestore for team members.
-  // This makes photos work reliably on GitHub Pages / custom domains.
-
-  function fileToDataURL(f){
-    return new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onerror = () => reject(new Error('file-read-failed'));
-      r.onload = () => resolve(String(r.result || ''));
-      r.readAsDataURL(f);
-    });
-  }
-
-  async function makeThumbnailDataURL(f){
-    const src = await fileToDataURL(f);
-    const img = new Image();
-    const loaded = new Promise((resolve, reject) => {
-      img.onload = () => resolve(true);
-      img.onerror = () => reject(new Error('image-decode-failed'));
-    });
-    img.src = src;
-    await loaded;
-
-    const MAX = 220; // keep very small to stay under Firestore limits
-    let w = img.naturalWidth || img.width || MAX;
-    let h = img.naturalHeight || img.height || MAX;
-    const scale = Math.min(1, MAX / Math.max(w, h));
-    w = Math.max(1, Math.round(w * scale));
-    h = Math.max(1, Math.round(h * scale));
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, w, h);
-
-    // Prefer WebP if available; fall back to JPEG.
-    let out = '';
-    try {
-      out = canvas.toDataURL('image/webp', 0.72);
-      if (!out || !out.startsWith('data:image/webp')) throw new Error('webp-not-supported');
-    } catch(e) {
-      out = canvas.toDataURL('image/jpeg', 0.72);
+    function fileToDataURL(f){
+        return new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onerror = () => reject(new Error('file-read-failed'));
+            r.onload = () => resolve(String(r.result || ''));
+            r.readAsDataURL(f);
+        });
     }
-    return out;
-  }
 
-  try {
-    const url = await makeThumbnailDataURL(file);
-    // Put a marker into photoPath so you can see in Firestore it's stored inline.
-    return { url, path: 'inline:dataurl' };
-  } catch(e) {
-    console.warn('uploadTeamPhoto failed (inline):', e);
-    return { url: '', path: '' };
-  }
+    async function makeThumbnailDataURL(f){
+        const src = await fileToDataURL(f);
+        const img = new Image();
+        const loaded = new Promise((resolve, reject) => {
+            img.onload = () => resolve(true);
+            img.onerror = () => reject(new Error('image-decode-failed'));
+        });
+        img.src = src;
+        await loaded;
+
+        const MAX = 220; // keep very small to stay under Firestore limits
+        let w = img.naturalWidth || img.width || MAX;
+        let h = img.naturalHeight || img.height || MAX;
+        const scale = Math.min(1, MAX / Math.max(w, h));
+        w = Math.max(1, Math.round(w * scale));
+        h = Math.max(1, Math.round(h * scale));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+
+        let out = '';
+        try {
+            out = canvas.toDataURL('image/webp', 0.72);
+            if (!out || !out.startsWith('data:image/webp')) throw new Error('webp-not-supported');
+        } catch(e) {
+            out = canvas.toDataURL('image/jpeg', 0.72);
+        }
+        return out;
+    }
+
+    try {
+        const url = await makeThumbnailDataURL(file);
+        return { url, path: 'inline:dataurl' };
+    } catch(e) {
+        console.warn('uploadTeamPhoto failed (inline):', e);
+        return { url: '', path: '' };
+    }
 }
 
 async function saveTeamToFirestore(){
-  if (!db) throw new Error('Firestore indisponibil');
-  await db.collection(TEAM_STATS_DOC.col).doc(TEAM_STATS_DOC.doc).set({
-    members: __teamMembers,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-  }, { merge: true });
+    if (!db) throw new Error('Firestore indisponibil');
+    await db.collection(TEAM_STATS_DOC.col).doc(TEAM_STATS_DOC.doc).set({
+        members: __teamMembers,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
 }
 
 window.saveTeamMember = async function saveTeamMember(){
-  try {
-    if (!db || !auth?.currentUser) { alert('Nu esti autentificat.'); return; }
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) { alert('Nu ai drepturi admin.'); return; }
+    try {
+        if (!db || !auth?.currentUser) { alert('Nu esti autentificat.'); return; }
+        const isAdmin = await computeIsAdmin(auth.currentUser);
+        if (!isAdmin) { alert('Nu ai drepturi admin.'); return; }
 
-    const name = (document.getElementById('teamName')?.value || '').trim();
-    const role = (document.getElementById('teamRole')?.value || '').trim();
-    const joinDateRaw = (document.getElementById('teamJoinDate')?.value || '').trim();
-    const face = (document.getElementById('teamFace')?.value || '👨‍💼');
-    const file = document.getElementById('teamPhotoFile')?.files?.[0] || null;
-    const urlInput = (document.getElementById('teamPhotoUrl')?.value || '').trim();
+        const name = (document.getElementById('teamName')?.value || '').trim();
+        const role = (document.getElementById('teamRole')?.value || '').trim();
+        const joinDateRaw = (document.getElementById('teamJoinDate')?.value || '').trim();
+        const face = (document.getElementById('teamFace')?.value || '👨‍💼');
+        const file = document.getElementById('teamPhotoFile')?.files?.[0] || null;
+        const urlInput = (document.getElementById('teamPhotoUrl')?.value || '').trim();
 
-    if (!name || !role) { alert('Completeaza Nume si Functie.'); return; }
+        if (!name || !role) { alert('Completeaza Nume si Functie.'); return; }
 
-    const memberId = teamId();
-    const memberSince = joinDateRaw ? joinDateRaw : '';
+        const memberId = teamId();
+        const memberSince = joinDateRaw ? joinDateRaw : '';
 
-    // 1) Salvam imediat membrul (fara a depinde de upload) ca sa nu se piarda nimic.
-    //    Daca exista URL introdus manual, il salvam direct.
-    const member = {
-      id: memberId,
-      name,
-      role,
-      memberSince,
-      face,
-      photoUrl: urlInput || '',
-      photoPath: '',
-      createdAt: Date.now(),
-    };
+        const member = {
+            id: memberId,
+            name,
+            role,
+            memberSince,
+            face,
+            photoUrl: urlInput || '',
+            photoPath: '',
+            createdAt: Date.now(),
+        };
 
-    __teamMembers = [member, ...(__teamMembers || [])];
-    renderTeamList();
-    await saveTeamToFirestore();
+        __teamMembers = [member, ...(__teamMembers || [])];
+        renderTeamList();
+        await saveTeamToFirestore();
 
-    // 2) Daca user a ales fisier, facem upload si apoi actualizam membrul in Firestore.
-    if (file) {
-      try {
-        const up = await uploadTeamPhoto(memberId, file);
-        const idx = (__teamMembers || []).findIndex(m => m.id === memberId);
-        if (idx >= 0) {
-          __teamMembers[idx].photoUrl = up.url;
-          __teamMembers[idx].photoPath = up.path;
-          renderTeamList();
-          await saveTeamToFirestore();
+        if (file) {
+            try {
+                const up = await uploadTeamPhoto(memberId, file);
+                const idx = (__teamMembers || []).findIndex(m => m.id === memberId);
+                if (idx >= 0) {
+                    __teamMembers[idx].photoUrl = up.url;
+                    __teamMembers[idx].photoPath = up.path;
+                    renderTeamList();
+                    await saveTeamToFirestore();
+                }
+            } catch (upErr) {
+                console.warn('Upload foto esuat:', upErr);
+            }
         }
-      } catch (upErr) {
-        console.warn('Upload foto esuat:', upErr);
-        // nu blocam; membrul ramane salvat cu emoticon sau cu urlInput daca exista
-      }
-    }
 
-    cancelTeamMember();
-  } catch (e) {
-    alert('Eroare la salvare membru: ' + (e?.message || e));
-    console.warn(e);
-  }
+        cancelTeamMember();
+    } catch (e) {
+        alert('Eroare la salvare membru: ' + (e?.message || e));
+        console.warn(e);
+    }
 }
 
 window.deleteTeamMember = async function deleteTeamMember(memberId){
-  try {
-    if (!db || !auth?.currentUser) return;
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) return;
-    if (!confirm('Stergi acest membru?')) return;
+    try {
+        if (!db || !auth?.currentUser) return;
+        const isAdmin = await computeIsAdmin(auth.currentUser);
+        if (!isAdmin) return;
+        if (!confirm('Stergi acest membru?')) return;
 
-    const target = (__teamMembers || []).find(m => m.id === memberId);
-    __teamMembers = (__teamMembers || []).filter(m => m.id !== memberId);
-    renderTeamList();
-    await saveTeamToFirestore();
+        const target = (__teamMembers || []).find(m => m.id === memberId);
+        __teamMembers = (__teamMembers || []).filter(m => m.id !== memberId);
+        renderTeamList();
+        await saveTeamToFirestore();
 
-    if (target?.photoPath && storage) {
-      storage.ref().child(target.photoPath).delete().catch(()=>{});
+        if (target?.photoPath && storage) {
+            storage.ref().child(target.photoPath).delete().catch(()=>{});
+        }
+    } catch(e) {
+        console.warn(e);
     }
-  } catch(e) {
-    console.warn(e);
-  }
 }
 
 window.clearAllTeamMembers = async function clearAllTeamMembers(){
-  try {
-    if (!db || !auth?.currentUser) return;
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) return;
-    if (!confirm('Stergi TOTI membrii echipei?')) return;
+    try {
+        if (!db || !auth?.currentUser) return;
+        const isAdmin = await computeIsAdmin(auth.currentUser);
+        if (!isAdmin) return;
+        if (!confirm('Stergi TOTI membrii echipei?')) return;
 
-    const toDelete = (__teamMembers || []).slice();
-    __teamMembers = [];
-    renderTeamList();
-    await saveTeamToFirestore();
+        const toDelete = (__teamMembers || []).slice();
+        __teamMembers = [];
+        renderTeamList();
+        await saveTeamToFirestore();
 
-    if (storage) {
-      for (const m of toDelete) {
-        if (m?.photoPath) {
-          storage.ref().child(m.photoPath).delete().catch(()=>{});
+        if (storage) {
+            for (const m of toDelete) {
+                if (m?.photoPath) {
+                    storage.ref().child(m.photoPath).delete().catch(()=>{});
+                }
+            }
         }
-      }
+    } catch(e) {
+        console.warn(e);
     }
-  } catch(e) {
-    console.warn(e);
-  }
 }
 
 function renderTeamList(){
-  const host = document.getElementById('teamList');
-  if (!host) return;
-  const isAdmin = !!window.__SBYT_ADMIN;
+    const host = document.getElementById('teamList');
+    if (!host) return;
+    const isAdmin = !!window.__SBYT_ADMIN;
 
-  const members = Array.isArray(__teamMembers) ? __teamMembers : [];
+    const members = Array.isArray(__teamMembers) ? __teamMembers : [];
 
-  if (members.length === 0) {
-    host.innerHTML = `<div style="opacity:.75; padding:12px;">Nu exista membri adaugati inca.</div>`;
-    return;
-  }
+    if (members.length === 0) {
+        host.innerHTML = `<div style="opacity:.75; padding:12px;">Nu exista membri adaugati inca.</div>`;
+        return;
+    }
 
-  host.innerHTML = members.map(m => {
-    const avatar = m.photoUrl
-      ? `<div class="team-avatar"><img src="${m.photoUrl}" alt="${(m.name||'').replace(/"/g,'&quot;')}"></div>`
-      : `<div class="team-avatar"><span class="team-emoji">${m.face || '👨‍💼'}</span></div>`;
+    host.innerHTML = members.map(m => {
+        const avatar = m.photoUrl
+            ? `<div class="team-avatar"><img src="${m.photoUrl}" alt="${(m.name||'').replace(/"/g,'&quot;')}"></div>`
+            : `<div class="team-avatar"><span class="team-emoji">${m.face || '👨‍💼'}</span></div>`;
 
-    const since = m.memberSince ? `Membru din: <strong>${m.memberSince}</strong>` : '';
+        const since = m.memberSince ? `Membru din: <strong>${m.memberSince}</strong>` : '';
 
-    const delBtn = isAdmin
-      ? `<div class="team-actions"><button class="news-btn" type="button" onclick="deleteTeamMember('${m.id}')">🗑️ Sterge</button></div>`
-      : '';
+        const delBtn = isAdmin
+            ? `<div class="team-actions"><button class="news-btn" type="button" onclick="deleteTeamMember('${m.id}')">🗑️ Sterge</button></div>`
+            : '';
 
-    return `
-      <div class="info-card team-member-card" style="text-align:left;">
-        ${avatar}
-        <div class="team-meta">
-          <h4>${(m.name||'').replace(/</g,'&lt;')}</h4>
-          <div class="team-role"><strong>${(m.role||'').replace(/</g,'&lt;')}</strong></div>
-          <div class="team-since">${since}</div>
-          ${delBtn}
-        </div>
-      </div>
-    `;
-  }).join('');
+        return `
+            <div class="info-card team-member-card" style="text-align:left;">
+                ${avatar}
+                <div class="team-meta">
+                    <h4>${(m.name||'').replace(/</g,'&lt;')}</h4>
+                    <div class="team-role"><strong>${(m.role||'').replace(/</g,'&lt;')}</strong></div>
+                    <div class="team-since">${since}</div>
+                    ${delBtn}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function initTeamLive(){
-  if (!db) return;
-  try {
-    if (__teamUnsub) { __teamUnsub(); __teamUnsub = null; }
-    const ref = db.collection(TEAM_STATS_DOC.col).doc(TEAM_STATS_DOC.doc);
-    __teamUnsub = ref.onSnapshot((doc) => {
-      if (!doc.exists) {
-        __teamMembers = [];
-        renderTeamList();
-        return;
-      }
-      const data = doc.data() || {};
-      const members = Array.isArray(data.members) ? data.members : [];
-      // sort: newest first
-      members.sort((a,b) => (b?.createdAt||0) - (a?.createdAt||0));
-      __teamMembers = members;
-      renderTeamList();
-    }, (err) => {
-      console.warn('team snapshot error', err);
-      renderTeamList();
-    });
-  } catch(e){
-    console.warn(e);
-  }
+    if (!db) return;
+    try {
+        if (__teamUnsub) { __teamUnsub(); __teamUnsub = null; }
+        const ref = db.collection(TEAM_STATS_DOC.col).doc(TEAM_STATS_DOC.doc);
+        __teamUnsub = ref.onSnapshot((doc) => {
+            if (!doc.exists) {
+                __teamMembers = [];
+                renderTeamList();
+                return;
+            }
+            const data = doc.data() || {};
+            const members = Array.isArray(data.members) ? data.members : [];
+            members.sort((a,b) => (b?.createdAt||0) - (a?.createdAt||0));
+            __teamMembers = members;
+            renderTeamList();
+        }, (err) => {
+            console.warn('team snapshot error', err);
+            renderTeamList();
+        });
+    } catch(e){
+        console.warn(e);
+    }
 }
-
-
 
 /* ============================================================
    FOUNDER PHOTO (Admin) - persistenta Firebase (fara Storage)
@@ -2720,160 +2728,152 @@ const FOUNDER_DOC = { col: 'news', id: 'founder' };
 let __founderUnsub = null;
 
 function applyFounderPhoto(photoUrl){
-  const img = document.getElementById('founderPhoto');
-  const emoji = document.getElementById('founderEmoji');
-  if (!img || !emoji) return;
-  const url = (photoUrl || '').trim();
-  if (url){
-    img.src = url;
-    img.style.display = 'block';
-    emoji.style.display = 'none';
-  } else {
-    img.removeAttribute('src');
-    img.style.display = 'none';
-    emoji.style.display = 'inline-block';
-  }
+    const img = document.getElementById('founderPhoto');
+    const emoji = document.getElementById('founderEmoji');
+    if (!img || !emoji) return;
+    const url = (photoUrl || '').trim();
+    if (url){
+        img.src = url;
+        img.style.display = 'block';
+        emoji.style.display = 'none';
+    } else {
+        img.removeAttribute('src');
+        img.style.display = 'none';
+        emoji.style.display = 'inline-block';
+    }
 }
 
 function setFounderAdminUI(isAdmin){
-  const box = document.getElementById('founderAdminControls');
-  if (box) box.style.display = isAdmin ? 'block' : 'none';
+    const box = document.getElementById('founderAdminControls');
+    if (box) box.style.display = isAdmin ? 'block' : 'none';
 }
 
 function setFounderMsg(ok, text){
-  const el = document.getElementById('founderPhotoMsg');
-  if (!el) return;
-  el.style.color = ok ? '#00ff88' : '#ff4d4d';
-  el.textContent = text || '';
+    const el = document.getElementById('founderPhotoMsg');
+    if (!el) return;
+    el.style.color = ok ? '#00ff88' : '#ff4d4d';
+    el.textContent = text || '';
 }
 
 function initFounderLive(){
-  if (!db) return;
-  if (__founderUnsub) { try{ __founderUnsub(); }catch(e){} }
-  __founderUnsub = db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).onSnapshot((doc)=>{
-    const data = (doc && doc.exists) ? (doc.data() || {}) : {};
-    applyFounderPhoto(data.photoUrl || '');
-  }, (err)=>{
-    console.warn('Founder photo read error:', err);
-  });
+    if (!db) return;
+    if (__founderUnsub) { try{ __founderUnsub(); }catch(e){} }
+    __founderUnsub = db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).onSnapshot((doc)=>{
+        const data = (doc && doc.exists) ? (doc.data() || {}) : {};
+        applyFounderPhoto(data.photoUrl || '');
+    }, (err)=>{
+        console.warn('Founder photo read error:', err);
+    });
 }
 
-// Proceseaza un fisier imagine din device in dataURL mic (thumbnail)
-// Functioneaza fara Firebase Storage (evita CORS/AppCheck).
 async function founderFileToDataUrl(file, maxSize = 220, quality = 0.82){
-  if (!file) return null;
-  const type = (file.type || '').toLowerCase();
-  // Browser-ul nu decodeaza unele formate (ex: HEIC). In acest caz, incercam fallback.
-  const readAsDataURL = (f) => new Promise((resolve, reject)=>{
-    const r = new FileReader();
-    r.onload = () => resolve(String(r.result || ''));
-    r.onerror = () => reject(r.error || new Error('FileReader error'));
-    r.readAsDataURL(f);
-  });
-
-  // 1) incercam ruta "corecta": Image + canvas resize
-  try{
-    const src = await readAsDataURL(file);
-    const img = await new Promise((resolve, reject)=>{
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error('Image decode failed'));
-      i.src = src;
+    if (!file) return null;
+    const type = (file.type || '').toLowerCase();
+    const readAsDataURL = (f) => new Promise((resolve, reject)=>{
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result || ''));
+        r.onerror = () => reject(r.error || new Error('FileReader error'));
+        r.readAsDataURL(f);
     });
 
-    const w = img.naturalWidth || img.width;
-    const h = img.naturalHeight || img.height;
-    if (!w || !h) throw new Error('Invalid image size');
-
-    const scale = Math.min(1, maxSize / Math.max(w, h));
-    const tw = Math.max(1, Math.round(w * scale));
-    const th = Math.max(1, Math.round(h * scale));
-    const canvas = document.createElement('canvas');
-    canvas.width = tw;
-    canvas.height = th;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Canvas not supported');
-    ctx.drawImage(img, 0, 0, tw, th);
-
-    // Preferam webp daca e suportat, altfel jpeg.
-    let out = '';
     try{
-      out = canvas.toDataURL('image/webp', quality);
-      if (!out || !out.startsWith('data:image/webp')) throw new Error('webp not ok');
-    } catch(e){
-      out = canvas.toDataURL('image/jpeg', quality);
+        const src = await readAsDataURL(file);
+        const img = await new Promise((resolve, reject)=>{
+            const i = new Image();
+            i.onload = () => resolve(i);
+            i.onerror = () => reject(new Error('Image decode failed'));
+            i.src = src;
+        });
+
+        const w = img.naturalWidth || img.width;
+        const h = img.naturalHeight || img.height;
+        if (!w || !h) throw new Error('Invalid image size');
+
+        const scale = Math.min(1, maxSize / Math.max(w, h));
+        const tw = Math.max(1, Math.round(w * scale));
+        const th = Math.max(1, Math.round(h * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = tw;
+        canvas.height = th;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas not supported');
+        ctx.drawImage(img, 0, 0, tw, th);
+
+        let out = '';
+        try{
+            out = canvas.toDataURL('image/webp', quality);
+            if (!out || !out.startsWith('data:image/webp')) throw new Error('webp not ok');
+        } catch(e){
+            out = canvas.toDataURL('image/jpeg', quality);
+        }
+        return out;
+    }catch(e){
+        try{
+            const src = await readAsDataURL(file);
+            if (src.length > 650000) {
+                throw new Error('Image too large for inline storage');
+            }
+            return src;
+        }catch(_){
+            throw new Error(type.includes('heic') || type.includes('heif')
+                ? 'Format HEIC/HEIF neacceptat in browser. Converteste poza in JPG/PNG.'
+                : 'Nu s-a putut procesa imaginea. Incearca JPG/PNG mai mic.');
+        }
     }
-    return out;
-  }catch(e){
-    // 2) fallback: salvam dataURL original (doar daca nu e prea mare)
-    try{
-      const src = await readAsDataURL(file);
-      // Limitam ca sa nu depasim limita de 1MB / document Firestore
-      if (src.length > 650000) { // ~650KB string (safe margin)
-        throw new Error('Image too large for inline storage');
-      }
-      return src;
-    }catch(_){
-      // mesaj prietenos pt HEIC/imagini foarte mari
-      throw new Error(type.includes('heic') || type.includes('heif')
-        ? 'Format HEIC/HEIF neacceptat in browser. Converteste poza in JPG/PNG.'
-        : 'Nu s-a putut procesa imaginea. Incearca JPG/PNG mai mic.');
-    }
-  }
 }
 
 window.saveFounderPhoto = async function saveFounderPhoto(){
-  try{
-    if (!db || !auth?.currentUser) { setFounderMsg(false, 'Trebuie sa fii autentificat ca admin.'); return; }
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) { setFounderMsg(false, 'Nu ai drepturi admin.'); return; }
-
-    const input = document.getElementById('founderPhotoFile');
-    const file = input?.files?.[0];
-    if (!file) { setFounderMsg(false, 'Alege o imagine.'); return; }
-
-    setFounderMsg(true, 'Se proceseaza imaginea...');
-    let dataUrl = null;
     try{
-      dataUrl = await founderFileToDataUrl(file, 240, 0.84);
-    }catch(err){
-      setFounderMsg(false, err?.message || 'Nu s-a putut procesa imaginea.');
-      return;
+        if (!db || !auth?.currentUser) { setFounderMsg(false, 'Trebuie sa fii autentificat ca admin.'); return; }
+        const isAdmin = await computeIsAdmin(auth.currentUser);
+        if (!isAdmin) { setFounderMsg(false, 'Nu ai drepturi admin.'); return; }
+
+        const input = document.getElementById('founderPhotoFile');
+        const file = input?.files?.[0];
+        if (!file) { setFounderMsg(false, 'Alege o imagine.'); return; }
+
+        setFounderMsg(true, 'Se proceseaza imaginea...');
+        let dataUrl = null;
+        try{
+            dataUrl = await founderFileToDataUrl(file, 240, 0.84);
+        }catch(err){
+            setFounderMsg(false, err?.message || 'Nu s-a putut procesa imaginea.');
+            return;
+        }
+
+        await db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).set({
+            photoUrl: dataUrl,
+            photoPath: 'inline:dataurl',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }, { merge:true });
+
+        applyFounderPhoto(dataUrl);
+        setFounderMsg(true, 'Foto fondator salvata.');
+        try { if (input) input.value = ''; } catch(e){}
+    } catch(e){
+        console.warn('Founder photo save error:', e);
+        setFounderMsg(false, 'Eroare la salvare foto fondator.');
     }
-
-    await db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).set({
-      photoUrl: dataUrl,
-      photoPath: 'inline:dataurl',
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    }, { merge:true });
-
-    applyFounderPhoto(dataUrl);
-    setFounderMsg(true, 'Foto fondator salvata.');
-    try { if (input) input.value = ''; } catch(e){}
-  } catch(e){
-    console.warn('Founder photo save error:', e);
-    setFounderMsg(false, 'Eroare la salvare foto fondator.');
-  }
 };
 
 window.removeFounderPhoto = async function removeFounderPhoto(){
-  try{
-    if (!db || !auth?.currentUser) { setFounderMsg(false, 'Trebuie sa fii autentificat ca admin.'); return; }
-    const isAdmin = await computeIsAdmin(auth.currentUser);
-    if (!isAdmin) { setFounderMsg(false, 'Nu ai drepturi admin.'); return; }
+    try{
+        if (!db || !auth?.currentUser) { setFounderMsg(false, 'Trebuie sa fii autentificat ca admin.'); return; }
+        const isAdmin = await computeIsAdmin(auth.currentUser);
+        if (!isAdmin) { setFounderMsg(false, 'Nu ai drepturi admin.'); return; }
 
-    await db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).set({
-      photoUrl: firebase.firestore.FieldValue.delete(),
-      photoPath: firebase.firestore.FieldValue.delete(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    }, { merge:true });
+        await db.collection(FOUNDER_DOC.col).doc(FOUNDER_DOC.id).set({
+            photoUrl: firebase.firestore.FieldValue.delete(),
+            photoPath: firebase.firestore.FieldValue.delete(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }, { merge:true });
 
-    applyFounderPhoto('');
-    setFounderMsg(true, 'Foto fondator stearsa.');
-  } catch(e){
-    console.warn('Founder photo remove error:', e);
-    setFounderMsg(false, 'Eroare la stergere foto fondator.');
-  }
+        applyFounderPhoto('');
+        setFounderMsg(true, 'Foto fondator stearsa.');
+    } catch(e){
+        console.warn('Founder photo remove error:', e);
+        setFounderMsg(false, 'Eroare la stergere foto fondator.');
+    }
 };
 
 </script>
