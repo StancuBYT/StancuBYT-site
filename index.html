@@ -1316,7 +1316,7 @@
 <p id="mainTotalSupply" style="font-size: 2rem; font-weight: bold; color: var(--green-growth);">
 <span id="supplyValue">Loading...</span> SBYT
                     </p>
-<small style="color: #888;">Live data from Etherscan</small>
+<small style="color: #888; display: block; margin-top: 5px;" id="supplyUpdateTime">Live data updating...</small>
 </div>
 <div class="info-card neon-glow">
 <h3>🏆 Founder</h3>
@@ -1476,23 +1476,7 @@ if (typeof particlesJS !== 'undefined') {
 const CONTRACT_ADDRESS = '0x44Cf220399be798baeaE45fd7C4fF44623713833';
 const ETHERSCAN_PROXY = 'https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/etherscanProxy';
 const SBYT_PRICE_ENDPOINT = "https://europe-west1-stancubyt-fc2b9.cloudfunctions.net/sbytPrice";
-
-async function etherscanProxyRequest(module, action, params = {}) {
-  const u = new URL(ETHERSCAN_PROXY);
-  u.searchParams.set('module', module);
-  u.searchParams.set('action', action);
-  for (const [k,v] of Object.entries(params)) {
-    if (v === undefined || v === null || v === '') continue;
-    u.searchParams.set(k, String(v));
-  }
-  const r = await fetch(u.toString());
-  const j = await r.json().catch(() => null);
-  if (!j) throw new Error('Etherscan proxy: invalid JSON');
-  if (j.status && j.status !== '1') {
-    throw new Error((j.result && typeof j.result === 'string' ? j.result : j.message) || 'Etherscan proxy failed');
-  }
-  return j;
-}
+const TOTALSUPPLY_ENDPOINT = "https://sbyttotalsupplyfree-jfka2frgwa-uc.a.run.app";
 
 // =============================================
 // UTILITIES
@@ -1773,19 +1757,31 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =============================================
-// TOKEN DATA FUNCTIONS
+// TOKEN DATA FUNCTIONS - UPDATED TO MATCH EXAMPLE CODE
 // =============================================
 async function updateTotalSupplyReal() {
-  const el = $("supplyValue") || $("mainTotalSupply");
+  const el = $("supplyValue");
+  const updateEl = $("supplyUpdateTime");
+  if (!el) return;
+  
+  el.textContent = "…";
+  if (updateEl) updateEl.textContent = "Updating...";
+  
   try {
-    const j = await etherscanProxyRequest('stats','tokensupply',{ contractaddress: CONTRACT_ADDRESS });
-    const weiStr = j.result;
-    const wei = Number(weiStr);
-    const tokens = wei / Math.pow(10, 18);
-    if (el) el.textContent = tokens.toLocaleString('en-US', { maximumFractionDigits: 0 });
-  } catch (e) {
-    console.warn("Supply API failed:", e);
-    if (el) el.textContent = "Error loading";
+    const r = await fetch(TOTALSUPPLY_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
+    const d = await r.json();
+    const supplyNum = parseFloat(String(d?.supply ?? ""));
+    
+    if (d?.ok && Number.isFinite(supplyNum)) {
+      el.textContent = supplyNum.toLocaleString("en-US", { maximumFractionDigits: 0 });
+      if (updateEl) updateEl.textContent = "Updated: " + new Date().toLocaleTimeString("en-US", {hour:"2-digit", minute:"2-digit"});
+    } else {
+      el.textContent = "—";
+      if (updateEl) updateEl.textContent = "Error loading data";
+    }
+  } catch {
+    el.textContent = "—";
+    if (updateEl) updateEl.textContent = "Connection error";
   }
 }
 
@@ -1818,6 +1814,9 @@ window.addEventListener('load', () => {
   // Auto-refresh price every 30 seconds
   setInterval(updateSBYTPrice, 30000);
   
+  // Auto-refresh total supply every 5 minutes (like in example)
+  setInterval(updateTotalSupplyReal, 300000);
+  
   // Simple section navigation
   window.showSection = function(sectionId) {
     const sections = document.querySelectorAll('.page-section');
@@ -1826,6 +1825,18 @@ window.addEventListener('load', () => {
     if (target) target.classList.add('active-section');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+  
+  // Add refresh button functionality for total supply
+  const refreshSupply = function() {
+    const el = $("supplyValue");
+    const updateEl = $("supplyUpdateTime");
+    if (el) el.textContent = "Refreshing...";
+    if (updateEl) updateEl.textContent = "Refreshing...";
+    updateTotalSupplyReal();
+  };
+  
+  // Make refresh function available globally
+  window.refreshSupplyData = refreshSupply;
 });
 
 // Emoji quick picker
