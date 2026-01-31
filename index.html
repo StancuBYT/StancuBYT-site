@@ -1298,6 +1298,22 @@
                         </td>
                     </tr>
                     <tr>
+                        <td><strong>Cod sursă & audit (GitHub)</strong></td>
+                        <td>
+                            <a href="https://github.com/StancuBYT/StancuBYT-Contract" target="_blank" style="color: var(--neon-cyan); text-decoration: none; font-family: monospace;">
+                                https://github.com/StancuBYT/StancuBYT-Contract
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Raport audit (Audit.md)</strong></td>
+                        <td>
+                            <a href="https://github.com/StancuBYT/StancuBYT-Contract/blob/main/Audit.md" target="_blank" style="color: var(--neon-cyan); text-decoration: none; font-family: monospace;">
+                                https://github.com/StancuBYT/StancuBYT-Contract/blob/main/Audit.md
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
                         <td><strong>Website oficial</strong></td>
                         <td>
                             <a href="https://stancubyt.com/" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
@@ -1519,6 +1535,12 @@
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <input id="founderPhotoFile" type="file" accept="image/*" style="max-width: 320px;" />
                         <button class="news-btn" type="button" onclick="saveFounderPhoto()">💾 Salveaza foto</button>
+                <button onclick="window.open('https://github.com/StancuBYT/StancuBYT-Contract', '_blank')" class="download-btn">
+                    <span>🛡️</span> Cod sursă & Audit (GitHub)
+                </button>
+                <button onclick="window.open('https://github.com/StancuBYT/StancuBYT-Contract/blob/main/Audit.md', '_blank')" class="download-btn">
+                    <span>📄</span> Raport Audit (Audit.md)
+                </button>
                         <button class="news-btn" type="button" onclick="removeFounderPhoto()">🗑️ Sterge foto</button>
                     </div>
                 </div>
@@ -1622,13 +1644,53 @@
                         <div>
                             <strong>Audit Smart‑Contract</strong>
                             <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Recomandat pentru credibilitate și securitate suplimentară înainte de listare.</p>
+                            <p style="margin-top: 0.6rem; font-size: 0.9rem; opacity: 0.9;">
+                                Linkuri: <a href="https://etherscan.io/token/0x44Cf220399be798baeaE45fd7C4fF44623713833" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Etherscan</a> ·
+                                <a href="https://github.com/StancuBYT/StancuBYT-Contract" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">GitHub</a> ·
+                                <a href="https://github.com/StancuBYT/StancuBYT-Contract/blob/main/Audit.md" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">Audit.md</a>
+                            </p>
                         </div>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(0, 255, 136, 0.05); border-radius: 10px;">
                         <span style="font-size: 1.5rem;">📊</span>
                         <div>
                             <strong>Transparență Distribuție</strong>
-                            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.</p>
+                            
+    <div id="distributionPublic">
+        <p id="distSummary" style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.88;">
+            Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.
+        </p>
+        <ul id="distBullets" style="margin: 0.7rem 0 0 1.2rem; font-size: 0.9rem; opacity: 0.86; line-height: 1.5;">
+            <li>Wallet-uri publice pentru: echipă, marketing, rezervă, presale.</li>
+            <li>Plan de vesting: perioadă, cliff, eliberare treptată (ex: lunar).</li>
+            <li>Dovezi: linkuri către adrese pe Etherscan + lock/vesting dacă există.</li>
+        </ul>
+        <p id="distUpdated" style="margin-top: 0.6rem; font-size: 0.82rem; opacity: 0.7;"></p>
+    </div>
+
+    <!-- Admin edit (doar după logare) -->
+    <div id="distAdminControls" style="display:none; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.14);">
+        <p style="margin:0 0 0.7rem 0; font-size:0.85rem; opacity:0.85;">
+            ✍️ Editează conținutul “Transparență Distribuție” (salvare în Firestore).
+        </p>
+
+        <label style="display:block; font-size:0.85rem; opacity:0.85; margin-bottom:6px;">Text principal</label>
+        <textarea id="distSummaryInput" class="team-file-input" style="width:100%; min-height: 84px; resize: vertical;" placeholder="Ex: Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori."></textarea>
+
+        <label style="display:block; font-size:0.85rem; opacity:0.85; margin: 10px 0 6px;">Bullets (o linie = un punct)</label>
+        <textarea id="distBulletsInput" class="team-file-input" style="width:100%; min-height: 110px; resize: vertical;" placeholder="Ex:
+Wallet echipă: 0x...
+Vesting: 12 luni, eliberare lunară
+LP Lock: link..."></textarea>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+            <button type="button" class="news-btn" onclick="saveDistributionTransparency()">💾 Salvează</button>
+            <button type="button" class="news-btn" onclick="resetDistributionDraft()">↩️ Reset</button>
+        </div>
+
+        <div id="distMsg" style="margin-top: 10px; font-size:0.85rem; opacity:0.85;"></div>
+    </div>
+
                         </div>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(138, 43, 226, 0.05); border-radius: 10px;">
@@ -1759,6 +1821,158 @@ const storage = (typeof firebase !== 'undefined' && firebase.storage) ? firebase
 window.__SBYT_ADMIN = false;
 const ADMIN_EMAILS = ["stancubyt@gmail.com"]; // ai zis ca acesta e admin
 
+/* ============================================================
+   DISTRIBUTION TRANSPARENCY (Firestore editable)
+   - Afisare publica: oricine vede
+   - Editare: doar admin (dupa logare)
+   - Salvare in Firestore: news/distribution_transparency
+   ============================================================ */
+const DISTRO_STATS_DOC = { col: 'news', doc: 'distribution_transparency' };
+let __distUnsub = null;
+let __distHydrating = false;
+let __distData = {
+  summary: 'Distribuția și vesting‑ul trebuie să fie clare și transparente pentru investitori.',
+  bullets: [
+    'Wallet-uri publice pentru: echipă, marketing, rezervă, presale.',
+    'Plan de vesting: perioadă, cliff, eliberare treptată (ex: lunar).',
+    'Dovezi: linkuri către adrese pe Etherscan + lock/vesting dacă există.'
+  ],
+  updatedAt: null,
+  updatedBy: null
+};
+
+function fmtFirestoreDate(ts){
+  if (!ts) return '';
+  try {
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString('ro-RO');
+  } catch(e) { return ''; }
+}
+
+function sanitizeLinesToBullets(text){
+  return String(text || '')
+    .split('\n')
+    .map(x => x.trim())
+    .filter(x => x.length > 0)
+    .slice(0, 12); // suficient pentru UI
+}
+
+function applyDistributionToUI(data){
+  const summaryEl = document.getElementById('distSummary');
+  const bulletsEl = document.getElementById('distBullets');
+  const updatedEl = document.getElementById('distUpdated');
+
+  const summary = (data && data.summary) ? String(data.summary) : __distData.summary;
+  const bullets = (data && Array.isArray(data.bullets) && data.bullets.length) ? data.bullets : __distData.bullets;
+
+  if (summaryEl) summaryEl.textContent = summary;
+
+  if (bulletsEl) {
+    bulletsEl.innerHTML = '';
+    bullets.forEach((b) => {
+      const li = document.createElement('li');
+      li.textContent = String(b);
+      bulletsEl.appendChild(li);
+    });
+  }
+
+  if (updatedEl) {
+    const when = fmtFirestoreDate(data?.updatedAt);
+    const by = data?.updatedBy ? String(data.updatedBy) : '';
+    updatedEl.textContent = (when || by) ? `Ultima actualizare: ${when}${by ? ' • ' + by : ''}` : '';
+  }
+
+  // daca admin e activ, actualizam draftul (fara sa deranjam editarea curenta)
+  if (window.__SBYT_ADMIN) {
+    const sIn = document.getElementById('distSummaryInput');
+    const bIn = document.getElementById('distBulletsInput');
+    if (__distHydrating) {
+      if (sIn) sIn.value = summary;
+      if (bIn) bIn.value = bullets.join('\n');
+    }
+  }
+}
+
+function setDistributionAdminUI(isAdmin){
+  const box = document.getElementById('distAdminControls');
+  if (box) box.style.display = isAdmin ? 'block' : 'none';
+
+  if (!isAdmin) return;
+
+  // hydrate inputs with current data
+  __distHydrating = true;
+  try { applyDistributionToUI(__distData); } catch(e) {}
+  __distHydrating = false;
+}
+
+function resetDistributionDraft(){
+  if (!window.__SBYT_ADMIN) return;
+  const sIn = document.getElementById('distSummaryInput');
+  const bIn = document.getElementById('distBulletsInput');
+  if (sIn) sIn.value = __distData.summary || '';
+  if (bIn) bIn.value = (Array.isArray(__distData.bullets) ? __distData.bullets : []).join('\n');
+  const msg = document.getElementById('distMsg');
+  if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Draft resetat la varianta publicată.'; }
+}
+
+async function saveDistributionTransparency(){
+  const msg = document.getElementById('distMsg');
+  try{
+    if (!window.__SBYT_ADMIN) {
+      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Nu ai drepturi admin.'; }
+      return;
+    }
+    if (!db) {
+      if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Firestore nu este disponibil.'; }
+      return;
+    }
+
+    const sIn = document.getElementById('distSummaryInput');
+    const bIn = document.getElementById('distBulletsInput');
+
+    const summary = (sIn?.value || '').trim() || __distData.summary;
+    const bullets = sanitizeLinesToBullets(bIn?.value || '') || __distData.bullets;
+
+    const payload = {
+      summary,
+      bullets,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: auth?.currentUser?.email ? String(auth.currentUser.email) : 'admin'
+    };
+
+    await db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).set(payload, { merge: true });
+
+    if (msg) { msg.style.color = '#00ff9c'; msg.textContent = 'Salvat ✅ (Transparență Distribuție)'; }
+  } catch(e){
+    if (msg) { msg.style.color = '#ff4d4d'; msg.textContent = 'Eroare salvare: ' + (e?.message || e); }
+  }
+}
+
+function initDistributionLive(){
+  if (!db) return;
+  if (__distUnsub) { try{ __distUnsub(); } catch(e){} __distUnsub = null; }
+
+  __distUnsub = db.collection(DISTRO_STATS_DOC.col).doc(DISTRO_STATS_DOC.doc).onSnapshot((snap) => {
+    const data = snap.exists ? snap.data() : null;
+    __distData = {
+      summary: data?.summary || __distData.summary,
+      bullets: Array.isArray(data?.bullets) && data.bullets.length ? data.bullets : __distData.bullets,
+      updatedAt: data?.updatedAt || null,
+      updatedBy: data?.updatedBy || null
+    };
+
+    __distHydrating = true;
+    applyDistributionToUI(__distData);
+    __distHydrating = false;
+  }, (err) => {
+    // fallback: still show defaults
+    try { applyDistributionToUI(__distData); } catch(e) {}
+  });
+
+  // initial render even before snapshot returns
+  try { applyDistributionToUI(__distData); } catch(e) {}
+}
+
 function maskEmail(email) {
   if (!email || typeof email !== 'string') return '';
   const parts = email.split('@');
@@ -1804,6 +2018,7 @@ function setAdminUI(isAdmin, user) {
   try { setFounderAdminUI(isAdmin); } catch(e) {}
   // activeaza/dezactiveaza controalele membri echipa
   try { setTeamAdminMode(isAdmin); } catch(e) {}
+  try { setDistributionAdminUI(isAdmin); } catch(e) {}
 }
 
 window.adminSignIn = async function adminSignIn(){
@@ -1847,6 +2062,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // init team from firestore (live)
   try { initTeamLive(); } catch(e) {}
+
+  // init distributie transparency (live)
+  try { initDistributionLive(); } catch(e) {}
 });
 
 /* ============================================================
