@@ -259,6 +259,43 @@
             50% { filter: hue-rotate(45deg); }
         }
 
+        /* Social Grid and Cards - From first code */
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .social-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .social-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
+            border-color: var(--blue-tech);
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
         /* Whitepaper Specific Styles */
         .whitepaper-header {
             text-align: center;
@@ -550,6 +587,10 @@
             .whitepaper-table td {
                 padding: 0.5rem;
             }
+
+            .social-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
         }
 
         @media (max-width: 480px) {
@@ -560,6 +601,10 @@
             .whitepaper-logo {
                 width: 80px;
                 height: 80px;
+            }
+
+            .social-grid {
+                grid-template-columns: 1fr;
             }
         }
 
