@@ -626,7 +626,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1.8rem;
+            font-size: 2rem;
             background: linear-gradient(45deg, var(--green-growth), var(--neon-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -664,6 +664,11 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* +60% vertical height for ALL announcement cards (HOME only) */
+       .news-card{
+              min-height: 480px;
+          }
+
 
         .news-card {
             background: rgba(255, 255, 255, 0.05);
@@ -694,7 +699,7 @@
         }
         .news-type{
             font-weight:700;
-            font-size:0.85rem;
+            font-size:1rem;
             padding:6px 10px;
             border-radius:999px;
             letter-spacing:0.2px;
@@ -703,7 +708,7 @@
             background: rgba(255,255,255,0.06);
         }
         .news-date{
-            font-size:0.85rem;
+            font-size:1rem;
             opacity:0.85;
             white-space:nowrap;
         }
@@ -723,7 +728,7 @@
             display: inline-block;
             padding: 0.3rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 1rem;
             font-weight: bold;
             margin-bottom: 1rem;
         }
@@ -9114,6 +9119,12 @@ function initDistributionLive(){
   height:34px;
   border-radius:50%;
   box-shadow:0 0 12px rgba(0,255,136,.35);
+}
+/* 🔼 Increase announcement cards height by ~60% (vertical only) */
+.news-card{
+  padding-top: calc(1.5rem * 1.6);
+  padding-bottom: calc(1.5rem * 1.6);
+  min-height: 260px; /* ajustare verticală controlată */
 }
 
 </style>
